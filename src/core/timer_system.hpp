@@ -29,7 +29,7 @@ struct Timer {
 
 class TimerSystem {
 public:
-	void OnChangeLevel();
+	void OnMapEnd();
 	void OnGameFrame(bool simulating);
 
 	void RunFrame();
