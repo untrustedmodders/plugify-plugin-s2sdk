@@ -40,6 +40,8 @@ double TimerSystem::CalculateNextThink(double lastThinkTime, double delay) {
 }
 
 void TimerSystem::RunFrame() {
+	std::lock_guard<std::mutex> lock(m_createTimerLock);
+
 	while (!m_timers.empty()) {
 		auto it = m_timers.begin();
 
