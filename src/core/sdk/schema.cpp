@@ -33,18 +33,18 @@ using SchemaTableMap = std::unordered_map<uint32_t, SchemaKeyValueMap>;
 static constexpr uint32_t g_ChainKey = hash_32_fnv1a_const("__m_pChainEntity");
 
 void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 nNetworkStateChangedOffset) {
-	NetworkStateChangedData data(nOffset);
+	NetworkStateChanged_t data(nOffset);
 	CALL_VIRTUAL(void, nNetworkStateChangedOffset, (void*)pNetworkVar, &data);
 }
 
 void EntityNetworkStateChanged(uintptr_t pEntity, uint nOffset) {
-	NetworkStateChangedData data(nOffset);
-	reinterpret_cast<CEntityInstance*>(pEntity)->NetworkStateChanged(NetworkStateChangedData(nOffset));
+	NetworkStateChanged_t data(nOffset);
+	reinterpret_cast<CEntityInstance*>(pEntity)->NetworkStateChanged(data);
 }
 
 void ChainNetworkStateChanged(uintptr_t pNetworkVarChainer, uint nLocalOffset) {
 	if (CEntityInstance* pEntity = reinterpret_cast<CNetworkVarChainer*>(pNetworkVarChainer)->GetObject()) {
-		pEntity->NetworkStateChanged(NetworkStateChangedData(nLocalOffset, -1, reinterpret_cast<CNetworkVarChainer*>(pNetworkVarChainer)->m_PathIndex));
+		pEntity->NetworkStateChanged(NetworkStateChanged_t(nLocalOffset, -1, reinterpret_cast<CNetworkVarChainer*>(pNetworkVarChainer)->m_PathIndex));
 	}
 }
 
@@ -139,7 +139,8 @@ namespace schema {
 		CNetworkVarChainer* chainEnt = reinterpret_cast<CNetworkVarChainer*>(chainEntity);
 		CEntityInstance* pEntity = chainEnt->GetObject();
 		if (pEntity && !(pEntity->m_pEntity->m_flags & EF_IS_CONSTRUCTION_IN_PROGRESS)) {
-			pEntity->NetworkStateChanged(NetworkStateChangedData{localOffset, arrayIndex, chainEnt->m_PathIndex});
+			NetworkStateChanged_t data(localOffset, arrayIndex, chainEnt->m_PathIndex);
+			pEntity->NetworkStateChanged(data);
 		}
 	}
 

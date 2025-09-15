@@ -624,8 +624,12 @@ extern "C" PLUGIN_API void SetEntSchema2(CEntityInstance* entity, const plg::str
 	}
 
 	if (changeState) {
-		const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
-		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			S2_LOGF(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
 	}
 
 	const auto [elementType, elementSize] = schema::IsIntType(type);
@@ -774,8 +778,12 @@ extern "C" PLUGIN_API void SetEntSchemaFloat2(CEntityInstance* entity, const plg
 	}
 
 	if (changeState) {
-		const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
-		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			S2_LOGF(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
 	}
 
 	const auto [elementType, elementSize] = schema::IsFloatType(type);
@@ -901,8 +909,12 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 	}
 
 	if (changeState) {
-		const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
-		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			S2_LOGF(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
 	}
 
 	switch (schema::IsPlainType(type, sizeof(CUtlString))) {
@@ -1003,8 +1015,12 @@ extern "C" PLUGIN_API void SetEntSchemaVector3D2(CEntityInstance* entity, const 
 	}
 
 	if (changeState) {
-		const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
-		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			S2_LOGF(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
 	}
 
 	switch (schema::IsPlainType(type, sizeof(Vector))) {
@@ -1084,8 +1100,12 @@ extern "C" PLUGIN_API void SetEntSchemaVector2D2(CEntityInstance* entity, const 
 	}
 
 	if (changeState) {
-		const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
-		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			S2_LOGF(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
 	}
 
 	switch (schema::IsPlainType(type, sizeof(Vector2D))) {
@@ -1163,8 +1183,12 @@ extern "C" PLUGIN_API void SetEntSchemaVector4D2(CEntityInstance* entity, const 
 	}
 
 	if (changeState) {
-		const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
-		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			S2_LOGF(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
 	}
 
 	switch (schema::IsPlainType(type, sizeof(Vector4D))) {
@@ -1246,8 +1270,12 @@ extern "C" PLUGIN_API void SetEntSchemaEnt2(CEntityInstance* entity, const plg::
 	}
 
 	if (changeState) {
-		const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
-		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className.c_str(), hash_32_fnv1a_const(className.c_str()));
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			S2_LOGF(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
 	}
 
 	switch (schema::IsAtomicType(type, sizeof(CEntityHandle))) {
