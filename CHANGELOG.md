@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.5.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v1.4.2...v1.5.0) (2025-09-17)
+
+
+### Features
+
+* **User message:** add `UserMessageAddRecipient` & `UserMessageAddAllPlayers` methods ([d65c60a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d65c60a012b80878b9448d2a12175771a83dff4c))
+
+
+### Bug Fixes
+
+* **`UserMessage`:** update consturctor ([bf80308](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bf80308c1d744f3f7b38313044609eade2358564))
+* add `CCSPlayer_WeaponServices::Weapon_Equip` signature ([f420d1c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f420d1c8da83fad4d1893021b5f4ef626e3067ed))
+* add conda recipe ([30fb5d9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/30fb5d93d8d296440abc9170597092f2b16e9344))
+* add map end and server started ([9fb88c4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9fb88c46d9baafc0b41af60a323236d728eaae10))
+* add missing mutex to timer system ([ccf0b0c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ccf0b0c55850a42b71604eb3fe306bd84a6a156a))
+* add new virtual functions & update gamedata ([32a688f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/32a688f5618a55571dffdf53d915e6204875dbc2))
+* linux build ([9d8b715](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9d8b715552b20b9dd9680ecd634c058b7e40af4a))
+* linux related ([b27f660](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b27f660e2ef4450a70636ed2c76949f2d34c18ba))
+* more cleanup ([5c7bdd7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5c7bdd7a0a8ee747bbc9a5471f2ad0e858f05f10))
+* remove modules ([44e1179](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/44e11794ad40caec3fcbdefebd10589dc26f9080))
+* remove multi addons ([6b2c397](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6b2c397cba6f89562b676ebd1cbf5f1490bfc71f))
+* update `gamedata` & `external/sourcesdk` ([b1580a8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b1580a83c05eaa347f397e354b7efba30baf5ad2))
+* update clang format ([db71c4f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/db71c4f85aec5afe98e55cdf5ee34026730acf18))
+* update deps ([bf71e92](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bf71e9263824b87f6b29e3d1e348ebea16f59616))
+* update deps ([d978336](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d978336d03068c8a92c4f4fc27feb0c57922e281))
+* update deps ([acb4d81](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/acb4d819f946b36c200d7e885648dd04f4355d5f))
+* update schema ([082791b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/082791b8a497380250132ddc49b658433eeb9d80))
+* update schema ([d52d504](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d52d50411960ff2e51c23fec9431b07897854f2f))
+* update submodules and api ([c424816](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c424816765cb4ccd76b92bb2b3e4ec8f9a173f45))
+
 ## [1.4.2](https://github.com/untrustedmodders/plugify-source-2/compare/v1.4.1...v1.4.2) (2025-09-01)
 
 
