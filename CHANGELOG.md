@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v1.5.0...v1.5.1) (2025-09-17)
+
+
+### Bug Fixes
+
+* **Logger:** include `shared_mutex` header ([b1952af](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b1952af9f57d5c0bc9113119dcfeaa0f6c709fb3))
+
 ## [1.5.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v1.4.2...v1.5.0) (2025-09-17)
 
 
