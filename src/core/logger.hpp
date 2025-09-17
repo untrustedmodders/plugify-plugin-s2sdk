@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <string>
+#include <shared_mutex>
 
 #include <tier0/dbg.h>
 #include <tier0/logging.h>
