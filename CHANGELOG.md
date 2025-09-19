@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v1.5.1...v1.5.2) (2025-09-19)
+
+
+### Bug Fixes
+
+* add missing build macros without prefix ([c7b9b4e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c7b9b4e516099c546a1e29eff093ab353434de4a))
+* build ([94db942](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/94db942c254dbc9edcfecadec72cb501e9ccd066))
+
 ## [1.5.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v1.5.0...v1.5.1) (2025-09-17)
 
 
