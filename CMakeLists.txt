@@ -78,12 +78,14 @@ set(SOURCESDK_LINK_STEAMWORKS ON CACHE INTERNAL "")
 set(SOURCESDK_MALLOC_OVERRIDE ON CACHE INTERNAL "")
 set(SOURCESDK_CONFIGURE_EXPORT_MAP OFF CACHE INTERNAL "")
 
+set(SOURCESDK_GAME_TARGET "cs2" CACHE INTERNAL "Set game library name to start after")
 if(SOURCESDK_GAME_TARGET STREQUAL "deadlock")
     set(SOURCESDK_PROTOS gcsdk_gcmessages networkbasetypes network_connection CACHE INTERNAL "")
 endif()
 
 add_subdirectory(external/sourcesdk)
 
+set(S2SDK_GAME_NAME "csgo" CACHE INTERNAL "Set game name")
 set(S2SDK_COMPILE_DEFINITIONS
         S2SDK_LOGGING_PREFIX="${S2SDK_PACKAGE}"
         S2SDK_GAME_NAME="${S2SDK_GAME_NAME}"
