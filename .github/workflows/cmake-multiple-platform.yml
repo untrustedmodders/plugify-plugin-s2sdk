@@ -101,7 +101,7 @@ jobs:
       - name: Configure
         shell: bash -el {0}
         run: |
-          cmake -S . -B build -G "Ninja" -DCPPLM_VERSION="${{ needs.setup.outputs.tag_name }}"
+          cmake -S . -B build -G "Ninja" -DS2SDK_VERSION="${{ needs.setup.outputs.tag_name }}"
 
       - name: Build
         shell: bash -el {0}
