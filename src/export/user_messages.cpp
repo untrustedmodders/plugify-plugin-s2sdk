@@ -87,7 +87,9 @@ extern "C" PLUGIN_API void UserMessageSend(UserMessage* userMessage) {
 	S2_LOGF(LS_MESSAGE, "Serializable message: {}\n", (void *)userMessage->GetSerializableMessage());
 	S2_LOGF(LS_MESSAGE, "Net message: {}\n", (void *)userMessage->GetNetMessage());
 
-	g_pGameEventSystem->PostEventAbstract(-1, false, &userMessage->GetRecipientFilter(), userMessage->GetSerializableMessage(), userMessage->GetNetMessage(), 0);
+	//g_pGameEventSystem->PostEventAbstract(-1, false, &userMessage->GetRecipientFilter(), userMessage->GetSerializableMessage(), userMessage->GetNetMessage(), 0);
+	auto& slots = userMessage->GetRecipientFilter().GetRecipients();
+	userMessage->GetNetMessage()->Send(slots);
 }
 
 /**
