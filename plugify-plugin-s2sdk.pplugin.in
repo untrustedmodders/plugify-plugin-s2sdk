@@ -19,10 +19,10 @@
   ],
   "methods": [
     {
-      "name": "GetPlayerSlotFromEntityPointer",
+      "name": "EntPointerToPlayerSlot",
       "group": "Clients",
       "description": "Retrieves The player slot from a given entity pointer.",
-      "funcName": "GetPlayerSlotFromEntityPointer",
+      "funcName": "EntPointerToPlayerSlot",
       "paramTypes": [
         {
           "name": "entity",
@@ -37,10 +37,10 @@
       }
     },
     {
-      "name": "GetEntityPointerFromPlayerSlot",
+      "name": "PlayerSlotToEntPointer",
       "group": "Clients",
       "description": "Returns a pointer to the entity instance by player slot index.",
-      "funcName": "GetEntityPointerFromPlayerSlot",
+      "funcName": "PlayerSlotToEntPointer",
       "paramTypes": [
         {
           "name": "playerSlot",
@@ -55,10 +55,28 @@
       }
     },
     {
-      "name": "GetClientBaseFromPlayerSlot",
+      "name": "PlayerSlotToEntHandle",
+      "group": "Clients",
+      "description": "Returns the entity handle associated with a player slot index.",
+      "funcName": "PlayerSlotToEntHandle",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "Index of the player slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The index of the entity, or -1 if the handle is invalid."
+      }
+    },
+    {
+      "name": "PlayerSlotToClientPtr",
       "group": "Clients",
       "description": "Retrieves the client object from a given player slot.",
-      "funcName": "GetClientBaseFromPlayerSlot",
+      "funcName": "PlayerSlotToClientPtr",
       "paramTypes": [
         {
           "name": "playerSlot",
@@ -73,10 +91,10 @@
       }
     },
     {
-      "name": "GetPlayerSlotFromClientBase",
+      "name": "ClientPtrToPlayerSlot",
       "group": "Clients",
       "description": "Retrieves the index of a given client object.",
-      "funcName": "GetPlayerSlotFromClientBase",
+      "funcName": "ClientPtrToPlayerSlot",
       "paramTypes": [
         {
           "name": "client",
@@ -91,10 +109,10 @@
       }
     },
     {
-      "name": "GetClientIndexFromPlayerSlot",
+      "name": "PlayerSlotToClientIndex",
       "group": "Clients",
       "description": "Returns the entity index for a given player slot.",
-      "funcName": "GetClientIndexFromPlayerSlot",
+      "funcName": "PlayerSlotToClientIndex",
       "paramTypes": [
         {
           "name": "playerSlot",
@@ -109,10 +127,10 @@
       }
     },
     {
-      "name": "GetPlayerSlotFromClientIndex",
+      "name": "ClientIndexToPlayerSlot",
       "group": "Clients",
       "description": "Retrieves the player slot from a given client index.",
-      "funcName": "GetPlayerSlotFromClientIndex",
+      "funcName": "ClientIndexToPlayerSlot",
       "paramTypes": [
         {
           "name": "clientIndex",

@@ -25,7 +25,7 @@ PLUGIFY_WARN_IGNORE(4190)
  * @param entity A pointer to the entity (CBaseEntity*).
  * @return The player slot if valid, otherwise -1.
  */
-extern "C" PLUGIN_API int GetPlayerSlotFromEntityPointer(CBaseEntity* entity) {
+extern "C" PLUGIN_API int EntPointerToPlayerSlot(CBaseEntity* entity) {
 	if (!g_pGameEntitySystem->IsEntityPtr(entity)) {
 		return -1;
 	}
@@ -42,13 +42,37 @@ extern "C" PLUGIN_API int GetPlayerSlotFromEntityPointer(CBaseEntity* entity) {
  * @param playerSlot Index of the player slot.
  * @return Pointer to the entity instance, or nullptr if the slot is invalid.
  */
-extern "C" PLUGIN_API CEntityInstance* GetEntityPointerFromPlayerSlot(int playerSlot) {
+extern "C" PLUGIN_API CEntityInstance* PlayerSlotToEntPointer(int playerSlot) {
 	CUtlClientVector* pClients = utils::GetClientList();
 	if (!pClients || !(0 <= playerSlot && playerSlot < pClients->Count())) {
 		return nullptr;
 	}
 
 	return g_pGameEntitySystem->GetEntityInstance(pClients->Element(playerSlot)->GetEntityIndex());
+}
+
+/**
+ * @brief Returns the entity handle associated with a player slot index.
+ *
+ * This function retrieves the entity handle corresponding to the specified
+ * player slot index. If the client list is unavailable, the slot index is invalid,
+ * or the entity cannot be resolved, it returns INVALID_EHANDLE_INDEX.
+ *
+ * @param playerSlot Index of the player slot.
+ * @return The index of the entity, or -1 if the handle is invalid.
+ */
+extern "C" PLUGIN_API int PlayerSlotToEntHandle(int playerSlot) {
+	CUtlClientVector* pClients = utils::GetClientList();
+	if (!pClients || !(0 <= playerSlot && playerSlot < pClients->Count())) {
+		return INVALID_EHANDLE_INDEX;
+	}
+
+	CBaseEntity* pEntity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(pClients->Element(playerSlot)->GetEntityIndex()));
+	if (!pEntity) {
+		return INVALID_EHANDLE_INDEX;
+	}
+
+	return pEntity->GetRefEHandle().ToInt();
 }
 
 /**
@@ -60,7 +84,7 @@ extern "C" PLUGIN_API CEntityInstance* GetEntityPointerFromPlayerSlot(int player
  * @param playerSlot The index of the player's slot (0-based).
  * @return A pointer to the client object if found, otherwise nullptr.
  */
-extern "C" PLUGIN_API void* GetClientBaseFromPlayerSlot(int playerSlot) {
+extern "C" PLUGIN_API void* PlayerSlotToClientPtr(int playerSlot) {
 	CUtlClientVector* pClients = utils::GetClientList();
 	if (!pClients || !(0 <= playerSlot && playerSlot < pClients->Count())) {
 		return nullptr;
@@ -78,7 +102,7 @@ extern "C" PLUGIN_API void* GetClientBaseFromPlayerSlot(int playerSlot) {
  * @param client A pointer to the client object (CServerSideClient*).
  * @return The player slot if found, otherwise -1.
  */
-extern "C" PLUGIN_API int GetPlayerSlotFromClientBase(CServerSideClient* client) {
+extern "C" PLUGIN_API int ClientPtrToPlayerSlot(CServerSideClient* client) {
 	CUtlClientVector* pClients = utils::GetClientList();
 	if (!pClients) {
 		return -1;
@@ -100,7 +124,7 @@ extern "C" PLUGIN_API int GetPlayerSlotFromClientBase(CServerSideClient* client)
  * @param playerSlot The index of the player's slot.
  * @return The entity index if valid, otherwise 0.
  */
-extern "C" PLUGIN_API int GetClientIndexFromPlayerSlot(int playerSlot) {
+extern "C" PLUGIN_API int PlayerSlotToClientIndex(int playerSlot) {
 	CUtlClientVector* pClients = utils::GetClientList();
 	if (!pClients || !(0 <= playerSlot && playerSlot < pClients->Count())) {
 		return 0;
@@ -118,7 +142,7 @@ extern "C" PLUGIN_API int GetClientIndexFromPlayerSlot(int playerSlot) {
  * @param clientIndex The index of the client.
  * @return The player slot if valid, otherwise -1.
  */
-extern "C" PLUGIN_API int GetPlayerSlotFromClientIndex(int clientIndex) {
+extern "C" PLUGIN_API int ClientIndexToPlayerSlot(int clientIndex) {
 	auto pController = g_PlayerManager.ToPlayer(CEntityIndex(clientIndex));
 	if (!pController) {
 		return -1;
