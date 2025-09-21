@@ -23,6 +23,10 @@
 #include "timer_system.hpp"
 #include "user_message_manager.hpp"
 
+#include <dynlibutils/module.hpp>
+#include <dynlibutils/virtual.hpp>
+#include <dynlibutils/vthook.hpp>
+
 #undef FindResource
 
 Source2SDK g_sdk;
@@ -32,6 +36,8 @@ CGameEntitySystem* GameEntitySystem() {
 	static int offset = g_pGameConfig->GetOffset("GameEntitySystem");
 	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + offset);
 }
+
+DynLibUtils::CVTFHookAuto<&CServerSideClientBase::ProcessRespondCvarValue> _ProcessRespondCvarValue;
 
 void Source2SDK::OnPluginStart() {
 	S2_LOG(LS_DEBUG, "[OnPluginStart] - Source2SDK!\n");
@@ -68,9 +74,12 @@ void Source2SDK::OnPluginStart() {
 	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput_FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
-	static std::array<void*, 1> clientBase;
-	clientBase[0] = g_GameConfigManager.GetModule("engine2")->GetVirtualTableByName("CServerSideClient");
-	g_PH.AddHookMemFunc(&CServerSideClientBase::ProcessRespondCvarValue, clientBase.data(), Hook_OnProcessRespondCvarValue, Post);
+	auto table = g_GameConfigManager.GetModule("engine2")->GetVirtualTableByName("CServerSideClient");
+	DynLibUtils::CVirtualTable vtable(table);
+	_ProcessRespondCvarValue.Hook(vtable, [](CServerSideClientBase* pThis, const CCLCMsg_RespondCvarValue_t& msg) -> bool {
+		g_PlayerManager.OnRespondCvarValue(pThis, msg);
+		return _ProcessRespondCvarValue.Call(pThis, msg);
+	});
 
 #if S2SDK_PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);
@@ -468,14 +477,6 @@ poly::ReturnAction Source2SDK::Hook_OnEntityParentChanged(poly::IHook& hook, pol
 	auto pNewParent = poly::GetArgument<CEntityInstance*>(params, 2);
 
 	GetOnEntityParentChangedListenerManager().Notify(pEntity->GetRefEHandle().ToInt(), pNewParent ? pNewParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
-	return poly::ReturnAction::Ignored;
-}
-
-poly::ReturnAction Source2SDK::Hook_OnProcessRespondCvarValue(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto client = poly::GetArgument<CServerSideClientBase*>(params, 0);
-	auto msg = *poly::GetArgument<CCLCMsg_RespondCvarValue_t*>(params, 1);
-
-	g_PlayerManager.OnRespondCvarValue(client, msg);
 	return poly::ReturnAction::Ignored;
 }
 
