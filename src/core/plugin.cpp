@@ -70,7 +70,7 @@ void Source2SDK::OnPluginStart() {
 	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput_FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 	g_clientBase[0] = g_GameConfigManager.GetModule("engine2")->GetVirtualTableByName("CServerSideClient");
-	g_PH.AddHookMemFunc(&CServerSideClientBase::ProcessRespondCvarValue, &g_clientBase, Hook_OnProcessRespondCvarValue, Post);
+	g_PH.AddHookMemFunc(&CServerSideClientBase::ProcessRespondCvarValue, g_clientBase.data(), Hook_OnProcessRespondCvarValue, Post);
 
 #if S2SDK_PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);
