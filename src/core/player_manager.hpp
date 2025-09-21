@@ -134,7 +134,7 @@ public:
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(PlayerManager, OnValidateAuthTicket, ValidateAuthTicketResponse_t, m_CallbackValidateAuthTicketResponse);
 
-	std::vector<Player*> GetOnlinePlayers() const;
+	std::inplace_vector<Player*, MAXPLAYERS> GetOnlinePlayers() const;
 	static int MaxClients();
 
 	TargetType TargetPlayerString(int caller, std::string_view target, plg::vector<int>& clients);

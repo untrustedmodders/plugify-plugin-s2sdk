@@ -190,8 +190,7 @@ void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* pResponse
 thread_local bool s_refuseConnection;
 
 bool PlayerManager::OnClientConnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID) {
-	Player* player = ToPlayer(slot);
-	if (player) {
+	if (Player* player = ToPlayer(slot)) {
 		player->Init(slot, steamID64);
 
 		s_refuseConnection = false;
@@ -207,8 +206,7 @@ bool PlayerManager::OnClientConnect(CPlayerSlot slot, const char* name, uint64 s
 }
 
 bool PlayerManager::OnClientConnect_Post(CPlayerSlot slot, bool origRet) {
-	Player* player = ToPlayer(slot);
-	if (player) {
+	if (Player* player = ToPlayer(slot)) {
 		if (s_refuseConnection) {
 			origRet = false;
 		}
@@ -232,8 +230,7 @@ void PlayerManager::OnClientConnected(CPlayerSlot slot, bool fakePlayer) {
 }
 
 void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name) {
-	Player* player = ToPlayer(slot);
-	if (player) {
+	if (Player* player = ToPlayer(slot)) {
 		// For bots only
 		if (player->GetPlayerSlot() == INVALID_PLAYER_SLOT) {
 			player->Init(slot, 0);
@@ -250,8 +247,7 @@ void PlayerManager::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionRe
 void PlayerManager::OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
 	GetOnClientDisconnect_PostListenerManager().Notify(slot, reason);
 
-	Player* player = ToPlayer(slot);
-	if (player) {
+	if (Player* player = ToPlayer(slot)) {
 		player->Reset();
 	}
 }
@@ -261,8 +257,7 @@ void PlayerManager::OnClientActive(CPlayerSlot slot, bool loadGame) const {
 }
 
 bool PlayerManager::QueryCvarValue(CPlayerSlot slot, const plg::string& convarName, CvarValueCallback callback, const plg::any& data) {
-	Player* player = ToPlayer(slot);
-	if (player) {
+	if (Player* player = ToPlayer(slot)) {
 		int queryCvarCookie = utils::SendCvarValueQueryToClient(slot, convarName.c_str());
 		if (queryCvarCookie != -1) {
 			std::scoped_lock lock(m_mutex);
@@ -275,8 +270,7 @@ bool PlayerManager::QueryCvarValue(CPlayerSlot slot, const plg::string& convarNa
 }
 
 void PlayerManager::OnRespondCvarValue(CServerSideClientBase* client, const CCLCMsg_RespondCvarValue_t& msg) {
-	Player* player = ToPlayer(client);
-	if (player) {
+	if (Player* player = ToPlayer(client)) {
 		player->OnRepondCvarValue(msg);
 	}
 }
@@ -360,10 +354,9 @@ Player* PlayerManager::ToPlayer(CSteamID steamid, bool validate) const {
 	return nullptr;
 }
 
-std::vector<Player*> PlayerManager::GetOnlinePlayers() const {
-	std::vector<Player*> players;
-	players.reserve(MAXPLAYERS);
-	for (auto& player: m_players) {
+std::inplace_vector<Player*, MAXPLAYERS> PlayerManager::GetOnlinePlayers() const {
+	std::inplace_vector<Player*, MAXPLAYERS> players;
+	for (const auto& player : m_players) {
 		if (utils::IsPlayerSlot(player.GetPlayerSlot())) {
 			players.emplace_back(const_cast<Player*>(&player));
 		}
