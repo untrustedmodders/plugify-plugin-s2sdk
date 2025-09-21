@@ -12,7 +12,7 @@
 #include "entity/cbaseplayerpawn.h"
 #include "entity/cplayercontroller.h"
 #include "entity/globaltypes.h"
-#include "core/player_manager.hpp
+#include "core/player_manager.hpp"
 
 #include <tier0/memdbgon.h>
 
