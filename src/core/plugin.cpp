@@ -243,8 +243,8 @@ poly::ReturnAction Source2SDK::Hook_ClientActive(poly::IHook& hook, poly::Params
 	// CPlayerSlot slot, bool bLoadGame, const char* name, uint64 steamID64
 	auto slot = (CPlayerSlot) poly::GetArgument<int>(params, 1);
 	auto bLoadGame = poly::GetArgument<bool>(params, 2);
-	auto name = poly::GetArgument<const char*>(params, 3);
-	auto steamID64 = (uint64) poly::GetArgument<uint64_t>(params, 4);
+	//auto name = poly::GetArgument<const char*>(params, 3);
+	//auto steamID64 = (uint64) poly::GetArgument<uint64_t>(params, 4);
 
 	//S2_LOGF(LS_DEBUG, "[OnClientActive] = {}, \"{}\", {}\n", slot, name, steamID64);
 
@@ -258,9 +258,9 @@ poly::ReturnAction Source2SDK::Hook_ClientDisconnect(poly::IHook& hook, poly::Pa
 	// CPlayerSlot slot, int reason, const char* name, uint64 steamID64, const char* networkID
 	auto slot = (CPlayerSlot) poly::GetArgument<int>(params, 1);
 	auto reason = (ENetworkDisconnectionReason) poly::GetArgument<int>(params, 2);
-	auto name = poly::GetArgument<const char*>(params, 3);
-	auto steamID64 = poly::GetArgument<uint64_t>(params, 4);
-	auto networkID = poly::GetArgument<const char*>(params, 5);
+	//auto name = poly::GetArgument<const char*>(params, 3);
+	//auto steamID64 = poly::GetArgument<uint64_t>(params, 4);
+	//auto networkID = poly::GetArgument<const char*>(params, 5);
 
 	//S2_LOGF(LS_DEBUG, "[ClientDisconnect] = {}, {}, \"{}\", {}, \"{}\"\n", slot, reason, name, steamID64, networkID);
 
