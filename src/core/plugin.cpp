@@ -33,6 +33,8 @@ CGameEntitySystem* GameEntitySystem() {
 	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + offset);
 }
 
+std::array<void*, 1> g_clientBase;
+
 void Source2SDK::OnPluginStart() {
 	S2_LOG(LS_DEBUG, "[OnPluginStart] - Source2SDK!\n");
 
@@ -67,11 +69,8 @@ void Source2SDK::OnPluginStart() {
 
 	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput_FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
-
-	auto pServerSideClientVTable = g_GameConfigManager.GetModule("engine2")->GetVirtualTableByName("CServerSideClient").CCast<uintptr_t*>();
-	auto fProcessRespondCvarValue = &CServerSideClientBase::ProcessRespondCvarValue;
-	int iProcessRespondCvarValueOffset = poly::GetVTableIndex((void*&) fProcessRespondCvarValue);
-	g_PH.AddHookDetourFunc<ProcessRespondCvarValueFn>(pServerSideClientVTable[iProcessRespondCvarValueOffset], Hook_OnProcessRespondCvarValue, Post);
+	g_clientBase[0] = g_GameConfigManager.GetModule("engine2")->GetVirtualTableByName("CServerSideClient");
+	g_PH.AddHookMemFunc(&CServerSideClientBase::ProcessRespondCvarValue, &g_clientBase, Hook_OnProcessRespondCvarValue, Post);
 
 #if S2SDK_PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);

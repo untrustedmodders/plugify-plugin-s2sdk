@@ -5,7 +5,7 @@ bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback 
 	std::scoped_lock lock(m_registerCmdLock);
 	
 	if (messageId == 0) {
-		return m_globalCallbacks[static_cast<size_t>(mode)].Register(callback);
+		return m_global.callbacks[static_cast<size_t>(mode)].Register(callback);
 	}
 
 	auto it = m_hooksMap.find(messageId);
@@ -22,7 +22,7 @@ bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallbac
 	std::scoped_lock lock(m_registerCmdLock);
 	
 	if (messageId == 0) {
-		return m_globalCallbacks[static_cast<size_t>(mode)].Unregister(callback);
+		return m_global.callbacks[static_cast<size_t>(mode)].Unregister(callback);
 	}
 
 	auto it = m_hooksMap.find(messageId);
@@ -35,6 +35,8 @@ bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallbac
 }
 
 ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode) {
+	std::scoped_lock lock(m_registerCmdLock);
+
 	UserMessage message(msgSerializable, msgData, *clients);
 
 	int16_t messageID = message.GetMessageID();
@@ -43,7 +45,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 
 	ResultType result = ResultType::Continue;
 	
-	const auto& globalCallback = m_globalCallbacks[static_cast<size_t>(mode)];
+	const auto& globalCallback = m_global.callbacks[static_cast<size_t>(mode)];
 
 	for (size_t i = 0; i < globalCallback.GetCount(); ++i) {
 		auto thisResult = globalCallback.Notify(i, &message);

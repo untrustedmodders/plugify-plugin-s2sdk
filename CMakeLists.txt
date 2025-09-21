@@ -150,13 +150,19 @@ elseif(LINUX)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-Wl,--version-script,${CMAKE_CURRENT_SOURCE_DIR}/sym/version_script.lds")
 endif()
 
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /Zc:preprocessor)#/W4 /WX
+else()
+    #target_compile_options(${PROJECT_NAME} PRIVATE -Wextra -Wshadow -Wconversion -Wpedantic -Werror)
+endif()
+
 if(LINUX)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _GLIBCXX_USE_CXX11_ABI=0)
     target_link_libraries(${PROJECT_NAME} PRIVATE -static-libstdc++ -static-libgcc)
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${S2SDK_COMPILE_DEFINITIONS})
-#target_compile_options(${PROJECT_NAME} PRIVATE ${S2SDK_COMPILE_OPTIONS})
+target_compile_options(${PROJECT_NAME} PRIVATE ${S2SDK_COMPILE_OPTIONS})
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include")
 

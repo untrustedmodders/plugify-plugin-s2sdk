@@ -23,7 +23,7 @@ public:
 
 private:
 	std::unordered_map<int16_t, UserMessageHook> m_hooksMap;
-	std::array<ListenerManager<UserMessageCallback>, 2> m_globalCallbacks;
+	UserMessageHook m_global;
 	std::mutex m_registerCmdLock;
 };
 

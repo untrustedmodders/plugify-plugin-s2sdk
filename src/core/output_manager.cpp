@@ -37,7 +37,7 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* pThis, CEnti
 	if (pCaller) {
 		//S2_LOGF(LS_DEBUG, "[EntityOutputManager][FireOutputHook] - {}, {}\n", pThis->m_pDesc->m_pName, pCaller->GetClassname());
 
-		std::array<OutputKey, 4> vecSearchKeys{
+		std::array vecSearchKeys{
 				OutputKey{"*", pThis->m_pDesc->m_pName},
 				OutputKey{"*", "*"},
 				OutputKey{pCaller->GetClassname(), pThis->m_pDesc->m_pName},
@@ -57,8 +57,8 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* pThis, CEnti
 
 	ResultType result = ResultType::Continue;
 
-	int activator = pActivator != nullptr ? pActivator->GetEntityIndex().Get() : -1;
-	int caller = pCaller != nullptr ? pCaller->GetEntityIndex().Get() : -1;
+	int activator = pActivator != nullptr ? pActivator->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
+	int caller = pCaller != nullptr ? pCaller->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
 
 	for (const auto& pCallbackPair: m_vecCallbackPairs) {
 		auto& cb = pCallbackPair->callbacks[0];
