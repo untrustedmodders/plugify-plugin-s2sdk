@@ -170,7 +170,7 @@ extern "C" PLUGIN_API plg::string GetClientAuthId(int playerSlot) {
  * @brief Returns the client's Steam account ID, a unique number identifying a given Steam account.
  *
  * @param playerSlot The index of the player's slot.
- * @return uint64_t Steam account ID.
+ * @return uint64_t The client's steam account ID.
  */
 extern "C" PLUGIN_API uint64_t GetClientAccountId(int playerSlot) {
 	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
@@ -185,7 +185,7 @@ extern "C" PLUGIN_API uint64_t GetClientAccountId(int playerSlot) {
  * @brief Retrieves a client's IP address.
  *
  * @param playerSlot The index of the player's slot.
- * @return The IP address.
+ * @return The client's IP address.
  */
 extern "C" PLUGIN_API plg::string GetClientIp(int playerSlot) {
 	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
@@ -194,6 +194,36 @@ extern "C" PLUGIN_API plg::string GetClientIp(int playerSlot) {
 	}
 
 	return pPlayer->GetIpAddress();
+}
+
+/**
+ * @brief Retrieves a client's language.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The client's language.
+ */
+extern "C" PLUGIN_API plg::string GetClientLanguage(int playerSlot) {
+	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (pPlayer == nullptr) {
+		return {};
+	}
+
+	return pPlayer->GetLanguage();
+}
+
+/**
+ * @brief Retrieves a client's operating system.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The client's operating system.
+ */
+extern "C" PLUGIN_API plg::string GetClientOS(int playerSlot) {
+	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (pPlayer == nullptr) {
+		return {};
+	}
+
+	return pPlayer->GetOperatingSystem();
 }
 
 /**

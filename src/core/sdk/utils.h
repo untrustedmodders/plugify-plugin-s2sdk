@@ -164,9 +164,11 @@ namespace utils {
 		return GetConVarValue<T>(conVar);
 	}
 
+	int SendCvarValueQueryToClient(CPlayerSlot slot, const char* cvarName, int queryCvarCookieOverride = -1);
+
 	// Print functions
 	bool CFormat(char* buffer, uint64_t buffer_size, const char* text);
-	void ClientPrintFilter(IRecipientFilter* filter, int msg_dest, const char* msg_name);
+	void ClientPrintFilter(IRecipientFilter* filter, int msgDest, const char* msgName);
 	void PrintConsole(CPlayerSlot slot, const char* message);
 	void PrintChat(CPlayerSlot slot, const char* message);
 	void PrintCentre(CPlayerSlot slot, const char* message);

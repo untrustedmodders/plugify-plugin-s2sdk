@@ -199,6 +199,42 @@
       }
     },
     {
+      "name": "GetClientLanguage",
+      "group": "Clients",
+      "description": "Retrieves a client's language.",
+      "funcName": "GetClientLanguage",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The client's language."
+      }
+    },
+    {
+      "name": "GetClientOS",
+      "group": "Clients",
+      "description": "Retrieves a client's operating system.",
+      "funcName": "GetClientOS",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The client's operating system."
+      }
+    },
+    {
       "name": "GetClientName",
       "group": "Clients",
       "description": "Returns the client's name.",
@@ -1423,7 +1459,23 @@
               {
                 "name": "context",
                 "type": "int32",
-                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command."
+                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
+                "enum": {
+                  "name": "CommandCallingContext",
+                  "description": "The command execution context.",
+                  "values": [
+                    {
+                      "value": 0,
+                      "name": "Console",
+                      "description": "The command execute from the client's console."
+                    },
+                    {
+                      "value": 1,
+                      "name": "Chat",
+                      "description": "The command execute from the client's chat."
+                    }
+                  ]
+                }
               },
               {
                 "name": "arguments",
@@ -1693,7 +1745,23 @@
               {
                 "name": "context",
                 "type": "int32",
-                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command."
+                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
+                "enum": {
+                  "name": "CommandCallingContext",
+                  "description": "The command execution context.",
+                  "values": [
+                    {
+                      "value": 0,
+                      "name": "Console",
+                      "description": "The command execute from the client's console."
+                    },
+                    {
+                      "value": 1,
+                      "name": "Chat",
+                      "description": "The command execute from the client's chat."
+                    }
+                  ]
+                }
               },
               {
                 "name": "arguments",
@@ -1790,7 +1858,23 @@
               {
                 "name": "context",
                 "type": "int32",
-                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command."
+                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
+                "enum": {
+                  "name": "CommandCallingContext",
+                  "description": "The command execution context.",
+                  "values": [
+                    {
+                      "value": 0,
+                      "name": "Console",
+                      "description": "The command execute from the client's console."
+                    },
+                    {
+                      "value": 1,
+                      "name": "Chat",
+                      "description": "The command execute from the client's chat."
+                    }
+                  ]
+                }
               },
               {
                 "name": "arguments",
@@ -1866,7 +1950,23 @@
               {
                 "name": "context",
                 "type": "int32",
-                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command."
+                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
+                "enum": {
+                  "name": "CommandCallingContext",
+                  "description": "The command execution context.",
+                  "values": [
+                    {
+                      "value": 0,
+                      "name": "Console",
+                      "description": "The command execute from the client's console."
+                    },
+                    {
+                      "value": 1,
+                      "name": "Chat",
+                      "description": "The command execute from the client's chat."
+                    }
+                  ]
+                }
               },
               {
                 "name": "arguments",
@@ -1963,7 +2063,23 @@
               {
                 "name": "context",
                 "type": "int32",
-                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command."
+                "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
+                "enum": {
+                  "name": "CommandCallingContext",
+                  "description": "The command execution context.",
+                  "values": [
+                    {
+                      "value": 0,
+                      "name": "Console",
+                      "description": "The command execute from the client's console."
+                    },
+                    {
+                      "value": 1,
+                      "name": "Chat",
+                      "description": "The command execute from the client's chat."
+                    }
+                  ]
+                }
               },
               {
                 "name": "arguments",
@@ -7512,6 +7628,108 @@
       ],
       "retType": {
         "type": "void"
+      }
+    },
+    {
+      "name": "QueryClientConVar",
+      "group": "Cvars",
+      "description": "Starts a query to retrieve the value of a client's console variable.",
+      "funcName": "QueryClientConVar",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to query the value from."
+        },
+        {
+          "name": "convarName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of client convar to query."
+        },
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "A function to use as a callback when the query has finished.",
+          "prototype": {
+            "name": "CvarValueCallback",
+            "funcName": "CvarValueCallback",
+            "description": "Handles changes to a console variable's value. This function is called whenever the value of a specific console variable is modified.",
+            "paramTypes": [
+              {
+                "name": "playerSlot",
+                "type": "int32",
+                "description": "The index of the player's slot to query the value from."
+              },
+              {
+                "name": "cookie",
+                "type": "int32",
+                "description": "The unique identifier of query."
+              },
+              {
+                "name": "code",
+                "type": "int32",
+                "description": "Result of query that tells one whether or not query was successful.",
+                "enum": {
+                  "name": "CvarValueStatus",
+                  "description": "Enum representing various flags for ConVars and ConCommands.",
+                  "values": [
+                    {
+                      "value": 0,
+                      "name": "ValueIntact",
+                      "description": "It got the value fine."
+                    },
+                    {
+                      "value": 1,
+                      "name": "CvarNotFound",
+                      "description": "It did not found the value."
+                    },
+                    {
+                      "value": 2,
+                      "name": "NotACvar",
+                      "description": "There's a ConCommand, but it's not a ConVar."
+                    },
+                    {
+                      "value": 3,
+                      "name": "CvarProtected",
+                      "description": "The cvar was marked with FCVAR_SERVER_CAN_NOT_QUERY, so the server is not allowed to have its value."
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "name",
+                "type": "int32",
+                "description": "The name of client convar that was queried."
+              },
+              {
+                "name": "value",
+                "type": "int32",
+                "description": "The value of client convar that was queried if successful. This will be empty if it was not."
+              },
+              {
+                "name": "data",
+                "type": "any",
+                "description": "The value that was passed when query was started."
+              }
+            ],
+            "retType": {
+              "type": "void"
+            }
+          }
+        },
+        {
+          "name": "data",
+          "type": "any",
+          "ref": false,
+          "description": "Optional value to pass to the callback function."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "A cookie that uniquely identifies the query. Returns -1 on failure, such as when used on a bot."
       }
     },
     {

@@ -90,6 +90,7 @@ class CServerSideClient;
 class CServerSideClientBase;
 class CNetMessage;
 class CCSWeaponBaseVData;
+class CCLCMsg_RespondCvarValue_t;
 
 namespace addresses {
 	inline IGameEventListener2* (*GetLegacyGameEventListener)(CPlayerSlot slot);
@@ -139,6 +140,7 @@ namespace addresses {
 using HostStateRequestFn = void* (*)(CHostStateMgr *pMgrDoNotUse, CHostStateRequest* pRequest);
 using ReplyConnectionFn = void (*)(CNetworkGameServerBase *server, CServerSideClient* client);
 using SendNetMessageFn = void* (*)(const CServerSideClientBase*, const CNetMessage* data, uint8 bufType);
+using ProcessRespondCvarValueFn = void* (*)(const CServerSideClientBase*, const CCLCMsg_RespondCvarValue_t& msg);
 
 inline HostStateRequestFn g_pfnSetPendingHostStateRequest;
 inline ReplyConnectionFn g_pfnReplyConnection;

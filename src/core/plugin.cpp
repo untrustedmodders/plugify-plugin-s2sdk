@@ -1,15 +1,17 @@
-#include "plugin.hpp"
-
+#include <core/sdk/entity/cgamerules.h>
 #include <eiface.h>
 #include <engine/igameeventsystem.h>
 #include <entity2/entitysystem.h>
 #include <igameevents.h>
 #include <iserver.h>
 #include <steam_gameserver.h>
+#include <netmessages.h>
 
-#include "core_config.hpp"
+#include "plugin.hpp"
+
 #include "con_command_manager.hpp"
 #include "con_var_manager.hpp"
+#include "core_config.hpp"
 #include "event_listener.hpp"
 #include "event_manager.hpp"
 #include "hook_holder.hpp"
@@ -20,8 +22,6 @@
 #include "server_manager.hpp"
 #include "timer_system.hpp"
 #include "user_message_manager.hpp"
-
-#include <core/sdk/entity/cgamerules.h>
 
 #undef FindResource
 
@@ -45,7 +45,7 @@ void Source2SDK::OnPluginStart() {
 	using enum poly::CallbackType;
 
 	g_PH.AddHookMemFunc(&IGameEventManager2::FireEvent, g_pGameEventManager, Hook_FireEvent, Pre, Post);
-	using PostEventAbstract = void(IGameEventSystem::*)( CSplitScreenSlot nSlot, bool bLocalOnly, int nClientCount, const uint64 *clients, INetworkMessageInternal *pEvent, const CNetMessage *pData, unsigned long nSize, NetChannelBufType_t bufType);
+	using PostEventAbstract = void(IGameEventSystem::*)( CSplitScreenSlot slot, bool bLocalOnly, int nClientCount, const uint64 *clients, INetworkMessageInternal *pEvent, const CNetMessage *pData, unsigned long nSize, NetChannelBufType_t bufType);
 	g_PH.AddHookMemFunc<PostEventAbstract>(&IGameEventSystem::PostEventAbstract, g_pGameEventSystem, Hook_PostEvent, Pre, Post);
 
 	g_PH.AddHookMemFunc(&IServerGameClients::ClientCommand, g_pSource2GameClients, Hook_ClientCommand, Pre);
@@ -67,6 +67,11 @@ void Source2SDK::OnPluginStart() {
 
 	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput_FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
+
+	auto pServerSideClientVTable = g_GameConfigManager.GetModule("engine2")->GetVirtualTableByName("CServerSideClient").CCast<uintptr_t*>();
+	auto fProcessRespondCvarValue = &CServerSideClientBase::ProcessRespondCvarValue;
+	int iProcessRespondCvarValueOffset = poly::GetVTableIndex((void*&) fProcessRespondCvarValue);
+	g_PH.AddHookDetourFunc<ProcessRespondCvarValueFn>(pServerSideClientVTable[iProcessRespondCvarValueOffset], Hook_OnProcessRespondCvarValue, Post);
 
 #if S2SDK_PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);
@@ -208,7 +213,7 @@ poly::ReturnAction Source2SDK::Hook_FireEvent(poly::IHook& hook, poly::Params& p
 }
 
 poly::ReturnAction Source2SDK::Hook_PostEvent(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//S2_LOGF(LS_DEBUG, "[PostEvent] = {}, {}, {}, {}\n", nSlot, bLocalOnly, nClientCount, clients );
+	//S2_LOGF(LS_DEBUG, "[PostEvent] = {}, {}, {}, {}\n", slot, bLocalOnly, nClientCount, clients );
 	//auto clientCount = poly::GetArgument<int>(params, 3);
 	auto clients = poly::GetArgument<uint64_t*>(params, 4);
 	auto message = poly::GetArgument<INetworkMessageInternal*>(params, 5);
@@ -299,12 +304,12 @@ poly::ReturnAction Source2SDK::Hook_OnClientConnected(poly::IHook& hook, poly::P
 	/*auto name = poly::GetArgument<const char*>(params, 2);
 	auto steamID64 = poly::GetArgument<uint64_t>(params, 3);
 	auto networkID = poly::GetArgument<const char*>(params, 4);
-	auto pszAddress = poly::GetArgument<const char*>(params, 5);
-	auto bFakePlayer = poly::GetArgument<bool>(params, 6);*/
+	auto pszAddress = poly::GetArgument<const char*>(params, 5);*/
+	auto bFakePlayer = poly::GetArgument<bool>(params, 6);
 
 	//S2_LOGF(LS_DEBUG, "[OnClientConnected] = {}, \"{}\", {}, \"{}\", \"{}\", {}\n", slot, name, steamID64, networkID, pszAddress, bFakePlayer);
 
-	g_PlayerManager.OnClientConnected(slot);
+	g_PlayerManager.OnClientConnected(slot, bFakePlayer);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -344,7 +349,7 @@ poly::ReturnAction Source2SDK::Hook_ClientConnect(poly::IHook& hook, poly::Param
 }
 
 poly::ReturnAction Source2SDK::Hook_ClientCommand(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	// CPlayerSlot nSlot, const CCommand& _cmd
+	// CPlayerSlot slot, const CCommand& _cmd
 	auto slot = (CPlayerSlot) poly::GetArgument<int>(params, 1);
 	auto args = poly::GetArgument<const CCommand*>(params, 2);
 	if (args == nullptr) {
@@ -463,6 +468,14 @@ poly::ReturnAction Source2SDK::Hook_OnEntityParentChanged(poly::IHook& hook, pol
 	auto pNewParent = poly::GetArgument<CEntityInstance*>(params, 2);
 
 	GetOnEntityParentChangedListenerManager().Notify(pEntity->GetRefEHandle().ToInt(), pNewParent ? pNewParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
+	return poly::ReturnAction::Ignored;
+}
+
+poly::ReturnAction Source2SDK::Hook_OnProcessRespondCvarValue(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	auto client = poly::GetArgument<CServerSideClientBase*>(params, 0);
+	auto msg = *poly::GetArgument<CCLCMsg_RespondCvarValue_t*>(params, 1);
+
+	g_PlayerManager.OnRespondCvarValue(client, msg);
 	return poly::ReturnAction::Ignored;
 }
 

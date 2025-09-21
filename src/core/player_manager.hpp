@@ -23,6 +23,20 @@ enum class TargetType : int {
 class CPlayerPawnComponent;
 class CCSObserverPawn;
 
+enum class CvarValueStatus {
+	ValueIntact = 0,	// It got the value fine.
+	CvarNotFound = 1,
+	NotACvar = 2,		// There's a ConCommand, but it's not a ConVar.
+	CvarProtected = 3	// The cvar was marked with FCVAR_SERVER_CAN_NOT_QUERY, so the server is not allowed to have its value.
+};
+
+using CvarValueCallback = void(*)(CPlayerSlot slot, int cookie, CvarValueStatus code, const plg::string& name, const plg::string& value, const plg::any& data);
+
+struct CvarQuery {
+	CvarValueCallback callback;
+	plg::any data;
+};
+
 class Player {
 public:
 	Player() = default;
@@ -31,11 +45,17 @@ public:
 	void Init(int slot, uint64 steamID64) {
 		m_slot = slot;
 		m_unauthenticatedSteamID = CSteamID(steamID64);
+		m_language.clear();
+		m_operatingSystem.clear();
+		m_queryCallback.clear();
 	}
 
 	void Reset() {
 		m_slot = -1;
 		m_unauthenticatedSteamID = k_steamIDNil;
+		m_language.clear();
+		m_operatingSystem.clear();
+		m_queryCallback.clear();
 	}
 
 	CBasePlayerController* GetController() const;
@@ -52,8 +72,10 @@ public:
 	bool IsSourceTV() const;
 	bool IsAlive() const;
 	bool IsValidClient() const;
-	const char* GetName() const;
-	const char* GetIpAddress() const;
+	std::string_view GetName() const;
+	std::string_view GetIpAddress() const;
+	std::string_view GetLanguage() const;
+	std::string_view GetOperatingSystem() const;
 	CSteamID GetSteamId(bool validated = false) const;
 	INetChannelInfo* GetNetInfo() const;
 	float GetTimeConnected() const;
@@ -73,9 +95,15 @@ public:
 		return m_slot + 1;
 	}
 
+	void QueryCvar(int queryCvarCookie, CvarQuery query);
+	void OnRepondCvarValue(const CCLCMsg_RespondCvarValue_t& msg);
+
 private:
 	int m_slot{-1};
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
+	std::string m_language;
+	std::string m_operatingSystem;
+	std::flat_map<int, CvarQuery> m_queryCallback;
 };
 
 class PlayerManager {
@@ -95,11 +123,14 @@ public:
 	void OnSteamAPIActivated();
 	bool OnClientConnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID);
 	bool OnClientConnect_Post(CPlayerSlot slot, bool origRet);
-	void OnClientConnected(CPlayerSlot slot);
+	void OnClientConnected(CPlayerSlot slot, bool fakePlayer);
 	void OnClientPutInServer(CPlayerSlot slot, char const* name);
 	void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason);
 	void OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnectionReason reason);
 	void OnClientActive(CPlayerSlot slot, bool loadGame) const;
+
+	bool QueryCvarValue(CPlayerSlot slot, const plg::string& convarName, CvarValueCallback callback, const plg::any& data);
+	void OnRespondCvarValue(CServerSideClientBase* client, const CCLCMsg_RespondCvarValue_t& msg);
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(PlayerManager, OnValidateAuthTicket, ValidateAuthTicketResponse_t, m_CallbackValidateAuthTicketResponse);
 
@@ -110,6 +141,7 @@ public:
 
 protected:
 	std::array<Player, MAXPLAYERS + 1> m_players{};
+	std::mutex m_mutex;
 	bool m_callbackRegistered{};
 };
 

@@ -2,12 +2,18 @@
 
 #include "plg/macro.hpp"
 
-#ifdef __cpp_lib_debugging
-
+#if __has_include(<debugging>)
 #include <debugging>
+#if defined(__cpp_lib_debugging) && __cpp_lib_debugging >= 202403L
+#define PLUGIFY_HAS_STD_DEBUGGING 1
+#else
+#define PLUGIFY_HAS_STD_DEBUGGING 0
+#endif
+#else
+#define PLUGIFY_HAS_STD_DEBUGGING 0
+#endif
 
-#else //def __cpp_lib_debugging
-
+#if !PLUGIFY_HAS_STD_DEBUGGING
 #if PLUGIFY_PLATFORM_WINDOWS
 #include <windows.h>
 #include <intrin.h>
@@ -25,16 +31,7 @@
 #include <unistd.h>
 #endif
 
-#endif //def __cpp_lib_debugging
-
 namespace plg {
-#ifdef __cpp_lib_debugging
-
-	using std::breakpoint;
-	using std::breakpoint_if_debugging;
-	using std::is_debugger_present;
-
-#else //def __cpp_lib_debugging
 
 #if PLUGIFY_PLATFORM_WINDOWS
 
@@ -178,7 +175,7 @@ namespace plg {
 		} // namespace debugging
 	} // namespace detail
 
-	PLUGIFY_NOINLINE inline bool is_debugger_present() noexcept {
+	inline bool is_debugger_present() noexcept {
 		return plg::detail::debugging::parse_proc_status();
 	}
 
@@ -190,7 +187,7 @@ namespace plg {
 
 #endif
 
-	PLUGIFY_FORCE_INLINE void breakpoint() noexcept {
+	inline void breakpoint() noexcept {
 #if PLUGIFY_COMPILER_MSVC
 		__debugbreak();
 #elif PLUGIFY_COMPILER_CLANG
@@ -202,11 +199,17 @@ namespace plg {
 #endif
 	}
 
-	PLUGIFY_FORCE_INLINE void breakpoint_if_debugging() noexcept {
+	inline void breakpoint_if_debugging() noexcept {
 		if (plg::is_debugger_present()) {
 			plg::breakpoint();
 		}
 	}
-
-#endif //def __cpp_lib_debugging
 } // namespace plg
+
+namespace std {
+	using plg::breakpoint;
+	using plg::breakpoint_if_debugging;
+	using plg::is_debugger_present;
+} // namespace std
+
+#endif // !PLUGIFY_HAS_STD_DEBUGGING

@@ -7,12 +7,11 @@
 #include <convar.h>
 
 enum CommandCallingContext : int {
-	Invalid = -1,
 	Console = 0,
 	Chat = 1,
 };
 
-using CommandListenerCallback = ResultType (*)(int caller, int context, const plg::vector<plg::string>& arguments);
+using CommandListenerCallback = ResultType (*)(int caller, CommandCallingContext context, const plg::vector<plg::string>& arguments);
 
 struct ConCommandInfo {
 	ConCommandInfo() = delete;

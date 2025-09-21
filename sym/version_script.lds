@@ -13,6 +13,8 @@
         GetClientAuthId;
         GetClientAccountId;
         GetClientIp;
+        GetClientLanguage;
+        GetClientOS;
         GetClientName;
         GetClientTime;
         GetClientLatency;
@@ -147,6 +149,7 @@
         SendConVarValue;
         GetClientConVarValue;
         SetFakeClientConVarValue;
+        QueryClientConVar;
 
         FindModule;
         FindInterface;

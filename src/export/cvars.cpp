@@ -1,3 +1,4 @@
+#include <basetypes.h>
 #include <convar.h>
 #include <core/con_var_manager.hpp>
 #include <core/game_config.hpp>
@@ -6,7 +7,7 @@
 #include <plg/plugin.hpp>
 #include <plugin_export.h>
 
-#include <basetypes.h>
+#include "core/player_manager.hpp"
 
 PLUGIFY_WARN_PUSH()
 
@@ -1156,6 +1157,21 @@ extern "C" PLUGIN_API void SetFakeClientConVarValue(int playerSlot, const plg::s
 	}
 
 	g_pEngineServer->SetFakeClientConVarValue(playerSlot, convarName.c_str(), convarValue.c_str());
+}
+
+/**
+ * @brief Starts a query to retrieve the value of a client's console variable.
+ *
+ * @param playerSlot The index of the player's slot to query the value from.
+ * @param convarName The name of client convar to query.
+ * @param callback A function to use as a callback when the query has finished.
+ * @param data Optional value to pass to the callback function.
+ *
+ * @return A cookie that uniquely identifies the query. Returns -1 on failure, such as when used on
+ * a bot.
+ */
+extern "C" PLUGIN_API int QueryClientConVar(int playerSlot, const plg::string& convarName, CvarValueCallback callback, const plg::any& data) {
+	return g_PlayerManager.QueryCvarValue(playerSlot, convarName, callback, data);
 }
 
 PLUGIFY_WARN_POP()

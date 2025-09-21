@@ -2,13 +2,18 @@
 
 #include "plg/macro.hpp"
 
-#ifdef __cpp_lib_expected
+#if __has_include(<expected>)
 #include <expected>
-namespace plg {
-	using std::expected;
-	using std::unexpected;
-}
+#if defined(__cpp_lib_expected) && __cpp_lib_expected >= 202211L
+#define PLUGIFY_HAS_STD_EXPECTED 1
 #else
+#define PLUGIFY_HAS_STD_EXPECTED 0
+#endif
+#else
+#define PLUGIFY_HAS_STD_EXPECTED 0
+#endif
+
+#if !PLUGIFY_HAS_STD_EXPECTED
 #include <concepts>
 #include <deque>
 #include <exception>
@@ -553,31 +558,23 @@ namespace plg {
 		}
 
 		constexpr auto value() const& -> T const& {
-			if (has_value()) {
-				return this->val;
-			}
-			throw bad_expected_access(error());
+			PLUGIFY_ASSERT(has_value(), "bad expected access", bad_expected_access, error());
+			return this->val;
 		}
 
 		constexpr auto value() & -> T& {
-			if (has_value()) {
-				return this->val;
-			}
-			throw bad_expected_access(error());
+			PLUGIFY_ASSERT(has_value(), "bad expected access", bad_expected_access, error());
+			return this->val;
 		}
 
 		constexpr auto value() const&& -> T const&& {
-			if (has_value()) {
-				return std::move(this->val);
-			}
-			throw bad_expected_access(std::move(error()));
+			PLUGIFY_ASSERT(has_value(), "bad expected access", bad_expected_access, std::move(error()));
+			return std::move(this->val);
 		}
 
 		constexpr auto value() && -> T&& {
-			if (has_value()) {
-				return std::move(this->val);
-			}
-			throw bad_expected_access(std::move(error()));
+			PLUGIFY_ASSERT(has_value(), "bad expected access", bad_expected_access, std::move(error()));
+			return std::move(this->val);
 		}
 
 		// precondition: has_value() = false
@@ -1125,15 +1122,11 @@ namespace plg {
 		constexpr void operator*() const noexcept {}
 
 		constexpr void value() const& {
-			if (!has_value()) {
-				throw bad_expected_access(error());
-			}
+			PLUGIFY_ASSERT(has_value(), "bad expected access", bad_expected_access, error());
 		}
 
 		constexpr void value() && {
-			if (!has_value()) {
-				throw bad_expected_access(std::move(error()));
-			}
+			PLUGIFY_ASSERT(has_value(), "bad expected access", bad_expected_access, std::move(error()));
 		}
 
 		// precondition: has_value() = false
@@ -1426,5 +1419,27 @@ namespace plg {
 		};
 	};
 
-}// namespace plg
+} // namespace plg
+
+namespace std {
+	template<class U, class G>
+	using expected = plg::expected<U, G>;
+
+	template <class T>
+	concept is_expected = std::same_as<std::remove_cvref_t<T>, expected<typename T::value_type, typename T::error_type> >;
+
+#if PLUGIFY_COMPILER_CLANG
+	template <class U>
+	struct unexpected : public plg::unexpected<U> {
+		using plg::unexpected<U>::unexpected;
+	};
+	template <class U>
+	unexpected(U) -> unexpected<U>;
+#else
+	template <class U>
+	using unexpected = plg::unexpected<U>;
 #endif
+
+} // namespace std
+
+#endif // !PLUGIFY_HAS_STD_EXPECTED

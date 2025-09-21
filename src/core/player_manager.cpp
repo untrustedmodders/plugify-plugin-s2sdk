@@ -1,17 +1,19 @@
-#include "player_manager.hpp"
-#include "listeners.hpp"
-
 #include <core/sdk/entity/cbaseplayercontroller.h>
 #include <core/sdk/entity/cplayercontroller.h>
 #include <core/sdk/entity/cplayerpawn.h>
 #include <core/sdk/utils.h>
-
 #include <eiface.h>
 #include <inetchannelinfo.h>
 #include <iserver.h>
+#include <netmessages.h>
 
+#include "player_manager.hpp"
+#include "listeners.hpp"
 
 PlayerManager g_PlayerManager;
+
+constexpr int CLIENT_LANGUAGE_ID = INT_MAX;
+constexpr int CLIENT_OPERATING_SYSTEMID = INT_MAX - 1;
 
 CBasePlayerController* Player::GetController() const {
 	auto entIndex = GetEntityIndex();
@@ -86,14 +88,22 @@ bool Player::IsValidClient() const {
 	return controller && controller->IsController() && client->IsConnected() && client->IsInGame() && !client->IsHLTV();
 }
 
-const char* Player::GetName() const {
+std::string_view Player::GetName() const {
 	auto client = GetClient();
-	return client ? client->GetClientName() : "<blank>";
+	return client ? client->GetClientName() : "<unknown>";
 }
 
-const char* Player::GetIpAddress() const {
+std::string_view Player::GetIpAddress() const {
 	auto client = GetClient();
-	return client ? client->GetNetChannel()->GetRemoteAddress().ToString(true) : nullptr;
+	return client ? client->GetNetChannel()->GetRemoteAddress().ToString(true) : "<unknown>";
+}
+
+std::string_view Player::GetLanguage() const {
+	return m_language;
+}
+
+std::string_view Player::GetOperatingSystem() const {
+	return m_operatingSystem;
 }
 
 CSteamID Player::GetSteamId(bool validated) const {
@@ -128,6 +138,32 @@ float Player::GetLatency() const {
 
 void Player::Kick(const char* internalReason, ENetworkDisconnectionReason reason) const {
 	g_pEngineServer->KickClient(GetPlayerSlot(), internalReason, reason);
+}
+
+void Player::QueryCvar(int queryCvarCookie, CvarQuery query) {
+	m_queryCallback[queryCvarCookie] = std::move(query);
+}
+
+void Player::OnRepondCvarValue(const CCLCMsg_RespondCvarValue_t& msg) {
+	switch (msg.cookie()) {
+		case CLIENT_LANGUAGE_ID:
+			m_language = msg.value();
+			break;
+
+		case CLIENT_OPERATING_SYSTEMID:
+			m_operatingSystem = msg.value();
+			break;
+
+		default: {
+			auto it = m_queryCallback.find(msg.cookie());
+			if (it != m_queryCallback.end()) {
+				auto& [callback, data] = it->second;
+				callback(m_slot, msg.cookie(), static_cast<CvarValueStatus>(msg.status_code()), msg.name(), msg.value(), data);
+				m_queryCallback.erase(it);
+			}
+			break;
+		}
+	}
 }
 
 void PlayerManager::OnSteamAPIActivated() {
@@ -187,7 +223,11 @@ bool PlayerManager::OnClientConnect_Post(CPlayerSlot slot, bool origRet) {
 	return origRet;
 }
 
-void PlayerManager::OnClientConnected(CPlayerSlot slot) {
+void PlayerManager::OnClientConnected(CPlayerSlot slot, bool fakePlayer) {
+	if (!fakePlayer) {
+		utils::SendCvarValueQueryToClient(slot, "cl_language", CLIENT_LANGUAGE_ID);
+		utils::SendCvarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
+	}
 	GetOnClientConnectedListenerManager().Notify(slot);
 }
 
@@ -218,6 +258,27 @@ void PlayerManager::OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnect
 
 void PlayerManager::OnClientActive(CPlayerSlot slot, bool loadGame) const {
 	GetOnClientActiveListenerManager().Notify(slot, loadGame);
+}
+
+bool PlayerManager::QueryCvarValue(CPlayerSlot slot, const plg::string& convarName, CvarValueCallback callback, const plg::any& data) {
+	Player* player = ToPlayer(slot);
+	if (player) {
+		int queryCvarCookie = utils::SendCvarValueQueryToClient(slot, convarName.c_str());
+		if (queryCvarCookie != -1) {
+			std::lock_guard<std::mutex> lock(m_mutex);
+			player->QueryCvar(queryCvarCookie, CvarQuery{callback, data});
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void PlayerManager::OnRespondCvarValue(CServerSideClientBase* client, const CCLCMsg_RespondCvarValue_t& msg) {
+	Player* player = ToPlayer(client);
+	if (player) {
+		player->OnRepondCvarValue(msg);
+	}
 }
 
 int PlayerManager::MaxClients() {

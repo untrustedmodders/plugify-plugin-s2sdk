@@ -11,6 +11,8 @@ ClientIndexToPlayerSlot
 GetClientAuthId
 GetClientAccountId
 GetClientIp
+GetClientLanguage
+GetClientOS
 GetClientName
 GetClientTime
 GetClientLatency
@@ -145,6 +147,7 @@ SetConVarQAngle
 SendConVarValue
 GetClientConVarValue
 SetFakeClientConVarValue
+QueryClientConVar
 
 FindModule
 FindInterface
