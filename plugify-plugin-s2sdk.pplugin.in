@@ -7711,8 +7711,8 @@
               },
               {
                 "name": "data",
-                "type": "any",
-                "description": "The value that was passed when query was started."
+                "type": "any[]",
+                "description": "The values that was passed when query was started."
               }
             ],
             "retType": {
@@ -7722,9 +7722,9 @@
         },
         {
           "name": "data",
-          "type": "any",
+          "type": "any[]",
           "ref": false,
-          "description": "Optional value to pass to the callback function."
+          "description": "Optional values to pass to the callback function."
         }
       ],
       "retType": {

@@ -30,11 +30,11 @@ enum class CvarValueStatus {
 	CvarProtected = 3	// The cvar was marked with FCVAR_SERVER_CAN_NOT_QUERY, so the server is not allowed to have its value.
 };
 
-using CvarValueCallback = void(*)(CPlayerSlot slot, int cookie, CvarValueStatus code, const plg::string& name, const plg::string& value, const plg::any& data);
+using CvarValueCallback = void(*)(CPlayerSlot slot, int cookie, CvarValueStatus code, const plg::string& name, const plg::string& value, const plg::vector<plg::any>& data);
 
 struct CvarQuery {
 	CvarValueCallback callback;
-	plg::any data;
+	plg::vector<plg::any> data;
 };
 
 class Player {
@@ -103,7 +103,7 @@ private:
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
 	std::string m_language;
 	std::string m_operatingSystem;
-	std::flat_map<int, CvarQuery> m_queryCallback;
+	std::map<int, CvarQuery> m_queryCallback;
 };
 
 class PlayerManager {
@@ -129,7 +129,7 @@ public:
 	void OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnectionReason reason);
 	void OnClientActive(CPlayerSlot slot, bool loadGame) const;
 
-	bool QueryCvarValue(CPlayerSlot slot, const plg::string& convarName, CvarValueCallback callback, const plg::any& data);
+	bool QueryCvarValue(CPlayerSlot slot, const plg::string& convarName, CvarValueCallback callback, const plg::vector<plg::any>& data);
 	void OnRespondCvarValue(CServerSideClientBase* client, const CCLCMsg_RespondCvarValue_t& msg);
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(PlayerManager, OnValidateAuthTicket, ValidateAuthTicketResponse_t, m_CallbackValidateAuthTicketResponse);

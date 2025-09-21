@@ -256,7 +256,7 @@ void PlayerManager::OnClientActive(CPlayerSlot slot, bool loadGame) const {
 	GetOnClientActiveListenerManager().Notify(slot, loadGame);
 }
 
-bool PlayerManager::QueryCvarValue(CPlayerSlot slot, const plg::string& convarName, CvarValueCallback callback, const plg::any& data) {
+bool PlayerManager::QueryCvarValue(CPlayerSlot slot, const plg::string& convarName, CvarValueCallback callback, const plg::vector<plg::any>& data) {
 	if (Player* player = ToPlayer(slot)) {
 		int queryCvarCookie = utils::SendCvarValueQueryToClient(slot, convarName.c_str());
 		if (queryCvarCookie != -1) {

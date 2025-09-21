@@ -1165,12 +1165,12 @@ extern "C" PLUGIN_API void SetFakeClientConVarValue(int playerSlot, const plg::s
  * @param playerSlot The index of the player's slot to query the value from.
  * @param convarName The name of client convar to query.
  * @param callback A function to use as a callback when the query has finished.
- * @param data Optional value to pass to the callback function.
+ * @param data Optional values to pass to the callback function.
  *
  * @return A cookie that uniquely identifies the query. Returns -1 on failure, such as when used on
  * a bot.
  */
-extern "C" PLUGIN_API int QueryClientConVar(int playerSlot, const plg::string& convarName, CvarValueCallback callback, const plg::any& data) {
+extern "C" PLUGIN_API int QueryClientConVar(int playerSlot, const plg::string& convarName, CvarValueCallback callback, const plg::vector<plg::any>& data) {
 	return g_PlayerManager.QueryCvarValue(playerSlot, convarName, callback, data);
 }
 
