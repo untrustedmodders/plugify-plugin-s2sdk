@@ -79,13 +79,11 @@ namespace pb = google::protobuf;
 		return false;                                                                              \
 	}
 
-#define CHECK_REPEATED_ELEMENT(idx)                                                                        \
-	{                                                                                                      \
-		int elemCount = m_msg->GetReflection()->FieldSize(*m_msg, field);                                  \
-		if (elemCount == 0 || idx >= elemCount || idx < 0) {                                               \
-			S2_LOGF(LS_WARNING, "Field '{}' invalid index {} (size = {})", field->name(), idx, elemCount); \
-			return false;                                                                                  \
-		}                                                                                                  \
+#define CHECK_REPEATED_ELEMENT(idx)                                                                    \
+	int elemCount = m_msg->GetReflection()->FieldSize(*m_msg, field);                                  \
+	if (elemCount == 0 || idx >= elemCount || idx < 0) {                                               \
+		S2_LOGF(LS_WARNING, "Field '{}' invalid index {} (size = {})", field->name(), idx, elemCount); \
+		return false;                                                                                  \
 	}
 
 class INetworkMessageInternal;
