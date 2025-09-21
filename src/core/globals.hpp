@@ -1,9 +1,12 @@
 #pragma once
 
-#include <playerslot.h>
-#include <steam_api.h>
 #include <plg/plugin.hpp>
 #include <plg/flat_map.hpp>
+#include <plg/inplace_vector.hpp>
+#include <plg/enum.hpp>
+
+#include <playerslot.h>
+#include <steam_api.h>
 #include <tier0/platform.h>
 #include <tier0/utlstring.h>
 #include <variant.h>

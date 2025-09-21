@@ -68,12 +68,6 @@ void Source2SDK::OnPluginStart() {
 	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput_FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
-	using ProcessRespondCvarValueFn = void* (*)(const CServerSideClient*, const CCLCMsg_RespondCvarValue_t& msg);
-	auto pServerSideClientVTable = g_GameConfigManager.GetModule("engine2")->GetVirtualTableByName("CServerSideClient").CCast<uintptr_t*>();
-	auto fProcessRespondCvarValue = &CServerSideClient::ProcessRespondCvarValue;
-	int iProcessRespondCvarValueOffset = poly::GetVTableIndex((void*&) fProcessRespondCvarValue);
-	g_PH.AddHookDetourFunc<ProcessRespondCvarValueFn>(pServerSideClientVTable[iProcessRespondCvarValueOffset], Hook_OnProcessRespondCvarValue, Post);
-
 #if S2SDK_PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);
 	g_PH.AddHookDetourFunc<PreloadLibrary>("PreloadLibrary", Hook_PreloadLibrary, Pre);
@@ -266,6 +260,10 @@ poly::ReturnAction Source2SDK::Hook_ClientDisconnect(poly::IHook& hook, poly::Pa
 
 	//S2_LOGF(LS_DEBUG, "[ClientDisconnect] = {}, {}, \"{}\", {}, \"{}\"\n", slot, reason, name, steamID64, networkID);
 
+	if (auto* client = utils::GetClientBySlot(slot)) {
+		g_PH.RemoveHookMemFunc(&CServerSideClient::ProcessRespondCvarValue, client);
+	}
+
 	if (type == poly::CallbackType::Pre) {
 		g_PlayerManager.OnClientDisconnect(slot, reason);
 	} else {
@@ -308,7 +306,12 @@ poly::ReturnAction Source2SDK::Hook_OnClientConnected(poly::IHook& hook, poly::P
 	auto pszAddress = poly::GetArgument<const char*>(params, 5);*/
 	auto bFakePlayer = poly::GetArgument<bool>(params, 6);
 
-	//S2_LOGF(LS_DEBUG, "[OnClientConnected] = {}, \"{}\", {}, \"{}\", \"{}\", {}\n", slot, name, steamID64, networkID, pszAddress, bFakePlayer);
+	// S2_LOGF(LS_DEBUG, "[OnClientConnected] = {}, \"{}\", {}, \"{}\", \"{}\", {}\n", slot, name,
+	// steamID64, networkID, pszAddress, bFakePlayer);
+
+	if (auto* client = utils::GetClientBySlot(slot)) {
+		g_PH.AddHookMemFunc(&CServerSideClient::ProcessRespondCvarValue, client, Hook_OnProcessRespondCvarValue, poly::CallbackType::Post);
+	}
 
 	g_PlayerManager.OnClientConnected(slot, bFakePlayer);
 	return poly::ReturnAction::Ignored;
