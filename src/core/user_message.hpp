@@ -7,45 +7,86 @@
 
 namespace pb = google::protobuf;
 
-#define GETCHECK_FIELD()                                                                   \
-	const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(fieldName); \
-	if (!field) {                                                                          \
-		return false;                                                                      \
+#define GETCHECK_FIELD()                                                                           \
+	const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(fieldName);         \
+	if (!field) {                                                                                  \
+		S2_LOGF(                                                                                   \
+		    LS_WARNING,                                                                            \
+		    "Field '{}' not found in message '{}'",                                                \
+		    fieldName,                                                                             \
+		    m_msg->GetDescriptor()->name()                                                         \
+		);                                                                                         \
+		return false;                                                                              \
 	}
 
-#define CHECK_FIELD_TYPE(type)                                      \
-	if (field->cpp_type() != pb::FieldDescriptor::CPPTYPE_##type) { \
-		return false;                                               \
+#define CHECK_FIELD_TYPE(type)                                                                     \
+	if (field->cpp_type() != pb::FieldDescriptor::CPPTYPE_##type) {                                \
+		S2_LOGF(                                                                                   \
+		    LS_WARNING,                                                                            \
+		    "Field '{}' has wrong type: expected {}, got {}",                                      \
+		    field->name(),                                                                         \
+		    #type,                                                                                 \
+		    plg::enum_to_string(field->cpp_type())                                                 \
+		);                                                                                         \
+		return false;                                                                              \
 	}
 
-#define CHECK_FIELD_TYPE2(type1, type2)                                                                           \
-	pb::FieldDescriptor::CppType fieldType = field->cpp_type();                                                   \
-	if (fieldType != pb::FieldDescriptor::CPPTYPE_##type1 && fieldType != pb::FieldDescriptor::CPPTYPE_##type2) { \
-		return false;                                                                                             \
+#define CHECK_FIELD_TYPE2(type1, type2)                                                            \
+	{                                                                                              \
+		pb::FieldDescriptor::CppType fieldType = field->cpp_type();                                \
+		if (fieldType != pb::FieldDescriptor::CPPTYPE_##type1                                      \
+		    && fieldType != pb::FieldDescriptor::CPPTYPE_##type2) {                                \
+			S2_LOGF(                                                                               \
+			    LS_WARNING,                                                                        \
+			    "Field '{}' has wrong type: expected {} or {}, got {}",                            \
+			    field->name(),                                                                     \
+			    #type1,                                                                            \
+			    #type2,                                                                            \
+			    fieldType                                                                          \
+			);                                                                                     \
+			return false;                                                                          \
+		}                                                                                          \
 	}
 
-#define CHECK_FIELD_TYPE3(type1, type2, type3)                                                                    \
-	pb::FieldDescriptor::CppType fieldType = field->cpp_type();                                                   \
-	if (fieldType != pb::FieldDescriptor::CPPTYPE_##type1 && fieldType != pb::FieldDescriptor::CPPTYPE_##type2 && \
-		fieldType != pb::FieldDescriptor::CPPTYPE_##type3) {                                                      \
-		return false;                                                                                             \
+#define CHECK_FIELD_TYPE3(type1, type2, type3)                                                     \
+	{                                                                                              \
+		pb::FieldDescriptor::CppType fieldType = field->cpp_type();                                \
+		if (fieldType != pb::FieldDescriptor::CPPTYPE_##type1                                      \
+		    && fieldType != pb::FieldDescriptor::CPPTYPE_##type2                                   \
+		    && fieldType != pb::FieldDescriptor::CPPTYPE_##type3) {                                \
+			S2_LOGF(                                                                               \
+			    LS_WARNING,                                                                        \
+			    "Field '{}' has wrong type: expected {}, {}, or {}, got {}",                       \
+			    field->name(),                                                                     \
+			    #type1,                                                                            \
+			    #type2,                                                                            \
+			    #type3,                                                                            \
+			    fieldType                                                                          \
+			);                                                                                     \
+			return false;                                                                          \
+		}                                                                                          \
 	}
 
-#define CHECK_FIELD_REPEATED()                                   \
-	if (field->label() != pb::FieldDescriptor::LABEL_REPEATED) { \
-		return false;                                            \
+#define CHECK_FIELD_REPEATED()                                                                     \
+	if (field->label() != pb::FieldDescriptor::LABEL_REPEATED) {                                   \
+		S2_LOGF(LS_WARNING, "Field '{}' is not repeated as expected", field->name());              \
+		return false;                                                                              \
 	}
 
-#define CHECK_FIELD_NOT_REPEATED()                               \
-	if (field->label() == pb::FieldDescriptor::LABEL_REPEATED) { \
-		return false;                                            \
+#define CHECK_FIELD_NOT_REPEATED()                                                                 \
+	if (field->label() == pb::FieldDescriptor::LABEL_REPEATED) {                                   \
+		S2_LOGF(LS_WARNING, "Field '{}' should not be repeated", field->name());                   \
+		return false;                                                                              \
 	}
 
-#define CHECK_REPEATED_ELEMENT(idx)                                   \
-	int elemCount = m_msg->GetReflection()->FieldSize(*m_msg, field); \
-	if (elemCount == 0 || idx >= elemCount || idx < 0) {              \
-		return false;                                                 \
-	};
+#define CHECK_REPEATED_ELEMENT(idx)                                                                        \
+	{                                                                                                      \
+		int elemCount = m_msg->GetReflection()->FieldSize(*m_msg, field);                                  \
+		if (elemCount == 0 || idx >= elemCount || idx < 0) {                                               \
+			S2_LOGF(LS_WARNING, "Field '{}' invalid index {} (size = {})", field->name(), idx, elemCount); \
+			return false;                                                                                  \
+		}                                                                                                  \
+	}
 
 class INetworkMessageInternal;
 namespace google::protobuf {
