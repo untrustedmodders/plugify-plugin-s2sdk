@@ -12,7 +12,7 @@ namespace pb = google::protobuf;
 	if (!field) {                                                                                  \
 		S2_LOGF(                                                                                   \
 		    LS_WARNING,                                                                            \
-		    "Field '{}' not found in message '{}'",                                                \
+		    "Field '{}' not found in message '{}'\n",                                              \
 		    fieldName,                                                                             \
 		    m_msg->GetDescriptor()->name()                                                         \
 		);                                                                                         \
@@ -23,7 +23,7 @@ namespace pb = google::protobuf;
 	if (field->cpp_type() != pb::FieldDescriptor::CPPTYPE_##type) {                                \
 		S2_LOGF(                                                                                   \
 		    LS_WARNING,                                                                            \
-		    "Field '{}' has wrong type: expected {}, got {}",                                      \
+		    "Field '{}' has wrong type: expected {}, got {}\n",                                    \
 		    field->name(),                                                                         \
 		    #type,                                                                                 \
 		    plg::enum_to_string(field->cpp_type())                                                 \
@@ -38,7 +38,7 @@ namespace pb = google::protobuf;
 		    && fieldType != pb::FieldDescriptor::CPPTYPE_##type2) {                                \
 			S2_LOGF(                                                                               \
 			    LS_WARNING,                                                                        \
-			    "Field '{}' has wrong type: expected {} or {}, got {}",                            \
+			    "Field '{}' has wrong type: expected {} or {}, got {}\n",                          \
 			    field->name(),                                                                     \
 			    #type1,                                                                            \
 			    #type2,                                                                            \
@@ -56,7 +56,7 @@ namespace pb = google::protobuf;
 		    && fieldType != pb::FieldDescriptor::CPPTYPE_##type3) {                                \
 			S2_LOGF(                                                                               \
 			    LS_WARNING,                                                                        \
-			    "Field '{}' has wrong type: expected {}, {}, or {}, got {}",                       \
+			    "Field '{}' has wrong type: expected {}, {}, or {}, got {}\n",                     \
 			    field->name(),                                                                     \
 			    #type1,                                                                            \
 			    #type2,                                                                            \
@@ -69,21 +69,21 @@ namespace pb = google::protobuf;
 
 #define CHECK_FIELD_REPEATED()                                                                     \
 	if (field->label() != pb::FieldDescriptor::LABEL_REPEATED) {                                   \
-		S2_LOGF(LS_WARNING, "Field '{}' is not repeated as expected", field->name());              \
+		S2_LOGF(LS_WARNING, "Field '{}' is not repeated as expected\n", field->name());            \
 		return false;                                                                              \
 	}
 
 #define CHECK_FIELD_NOT_REPEATED()                                                                 \
 	if (field->label() == pb::FieldDescriptor::LABEL_REPEATED) {                                   \
-		S2_LOGF(LS_WARNING, "Field '{}' should not be repeated", field->name());                   \
+		S2_LOGF(LS_WARNING, "Field '{}' should not be repeated\n", field->name());                 \
 		return false;                                                                              \
 	}
 
-#define CHECK_REPEATED_ELEMENT(idx)                                                                    \
-	int elemCount = m_msg->GetReflection()->FieldSize(*m_msg, field);                                  \
-	if (elemCount == 0 || idx >= elemCount || idx < 0) {                                               \
-		S2_LOGF(LS_WARNING, "Field '{}' invalid index {} (size = {})", field->name(), idx, elemCount); \
-		return false;                                                                                  \
+#define CHECK_REPEATED_ELEMENT(idx)                                                                      \
+	int elemCount = m_msg->GetReflection()->FieldSize(*m_msg, field);                                    \
+	if (elemCount == 0 || idx >= elemCount || idx < 0) {                                                 \
+		S2_LOGF(LS_WARNING, "Field '{}' invalid index {} (size = {})\n", field->name(), idx, elemCount); \
+		return false;                                                                                    \
 	}
 
 class INetworkMessageInternal;
