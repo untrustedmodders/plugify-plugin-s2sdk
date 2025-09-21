@@ -205,9 +205,9 @@ void utils::SendConVarValue(CPlayerSlot slot, const char* name, const char* valu
 	if (g_pEngineServer->GetPlayerNetInfo(slot)) {
 		static INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("CNETMsg_SetConVar");
 		auto msg = pNetMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
-		CMsg_CVars_CVar* cvar = msg->mutable_convars()->add_cvars();
-		cvar->set_name(name);
-		cvar->set_value(value);
+		CMsg_CVars_CVar* data = msg->mutable_convars()->add_cvars();
+		data->set_name(name);
+		data->set_value(value);
 
 		CSingleRecipientFilter filter(slot);
 		g_pGameEventSystem->PostEventAbstract(-1, false, &filter, pNetMsg, msg, 0);
@@ -220,9 +220,9 @@ void utils::SendMultipleConVarValues(CPlayerSlot slot, const char** names, const
 		static INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("CNETMsg_SetConVar");
 		auto msg = pNetMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
 		for (uint32_t i = 0; i < size; ++i) {
-			CMsg_CVars_CVar* cvar = msg->mutable_convars()->add_cvars();
-			cvar->set_name(names[i]);
-			cvar->set_value(value[i]);
+			CMsg_CVars_CVar* data = msg->mutable_convars()->add_cvars();
+			data->set_name(names[i]);
+			data->set_value(value[i]);
 		}
 		CSingleRecipientFilter filter(slot);
 		g_pGameEventSystem->PostEventAbstract(-1, false, &filter, pNetMsg, msg, 0);

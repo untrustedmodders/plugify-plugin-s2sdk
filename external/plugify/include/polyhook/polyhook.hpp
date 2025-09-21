@@ -761,9 +761,6 @@ namespace poly
 		template<class>
 		class function_traits;
 
-		template <typename Function>
-		struct function_traits;
-
 		template <typename Ret, typename... Args>
 		struct function_traits<Ret (*)(Args...)>
 		{

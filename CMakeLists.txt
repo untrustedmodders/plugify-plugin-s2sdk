@@ -151,9 +151,9 @@ elseif(LINUX)
 endif()
 
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /Zc:preprocessor)#/W4 /WX
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX /Zc:preprocessor)
 else()
-    #target_compile_options(${PROJECT_NAME} PRIVATE -Wextra -Wshadow -Wconversion -Wpedantic -Werror)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wextra -Wshadow -Wconversion) # -Werror -Wpedantic
 endif()
 
 if(LINUX)
