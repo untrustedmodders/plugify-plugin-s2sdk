@@ -1,15 +1,14 @@
 #include "panorama_vote.hpp"
-#include "timer_system.hpp"
-#include "server_manager.hpp"
-
-#include <cstrike15_usermessages.pb.h>
-#include <engine/igameeventsystem.h>
-#include <networksystem/inetworkmessages.h>
-
 #include "event_listener.hpp"
 #include "server_manager.hpp"
+#include "timer_system.hpp"
+
 #include <core/sdk/entity/cplayercontroller.h>
+#include <engine/igameeventsystem.h>
+#include <networksystem/inetworkmessages.h>
 #include <recipientfilter.h>
+#include <cstrike15_usermessages.pb.h>
+#include <cstrike15/usermessages.h>
 
 void CPanoramaVoteHandler::Reset() {
 	m_voteInProgress = false;
@@ -175,7 +174,7 @@ bool CPanoramaVoteHandler::SendYesNoVote(double duration, int caller,
 }
 
 void CPanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
-	/*INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteStart");
+	INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteStart");
 	auto data = pNetMsg->AllocateMessage()->As<CCSUsrMsg_VoteStart_t>();
 
 	data->set_team(-1);
@@ -187,7 +186,7 @@ void CPanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
 
 	g_pGameEventSystem->PostEventAbstract(-1, false, filter, pNetMsg, data, 0);
 
-	delete data;*/
+	delete data;
 }
 
 void CPanoramaVoteHandler::InitVoters(IRecipientFilter* filter) {
@@ -289,7 +288,7 @@ void CPanoramaVoteHandler::EndVote(VoteEndReason reason) {
 }
 
 void CPanoramaVoteHandler::SendVoteFailed() const {
-	/*INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteFailed");
+	INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteFailed");
 
 	auto data = pNetMsg->AllocateMessage()->As<CCSUsrMsg_VoteFailed_t>();
 
@@ -304,11 +303,11 @@ void CPanoramaVoteHandler::SendVoteFailed() const {
 	}
 	g_pGameEventSystem->PostEventAbstract(-1, false, &filter, pNetMsg, data, 0);
 
-	delete data;*/
+	delete data;
 }
 
 void CPanoramaVoteHandler::SendVotePassed() const {
-	/*INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VotePass");
+	INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VotePass");
 
 	auto data = pNetMsg->AllocateMessage()->As<CCSUsrMsg_VotePass_t>();
 
@@ -325,7 +324,7 @@ void CPanoramaVoteHandler::SendVotePassed() const {
 	}
 	g_pGameEventSystem->PostEventAbstract(-1, false, &filter, pNetMsg, data, 0);
 
-	delete data;*/
+	delete data;
 }
 
 GAME_EVENT_F(vote_cast) {
