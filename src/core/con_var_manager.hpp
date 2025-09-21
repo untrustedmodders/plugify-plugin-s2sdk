@@ -72,7 +72,7 @@ public:
 
 	template<typename T>
 	ConVarRef CreateConVar(const plg::string& name, const plg::string& description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
-		std::lock_guard<std::mutex> lock(m_registerCnvLock);
+		std::scoped_lock lock(m_registerCnvLock);
 
 		if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
 			return {};
@@ -96,7 +96,7 @@ public:
 
 	template<typename T>
 	ConVarRef FindConVar(const plg::string& name) {
-		std::lock_guard<std::mutex> lock(m_registerCnvLock);
+		std::scoped_lock lock(m_registerCnvLock);
 
 		auto it = m_cnvLookup.find(name);
 		if (it != m_cnvLookup.end()) {
@@ -122,7 +122,7 @@ public:
 	void UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
 
 	template<typename T>
-	static void ChangeCallback(CConVar<T>* ref, const CSplitScreenSlot nSlot, const T* pNewValue, const T* pOldValue) {
+	static void ChangeCallback(CConVar<T>* ref, const CSplitScreenSlot slot, const T* pNewValue, const T* pOldValue) {
 		auto it = g_ConVarManager.m_cnvCache.find(ref);
 		if (it == g_ConVarManager.m_cnvCache.end())
 			return;
@@ -154,7 +154,7 @@ public:
 		}
 	}
 
-	static void ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot nSlot, const char* pNewValue, const char* pOldValue, void*);
+	static void ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot slot, const char* pNewValue, const char* pOldValue, void*);
 
 private:
 	std::unordered_map<plg::string, ConVarInfoPtr, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;

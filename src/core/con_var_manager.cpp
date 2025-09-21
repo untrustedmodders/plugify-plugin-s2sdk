@@ -15,7 +15,7 @@ ConVarInfo::ConVarInfo(plg::string name, plg::string description) : name(std::mo
 }
 
 bool ConVarManager::RemoveConVar(const plg::string& name) {
-	std::lock_guard<std::mutex> lock(m_registerCnvLock);
+	std::scoped_lock lock(m_registerCnvLock);
 
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
@@ -28,7 +28,7 @@ bool ConVarManager::RemoveConVar(const plg::string& name) {
 }
 
 ConVarRef ConVarManager::FindConVar(const plg::string& name) {
-	std::lock_guard<std::mutex> lock(m_registerCnvLock);
+	std::scoped_lock lock(m_registerCnvLock);
 
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
@@ -48,7 +48,7 @@ ConVarRef ConVarManager::FindConVar(const plg::string& name) {
 }
 
 void ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
-	std::lock_guard<std::mutex> lock(m_registerCnvLock);
+	std::scoped_lock lock(m_registerCnvLock);
 
 	if (name.empty()) {
 		if (m_global.Empty()) {
@@ -66,7 +66,7 @@ void ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListen
 }
 
 void ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
-	std::lock_guard<std::mutex> lock(m_registerCnvLock);
+	std::scoped_lock lock(m_registerCnvLock);
 
 	if (name.empty()) {
 		m_global.Unregister(callback);
@@ -83,7 +83,7 @@ void ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeList
 	}
 }
 
-void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot nSlot, const char* pNewValue, const char* pOldValue, void*) {
+void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot slot, const char* pNewValue, const char* pOldValue, void*) {
 	g_ConVarManager.m_global.Notify(*ref, pNewValue, pOldValue);
 }
 

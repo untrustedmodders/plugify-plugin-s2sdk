@@ -14,6 +14,7 @@
 #include <span>
 #include <set>
 #include <mutex>
+#include <shared_mutex>
 #include <atomic>
 #include <sstream>
 #include <stack>

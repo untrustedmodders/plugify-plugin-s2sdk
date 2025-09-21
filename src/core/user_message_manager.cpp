@@ -2,7 +2,7 @@
 #include "user_message.hpp"
 
 bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode) {
-	std::lock_guard<std::mutex> lock(m_registerCmdLock);
+	std::scoped_lock lock(m_registerCmdLock);
 	
 	if (messageId == 0) {
 		return m_globalCallbacks[static_cast<size_t>(mode)].Register(callback);
@@ -19,7 +19,7 @@ bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback 
 }
 
 bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode) {
-	std::lock_guard<std::mutex> lock(m_registerCmdLock);
+	std::scoped_lock lock(m_registerCmdLock);
 	
 	if (messageId == 0) {
 		return m_globalCallbacks[static_cast<size_t>(mode)].Unregister(callback);
