@@ -148,6 +148,7 @@ SendConVarValue
 GetClientConVarValue
 SetFakeClientConVarValue
 QueryClientConVar
+GetServerLanguage
 
 FindModule
 FindInterface

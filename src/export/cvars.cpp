@@ -1,6 +1,7 @@
 #include <basetypes.h>
 #include <convar.h>
 #include <core/con_var_manager.hpp>
+#include <core/core_config.hpp>
 #include <core/game_config.hpp>
 #include <core/sdk/utils.h>
 #include <core/sdk/virtual.h>
@@ -1172,6 +1173,14 @@ extern "C" PLUGIN_API void SetFakeClientConVarValue(int playerSlot, const plg::s
  */
 extern "C" PLUGIN_API int QueryClientConVar(int playerSlot, const plg::string& convarName, CvarValueCallback callback, const plg::vector<plg::any>& data) {
 	return g_PlayerManager.QueryCvarValue(playerSlot, convarName, callback, data);
+}
+
+/**
+ * @brief Returns the current server language.
+ * @return The server language as a string.
+ */
+extern "C" PLUGIN_API plg::string GetServerLanguage() {
+	return g_pCoreConfig->ServerLanguage;
 }
 
 PLUGIFY_WARN_POP()

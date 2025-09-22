@@ -7733,6 +7733,17 @@
       }
     },
     {
+      "name": "GetServerLanguage",
+      "group": "Cvars",
+      "description": "Returns the current server language.",
+      "funcName": "GetServerLanguage",
+      "paramTypes": [],
+      "retType": {
+        "type": "string",
+        "description": "The server language as a string."
+      }
+    },
+    {
       "name": "FindModule",
       "group": "Engine",
       "description": "Finds a module by name.",

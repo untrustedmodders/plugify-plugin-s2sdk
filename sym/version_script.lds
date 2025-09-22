@@ -150,6 +150,7 @@
         GetClientConVarValue;
         SetFakeClientConVarValue;
         QueryClientConVar;
+        GetServerLanguage;
 
         FindModule;
         FindInterface;
