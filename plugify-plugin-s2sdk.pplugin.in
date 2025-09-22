@@ -7701,12 +7701,12 @@
               },
               {
                 "name": "name",
-                "type": "int32",
+                "type": "string",
                 "description": "The name of client convar that was queried."
               },
               {
                 "name": "value",
-                "type": "int32",
+                "type": "string",
                 "description": "The value of client convar that was queried if successful. This will be empty if it was not."
               },
               {
