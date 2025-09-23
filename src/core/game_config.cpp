@@ -319,12 +319,7 @@ DynLibUtils::CModule* GameConfigManager::GetModule(std::string_view name) {
 		return &std::get<DynLibUtils::CModule>(*it);
 	}
 
-	auto system = globals::FindModule(name);
-	if (system != nullptr) {
-		return &m_modules.try_emplace(name, DynLibUtils::CModule{system}).first->second;
-	}
-
-	return nullptr;
+	return &m_modules.try_emplace(name, DynLibUtils::CModule{name}).first->second;
 }
 
 GameConfigManager g_GameConfigManager;
