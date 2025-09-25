@@ -270,8 +270,6 @@ GameConfigManager::GameConfigManager() {
 }
 
 uint32_t GameConfigManager::LoadGameConfigFile(plg::vector<plg::string> paths) {
-	std::scoped_lock lock(m_lockConfigLock);
-
 	for (auto& [id, config] : m_configs) {
 		if (config.GetPaths() == paths) {
 			++config.m_refCount;
@@ -290,8 +288,6 @@ uint32_t GameConfigManager::LoadGameConfigFile(plg::vector<plg::string> paths) {
 }
 
 void GameConfigManager::CloseGameConfigFile(uint32_t id) {
-	std::scoped_lock lock(m_lockConfigLock);
-
 	auto it = m_configs.find(id);
 	if (it != m_configs.end()) {
 		auto& config = std::get<GameConfig>(*it);
@@ -302,8 +298,6 @@ void GameConfigManager::CloseGameConfigFile(uint32_t id) {
 }
 
 GameConfig* GameConfigManager::GetGameConfig(uint32_t id) {
-	std::scoped_lock lock(m_lockConfigLock);
-	
 	auto it = m_configs.find(id);
 	if (it != m_configs.end()) {
 		return &std::get<GameConfig>(*it);
@@ -312,8 +306,6 @@ GameConfig* GameConfigManager::GetGameConfig(uint32_t id) {
 }
 
 DynLibUtils::CModule* GameConfigManager::GetModule(std::string_view name) {
-	std::scoped_lock lock(m_lockConfigLock);
-	
 	auto it = m_modules.find(name);
 	if (it != m_modules.end()) {
 		return &std::get<DynLibUtils::CModule>(*it);

@@ -141,7 +141,7 @@ public:
 
 protected:
 	std::array<Player, MAXPLAYERS + 1> m_players{};
-	std::mutex m_mutex;
+	//std::mutex m_mutex;
 	bool m_callbackRegistered{};
 };
 

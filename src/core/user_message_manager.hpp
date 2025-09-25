@@ -24,7 +24,7 @@ public:
 private:
 	std::unordered_map<int16_t, UserMessageHook> m_hooksMap;
 	UserMessageHook m_global;
-	std::mutex m_registerCmdLock;
+	//std::mutex m_registerCmdLock;
 };
 
 extern UserMessageManager g_UserMessageManager;

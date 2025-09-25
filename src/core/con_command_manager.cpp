@@ -24,8 +24,6 @@ ConCommandInfo::~ConCommandInfo() {
 }
 
 bool ConCommandManager::AddCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
-	std::scoped_lock lock(m_registerCmdLock);
-
 	if (name.empty()) {
 		return m_globalCallbacks[static_cast<size_t>(mode)].Register(callback);
 	}
@@ -48,8 +46,6 @@ bool ConCommandManager::AddCommandListener(const plg::string& name, CommandListe
 }
 
 bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
-	std::scoped_lock lock(m_registerCmdLock);
-
 	if (name.empty()) {
 		return m_globalCallbacks[static_cast<size_t>(mode)].Unregister(callback);
 	}
@@ -64,8 +60,6 @@ bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandLi
 }
 
 bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, uint64 adminFlags) {
-	std::scoped_lock lock(m_registerCmdLock);
-
 	if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
 		return false;
 	}
@@ -96,8 +90,6 @@ bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::stri
 }
 
 bool ConCommandManager::RemoveValveCommand(const plg::string& name) {
-	std::scoped_lock lock(m_registerCmdLock);
-
 	auto commandRef = g_pCVar->FindConCommand(name.c_str());
 	if (!commandRef.IsValidRef()) {
 		return false;
@@ -170,7 +162,6 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(const plg::string& name, c
 		}
 	}
 
-	std::scoped_lock lock(m_registerCmdLock);
 	auto it = m_cmdLookup.find(name);
 	if (it != m_cmdLookup.end()) {
 		const auto& commandInfo = *std::get<CommandInfoPtr>(*it);

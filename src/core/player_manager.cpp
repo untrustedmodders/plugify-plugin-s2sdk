@@ -260,7 +260,6 @@ bool PlayerManager::QueryCvarValue(CPlayerSlot slot, const plg::string& convarNa
 	if (Player* player = ToPlayer(slot)) {
 		int queryCvarCookie = utils::SendCvarValueQueryToClient(slot, convarName.c_str());
 		if (queryCvarCookie != -1) {
-			std::scoped_lock lock(m_mutex);
 			player->QueryCvar(queryCvarCookie, CvarQuery{callback, data});
 			return true;
 		}

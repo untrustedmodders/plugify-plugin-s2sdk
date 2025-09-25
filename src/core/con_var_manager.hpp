@@ -72,8 +72,6 @@ public:
 
 	template<typename T>
 	ConVarRef CreateConVar(const plg::string& name, const plg::string& description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
-		std::scoped_lock lock(m_registerCnvLock);
-
 		if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
 			return {};
 		}
@@ -96,8 +94,6 @@ public:
 
 	template<typename T>
 	ConVarRef FindConVar(const plg::string& name) {
-		std::scoped_lock lock(m_registerCnvLock);
-
 		auto it = m_cnvLookup.find(name);
 		if (it != m_cnvLookup.end()) {
 			return *std::get<ConVarInfoPtr>(*it)->conVar;
@@ -160,5 +156,5 @@ private:
 	std::unordered_map<plg::string, ConVarInfoPtr, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
 	plg::flat_map<const ConVarRef*, const ConVarInfo*> m_cnvCache;
 	ListenerManager<ConVarChangeListenerCallback> m_global;
-	std::mutex m_registerCnvLock;
+	//std::mutex m_registerCnvLock;
 };

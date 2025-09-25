@@ -2,8 +2,6 @@
 #include "user_message.hpp"
 
 bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode) {
-	std::scoped_lock lock(m_registerCmdLock);
-	
 	if (messageId == 0) {
 		return m_global.callbacks[static_cast<size_t>(mode)].Register(callback);
 	}
@@ -19,8 +17,6 @@ bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback 
 }
 
 bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode) {
-	std::scoped_lock lock(m_registerCmdLock);
-	
 	if (messageId == 0) {
 		return m_global.callbacks[static_cast<size_t>(mode)].Unregister(callback);
 	}
@@ -35,8 +31,6 @@ bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallbac
 }
 
 ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode) {
-	std::scoped_lock lock(m_registerCmdLock);
-
 	UserMessage message(msgSerializable, msgData, *clients);
 
 	int16_t messageID = message.GetMessageID();

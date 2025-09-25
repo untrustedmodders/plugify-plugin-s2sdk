@@ -27,7 +27,7 @@ public:
 private:
 	std::unordered_map<OutputKey, CallbackPair, plg::pair_hash<plg::string, plg::string>> m_hookMap;
 	std::vector<CallbackPair*> m_vecCallbackPairs;
-	std::mutex m_registerHookLock;
+	//std::mutex m_registerHookLock;
 };
 
 extern EntityOutputManager g_OutputManager;

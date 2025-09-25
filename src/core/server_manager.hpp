@@ -21,8 +21,8 @@ private:
 
 	std::vector<Task> m_nextWorldUpdateTasks;
 	std::vector<Task> m_nextTasks;
-	std::mutex m_nextWorldUpdateTasksLock;
-	std::mutex m_nextTasksLock;
+	//std::mutex m_nextWorldUpdateTasksLock;
+	//std::mutex m_nextTasksLock;
 };
 
 extern ServerManager g_ServerManager;

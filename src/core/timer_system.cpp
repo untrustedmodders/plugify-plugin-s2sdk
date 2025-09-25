@@ -40,8 +40,6 @@ double TimerSystem::CalculateNextThink(double lastThinkTime, double delay) {
 }
 
 void TimerSystem::RunFrame() {
-	std::scoped_lock lock(m_createTimerLock);
-
 	while (!m_timers.empty()) {
 		auto it = m_timers.begin();
 
@@ -65,8 +63,6 @@ void TimerSystem::RunFrame() {
 }
 
 void TimerSystem::RemoveMapChangeTimers() {
-	std::scoped_lock lock(m_createTimerLock);
-
 	for (auto it = m_timers.begin(); it != m_timers.end();) {
 		if (it->noMapChange) {
 			it = m_timers.erase(it);
@@ -77,16 +73,12 @@ void TimerSystem::RemoveMapChangeTimers() {
 }
 
 uint32_t TimerSystem::CreateTimer(double delay, TimerCallback callback, TimerFlag flags, const plg::vector<plg::any>& userData) {
-	std::scoped_lock lock(m_createTimerLock);
-
 	uint32_t id = ++s_nextId;
 	m_timers.emplace(id, flags & Repeat, flags & NoMapChange, false, false, universalTime + delay, delay, callback, userData);
 	return id;
 }
 
 void TimerSystem::KillTimer(uint32_t id) {
-	std::scoped_lock lock(m_createTimerLock);
-
 	auto it = std::find_if(m_timers.begin(), m_timers.end(), [id](const Timer& timer) {
 		return timer.id == id;
 	});
@@ -101,8 +93,6 @@ void TimerSystem::KillTimer(uint32_t id) {
 }
 
 void TimerSystem::RescheduleTimer(uint32_t id, double newDelay) {
-	std::scoped_lock lock(m_createTimerLock);
-
 	auto it = std::find_if(m_timers.begin(), m_timers.end(), [id](const Timer& timer) {
 		return timer.id == id;
 	});

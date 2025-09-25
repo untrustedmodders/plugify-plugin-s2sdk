@@ -55,7 +55,7 @@ public:
 private:
 	std::unordered_map<uint32_t, GameConfig> m_configs;
 	std::unordered_map<plg::string, DynLibUtils::CModule, plg::string_hash, std::equal_to<>> m_modules;
-	std::mutex m_lockConfigLock;
+	//std::mutex m_lockConfigLock;
 	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
 };
 

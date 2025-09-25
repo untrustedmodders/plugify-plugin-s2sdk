@@ -1,7 +1,6 @@
 #include "output_manager.hpp"
 
 bool EntityOutputManager::HookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode) {
-	std::scoped_lock lock(m_registerHookLock);
 	OutputKey outputKey{std::move(classname), std::move(output)};
 
 	auto it = m_hookMap.find(outputKey);
@@ -15,7 +14,6 @@ bool EntityOutputManager::HookEntityOutput(plg::string classname, plg::string ou
 }
 
 bool EntityOutputManager::UnhookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode) {
-	std::scoped_lock lock(m_registerHookLock);
 	OutputKey outputKey{std::move(classname), std::move(output)};
 
 	auto it = m_hookMap.find(outputKey);
@@ -32,7 +30,6 @@ bool EntityOutputManager::UnhookEntityOutput(plg::string classname, plg::string 
 }
 
 ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* pThis, CEntityInstance* pActivator, CEntityInstance* pCaller, float flDelay) {
-	std::scoped_lock lock(m_registerHookLock);
 
 	if (pCaller) {
 		//S2_LOGF(LS_DEBUG, "[EntityOutputManager][FireOutputHook] - {}, {}\n", pThis->m_pDesc->m_pName, pCaller->GetClassname());

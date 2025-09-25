@@ -12,8 +12,6 @@ EventManager::~EventManager() {
 }
 
 EventHookError EventManager::HookEvent(const plg::string& name, EventListenerCallback callback, HookMode mode) {
-	std::scoped_lock lock(m_registerEventLock);
-
 	if (!g_pGameEventManager->FindListener(this, name.c_str())) {
 		if (!g_pGameEventManager->AddListener(this, name.c_str(), true)) {
 			return EventHookError::InvalidEvent;
@@ -65,8 +63,6 @@ EventHookError EventManager::HookEvent(const plg::string& name, EventListenerCal
 }
 
 EventHookError EventManager::UnhookEvent(const plg::string& name, EventListenerCallback callback, HookMode mode) {
-	std::scoped_lock lock(m_registerEventLock);
-
 	auto it = m_eventHooks.find(name);
 	if (it == m_eventHooks.end()) {
 		return EventHookError::NotActive;
@@ -140,8 +136,6 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 	plg::string name(event->GetName());
 	bool localDontBroadcast = dontBroadcast;
 
-	std::scoped_lock lock(m_registerEventLock);
-
 	auto it = m_eventHooks.find(name);
 	if (it != m_eventHooks.end()) {
 		auto& eventHook = std::get<EventHook>(*it);
@@ -205,7 +199,6 @@ ResultType EventManager::OnFireEvent_Post(IGameEvent* event, bool dontBroadcast)
 		if (--hook->refCount == 0) {
 			AssertFatal(hook->postHook == nullptr);
 			AssertFatal(hook->preHook == nullptr);
-			std::scoped_lock lock(m_registerEventLock);
 			m_eventHooks.erase(hook->name);
 			delete hook;
 		}

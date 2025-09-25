@@ -15,8 +15,6 @@ ConVarInfo::ConVarInfo(plg::string name, plg::string description) : name(std::mo
 }
 
 bool ConVarManager::RemoveConVar(const plg::string& name) {
-	std::scoped_lock lock(m_registerCnvLock);
-
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
 		m_cnvCache.erase(std::get<ConVarInfoPtr>(*it)->conVar.get());
@@ -28,8 +26,6 @@ bool ConVarManager::RemoveConVar(const plg::string& name) {
 }
 
 ConVarRef ConVarManager::FindConVar(const plg::string& name) {
-	std::scoped_lock lock(m_registerCnvLock);
-
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
 		return *std::get<ConVarInfoPtr>(*it)->conVar;
@@ -48,8 +44,6 @@ ConVarRef ConVarManager::FindConVar(const plg::string& name) {
 }
 
 void ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
-	std::scoped_lock lock(m_registerCnvLock);
-
 	if (name.empty()) {
 		if (m_global.Empty()) {
 			g_pCVar->InstallGlobalChangeCallback(&ChangeGlobal);
@@ -66,8 +60,6 @@ void ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListen
 }
 
 void ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
-	std::scoped_lock lock(m_registerCnvLock);
-
 	if (name.empty()) {
 		m_global.Unregister(callback);
 		if (m_global.Empty()) {
