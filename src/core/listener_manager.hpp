@@ -10,8 +10,8 @@ enum class HookMode : bool {
 enum class ResultType : int {
 	Continue = 0,
 	Changed = 1,
-	Handled = 3,
-	Stop = 4,
+	Handled = 2,
+	Stop = 3,
 };
 
 template<class = void>
