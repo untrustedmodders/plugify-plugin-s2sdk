@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.0...v2.0.1) (2025-09-27)
+
+
+### Bug Fixes
+
+* specify lib extension to avoid other files ([2a24d24](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2a24d24db8f7bf015c47cfdea3a3b72571619558))
+
 ## [2.0.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v1.5.1...v2.0.0) (2025-09-27)
 
 
