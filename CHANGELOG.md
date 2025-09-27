@@ -1,5 +1,47 @@
 # Changelog
 
+## [2.0.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v1.5.1...v2.0.0) (2025-09-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* bump for new plugify
+
+### Features
+
+* bump for new plugify ([1be5782](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1be57829df1d8314133a396348cf7ad50ec63368))
+* update sdk ([f1a6e6d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f1a6e6dc4f2874825d8b85f653c7a492786f3b6c))
+
+
+### Bug Fixes
+
+* add cvar query features + client's language and os ([add3e56](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/add3e5677d7ad651b26aef4856cf58f6e504bc6b))
+* add logging to pb ([7e8a11f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7e8a11f52e583eab121aa0d0a62827a3ae110d4f))
+* add missing build macros without prefix ([c7b9b4e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c7b9b4e516099c546a1e29eff093ab353434de4a))
+* add new line to log ([7fb752c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7fb752c0e6a702fcb227061129aba01f920f5d14))
+* add new method `GetServerLanguage` ([5d88855](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5d88855fb38bebf9050db31a6bbf9beb9277f6f4))
+* another hook rework ([ca0ad44](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ca0ad44d86707fc48bc93138a34158fca5d74b96))
+* build ([94db942](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/94db942c254dbc9edcfecadec72cb501e9ccd066))
+* build issue ([4fcebbe](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4fcebbecb9de3725b334558904d85d7c32bac5af))
+* change some client method names ([231905b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/231905b82a4ce3c485566eda9772385d4451153d))
+* changed type of 'name' and 'value' (CvarValueCallback) from int32 to string ([c365a71](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c365a71e65670076e609a5747b99e96bfc441eed))
+* correct include directive syntax ([34a54c9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/34a54c9de9718fa57775940d5c2fdca3a9deca96))
+* enable warnings ([918bb9e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/918bb9ee4f0f13b1487b9ff6af1e62f50311e794))
+* gameconfig loading ([c9fe1d4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c9fe1d40c8dbfd1ec1005cb325fc2b321384eb17))
+* hook for cvar respond ([9c6a7c7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9c6a7c75372332199853e98e6e2704557564d59c))
+* make data as array for cvar query ([3488009](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3488009bc62a7fe21eacd52d1531cc89338bbbd5))
+* remove mutexes ([74a4af6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/74a4af60b74b5a19a4c8336a42404b3935c6cb48))
+* replace hook ([34bf332](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/34bf332bb2c3fe035be0f1adfda9265c0954eac4))
+* replace PostEventAbstract by Send ([4a91994](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4a9199471525ba0cad584f5883743065148d3758))
+* respond hook ([6dd4706](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6dd4706e4e1eece13b177801d0a274324783d578))
+* small refactor ([a3122fa](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a3122fa26edb6e9b074953ed29db7a3a108c1b02))
+* some fixes for hooks ([502670b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/502670b6585d64b8147131afd75821ef7790a88a))
+* uncomment vote ([2cc5a7d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2cc5a7d893521953c40332e00319101f906326d5))
+* update export symbols ([195ba8b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/195ba8bba8ec5f96a481df19062fc8b970bdd1ff))
+* update hook ([d580f77](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d580f776766933df019c08ec086d9a9d39f0ff49))
+* update plugify ([10a0ce1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/10a0ce174a10f79f91ee3b05105b573041491a0d))
+* updating `ResultType` structure ([b2731b6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b2731b651b015f2de62ddf442386ecdf33a93b28))
+
 ## [1.5.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v1.5.0...v1.5.1) (2025-09-17)
 
 
