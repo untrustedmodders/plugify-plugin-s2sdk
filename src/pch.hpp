@@ -28,3 +28,4 @@ namespace fs = std::filesystem;
 
 #include "core/globals.hpp"
 #include "core/logger.hpp"
+#include "safe.hpp"

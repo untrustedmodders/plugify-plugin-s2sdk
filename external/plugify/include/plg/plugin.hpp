@@ -181,15 +181,15 @@ namespace plg {
 namespace plg {
 	namespace raw {
 		struct vector {
-			[[maybe_unused]] uint8_t padding[sizeof(plg::vector<int>)]{};
+			uint8_t pad[sizeof(plg::vector<int>)]{};
 		};
 
 		struct string {
-			[[maybe_unused]] uint8_t padding[sizeof(plg::string)]{};
+			uint8_t pad[sizeof(plg::string)]{};
 		};
 
 		struct variant {
-			[[maybe_unused]] uint8_t padding[sizeof(plg::any)]{};
+			uint8_t pad[sizeof(plg::any)]{};
 		};
 	} // namespace raw
 

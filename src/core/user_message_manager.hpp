@@ -22,9 +22,8 @@ public:
 	ResultType ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode);
 
 private:
-	std::unordered_map<int16_t, UserMessageHook> m_hooksMap;
+	plg::map<int16_t, UserMessageHook> m_hooksMap;
 	UserMessageHook m_global;
-	//std::mutex m_registerCmdLock;
 };
 
 extern UserMessageManager g_UserMessageManager;

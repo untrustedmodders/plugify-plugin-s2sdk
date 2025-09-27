@@ -36,8 +36,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(NOT CMAKE_BUILD_TYPE MATCHES "Debug|Devel|MinSizeRel|RelWithDebInfo|Release")
-    message(STATUS "CMAKE_BUILD_TYPE not set, defaulting to Debug.")
-    set(CMAKE_BUILD_TYPE Debug)
+    message(STATUS "CMAKE_BUILD_TYPE not set, defaulting to Release.")
+    set(CMAKE_BUILD_TYPE Release)
 endif()
 
 if(UNIX)
@@ -138,23 +138,27 @@ elseif(MACOS)
     set_target_properties(${PROJECT_NAME} PROPERTIES OSX_ARCHITECTURES "x86_64")
 endif()
 
-include(GenerateExportHeader)
-generate_export_header(${PROJECT_NAME} EXPORT_MACRO_NAME PLUGIN_API EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/plugin_export.h)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/exports)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE sourcesdk plugify-plugin-configs cpp-memory_utils)
+
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX /Zc:preprocessor $<$<CONFIG:Release>:/Zi>)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wextra -Wshadow -Wconversion $<$<CONFIG:Release>:-g1>) # -Werror -Wpedantic
+endif()
 
 if(MACOS)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/sym/exported_symbols.lds")
 elseif(LINUX)
+    target_link_options(${PROJECT_NAME} PRIVATE
+            -Wl,--wrap=_ZNSs4_Rep20_S_empty_rep_storageE
+            -Wl,--wrap=_ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE
+    )
     target_link_libraries(${PROJECT_NAME} PRIVATE "-Wl,--version-script,${CMAKE_CURRENT_SOURCE_DIR}/sym/version_script.lds")
 endif()
 
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX /Zc:preprocessor)
-else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wextra -Wshadow -Wconversion) # -Werror -Wpedantic
-endif()
+include(GenerateExportHeader)
+generate_export_header(${PROJECT_NAME} EXPORT_MACRO_NAME PLUGIN_API EXPORT_FILE_NAME ${CMAKE_BINARY_DIR}/exports/plugin_export.h)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/exports)
 
 if(LINUX)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _GLIBCXX_USE_CXX11_ABI=0)

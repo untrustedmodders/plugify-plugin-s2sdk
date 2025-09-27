@@ -38,6 +38,8 @@ CGameEntitySystem* GameEntitySystem() {
 }
 
 DynLibUtils::CVTFHookAuto<&CServerSideClientBase::ProcessRespondCvarValue> _ProcessRespondCvarValue;
+void* _ZNSs4_Rep20_S_empty_rep_storageE_ptr;
+void* _ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE_ptr;
 
 void Source2SDK::OnPluginStart() {
 	S2_LOG(LS_DEBUG, "[OnPluginStart] - Source2SDK!\n");
@@ -74,7 +76,8 @@ void Source2SDK::OnPluginStart() {
 	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput_FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
-	auto table = g_GameConfigManager.GetModule("engine2")->GetVirtualTableByName("CServerSideClient");
+	auto engine2 = g_GameConfigManager.GetModule("engine2");
+	auto table = engine2->GetVirtualTableByName("CServerSideClient");
 	DynLibUtils::CVirtualTable vtable(table);
 	_ProcessRespondCvarValue.Hook(vtable, [](CServerSideClientBase* pThis, const CCLCMsg_RespondCvarValue_t& msg) -> bool {
 		g_PlayerManager.OnRespondCvarValue(pThis, msg);
@@ -84,6 +87,11 @@ void Source2SDK::OnPluginStart() {
 #if S2SDK_PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);
 	g_PH.AddHookDetourFunc<PreloadLibrary>("PreloadLibrary", Hook_PreloadLibrary, Pre);
+#else
+	using GetRepStorageFn = void*(*)();
+	auto tier0 = g_GameConfigManager.GetModule("tier0");
+	_ZNSs4_Rep20_S_empty_rep_storageE_ptr = tier0->GetFunctionByName("_ZNSs4_Rep12_S_empty_repEv").RCast<GetRepStorageFn>()();
+	_ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE_ptr = tier0->GetFunctionByName("_ZNSbIwSt11char_traitsIwESaIwEE4_Rep12_S_empty_repEv").RCast<GetRepStorageFn>()();
 #endif
 
 	OnServerStartup();// for late load*/
@@ -504,5 +512,13 @@ poly::ReturnAction Source2SDK::Hook_PreloadLibrary(poly::IHook& hook, poly::Para
 
 	return poly::ReturnAction::Ignored;
 }
-
+#else
+extern "C" {
+	void* __wrap__ZNSs4_Rep20_S_empty_rep_storageE() {
+		return _ZNSs4_Rep20_S_empty_rep_storageE_ptr;
+	}
+	void* __wrap__ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE() {
+		return _ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE_ptr;
+	}
+}
 #endif

@@ -42,7 +42,7 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* pThis, CEnti
 
 		m_vecCallbackPairs.clear();
 
-		for (const auto& searchKey: vecSearchKeys) {
+		for (const auto& searchKey : vecSearchKeys) {
 			auto it = m_hookMap.find(searchKey);
 			if (it != m_hookMap.end()) {
 				m_vecCallbackPairs.emplace_back(&std::get<CallbackPair>(*it));

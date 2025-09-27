@@ -1,8 +1,6 @@
 #pragma once
 
 #include <plg/plugin.hpp>
-#include <plg/flat_map.hpp>
-#include <plg/inplace_vector.hpp>
 #include <plg/enum.hpp>
 
 #include <playerslot.h>
@@ -70,7 +68,7 @@ extern std::unique_ptr<CoreConfig> g_pCoreConfig;
 extern std::unique_ptr<GameConfig> g_pGameConfig;
 
 namespace globals {
-	void Initialize(plg::flat_map<plg::string, plg::string> paths);
+	void Initialize(std::map<plg::string, plg::string> paths);
 	void Terminate();
 
 	PlatModule_t FindModule(std::string_view name);

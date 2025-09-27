@@ -8,9 +8,10 @@ void ServerManager::OnGameFrame() {
 
 	//S2_LOGF(LS_DEBUG, "Executing queued tasks of size: {} on tick number {}\n", m_nextTasks.size(), gpGlobals->tickcount);
 
-	for (const auto& [nextTask, userData]: m_nextTasks) {
+	m_nextTasks.for_each([](const Task& task) {
+		const auto& [nextTask, userData] = task;
 		nextTask(userData);
-	}
+	});
 
 	m_nextTasks.clear();
 }
@@ -21,19 +22,20 @@ void ServerManager::OnPreWorldUpdate() {
 
 	//S2_LOGF(LS_DEBUG, "Executing queued tasks of size: {} at time {}\n", m_nextWorldUpdateTasks.size(), gpGlobals->curtime);
 
-	for (const auto& [nextTask, userData]: m_nextWorldUpdateTasks) {
+	m_nextWorldUpdateTasks.for_each([](const Task& task) {
+		const auto& [nextTask, userData] = task;
 		nextTask(userData);
-	}
+	});
 
 	m_nextWorldUpdateTasks.clear();
 }
 
 void ServerManager::AddTaskForNextFrame(TaskCallback task, const plg::vector<plg::any>& userData) {
-	m_nextTasks.emplace_back(task, userData);
+	m_nextTasks.emplace(task, userData);
 }
 
 void ServerManager::AddTaskForNextWorldUpdate(TaskCallback task, const plg::vector<plg::any>& userData) {
-	m_nextWorldUpdateTasks.emplace_back(task, userData);
+	m_nextWorldUpdateTasks.emplace(task, userData);
 }
 
 ServerManager g_ServerManager;

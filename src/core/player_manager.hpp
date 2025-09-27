@@ -103,7 +103,7 @@ private:
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
 	std::string m_language;
 	std::string m_operatingSystem;
-	std::map<int, CvarQuery> m_queryCallback;
+	plg::map<int, CvarQuery> m_queryCallback;
 };
 
 class PlayerManager {
@@ -134,7 +134,7 @@ public:
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(PlayerManager, OnValidateAuthTicket, ValidateAuthTicketResponse_t, m_CallbackValidateAuthTicketResponse);
 
-	std::inplace_vector<Player*, MAXPLAYERS> GetOnlinePlayers() const;
+	std::vector<Player*> GetOnlinePlayers() const;
 	static int MaxClients();
 
 	TargetType TargetPlayerString(int caller, std::string_view target, plg::vector<int>& clients);

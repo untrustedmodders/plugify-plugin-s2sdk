@@ -46,8 +46,7 @@ private:
 	bool m_hasMapTicked{};
 	bool m_hasMapSimulated{};
 	float m_lastTickedTime{};
-	std::set<Timer> m_timers;
-	//std::mutex m_createTimerLock;
+	plg::set<Timer> m_timers;
 	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
 };
 

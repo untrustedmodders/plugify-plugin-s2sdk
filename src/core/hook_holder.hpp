@@ -27,7 +27,7 @@ public:
 			return ihook->GetAddress();
 		}
 
-		ihook = poly::Hook::CreateHookVirtualByFunc(ptr, (void*&) func, ret, plg::vector(args.begin(), args.end()), varIndex);
+		ihook = poly::Hook::CreateHookVirtualByFunc(ptr, (void*&) func, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 #if PLUGIFY_IS_DEBUG
 			S2_LOGF(LS_WARNING, "Could not hook member function \"{}\".\n", ptr);
@@ -67,7 +67,7 @@ public:
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		ihook = poly::Hook::CreateDetourHook(addr, ret, plg::vector(args.begin(), args.end()), varIndex);
+		ihook = poly::Hook::CreateDetourHook(addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 			S2_LOGF(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;
@@ -99,7 +99,7 @@ public:
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		ihook = poly::Hook::CreateDetourHook((void*)addr, ret, plg::vector(args.begin(), args.end()), varIndex);
+		ihook = poly::Hook::CreateDetourHook((void*)addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 			S2_LOGF(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;

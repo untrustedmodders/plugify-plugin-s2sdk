@@ -53,9 +53,8 @@ public:
 	DynLibUtils::CModule* GetModule(std::string_view name);
 
 private:
-	std::unordered_map<uint32_t, GameConfig> m_configs;
-	std::unordered_map<plg::string, DynLibUtils::CModule, plg::string_hash, std::equal_to<>> m_modules;
-	//std::mutex m_lockConfigLock;
+	plg::map<uint32_t, GameConfig> m_configs;
+	plg::map<plg::string, DynLibUtils::CModule> m_modules;
 	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
 };
 

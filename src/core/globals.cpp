@@ -23,7 +23,7 @@ std::unique_ptr<CoreConfig> g_pCoreConfig = nullptr;
 std::unique_ptr<GameConfig> g_pGameConfig = nullptr;
 
 namespace globals {
-	void Initialize(plg::flat_map<plg::string, plg::string> paths) {
+	void Initialize(std::map<plg::string, plg::string> paths) {
 		g_pCoreConfig = std::make_unique<CoreConfig>(plg::vector{
 				paths["base"] + "/settings.jsonc",
 				paths["configs"] + "/settings.jsonc",

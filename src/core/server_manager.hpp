@@ -3,6 +3,8 @@
 #include <mutex>
 #include <thread>
 
+#include "safe.hpp"
+
 using TaskCallback = void (*)(const plg::vector<plg::any>&);
 
 class ServerManager {
@@ -17,12 +19,14 @@ private:
 	struct Task {
 		TaskCallback callback;
 		plg::vector<plg::any> userData;
+
+		bool operator<(const Task& other) const {
+			return callback < other.callback;
+		}
 	};
 
-	std::vector<Task> m_nextWorldUpdateTasks;
-	std::vector<Task> m_nextTasks;
-	//std::mutex m_nextWorldUpdateTasksLock;
-	//std::mutex m_nextTasksLock;
+	plg::multiset<Task> m_nextWorldUpdateTasks;
+	plg::multiset<Task> m_nextTasks;
 };
 
 extern ServerManager g_ServerManager;

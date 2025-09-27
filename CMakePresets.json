@@ -53,7 +53,7 @@
 			"displayName": "Release (CS2)",
 			"inherits": "cs2-base",
 			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
+				"CMAKE_BUILD_TYPE": "Release"
 			}
 		},
 
@@ -70,7 +70,7 @@
 			"displayName": "Release (Deadlock)",
 			"inherits": "deadlock-base",
 			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
+				"CMAKE_BUILD_TYPE": "Release"
 			}
 		}
 	],

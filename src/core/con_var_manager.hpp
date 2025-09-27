@@ -153,8 +153,7 @@ public:
 	static void ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot slot, const char* pNewValue, const char* pOldValue, void*);
 
 private:
-	std::unordered_map<plg::string, ConVarInfoPtr, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
-	plg::flat_map<const ConVarRef*, const ConVarInfo*> m_cnvCache;
+	plg::map<plg::string, ConVarInfoPtr, plg::case_insensitive_equal> m_cnvLookup;
+	plg::map<const ConVarRef*, const ConVarInfo*> m_cnvCache;
 	ListenerManager<ConVarChangeListenerCallback> m_global;
-	//std::mutex m_registerCnvLock;
 };

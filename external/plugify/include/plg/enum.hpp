@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string_view>
 
-#include "plg/macro.hpp"
+#include "plg/config.hpp"
 
 // from
 // https://web.archive.org/web/20230212183620/https://blog.rink.nu/2023/02/12/behind-the-magic-of-magic_enum/
@@ -17,15 +17,15 @@ namespace plg {
 	template <std::size_t N>
 	struct static_string {
 		constexpr static_string(std::string_view sv) noexcept {
-			std::copy(sv.begin(), sv.end(), content.begin());
+			std::copy(sv.begin(), sv.end(), content_.begin());
 		}
 
 		constexpr operator std::string_view() const noexcept {
-			return { content.data(), N };
+			return { content_.data(), N };
 		}
 
 	private:
-		std::array<char, N + 1> content{};
+		std::array<char, N + 1> content_{};
 	};
 
 	constexpr auto is_pretty(char ch) noexcept {

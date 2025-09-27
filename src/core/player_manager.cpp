@@ -353,8 +353,9 @@ Player* PlayerManager::ToPlayer(CSteamID steamid, bool validate) const {
 	return nullptr;
 }
 
-std::inplace_vector<Player*, MAXPLAYERS> PlayerManager::GetOnlinePlayers() const {
-	std::inplace_vector<Player*, MAXPLAYERS> players;
+std::vector<Player*> PlayerManager::GetOnlinePlayers() const {
+	std::vector<Player*> players;
+	players.reserve(MAXPLAYERS);
 	for (const auto& player : m_players) {
 		if (utils::IsPlayerSlot(player.GetPlayerSlot())) {
 			players.emplace_back(const_cast<Player*>(&player));
