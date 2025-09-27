@@ -112,7 +112,7 @@ jobs:
         shell: bash -el {0}
         run: |
           mkdir -p build/output/bin
-          cp build/*${{ env.PROJECT_NAME }}.* build/output/bin/
+          cp build/*${{ env.PROJECT_NAME }}*.{dll,so,dylib} build/output/bin/
           cp build/${{ env.PROJECT_NAME }}.pplugin build/output/
           cp build/gamedata.jsonc build/output/
           cp build/settings.jsonc build/output/
