@@ -16,10 +16,10 @@ The **Source2 SDK** is a specialized plugin for the Plugify plugin system, desig
 
 #### Option 1: Install via Plugify Plugin Manager
 
-You can install the Source2 SDK using the Plugify plugin manager by running the following command:
+You can install the Source2 SDK using the Mamba package manager by running the following command:
 
 ```bash
-plg install s2sdk
+mamba install -n your_env_name -c https://untrustedmodders.github.io/plugify-plugin-s2sdk/ plugify-module-s2sdk
 ```
 
 #### Option 2: Manual Installation
