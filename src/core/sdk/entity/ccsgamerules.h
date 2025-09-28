@@ -39,6 +39,9 @@ public:
 	SCHEMA_FIELD_POINTER(int, m_nEndMatchMapGroupVoteOptions)
 	SCHEMA_FIELD(int, m_nEndMatchMapVoteWinner)
 	SCHEMA_FIELD(int, m_iRoundTime)
+	SCHEMA_FIELD(int, m_iNumCT)
+	SCHEMA_FIELD(int, m_iNumTerrorist)
+	SCHEMA_FIELD(int, m_iSpectatorSlotCount)
 	SCHEMA_FIELD_POINTER(CUtlVector<SpawnPoint*>, m_CTSpawnPoints)
 	SCHEMA_FIELD_POINTER(CUtlVector<SpawnPoint*>, m_TerroristSpawnPoints)
 

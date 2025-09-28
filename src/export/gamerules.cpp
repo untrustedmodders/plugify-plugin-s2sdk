@@ -1,6 +1,7 @@
 #include <plugin_export.h>
 
 #include <core/sdk/entity/cgamerules.h>
+#include <core/sdk/entity/cteam.h>
 
 PLUGIFY_WARN_PUSH()
 
@@ -37,6 +38,57 @@ extern "C" PLUGIN_API void* GetGameRulesProxy() {
  */
 extern "C" PLUGIN_API void* GetGameRules() {
 	return g_pGameRules;
+}
+
+/**
+ *
+ * @param team
+ * @return
+ */
+extern "C" PLUGIN_API int GetGameTeamScore(int team) {
+	auto it = g_pTeamManagers.find(team);
+	if (it == g_pTeamManagers.end()) {
+		S2_LOGF(LS_WARNING,  "Failed to find \"{}\" team\n", team);
+		return -1;
+	}
+
+	return std::get<CTeam*>(*it)->m_iScore;
+}
+
+/**
+ *
+ * @param team
+ * @return
+ */
+extern "C" PLUGIN_API int GetGamePlayerCount(int team) {
+	if (g_pGameRules == nullptr) {
+		S2_LOG(LS_WARNING, "cs_gamerules not instantiated yet.\n");
+		return -1;
+	}
+
+	switch (team) {
+		case CS_TEAM_T:
+			return g_pGameRules->m_iNumTerrorist;
+		case CS_TEAM_CT:
+			return g_pGameRules->m_iNumCT;
+		case CS_TEAM_SPECTATOR:
+			return g_pGameRules->m_iSpectatorSlotCount;
+		default:
+			return 0;
+	}
+}
+
+/**
+ *
+ * @return
+ */
+extern "C" PLUGIN_API int GetGameTotalRoundsPlayed() {
+	if (g_pGameRules == nullptr) {
+		S2_LOG(LS_WARNING, "cs_gamerules not instantiated yet.\n");
+		return -1;
+	}
+
+	return g_pGameRules->m_totalRoundsPlayed;
 }
 
 /**

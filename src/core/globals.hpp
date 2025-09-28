@@ -38,6 +38,7 @@ class CBaseEntity;
 class CHostStateMgr;
 struct CHostStateRequest;
 class CGameRules;
+class CTeam;
 #if defined(CS2)
 class CCSGameRules;
 class CCSGameRulesProxy;
@@ -58,6 +59,7 @@ inline CGlobalVars* gpGlobals = nullptr;
 inline CGameEntitySystem* g_pGameEntitySystem = nullptr;
 inline CBaseGameRules* g_pGameRules = nullptr;
 inline CBaseGameRulesProxy* g_pGameRulesProxy = nullptr;
+inline std::map<int, CTeam*> g_pTeamManagers;
 //inline ISteamHTTP* g_http = nullptr;
 inline CSteamGameServerAPIContext g_SteamAPI = {};
 

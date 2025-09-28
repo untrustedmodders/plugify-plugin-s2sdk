@@ -1,4 +1,5 @@
 #include <core/sdk/entity/cgamerules.h>
+#include <core/sdk/entity/cteam.h>
 #include <eiface.h>
 #include <engine/igameeventsystem.h>
 #include <entity2/entitysystem.h>
@@ -455,34 +456,38 @@ poly::ReturnAction Source2SDK::Hook_DispatchConCommand(poly::IHook& hook, poly::
 }
 
 poly::ReturnAction Source2SDK::Hook_OnAddEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto pEntity = poly::GetArgument<CEntityInstance*>(params, 1);
+	auto pEntity = poly::GetArgument<CBaseEntity*>(params, 1);
 	auto handle = (CEntityHandle) poly::GetArgument<int>(params, 2);
 
 	std::string_view name(pEntity->GetClassname());
 	if (name == "cs_gamerules") {
 		g_pGameRulesProxy = static_cast<CBaseGameRulesProxy *>(pEntity);
 		g_pGameRules = g_pGameRulesProxy->m_pGameRules;
+	} else if (name == "cs_team_manager") {
+		g_pTeamManagers[pEntity->m_iTeamNum] = static_cast<CTeam *>(pEntity);
 	}
 	GetOnEntityCreatedListenerManager().Notify(handle.ToInt());
 	return poly::ReturnAction::Ignored;
 }
 
 poly::ReturnAction Source2SDK::Hook_OnRemoveEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto pEntity = poly::GetArgument<CEntityInstance*>(params, 1);
+	auto pEntity = poly::GetArgument<CBaseEntity*>(params, 1);
 	auto handle = (CEntityHandle) poly::GetArgument<int>(params, 2);
 
 	std::string_view name(pEntity->GetClassname());
 	if (name == "cs_gamerules") {
 		g_pGameRulesProxy = nullptr;
 		g_pGameRules = nullptr;
+	} else if (name == "cs_team_manager") {
+		g_pTeamManagers.erase(pEntity->m_iTeamNum);
 	}
 	GetOnEntityDeletedListenerManager().Notify(handle.ToInt());
 	return poly::ReturnAction::Ignored;
 }
 
 poly::ReturnAction Source2SDK::Hook_OnEntityParentChanged(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto pEntity = poly::GetArgument<CEntityInstance*>(params, 1);
-	auto pNewParent = poly::GetArgument<CEntityInstance*>(params, 2);
+	auto pEntity = poly::GetArgument<CBaseEntity*>(params, 1);
+	auto pNewParent = poly::GetArgument<CBaseEntity*>(params, 2);
 
 	GetOnEntityParentChangedListenerManager().Notify(pEntity->GetRefEHandle().ToInt(), pNewParent ? pNewParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
 	return poly::ReturnAction::Ignored;
