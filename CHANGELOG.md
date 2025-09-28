@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.1...v2.0.2) (2025-09-28)
+
+
+### Bug Fixes
+
+* remove dev files ([e6d7fe5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e6d7fe5abb265c52d1118e547dcd587b1ea571b5))
+
 ## [2.0.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.0...v2.0.1) (2025-09-27)
 
 
