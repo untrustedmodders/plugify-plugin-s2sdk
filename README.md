@@ -2,9 +2,29 @@
 
 ## Overview
 
-The **Source2 SDK** is a specialized plugin for the Plugify plugin system, designed to facilitate the development of plugins for the Source 2 engine. With this SDK, developers can create, manage, and deploy custom plugins that enhance gameplay and user experience in Source 2 games.
+The **Source2 SDK** is a plugin for the [Plugify](https://github.com/untrustedmodders/plugify) framework that makes it easier to build custom plugins for games running on the Source 2 engine. It provides a clean interface to extend game functionality, hook into engine systems, and create gameplay or debugging tools.
 
-[Come and join our Discord](https://discord.gg/rX9TMmpang)
+With this SDK, developers can quickly prototype plugins without reverse-engineering effort. The design emphasizes clarity, modularity, and ease of extension.
+
+[Join our Discord](https://discord.gg/rX9TMmpang) to discuss plugin development, share examples, or get help.
+
+---
+
+### Key Features
+
+- Create and register **console commands** dynamically  
+  → [Guide: Console Commands](https://plugify.net/plugins/s2sdk/guides/console-commands)
+
+- Read and modify **console variables (ConVars)** in real time  
+  → [Guide: Console Variables](https://plugify.net/plugins/s2sdk/guides/console-commands)
+
+- Subscribe to and listen for **Source 2 style game events**  
+  → [Guide: Game Events](https://plugify.net/plugins/s2sdk/guides/game-events)
+
+- Register **global listeners** for SDK-wide hooks  
+  → [Guide: Global Listeners](https://plugify.net/plugins/s2sdk/guides/global-listeners)
+
+More guides will be added over time to cover advanced use cases could be found [here](https://plugify.net/plugins/s2sdk/guides/).
 
 ### Prerequisites
 
@@ -14,7 +34,7 @@ The **Source2 SDK** is a specialized plugin for the Plugify plugin system, desig
 
 ### Installation
 
-#### Option 1: Install via Plugify Plugin Manager
+#### Option 1: Install via Mamba Plugin Manager (embedded in s2 lauc
 
 You can install the Source2 SDK using the Mamba package manager by running the following command:
 
@@ -24,11 +44,46 @@ mamba install -n your_env_name -c https://untrustedmodders.github.io/plugify-plu
 
 #### Option 2: Manual Installation
 
+##### 1) Download the Release
+Grab the latest release package from the [Releases](/releases) page.
+
+##### 2) Extract the Package
+Unzip the downloaded archive to a temporary directory.
+
+##### 3) Place the Plugin in the Plugins Folder
+Move the extracted `plugify-plugin-s2sdk` directory into:
+
+```text
+csgo/addons/plugify/envs/plugify-plugin-s2sdk
+```
+
+##### 4) Verify Installation
+Check that the following structure exists:
+
+```text
+csgo/
+└── addons/
+    └── plugify/
+        └── envs/
+            └── plugify-plugin-s2sdk/
+                ├── plugify-plugin-s2sdk.pplugin    # Plugify plugin definition file
+                └── bin/                            # Compiled binaries and runtime artifacts
+                    ├── plugify-plugin-s2sdk.dll    # Windows build of the SDK
+                    └── libplugify-plugin-s2sdk.so  # Linux build of the SDK
+```
+
+- **bin/** – contains build outputs and other runtime files  
+- **plugify-plugin-s2sdk.dll** – dynamic library for Windows environments  
+- **libplugify-plugin-s2sdk.so** – shared object library for Linux environments  
+- **plugify-plugin-s2sdk.pplugin** – metadata file that defines the plugin for Plugify  
+
+### Building
+
 1. Clone this repository:
 
     ```bash
-    git clone https://github.com/untrustedmodders/plugify-source-2.git --recursive
-    cd plugify-source-2
+    git clone https://github.com/untrustedmodders/plugify-plugin-s2sdk.git --recursive
+    cd plugify-plugin-s2sdk
     ```
 
 2. Build the plugin:
