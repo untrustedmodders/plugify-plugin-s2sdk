@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.2...v2.0.3) (2025-09-30)
+
+
+### Bug Fixes
+
+* add method info ([079901e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/079901e42479a013349de9ba390510dd329e4172))
+* add new score methods ([c91a322](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c91a3225ecba0f5098d88805423760531372b15c))
+* disable string fix for now ([ebbeb4f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ebbeb4ff0f662968384f2614183afd063374b18e))
+* update case_insensitive_equal ([310df34](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/310df344cf89d2bc3b18b6b780f662d3482aad0c))
+
 ## [2.0.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.1...v2.0.2) (2025-09-28)
 
 
