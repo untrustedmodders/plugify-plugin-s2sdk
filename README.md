@@ -46,7 +46,7 @@ More guides will be added over time to cover advanced use cases could be found [
 
 ### Installation
 
-#### Option 1: Install via Mamba Plugin Manager (embedded in s2 lauc
+#### Option 1: Install via Mamba Plugin Manager (embedded in s2 launcher)
 
 You can install the Source2 SDK using the Mamba package manager by running the following command:
 
