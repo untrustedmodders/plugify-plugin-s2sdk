@@ -12,6 +12,18 @@ With this SDK, developers can quickly prototype plugins without reverse-engineer
 
 ### Key Features
 
+**S2SDK** is a lightweight SourceMod alternative written in C++ using **source2sdk** and **Plugify** as its module/plugin system.  
+It exposes **over 500 exported methods** inspired by the SourceMod API and can be used from any language that Plugify supports.
+
+S2SDK supports:
+- Source 2 schemas and Protobufs
+- Command registration
+- Source 2 events, entities and client handling
+- Game configuration (signatures and offsets)
+- Other core features similar to SourceMod
+
+The project is actively developed and will continue to expand its feature set.
+
 - Create and register **console commands** dynamically  
   → [Guide: Console Commands](https://plugify.net/plugins/s2sdk/guides/console-commands)
 
@@ -96,7 +108,7 @@ csgo/
    
 ## Documentation
 
-For a complete list of functions, parameters, and examples, please visit our documentation site at: [Plugify Source 2 Documentation](https://untrustedmodders.github.io/plugify-generator/?file=https%3A%2F%2Fgithub.com%2Funtrustedmodders%2Fplugify-source-2%2Fblob%2Fmain%2Fs2sdk.pplugin.in).
+For a complete list of functions, parameters, and examples, please visit our documentation site at: [Plugify Source 2 Documentation](https://api.plugify.net?file=https://raw.githubusercontent.com/untrustedmodders/plugify-plugin-s2sdk/refs/heads/main/plugify-plugin-s2sdk.pplugin.in).
 
 ## Contributing
 
