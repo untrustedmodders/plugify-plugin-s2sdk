@@ -19982,7 +19982,8 @@
             { "value": 2, "name": "Secondary" },
             { "value": 3, "name": "SMG" },
             { "value": 4, "name": "Rifle" },
-            { "value": 5, "name": "Heavy" }
+            { "value": 5, "name": "Heavy" },
+            { "value": 6, "name": "Count" }
           ]
         }
       }
@@ -20020,7 +20021,10 @@
             { "value": 9, "name": "ReservedSlot10" },
             { "value": 10, "name": "ReservedSlot11" },
             { "value": 11, "name": "Boosts" },
-            { "value": 12, "name": "Utility" }
+            { "value": 12, "name": "Utility" },
+            { "value": 13, "name": "Count" },
+            { "value": 14, "name": "First" },
+            { "value": 15, "name": "Last" }
           ]
         }
       }
