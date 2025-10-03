@@ -24,10 +24,10 @@ list(GET S2SDK_VERSION_LIST 1 S2SDK_VERSION_MINOR)
 list(GET S2SDK_VERSION_LIST 2 S2SDK_VERSION_PATCH)
 
 project(plugify-plugin-s2sdk
-		VERSION "${S2SDK_VERSION_MAJOR}.${S2SDK_VERSION_MINOR}.${S2SDK_VERSION_PATCH}"
-		DESCRIPTION "Source2 SDK Plugin"
-		HOMEPAGE_URL "https://github.com/untrustedmodders/plugify-plugin-s2sdk"
-		LANGUAGES C CXX
+        VERSION "${S2SDK_VERSION_MAJOR}.${S2SDK_VERSION_MINOR}.${S2SDK_VERSION_PATCH}"
+        DESCRIPTION "Source2 SDK Plugin"
+        HOMEPAGE_URL "https://github.com/untrustedmodders/plugify-plugin-s2sdk"
+        LANGUAGES C CXX
 )
 
 set(CMAKE_CXX_STANDARD 23)
@@ -102,7 +102,7 @@ set(S2SDK_COMPILE_DEFINITIONS
 
 if(WINDOWS)
     set(S2SDK_COMPILE_DEFINITIONS
-			${S2SDK_COMPILE_DEFINITIONS}
+            ${S2SDK_COMPILE_DEFINITIONS}
             S2SDK_PLATFORM="win64"
             S2SDK_ROOT_BINARY="/bin/win64/"
             S2SDK_GAME_BINARY="/csgo/bin/win64/"
@@ -123,13 +123,13 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 target_precompile_headers(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/pch.hpp")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-		C_STANDARD 11
-		C_STANDARD_REQUIRED ON
-		C_EXTENSIONS OFF
+        C_STANDARD 11
+        C_STANDARD_REQUIRED ON
+        C_EXTENSIONS OFF
 
-		CXX_STANDARD 23
-		CXX_STANDARD_REQUIRED ON
-		CXX_EXTENSIONS OFF
+        CXX_STANDARD 23
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS OFF
 )
 
 if(WINDOWS)
@@ -142,6 +142,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE sourcesdk plugify-plugin-configs c
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX /Zc:preprocessor $<$<CONFIG:Release>:/Zi>)
+    target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Release>:/DEBUG /OPT:REF /OPT:ICF>)
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wextra -Wshadow -Wconversion $<$<CONFIG:Release>:-g1>) # -Werror -Wpedantic
 endif()
