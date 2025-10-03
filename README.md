@@ -16,7 +16,7 @@ With this SDK, developers can quickly prototype plugins without reverse-engineer
 It exposes **over 500 exported methods** inspired by the SourceMod API and can be used from any language that Plugify supports.
 
 S2SDK supports:
-- Source 2 schemas and Protobufs
+- Source 2 schemas and protobufs
 - Command registration
 - Source 2 events, entities and client handling
 - Game configuration (signatures and offsets)
@@ -35,6 +35,12 @@ The project is actively developed and will continue to expand its feature set.
 
 - Register **global listeners** for SDK-wide hooks  
   → [Guide: Global Listeners](https://plugify.net/plugins/s2sdk/guides/global-listeners)
+
+- Inspect and interact with **entity schemas** (networked properties, data tables)  
+  → [Guide: Entity Schemas](https://plugify.net/plugins/s2sdk/guides/entity-schemas)
+
+- Send and handle **user messages** for client–server communication  
+  → [Guide: User Messages](https://plugify.net/plugins/s2sdk/guides/user-messages)
 
 More guides will be added over time to cover advanced use cases could be found [here](https://plugify.net/plugins/s2sdk/guides/).
 
