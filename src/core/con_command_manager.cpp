@@ -61,15 +61,18 @@ bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandLi
 
 bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, uint64 adminFlags) {
 	if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
+		S2_LOGF(LS_DEBUG, "[ConCommandManager::AddValveCommand]: Command '{}' is empty or already exists\n", name);
 		return false;
 	}
 
 	if (g_pCVar->FindConCommand(name.c_str()).IsValidRef()) {
+		S2_LOGF(LS_DEBUG, "[ConCommandManager::AddValveCommand]: Command '{}' already exists\n", name);
 		return false;
 	}
 
 	auto it = m_cmdLookup.find(name);
 	if (it != m_cmdLookup.end()) {
+		S2_LOGF(LS_DEBUG, "[ConCommandManager::AddValveCommand]: Command '{}' already exists\n", name);
 		return false;
 	}
 
