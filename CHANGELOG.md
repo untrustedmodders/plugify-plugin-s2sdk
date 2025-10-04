@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.3...v2.0.4) (2025-10-04)
+
+
+### Bug Fixes
+
+* AccountId type ([37d05b3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/37d05b39e1582fbd127a0fbb69437826d14bf1cb))
+* add `ConCommandManager::AddValveCommand` logging ([63a4993](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/63a4993c31dcbd6e88234198b66c2a805b85d902))
+* improve san and debug symbols on windows ([9241e5c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9241e5ce5e6aca9f7f596b5277cc594eb95d80cd))
+* update `GetWeaponCategory` and `GetWeaponGearSlot` enum's ([e6761ca](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e6761ca7ea79c7e178f4df2233440055cf2388a2))
+* update configs ([316d45b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/316d45bbe6fd03eb58ba30ac27d69a4788bfa3df))
+* update method `GetClientAccountId` and add new method `GetClientSteamID64` ([d339101](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d33910118c9d33c8e1b15328537f28d69b8b5fe3))
+
 ## [2.0.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.2...v2.0.3) (2025-09-30)
 
 
