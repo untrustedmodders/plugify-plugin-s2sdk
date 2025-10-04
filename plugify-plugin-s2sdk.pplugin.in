@@ -176,7 +176,7 @@
         }
       ],
       "retType": {
-        "type": "uint64",
+        "type": "uint32",
         "description": "Steam account ID."
       }
     },

@@ -170,9 +170,9 @@ extern "C" PLUGIN_API plg::string GetClientAuthId(int playerSlot) {
  * @brief Returns the client's Steam account ID, a unique number identifying a given Steam account.
  *
  * @param playerSlot The index of the player's slot.
- * @return uint64_t The client's steam account ID.
+ * @return uint32_t The client's steam account ID.
  */
-extern "C" PLUGIN_API uint64_t GetClientAccountId(int playerSlot) {
+extern "C" PLUGIN_API uint32_t GetClientAccountId(int playerSlot) {
 	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
 	if (pPlayer == nullptr) {
 		return 0;
