@@ -181,6 +181,24 @@
       }
     },
     {
+      "name": "GetClientSteamID64",
+      "group": "Clients",
+      "description": "Returns the client's SteamID64 — a unique 64-bit identifier of a Steam account.",
+      "funcName": "GetClientSteamID64",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "uint64",
+        "description": "SteamID64"
+      }
+    },
+    {
       "name": "GetClientIp",
       "group": "Clients",
       "description": "Retrieves a client's IP address.",

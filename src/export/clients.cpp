@@ -178,6 +178,21 @@ extern "C" PLUGIN_API uint64_t GetClientAccountId(int playerSlot) {
 		return 0;
 	}
 
+	return pPlayer->GetSteamId().GetAccountID();
+}
+
+/**
+ * @brief Returns the client's SteamID64 — a unique 64-bit identifier of a Steam account.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return uint64_t The client's SteamID64.
+ */
+extern "C" PLUGIN_API uint64_t GetClientSteamID64(int playerSlot) {
+	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (pPlayer == nullptr) {
+		return 0;
+	}
+
 	return pPlayer->GetSteamId().ConvertToUint64();
 }
 

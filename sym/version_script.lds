@@ -12,6 +12,7 @@
         ClientIndexToPlayerSlot;
         GetClientAuthId;
         GetClientAccountId;
+        GetClientSteamID64;
         GetClientIp;
         GetClientLanguage;
         GetClientOS;
