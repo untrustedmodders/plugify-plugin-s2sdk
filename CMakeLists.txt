@@ -71,6 +71,45 @@ add_subdirectory(external/configs)
 add_subdirectory(external/dynlibutils)
 
 #
+# V8
+#
+set(V8_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/v8/include/")
+if(WIN32)
+    set(V8LM_LINK_LIBRARIES winmm dbghelp)
+    set(V8_COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS=1)
+elseif(LINUX)
+    set(V8LM_LINK_LIBRARIES pthread)
+endif()
+add_library(v8_monolith SHARED IMPORTED)
+if(WIN32)
+    set(V8LM_V8_RELEASE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/v8/libs/windows/v8.dll")
+    set(V8LM_V8_RELEASE_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/v8/libs/windows/v8.lib")
+
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_LOCATION ${V8LM_V8_RELEASE_LIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_IMPLIB ${V8LM_V8_RELEASE_IMPLIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_LOCATION_RELEASE  ${V8LM_V8_RELEASE_LIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_IMPLIB_RELEASE ${V8LM_V8_RELEASE_IMPLIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_LOCATION_RELWITHDEBINFO ${V8LM_V8_RELEASE_LIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_IMPLIB_RELWITHDEBINFO ${V8LM_V8_RELEASE_IMPLIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_LOCATION_MINSIZEREL ${V8LM_V8_RELEASE_LIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_IMPLIB_MINSIZEREL ${V8LM_V8_RELEASE_IMPLIB})
+elseif(LINUX)
+    set(V8LM_V8_RELEASE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/v8/libs/linux/libv8.so")
+
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_LOCATION ${V8LM_V8_RELEASE_LIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_LOCATION_RELEASE ${V8LM_V8_RELEASE_LIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_LOCATION_RELWITHDEBINFO ${V8LM_V8_RELEASE_LIB})
+    set_property(TARGET v8_monolith PROPERTY IMPORTED_LOCATION_MINSIZEREL ${V8LM_V8_RELEASE_LIB})
+endif()
+target_include_directories(v8_monolith INTERFACE ${V8_INCLUDE_DIRS})
+target_link_libraries(v8_monolith INTERFACE ${V8LM_LINK_LIBRARIES})
+if(MSVC)
+    target_compile_options(v8_monolith INTERFACE /wd4100 /wd4244)
+else()
+    target_compile_options(v8_monolith INTERFACE -Wno-unused-parameter -Wno-conversion -Wno-template-id-cdtor -Wno-shadow)
+endif()
+
+#
 # SourceSDK
 #
 set(SOURCESDK_LINK_STRIP_CPP_EXPORTS ON CACHE INTERNAL "")
@@ -138,7 +177,7 @@ elseif(MACOS)
     set_target_properties(${PROJECT_NAME} PROPERTIES OSX_ARCHITECTURES "x86_64")
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE sourcesdk plugify-plugin-configs cpp-memory_utils)
+target_link_libraries(${PROJECT_NAME} PRIVATE sourcesdk plugify-plugin-configs cpp-memory_utils v8_monolith)
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX /Zc:preprocessor $<$<CONFIG:Release>:/Zi>)
