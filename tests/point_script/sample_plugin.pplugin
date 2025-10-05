@@ -1,0 +1,18 @@
+{
+	"$schema": "https://raw.githubusercontent.com/untrustedmodders/plugify/refs/heads/main/schemas/plugin.schema.json",
+	"version": "0.1.0",
+	"name": "sample_plugin",
+	"description": "Node test",
+	"author": "untrustedmodders",
+	"website": "https://github.com/untrustedmodders/",
+	"license": "MIT",
+	"entry": "sample_plugin.SamplePlugin",
+	"platforms": [],
+	"language": "javascript",
+	"dependencies": [
+		{
+		  "name": "s2sdk"
+		}
+	],
+	"methods": []
+}
