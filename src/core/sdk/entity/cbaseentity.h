@@ -22,6 +22,7 @@
 #include <core/game_config.hpp>
 #include <core/sdk/schema.h>
 #include <ehandle.h>
+#include <entitykeyvalues.h>
 
 #include "ccollisionproperty.h"
 #include "ctakedamageinfo.h"
@@ -224,6 +225,68 @@ public:
 
 	void DispatchSpawn(CEntityKeyValues* pEntityKeyValues = nullptr) {
 		addresses::DispatchSpawn(this, pEntityKeyValues);
+	}
+
+	void DispatchSpawn(const plg::vector<plg::string>& keys, const plg::vector<plg::any>& values) {
+		CEntityKeyValues* ESKeyValues = new CEntityKeyValues(g_pGameEntitySystem->GetEntityKeyValuesAllocator(), EKV_ALLOCATOR_EXTERNAL);
+
+		g_pGameEntitySystem->AddRefKeyValues(ESKeyValues);
+
+		for (size_t i = 0; i < values.size(); ++i) {
+			auto key = EntityKeyId_t::Make(keys[i].c_str());
+			plg::visit([&](const auto& v) {
+				using T = std::decay_t<decltype(v)>;
+				if constexpr (std::is_same_v<T, plg::string>) {
+					ESKeyValues->SetString(key, v.c_str());
+				} else if constexpr (std::is_pointer_v<T>) {
+					ESKeyValues->SetPtr(key, v);
+				} else if constexpr (std::is_same_v<T, int32_t>) {
+					ESKeyValues->SetInt(key, v);
+				} else if constexpr (std::is_same_v<T, uint32_t>) {
+					ESKeyValues->SetUint(key, v);
+				} else if constexpr (std::is_same_v<T, int64_t>) {
+					ESKeyValues->SetInt64(key, v);
+				} else if constexpr (std::is_same_v<T, uint64_t>) {
+					ESKeyValues->SetUint64(key, v);
+				} else if constexpr (std::is_same_v<T, bool>) {
+					ESKeyValues->SetBool(key, v);
+				} else if constexpr (std::is_same_v<T, float>) {
+					ESKeyValues->SetFloat(key, v);
+				} else if constexpr (std::is_same_v<T, double>) {
+					ESKeyValues->SetDouble(key, v);
+				} else if constexpr (std::is_same_v<T, plg::vec2>) {
+					ESKeyValues->SetVector2D(key, *reinterpret_cast<const Vector2D*>(&v));
+				} else if constexpr (std::is_same_v<T, plg::vec3>) {
+					ESKeyValues->SetVector(key, *reinterpret_cast<const Vector*>(&v));
+				} else if constexpr (std::is_same_v<T, plg::vec4>) {
+					ESKeyValues->SetVector4D(key, *reinterpret_cast<const Vector4D*>(&v));
+				} else if constexpr (std::is_same_v<T, plg::mat4x4>) {
+					ESKeyValues->SetMatrix3x4(key, *reinterpret_cast<const matrix3x4_t*>(&v));
+				} else if constexpr (std::is_arithmetic_v<T>) {
+					ESKeyValues->SetInt(key, static_cast<int>(v));
+				}
+			},
+			values[i]);
+		}
+
+		DispatchSpawn(ESKeyValues);
+
+		g_pGameEntitySystem->ReleaseKeyValues(ESKeyValues);
+	}
+
+	void DispatchSpawn(const plg::vector<std::pair<plg::string, plg::string>>& kv) {
+		CEntityKeyValues* ESKeyValues = new CEntityKeyValues(g_pGameEntitySystem->GetEntityKeyValuesAllocator(), EKV_ALLOCATOR_EXTERNAL);
+
+		g_pGameEntitySystem->AddRefKeyValues(ESKeyValues);
+
+		for (const auto& [k, v] : kv) {
+			auto key = EntityKeyId_t::Make(k.c_str());
+			ESKeyValues->SetString(key, v.c_str());
+		}
+
+		DispatchSpawn(ESKeyValues);
+
+		g_pGameEntitySystem->ReleaseKeyValues(ESKeyValues);
 	}
 
 	// Emit a sound event
