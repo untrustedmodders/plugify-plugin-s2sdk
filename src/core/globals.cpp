@@ -57,6 +57,12 @@ namespace globals {
 		}
 		g_pGameEventManager = *p_ppGameEventManager;
 
+		g_pScripts = g_pGameConfig->GetAddress("&s_pScripts").RCast<CUtlVector<void*>*>();
+		if (!g_pScripts) {
+			S2_LOG(LS_ERROR, "s_pScripts not found!\n");
+			return;
+		}
+
 		g_pCVar = static_cast<ICvar*>(QueryInterface("tier0", CVAR_INTERFACE_VERSION));
 		g_pSchemaSystem = static_cast<ISchemaSystem*>(QueryInterface("schemasystem", SCHEMASYSTEM_INTERFACE_VERSION));
 		g_pSource2Server = static_cast<ISource2Server*>(QueryInterface("server", SOURCE2SERVER_INTERFACE_VERSION));
@@ -88,6 +94,8 @@ namespace globals {
 		RESOLVE_SIG(g_pGameConfig, "CBaseEntity_SetParent", addresses::CBaseEntity_SetParent);
 		RESOLVE_SIG(g_pGameConfig, "CBaseEntity_EmitSoundFilter", addresses::CBaseEntity_EmitSoundFilter);
 		RESOLVE_SIG(g_pGameConfig, "CBaseEntity_SetMoveType", addresses::CBaseEntity_SetMoveType);
+		//RESOLVE_SIG(g_pGameConfig, "CCSServerPointScriptEntityEnterScope", addresses::CCSServerPointScriptEntityEnterScope);
+		RESOLVE_SIG(g_pGameConfig, "CSScriptResolveModule", addresses::CSScriptResolveModule);
 
 #if defined (CS2)
 		RESOLVE_SIG(g_pGameConfig, "CCSPlayer_WeaponServices_RemoveItem", addresses::CCSPlayer_WeaponServices_RemoveItem);

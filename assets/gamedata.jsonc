@@ -7,6 +7,18 @@
         "library": "engine2",
         "win64": "48 89 4C 24 ? 53 56 57 48 83 EC ? 48 8B F1"
       },
+      "CCSServerPointScriptEntityEnterScope": {
+        "library": "server",
+        "win64": "48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC ? 48 89 11"
+      },
+      "CCSScriptConstuctor": {
+        "library": "server",
+        "win64": "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 F6 48 8D 05 ? ? ? ? 48 89 01 48 8B D9 48 83 C1"
+      },
+      "CSScriptResolveModule": {
+        "library": "server",
+        "win64": "48 89 54 24 ? 48 89 4C 24 ? 55 53 56 57 41 55 41 56 48 8D AC 24"
+      },
       // String: "ApplicationInfo"
       "AppSystemCreateInterfaceFn": {
         "library": "engine2",
@@ -257,6 +269,30 @@
         "linuxsteamrt64": [
           {
             "read_offs32": 29
+          }
+        ]
+      },
+      "&s_pScripts": {
+        "signature": "CCSServerPointScriptEntityEnterScope",
+        "win64": [
+          {
+            "read_offs32": 25
+          }
+        ]
+      },
+      "v8::Isolate::Enter": {
+        "signature": "CCSScriptConstuctor",
+        "win64": [
+          {
+            "read_offs32": 307
+          }
+        ]
+      },
+      "v8::Isolate::Exit": {
+        "signature": "CCSScriptConstuctor",
+        "win64": [
+          {
+            "read_offs32": 462
           }
         ]
       }

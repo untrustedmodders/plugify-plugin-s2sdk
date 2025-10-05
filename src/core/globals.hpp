@@ -1,13 +1,13 @@
 #pragma once
 
-#include <plg/plugin.hpp>
-#include <plg/enum.hpp>
-
 #include <playerslot.h>
+#include <plg/enum.hpp>
+#include <plg/plugin.hpp>
 #include <steam_api.h>
 #include <tier0/platform.h>
 #include <tier0/utlstring.h>
 #include <variant.h>
+#include <v8.h>
 
 #define CS_TEAM_NONE 0
 #define CS_TEAM_SPECTATOR 1
@@ -53,12 +53,14 @@ using CBaseGameRulesProxy = CCitadelGameRulesProxy;
 
 inline IGameEventSystem* g_pGameEventSystem = nullptr;
 inline IGameEventManager2* g_pGameEventManager = nullptr;
+inline CUtlVector<void*>* g_pScripts = nullptr;
 inline CAppSystemDict* g_pCurrentAppSystem = nullptr;
 inline CNetworkGameServerBase* g_pNetworkGameServer = nullptr;
 inline CGlobalVars* gpGlobals = nullptr;
 inline CGameEntitySystem* g_pGameEntitySystem = nullptr;
 inline CBaseGameRules* g_pGameRules = nullptr;
 inline CBaseGameRulesProxy* g_pGameRulesProxy = nullptr;
+inline CBaseEntity* g_pPointScript = nullptr;
 inline std::map<int, CTeam*> g_pTeamManagers;
 //inline ISteamHTTP* g_http = nullptr;
 inline CSteamGameServerAPIContext g_SteamAPI = {};
@@ -137,5 +139,7 @@ namespace addresses {
 	inline void (*CGameRules_TerminateRound)(CGameRules* pGameRules, float delay, unsigned int reason, int64 a4, unsigned int a5);
 
 	inline CCSWeaponBaseVData* (*GetCSWeaponDataFromKey)(int, const char*);
+
+	inline v8::MaybeLocal<v8::Module> (*CSScriptResolveModule)(v8::Local<v8::Context> context, v8::Local<v8::String> specifier, v8::Local<v8::FixedArray> import_assertions, v8::Local<v8::Module> referrer);
 
 }// namespace addresses

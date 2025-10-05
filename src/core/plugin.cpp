@@ -1,12 +1,16 @@
 #include <core/sdk/entity/cgamerules.h>
 #include <core/sdk/entity/cteam.h>
+#include <dynlibutils/module.hpp>
+#include <dynlibutils/virtual.hpp>
+#include <dynlibutils/vthook.hpp>
 #include <eiface.h>
 #include <engine/igameeventsystem.h>
 #include <entity2/entitysystem.h>
+#include <vscript/ccscript.h>
 #include <igameevents.h>
 #include <iserver.h>
-#include <steam_gameserver.h>
 #include <netmessages.h>
+#include <steam_gameserver.h>
 
 #include "plugin.hpp"
 
@@ -24,10 +28,6 @@
 #include "timer_system.hpp"
 #include "user_message_manager.hpp"
 
-#include <dynlibutils/module.hpp>
-#include <dynlibutils/virtual.hpp>
-#include <dynlibutils/vthook.hpp>
-
 #undef FindResource
 
 Source2SDK g_sdk;
@@ -38,9 +38,13 @@ CGameEntitySystem* GameEntitySystem() {
 	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + offset);
 }
 
-DynLibUtils::CVTFHookAuto<&CServerSideClientBase::ProcessRespondCvarValue> _ProcessRespondCvarValue;
+DynLibUtils::CVTFHookAuto<&CServerSideClientBase::ProcessRespondCvarValue> s_ProcessRespondCvarValue;
+DynLibUtils::CVTFHookAuto<&IGameSystem::BuildGameSessionManifest> s_BuildGameSessionManifest;
 void* _ZNSs4_Rep20_S_empty_rep_storageE_ptr;
 void* _ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE_ptr;
+
+//constexpr auto CS_SCRIPT_PATH = "scripts/vscripts/test.vjs";
+constexpr auto CS_SCRIPT_PATH = "maps/editor/zoo/scripts/hello.vjs";
 
 void Source2SDK::OnPluginStart() {
 	S2_LOG(LS_DEBUG, "[OnPluginStart] - Source2SDK!\n");
@@ -77,13 +81,56 @@ void Source2SDK::OnPluginStart() {
 	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput_FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
-	auto engine2 = g_GameConfigManager.GetModule("engine2");
-	auto table = engine2->GetVirtualTableByName("CServerSideClient");
-	DynLibUtils::CVirtualTable vtable(table);
-	_ProcessRespondCvarValue.Hook(vtable, [](CServerSideClientBase* pThis, const CCLCMsg_RespondCvarValue_t& msg) -> bool {
-		g_PlayerManager.OnRespondCvarValue(pThis, msg);
-		return _ProcessRespondCvarValue.Call(pThis, msg);
-	});
+	{
+		auto engine2 = g_GameConfigManager.GetModule("engine2");
+		auto table = engine2->GetVirtualTableByName("CServerSideClient");
+		DynLibUtils::CVirtualTable vtable(table);
+		s_ProcessRespondCvarValue.Hook(vtable, [](CServerSideClientBase* pThis, const CCLCMsg_RespondCvarValue_t& msg) -> bool {
+			g_PlayerManager.OnRespondCvarValue(pThis, msg);
+			return s_ProcessRespondCvarValue.Call(pThis, msg);
+		});
+	}
+
+	{
+		auto server = g_GameConfigManager.GetModule("server");
+		auto table = server->GetVirtualTableByName("CGameRulesGameSystem");
+		DynLibUtils::CVirtualTable vtable(table);
+		s_BuildGameSessionManifest.Hook(vtable, [](IGameSystem* pThis, const EventBuildGameSessionManifest_t& msg) {
+			msg.m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
+			s_BuildGameSessionManifest.Call(pThis, msg);
+		});
+	}
+
+	using CCSServerPointScriptEntityEnterScope = void*(*)(void*, void*);
+	g_PH.AddHookDetourFunc<CCSServerPointScriptEntityEnterScope>("CCSServerPointScriptEntityEnterScope", Hook_CCSServerPointScriptEntity, Pre);
+
+	using v8IsolateFn = void(*)(v8::Isolate*);
+
+	auto v8IsolateEnterPtr = g_pGameConfig->GetAddress("v8::Isolate::Enter").CCast<void*>();
+	if (!v8IsolateEnterPtr) {
+		S2_LOG(LS_ERROR, "v8::Isolate::Enter not found!\n");
+		return;
+	}
+
+	auto v8IsolateExitPtr = g_pGameConfig->GetAddress("v8::Isolate::Exit").CCast<void*>();
+	if (!v8IsolateExitPtr) {
+		S2_LOG(LS_ERROR, "v8::Isolate::Exit not found!\n");
+		return;
+	}
+
+	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)v8IsolateEnterPtr, Hook_IsolateEnter, Pre);
+	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)v8IsolateExitPtr, Hook_IsolateExit, Post);
+
+	{
+		using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
+		DynLibUtils::CModule v8("plugify-module-v8");
+		auto resolve = v8.GetFunctionByName("SetModuleResolver").RCast<SetModuleResolverFn>();
+		if (!resolve) {
+			S2_LOG(LS_ERROR, "SetModuleResolver not found!\n");
+			return;
+		}
+		resolve(addresses::CSScriptResolveModule);
+	}
 
 #if S2SDK_PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);
@@ -463,6 +510,17 @@ poly::ReturnAction Source2SDK::Hook_OnAddEntity(poly::IHook& hook, poly::Params&
 	if (name == "cs_gamerules") {
 		g_pGameRulesProxy = static_cast<CBaseGameRulesProxy *>(pEntity);
 		g_pGameRules = g_pGameRulesProxy->m_pGameRules;
+
+		v8::Isolate* isolate = v8::Isolate::TryGetCurrent();
+		v8::Locker locker(isolate);
+		v8::Isolate::Scope isolateScope(isolate);
+		v8::HandleScope handleScope(isolate);
+
+		g_pPointScript = static_cast<CBaseEntity*>(addresses::CreateEntityByName("point_script", -1));
+		g_pPointScript->DispatchSpawn({
+			{"target_name", "script_main" },
+			{"cs_script", CS_SCRIPT_PATH}
+		});
 	} else if (name == "cs_team_manager") {
 		g_pTeamManagers[pEntity->m_iTeamNum] = static_cast<CTeam *>(pEntity);
 	}
@@ -490,6 +548,39 @@ poly::ReturnAction Source2SDK::Hook_OnEntityParentChanged(poly::IHook& hook, pol
 	auto pNewParent = poly::GetArgument<CBaseEntity*>(params, 2);
 
 	GetOnEntityParentChangedListenerManager().Notify(pEntity->GetRefEHandle().ToInt(), pNewParent ? pNewParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
+	return poly::ReturnAction::Ignored;
+}
+
+/*poly::ReturnAction Source2SDK::Hook_CCSScriptConstuctor(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	auto pScript = poly::GetArgument<CCSScript*>(params, 0);
+
+	v8::Isolate* isolate = v8::Isolate::GetCurrent();
+	auto* cxt = reinterpret_cast<v8::Global<v8::Context>*>(isolate->GetData(v8::Isolate::GetNumberOfDataSlots() - 2));
+
+	pScript->v8_api_global.Reset(isolate, cxt->Get(isolate));
+
+	return poly::ReturnAction::Ignored;
+}*/
+
+poly::ReturnAction Source2SDK::Hook_CCSServerPointScriptEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	//auto pEntity = poly::GetArgument<CCSPointScriptEntity*>(params, 0);
+	auto pScript = poly::GetArgument<CCSScript_EntityScript*>(params, 1);
+
+	g_pScripts->AddToTail(pScript);
+
+	return poly::ReturnAction::Ignored;
+}
+
+poly::ReturnAction Source2SDK::Hook_IsolateEnter(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	auto isolate = poly::GetArgument<v8::Isolate*>(params, 0);
+	isolate->SetData(v8::Isolate::GetNumberOfDataSlots() - 2, new v8::Locker(isolate));
+	return poly::ReturnAction::Ignored;
+}
+
+poly::ReturnAction Source2SDK::Hook_IsolateExit(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	auto isolate = poly::GetArgument<v8::Isolate*>(params, 0);
+	delete reinterpret_cast<v8::Locker*>(isolate->GetData(v8::Isolate::GetNumberOfDataSlots() - 2));
+	isolate->SetData(v8::Isolate::GetNumberOfDataSlots() - 2, nullptr);
 	return poly::ReturnAction::Ignored;
 }
 
