@@ -39,7 +39,6 @@ public:
 	static poly::ReturnAction Hook_OnAddEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type);
 	static poly::ReturnAction Hook_OnRemoveEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type);
 	static poly::ReturnAction Hook_OnEntityParentChanged(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type);
-	static poly::ReturnAction Hook_CCSServerPointScriptEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type);
 	static poly::ReturnAction Hook_IsolateEnter(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type);
 	static poly::ReturnAction Hook_IsolateExit(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type);
 #if S2SDK_PLATFORM_WINDOWS

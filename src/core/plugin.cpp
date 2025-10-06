@@ -101,9 +101,6 @@ void Source2SDK::OnPluginStart() {
 		});
 	}
 
-	using CCSServerPointScriptEntityEnterScope = void*(*)(void*, void*);
-	g_PH.AddHookDetourFunc<CCSServerPointScriptEntityEnterScope>("CCSServerPointScriptEntityEnterScope", Hook_CCSServerPointScriptEntity, Pre);
-
 	using v8IsolateFn = void(*)(v8::Isolate*);
 
 	auto v8IsolateEnterPtr = g_pGameConfig->GetAddress("v8::Isolate::Enter").CCast<void*>();
@@ -516,11 +513,13 @@ poly::ReturnAction Source2SDK::Hook_OnAddEntity(poly::IHook& hook, poly::Params&
 		v8::Isolate::Scope isolateScope(isolate);
 		v8::HandleScope handleScope(isolate);
 
-		g_pPointScript = static_cast<CBaseEntity*>(addresses::CreateEntityByName("point_script", -1));
+		auto pPointScript = addresses::CreateEntityByName("point_script", -1);
+		g_pPointScript = static_cast<CBaseEntity*>(pPointScript);
 		g_pPointScript->DispatchSpawn({
 			{"target_name", "script_main" },
 			{"cs_script", CS_SCRIPT_PATH}
 		});
+		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pPointScript) + g_pGameConfig->GetOffset("CCSScript_EntityScript"));
 	} else if (name == "cs_team_manager") {
 		g_pTeamManagers[pEntity->m_iTeamNum] = static_cast<CTeam *>(pEntity);
 	}
@@ -562,14 +561,14 @@ poly::ReturnAction Source2SDK::Hook_OnEntityParentChanged(poly::IHook& hook, pol
 	return poly::ReturnAction::Ignored;
 }*/
 
-poly::ReturnAction Source2SDK::Hook_CCSServerPointScriptEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+/*poly::ReturnAction Source2SDK::Hook_CCSServerPointScriptEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	//auto pEntity = poly::GetArgument<CCSPointScriptEntity*>(params, 0);
 	auto pScript = poly::GetArgument<CCSScript_EntityScript*>(params, 1);
 
 	g_pScripts->AddToTail(pScript);
 
 	return poly::ReturnAction::Ignored;
-}
+}*/
 
 poly::ReturnAction Source2SDK::Hook_IsolateEnter(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto isolate = poly::GetArgument<v8::Isolate*>(params, 0);

@@ -10,12 +10,13 @@
       "CCSServerPointScriptEntityEnterScope": {
         "library": "server",
         "win64": "48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC ? 48 89 11",
-        "linuxsteamrt64": "55 31 F6 48 89 E5 41 57 41 56 4C 8D 35 D8 DF 8A FF"
+        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 41 89 F4 53 48 89 FB 48 83 EC ? E8 ? ? ? ? 48 8B 43" // any function with g_Scripts
       },
-      "CCSScriptConstuctor": {
+      // String: "InitialActivate" and "OnActivate"
+      "CCSScriptOnActivate": {
         "library": "server",
-        "win64": "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 F6 48 8D 05 ? ? ? ? 48 89 01 48 8B D9 48 83 C1",
-        "linuxsteamrt64": "TODO"
+        "win64": "48 89 5C 24 ? 57 48 83 EC ? 8B FA 48 8B D9 E8 ? ? ? ? 48 8B 43",
+        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 41 89 F4 53 48 89 FB 48 83 EC ? E8 ? ? ? ? 48 8B 43"
       },
       // String: "Unexpected module request."
       "CSScriptResolveModule": {
@@ -245,6 +246,10 @@
       "EndTouch": {
         "win64": 145,
         "linuxsteamrt64": 144
+      },
+      "CCSScript_EntityScript": {
+        "win64": 1288,
+        "linuxsteamrt64": 2032
       }
     },
     "Addresses": {
@@ -285,23 +290,33 @@
         ],
         "linuxsteamrt64": [
           {
-            "read_offs32": 53
+            "read_offs32": 153
           }
         ]
       },
       "v8::Isolate::Enter": {
-        "signature": "CCSScriptConstuctor",
+        "signature": "CCSScriptOnActivate",
         "win64": [
           {
-            "read_offs32": 307
+            "read_offs32": 85
+          }
+        ],
+        "linuxsteamrt64": [
+          {
+            "read_offs32": 95
           }
         ]
       },
       "v8::Isolate::Exit": {
-        "signature": "CCSScriptConstuctor",
+        "signature": "CCSScriptOnActivate",
         "win64": [
           {
-            "read_offs32": 462
+            "read_offs32": 331
+          }
+        ],
+        "linuxsteamrt64": [
+          {
+            "read_offs32": 262
           }
         ]
       }
