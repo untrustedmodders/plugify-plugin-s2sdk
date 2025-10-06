@@ -9,7 +9,11 @@ export class SamplePlugin extends Plugin {
 
 		s2sdk.OnEntityCreated_Register(SamplePlugin.OnEntityCreated)
 	}
-	
+
+	pluginEnd() {
+		s2sdk.OnEntityCreated_Unregister(SamplePlugin.OnEntityCreated);
+	}
+
 	static OnEntityCreated(entityHandle) {
 		var className = s2sdk.GetEntityClassname(entityHandle)
 		if (className == "point_script") {

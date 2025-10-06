@@ -42,6 +42,9 @@ The project is actively developed and will continue to expand its feature set.
 - Send and handle **user messages** for client–server communication  
   → [Guide: User Messages](https://plugify.net/plugins/s2sdk/guides/user-messages)
 
+- How to integrate Valve's Pulse ([cs_script](https://developer.valvesoftware.com/wiki/Counter-Strike_2_Workshop_Tools/Scripting)) system with Plugify plugins.  
+  → [Guide: Pulse Integration](https://plugify.net/plugins/s2sdk/guides/pulse-integration)
+
 More guides will be added over time to cover advanced use cases could be found [here](https://plugify.net/plugins/s2sdk/guides/).
 
 ### Prerequisites
