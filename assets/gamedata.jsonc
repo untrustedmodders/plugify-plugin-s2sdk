@@ -9,15 +9,19 @@
       },
       "CCSServerPointScriptEntityEnterScope": {
         "library": "server",
-        "win64": "48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC ? 48 89 11"
+        "win64": "48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC ? 48 89 11",
+        "linuxsteamrt64": "55 31 F6 48 89 E5 41 57 41 56 4C 8D 35 D8 DF 8A FF"
       },
       "CCSScriptConstuctor": {
         "library": "server",
-        "win64": "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 F6 48 8D 05 ? ? ? ? 48 89 01 48 8B D9 48 83 C1"
+        "win64": "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 F6 48 8D 05 ? ? ? ? 48 89 01 48 8B D9 48 83 C1",
+        "linuxsteamrt64": "TODO"
       },
+      // String: "Unexpected module request."
       "CSScriptResolveModule": {
         "library": "server",
-        "win64": "48 89 54 24 ? 48 89 4C 24 ? 55 53 56 57 41 55 41 56 48 8D AC 24"
+        "win64": "48 89 54 24 ? 48 89 4C 24 ? 55 53 56 57 41 55 41 56 48 8D AC 24",
+        "linuxsteamrt64": "55 48 89 E5 41 57 49 89 F7 41 56 41 55 41 54 53 48 89 FB 48 81 EC A8 01 00 00"
       },
       // String: "ApplicationInfo"
       "AppSystemCreateInterfaceFn": {
@@ -277,6 +281,11 @@
         "win64": [
           {
             "read_offs32": 25
+          }
+        ],
+        "linuxsteamrt64": [
+          {
+            "read_offs32": 53
           }
         ]
       },
