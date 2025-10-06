@@ -115,8 +115,14 @@ void Source2SDK::OnPluginStart() {
 		return;
 	}
 
-	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)v8IsolateEnterPtr, Hook_IsolateEnter, Pre);
-	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)v8IsolateExitPtr, Hook_IsolateExit, Post);
+#if S2SDK_PLATFORM_WINDOWS
+	uint8_t fix = 0;
+#else
+	uint8_t fix = 6;
+#endif
+
+	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)((uint8_t*)(v8IsolateEnterPtr) + fix), Hook_IsolateEnter, Pre);
+	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)((uint8_t*)(v8IsolateExitPtr) + fix), Hook_IsolateExit, Post);
 
 	{
 		using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
