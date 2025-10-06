@@ -181,7 +181,7 @@ void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* pResponse
 	for (const Player& player : m_players) {
 		CSteamID steamID = player.GetSteamId();
 		if (steamID == pResponse->m_SteamID) {
-			GetOnClientAuthenticatedListenerManager().Notify(player.GetPlayerSlot(), steamID.ConvertToUint64());
+			GetOnClientAuthenticatedListenerManager().Notify(player.GetPlayerSlot(), steamID.GetAccountID());
 			return;
 		}
 	}

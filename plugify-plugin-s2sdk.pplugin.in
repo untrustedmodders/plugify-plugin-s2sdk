@@ -15657,8 +15657,8 @@
                 "description": "The player slot"
               },
               {
-                "name": "steam",
-                "type": "uint64",
+                "name": "accountID",
+                "type": "uint32",
                 "description": "Steam account ID or 0 if not available."
               }
             ],
@@ -15695,8 +15695,8 @@
                 "description": "The player slot"
               },
               {
-                "name": "steam",
-                "type": "uint64",
+                "name": "accountID",
+                "type": "uint32",
                 "description": "Steam account ID or 0 if not available."
               }
             ],
