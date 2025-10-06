@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.1.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.3...v2.1.0) (2025-10-06)
+
+
+### Features
+
+* add v8 support to plugify ([b9e9268](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b9e92680d12ddebcbe612910a5c030109dd0f243))
+
+
+### Bug Fixes
+
+* AccountId type ([37d05b3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/37d05b39e1582fbd127a0fbb69437826d14bf1cb))
+* add `ConCommandManager::AddValveCommand` logging ([63a4993](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/63a4993c31dcbd6e88234198b66c2a805b85d902))
+* add linux addresses ([b70f232](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b70f2329ebd5a93668ae3d888ce1e248e599826b))
+* add v8 ([4d43d58](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4d43d58177c1c0f3bee9ec6e1fc2a08d928fd4b1))
+* improve san and debug symbols on windows ([9241e5c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9241e5ce5e6aca9f7f596b5277cc594eb95d80cd))
+* isolate hook on linux ([4328e82](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4328e82451c3b7ec3a7c4a67977e5dc160f2e329))
+* rework dispatch spawn ([55d305a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/55d305a035107f677339a5256bb47ff15681f959))
+* update `GetWeaponCategory` and `GetWeaponGearSlot` enum's ([e6761ca](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e6761ca7ea79c7e178f4df2233440055cf2388a2))
+* update callback `OnClientAuthenticated` ([4b1eb52](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4b1eb52ba152c70e1d2e784177e7f162dde89ed6))
+* update configs ([316d45b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/316d45bbe6fd03eb58ba30ac27d69a4788bfa3df))
+* update method `GetClientAccountId` and add new method `GetClientSteamID64` ([d339101](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d33910118c9d33c8e1b15328537f28d69b8b5fe3))
+* update sigs for point script on linux ([cd1198c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/cd1198c56117842c91db5bce9e437eb796eb9390))
+
 ## [2.0.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.2...v2.0.3) (2025-09-30)
 
 
