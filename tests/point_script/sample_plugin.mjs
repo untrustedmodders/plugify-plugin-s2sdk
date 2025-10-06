@@ -1,5 +1,5 @@
 import { Plugin } from 'plugify';
-// We could not load module here as v8 plugify load much ealier
+// We could not load module here as v8 plugify load much earlier
 //import { Instance } from "cs_script/point_script";
 import * as s2sdk from ':s2sdk';
 
@@ -21,7 +21,7 @@ export class SamplePlugin extends Plugin {
 			console.log("SamplePlugin: [handle]" + entityHandle + " created");
 			setTimeout(() => {
 				console.log("SamplePlugin: [timer]");
-				// We could only load module dynamicly after point script created
+				// We could only load module dynamically after point script created
 				import("cs_script/point_script").then(point_script => {
 					var { Instance } = point_script;
 					console.log("cs_script point_script - Imported");
