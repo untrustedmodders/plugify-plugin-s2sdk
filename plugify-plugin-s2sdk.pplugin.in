@@ -20041,8 +20041,8 @@
             { "value": 11, "name": "Boosts" },
             { "value": 12, "name": "Utility" },
             { "value": 13, "name": "Count" },
-            { "value": 14, "name": "First" },
-            { "value": 15, "name": "Last" }
+            { "value": 0, "name": "First" },
+            { "value": 12, "name": "Last" }
           ]
         }
       }
