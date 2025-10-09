@@ -26,6 +26,7 @@ DEFINE_MANAGER_ACCESSOR(OnClientAuthenticated, void, int, uint32)
 
 DEFINE_MANAGER_ACCESSOR(OnLevelInit, void, const plg::string&, const plg::string&)
 DEFINE_MANAGER_ACCESSOR(OnLevelShutdown, void)
+DEFINE_MANAGER_ACCESSOR(OnRoundTerminated, void, float, int)
 
 DEFINE_MANAGER_ACCESSOR(OnEntitySpawned, void, int)
 DEFINE_MANAGER_ACCESSOR(OnEntityCreated, void, int)

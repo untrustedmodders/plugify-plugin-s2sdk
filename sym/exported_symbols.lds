@@ -271,6 +271,10 @@ GetGameConfigMemSig
 
 GetGameRulesProxy
 GetGameRules
+GetGameTeamManager
+GetGameTeamScore
+GetGamePlayerCount
+GetGameTotalRoundsPlayed
 TerminateRound
 
 RegisterLoggingChannel

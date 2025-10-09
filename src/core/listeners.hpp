@@ -20,7 +20,7 @@ DEFINE_MANAGER_CREATOR(OnClientAuthenticated, void, int, uint32)
 
 DEFINE_MANAGER_CREATOR(OnLevelInit, void, const plg::string&, const plg::string&)
 DEFINE_MANAGER_CREATOR(OnLevelShutdown, void)
-DEFINE_MANAGER_CREATOR(OnTerminateRound, void, float, int)
+DEFINE_MANAGER_CREATOR(OnRoundTerminated, void, float, int)
 
 DEFINE_MANAGER_CREATOR(OnEntitySpawned, void, int)
 DEFINE_MANAGER_CREATOR(OnEntityCreated, void, int)

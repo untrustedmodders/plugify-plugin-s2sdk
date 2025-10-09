@@ -42,7 +42,6 @@ DynLibUtils::CVTFHookAuto<&IGameSystem::BuildGameSessionManifest> s_BuildGameSes
 void* _ZNSs4_Rep20_S_empty_rep_storageE_ptr;
 void* _ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE_ptr;
 
-//constexpr auto CS_SCRIPT_PATH = "scripts/vscripts/test.vjs";
 constexpr auto CS_SCRIPT_PATH = "maps/editor/zoo/scripts/hello.vjs";
 
 poly::ReturnAction Hook_StartupServer(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
@@ -108,6 +107,7 @@ poly::ReturnAction Hook_Release(poly::IHook& hook, poly::Params& params, int cou
 poly::ReturnAction Hook_ActivateServer(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	//S2_LOGF(LS_DEBUG, "[ActivateServer]\n");
 
+#if defined (CS2)
 	g_TimerSystem.CreateTimer(0.5f, [](uint32_t, const plg::vector<plg::any>&) {
 		if (g_pGameRules == nullptr || g_pGameRules->m_bWarmupPeriod || g_pGameRules->m_iRoundWinStatus > 0) {
 			return;
@@ -116,6 +116,9 @@ poly::ReturnAction Hook_ActivateServer(poly::IHook& hook, poly::Params& params, 
 		g_pGameRules->m_bGameRestart = g_pGameRules->m_flRestartRoundTime() == 0.0f;
 
 	}, TimerFlag::Repeat | TimerFlag::NoMapChange, {});
+#endif
+
+	g_Precached.clear();
 
 	GetOnServerActivateListenerManager().Notify();
 
@@ -361,6 +364,7 @@ poly::ReturnAction Hook_FireOutputInternal(poly::IHook& hook, poly::Params& para
 	return poly::ReturnAction::Ignored;
 }
 
+#if defined (CS2)
 poly::ReturnAction Hook_TerminateRound(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto pGameRules = poly::GetArgument<CCSGameRules*>(params, 0);
 	auto delay = poly::GetArgument<float>(params, 1);
@@ -368,10 +372,11 @@ poly::ReturnAction Hook_TerminateRound(poly::IHook& hook, poly::Params& params, 
 
 	pGameRules->m_bGameRestart = true;
 
-	GetOnTerminateRoundListenerManager().Notify(delay, reason);
+	GetOnRoundTerminatedListenerManager().Notify(delay, reason);
 
 	return poly::ReturnAction::Ignored;
 }
+#endif
 
 poly::ReturnAction Hook_DispatchConCommand(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	// auto cmd = poly::GetArgument<ConCommandRef* const>(params, 1);
@@ -386,9 +391,9 @@ poly::ReturnAction Hook_DispatchConCommand(poly::IHook& hook, poly::Params& para
 }
 
 poly::ReturnAction Hook_OnAddEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto pEntity = poly::GetArgument<CBaseEntity*>(params, 1);
 	auto handle = (CEntityHandle) poly::GetArgument<int>(params, 2);
-
+#if defined (CS2)
+	auto pEntity = poly::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(pEntity->GetClassname());
 	if (name == "cs_gamerules") {
 		g_pGameRulesProxy = static_cast<CBaseGameRulesProxy *>(pEntity);
@@ -409,14 +414,16 @@ poly::ReturnAction Hook_OnAddEntity(poly::IHook& hook, poly::Params& params, int
 	} else if (name == "cs_team_manager") {
 		g_pTeamManagers[pEntity->m_iTeamNum] = static_cast<CTeam *>(pEntity);
 	}
+#endif
+
 	GetOnEntityCreatedListenerManager().Notify(handle.ToInt());
 	return poly::ReturnAction::Ignored;
 }
 
 poly::ReturnAction Hook_OnRemoveEntity(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto pEntity = poly::GetArgument<CBaseEntity*>(params, 1);
 	auto handle = (CEntityHandle) poly::GetArgument<int>(params, 2);
-
+#if defined (CS2)
+	auto pEntity = poly::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(pEntity->GetClassname());
 	if (name == "cs_gamerules") {
 		g_pGameRulesProxy = nullptr;
@@ -424,6 +431,8 @@ poly::ReturnAction Hook_OnRemoveEntity(poly::IHook& hook, poly::Params& params, 
 	} else if (name == "cs_team_manager") {
 		g_pTeamManagers.erase(pEntity->m_iTeamNum);
 	}
+#endif
+
 	GetOnEntityDeletedListenerManager().Notify(handle.ToInt());
 	return poly::ReturnAction::Ignored;
 }
@@ -436,6 +445,7 @@ poly::ReturnAction Hook_OnEntityParentChanged(poly::IHook& hook, poly::Params& p
 	return poly::ReturnAction::Ignored;
 }
 
+#if defined (CS2)
 poly::ReturnAction Hook_IsolateEnter(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto isolate = poly::GetArgument<v8::Isolate*>(params, 0);
 	isolate->SetData(v8::Isolate::GetNumberOfDataSlots() - 2, new v8::Locker(isolate));
@@ -448,6 +458,7 @@ poly::ReturnAction Hook_IsolateExit(poly::IHook& hook, poly::Params& params, int
 	isolate->SetData(v8::Isolate::GetNumberOfDataSlots() - 2, nullptr);
 	return poly::ReturnAction::Ignored;
 }
+#endif
 
 #if S2SDK_PLATFORM_WINDOWS
 
@@ -517,12 +528,6 @@ void Source2SDK::OnPluginStart() {
 	g_PH.AddHookMemFunc(&IServerGameDLL::GameFrame, g_pSource2Server, Hook_GameFrame, Post);
 	g_PH.AddHookMemFunc(&ICvar::DispatchConCommand, g_pCVar, Hook_DispatchConCommand, Pre, Post);
 
-	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
-	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput_FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
-
-	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
-	g_PH.AddHookDetourFunc<TerminateRoundFn>("CGameRules_TerminateRound", Hook_TerminateRound, Pre);
-
 	{
 		auto engine2 = g_GameConfigManager.GetModule("engine2");
 		auto table = engine2->GetVirtualTableByName("CServerSideClient");
@@ -540,9 +545,18 @@ void Source2SDK::OnPluginStart() {
 		s_BuildGameSessionManifest.Hook(vtable, [](IGameSystem* pThis, const EventBuildGameSessionManifest_t& msg) {
 			msg.m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
 			for (const auto& resource : g_Precached) {
+				msg.m_pResourceManifest->AddResource(resource.c_str());
+			}
 			s_BuildGameSessionManifest.Call(pThis, msg);
 		});
 	}
+
+	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
+	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput_FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
+
+#if defined (CS2)
+	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
+	g_PH.AddHookDetourFunc<TerminateRoundFn>("CGameRules_TerminateRound", Hook_TerminateRound, Pre);
 
 	using v8IsolateFn = void(*)(v8::Isolate*);
 
@@ -559,9 +573,9 @@ void Source2SDK::OnPluginStart() {
 	}
 
 #if S2SDK_PLATFORM_WINDOWS
-	uint8_t fix = 0;
+	const uint8_t fix = 0;
 #else
-	uint8_t fix = 6;
+	const uint8_t fix = 6;
 #endif
 
 	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)((uint8_t*)(v8IsolateEnterPtr) + fix), Hook_IsolateEnter, Pre);
@@ -569,7 +583,7 @@ void Source2SDK::OnPluginStart() {
 
 	{
 		using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
-		DynLibUtils::CModule v8("plugify-module-v8");
+		Module v8("plugify-module-v8");
 		auto resolve = v8.GetFunctionByName("SetModuleResolver").RCast<SetModuleResolverFn>();
 		if (!resolve) {
 			S2_LOG(LS_ERROR, "SetModuleResolver not found!\n");
@@ -577,6 +591,7 @@ void Source2SDK::OnPluginStart() {
 		}
 		resolve(addresses::CSScriptResolveModule);
 	}
+#endif
 
 #if S2SDK_PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);
