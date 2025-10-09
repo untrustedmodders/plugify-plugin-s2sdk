@@ -26,6 +26,6 @@
 
 namespace fs = std::filesystem;
 
+#include "safe.hpp"
 #include "core/globals.hpp"
 #include "core/logger.hpp"
-#include "safe.hpp"

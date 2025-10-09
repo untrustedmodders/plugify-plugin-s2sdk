@@ -212,14 +212,14 @@ void utils::PrintAlert(CPlayerSlot slot, const char* message) {
 	ClientPrintFilter(&filter, HUD_PRINTALERT, message);
 }
 
-void utils::PrintHtmlCentre(CPlayerSlot slot, const char* message) {
+void utils::PrintHtmlCentre(CPlayerSlot slot, const char* message, int duration) {
 	IGameEvent* event = g_pGameEventManager->CreateEvent("show_survival_respawn_status");
 	if (!event) {
 		return;
 	}
 
 	event->SetString("loc_token", message);
-	event->SetInt("duration", 5);
+	event->SetInt("duration", duration);
 	event->SetInt("userid", slot);
 
 	IGameEventListener2* listener = addresses::GetLegacyGameEventListener(slot);
@@ -252,14 +252,14 @@ void utils::PrintAlertAll(const char* message) {
 	ClientPrintFilter(&filter, HUD_PRINTALERT, message);
 }
 
-void utils::PrintHtmlCentreAll(const char* message) {
+void utils::PrintHtmlCentreAll(const char* message, int duration) {
 	IGameEvent* event = g_pGameEventManager->CreateEvent("show_survival_respawn_status", true);
 	if (!event) {
 		return;
 	}
 
 	event->SetString("loc_token", message);
-	event->SetInt("duration", 5);
+	event->SetInt("duration", duration);
 	event->SetInt("userid", -1);
 
 	g_pGameEventManager->FireEvent(event);

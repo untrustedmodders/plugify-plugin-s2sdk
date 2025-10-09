@@ -34,6 +34,7 @@ public:
 	SCHEMA_FIELD(float, m_fMatchStartTime)
 	SCHEMA_FIELD(float, m_flGameStartTime)
 	SCHEMA_FIELD(int, m_totalRoundsPlayed)
+	SCHEMA_FIELD(int, m_iRoundWinStatus)
 	SCHEMA_FIELD(GameTime_t, m_fRoundStartTime)
 	SCHEMA_FIELD(GameTime_t, m_flRestartRoundTime)
 	SCHEMA_FIELD_POINTER(int, m_nEndMatchMapGroupVoteOptions)
@@ -42,6 +43,8 @@ public:
 	SCHEMA_FIELD(int, m_iNumCT)
 	SCHEMA_FIELD(int, m_iNumTerrorist)
 	SCHEMA_FIELD(int, m_iSpectatorSlotCount)
+	SCHEMA_FIELD(bool, m_bWarmupPeriod)
+	SCHEMA_FIELD(bool, m_bGameRestart)
 	SCHEMA_FIELD_POINTER(CUtlVector<SpawnPoint*>, m_CTSpawnPoints)
 	SCHEMA_FIELD_POINTER(CUtlVector<SpawnPoint*>, m_TerroristSpawnPoints)
 

@@ -173,12 +173,12 @@ namespace utils {
 	void PrintChat(CPlayerSlot slot, const char* message);
 	void PrintCentre(CPlayerSlot slot, const char* message);
 	void PrintAlert(CPlayerSlot slot, const char* message);
-	void PrintHtmlCentre(CPlayerSlot slot, const char* message);// This one uses HTML formatting.
+	void PrintHtmlCentre(CPlayerSlot slot, const char* message, int duration);// This one uses HTML formatting.
 	void PrintConsoleAll(const char* message);
 	void PrintChatAll(const char* message);
 	void PrintCentreAll(const char* message);
 	void PrintAlertAll(const char* message);
-	void PrintHtmlCentreAll(const char* message);// This one uses HTML formatting.
+	void PrintHtmlCentreAll(const char* message, int duration);// This one uses HTML formatting.
 
 	// Color print
 	void CPrintChat(CPlayerSlot slot, const char* message);

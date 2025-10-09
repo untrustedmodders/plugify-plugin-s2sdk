@@ -1,6 +1,6 @@
 #pragma once
 
-enum TimerFlag : int {
+enum class TimerFlag {
 	Default = 0,
 
 	Repeat = (1 << 0),
@@ -38,7 +38,7 @@ public:
 	static double GetTickedTime();
 	static double GetTickedInterval();
 
-	uint32_t CreateTimer(double delay, TimerCallback callback, TimerFlag flags = Default, const plg::vector<plg::any>& userData = {});
+	uint32_t CreateTimer(double delay, TimerCallback callback, TimerFlag flags = TimerFlag::Default, const plg::vector<plg::any>& userData = {});
 	void KillTimer(uint32_t id);
 	void RescheduleTimer(uint32_t id, double newDelay);
 
@@ -49,5 +49,20 @@ private:
 	plg::set<Timer> m_timers;
 	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
 };
+
+inline TimerFlag operator|(TimerFlag lhs, TimerFlag rhs) noexcept {
+	using underlying = std::underlying_type_t<TimerFlag>;
+	return static_cast<TimerFlag>(static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+}
+
+inline bool operator&(TimerFlag lhs, TimerFlag rhs) noexcept {
+	using underlying = std::underlying_type_t<TimerFlag>;
+	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
+}
+
+inline TimerFlag& operator|=(TimerFlag& lhs, TimerFlag rhs) noexcept {
+	lhs = lhs | rhs;
+	return lhs;
+}
 
 extern TimerSystem g_TimerSystem;

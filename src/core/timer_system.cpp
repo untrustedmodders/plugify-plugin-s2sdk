@@ -74,7 +74,7 @@ void TimerSystem::RemoveMapChangeTimers() {
 
 uint32_t TimerSystem::CreateTimer(double delay, TimerCallback callback, TimerFlag flags, const plg::vector<plg::any>& userData) {
 	uint32_t id = ++s_nextId;
-	m_timers.emplace(id, flags & Repeat, flags & NoMapChange, false, false, universalTime + delay, delay, callback, userData);
+	m_timers.emplace(id, flags & TimerFlag::Repeat, flags & TimerFlag::NoMapChange, false, false, universalTime + delay, delay, callback, userData);
 	return id;
 }
 

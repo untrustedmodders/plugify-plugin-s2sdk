@@ -57,9 +57,10 @@ extern "C" PLUGIN_API void PrintAlertText(int playerSlot, const plg::string& mes
  * @brief Prints a html message to a specific client in the center of the screen.
  * @param playerSlot The index of the player's slot to whom the message will be sent.
  * @param message The HTML-formatted message to be printed.
+ * @param duration The duration of the message in seconds.
  */
-extern "C" PLUGIN_API void PrintCentreHtml(int playerSlot, const plg::string& message) {
-	utils::PrintHtmlCentre(playerSlot, message.c_str());
+extern "C" PLUGIN_API void PrintCentreHtml(int playerSlot, const plg::string& message, int duration) {
+	utils::PrintHtmlCentre(playerSlot, message.c_str(), duration);
 }
 
 /**
@@ -97,9 +98,10 @@ extern "C" PLUGIN_API void PrintAlertTextAll(const plg::string& message) {
 /**
  * @brief Prints a html message to all clients in the center of the screen.
  * @param message The HTML-formatted message to be printed in the center of the screen for all clients.
+ * @param duration The duration of the message in seconds.
  */
-extern "C" PLUGIN_API void PrintCentreHtmlAll(const plg::string& message) {
-	utils::PrintHtmlCentreAll(message.c_str());
+extern "C" PLUGIN_API void PrintCentreHtmlAll(const plg::string& message, int duration) {
+	utils::PrintHtmlCentreAll(message.c_str(), duration);
 }
 
 /**

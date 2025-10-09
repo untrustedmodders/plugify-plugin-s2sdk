@@ -2371,6 +2371,12 @@
           "type": "string",
           "ref": false,
           "description": "The HTML-formatted message to be printed."
+        },
+        {
+            "name": "duration",
+            "type": "int32",
+            "ref": false,
+            "description": "The duration of the message in seconds."
         }
       ],
       "retType": {
@@ -2456,6 +2462,12 @@
           "type": "string",
           "ref": false,
           "description": "The HTML-formatted message to be printed in the center of the screen for all clients."
+        },
+        {
+          "name": "duration",
+          "type": "int32",
+          "ref": false,
+          "description": "The duration of the message in seconds."
         }
       ],
       "retType": {
