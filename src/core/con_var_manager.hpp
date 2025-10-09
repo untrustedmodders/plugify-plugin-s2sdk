@@ -7,7 +7,7 @@
 
 using ConVarChangeListenerCallback = void (*)(ConVarRefAbstract conVar, const plg::string& newValue, const plg::string& oldValue);
 
-enum ConVarFlag : int64_t {
+enum class ConVarFlag : uint64_t {
 	None = 0, // The default, no flags at all
 				  
 	// Command to ConVars and ConCommands
@@ -86,7 +86,7 @@ public:
 		if (conVar->IsValidRef()) {
 			conVarInfo.conVar = std::move(conVar);
 		} else {
-			conVarInfo.conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(conVarInfo.name.c_str(), flags, conVarInfo.description.c_str(), defaultVal, hasMin, min, hasMax, max, &ChangeCallback));
+			conVarInfo.conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(conVarInfo.name.c_str(), static_cast<uint64_t>(flags), conVarInfo.description.c_str(), defaultVal, hasMin, min, hasMax, max, &ChangeCallback));
 		}
 		m_cnvCache.emplace(conVarInfo.conVar.get(), &conVarInfo);
 		return *conVarInfo.conVar;

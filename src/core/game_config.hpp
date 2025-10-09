@@ -4,6 +4,9 @@
 #include <dynlibutils/memaddr.hpp>
 #include <dynlibutils/module.hpp>
 
+using Module = DynLibUtils::CModule;
+using Memory = DynLibUtils::CMemory;
+
 class GameConfig {
 	friend class GameConfigManager;
 public:
@@ -19,10 +22,10 @@ public:
 	std::string_view GetSymbol(std::string_view name) const;
 	std::string_view GetPatch(std::string_view name) const;
 	int32_t GetOffset(std::string_view name) const;
-	DynLibUtils::CMemory GetAddress(std::string_view name) const;
-	const DynLibUtils::CModule* GetModule(std::string_view name) const;
+	Memory GetAddress(std::string_view name) const;
+	const Module* GetModule(std::string_view name) const;
 	bool IsSymbol(std::string_view name) const;
-	DynLibUtils::CMemory ResolveSignature(std::string_view name) const;
+	Memory ResolveSignature(std::string_view name) const;
 
 private:
 	struct AddressConf {
@@ -50,11 +53,11 @@ public:
 	uint32_t LoadGameConfigFile(plg::vector<plg::string> paths);
 	void CloseGameConfigFile(uint32_t id);
 	GameConfig* GetGameConfig(uint32_t id);
-	DynLibUtils::CModule* GetModule(std::string_view name);
+	Module* GetModule(std::string_view name);
 
 private:
 	plg::map<uint32_t, GameConfig> m_configs;
-	plg::map<plg::string, DynLibUtils::CModule> m_modules;
+	plg::map<plg::string, Module> m_modules;
 	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
 };
 

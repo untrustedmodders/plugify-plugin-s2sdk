@@ -6,7 +6,7 @@
 
 #include <convar.h>
 
-enum CommandCallingContext : int {
+enum class CommandCallingContext  {
 	Console = 0,
 	Chat = 1,
 };

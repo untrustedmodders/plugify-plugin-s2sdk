@@ -133,9 +133,9 @@ std::string_view GameConfig::GetLibrary(std::string_view name) const {
 }
 
 // memory addresses below 0x10000 are automatically considered invalid for dereferencing
-constexpr DynLibUtils::CMemory VALID_MINIMUM_MEMORY_ADDRESS(0x10000);
+constexpr Memory VALID_MINIMUM_MEMORY_ADDRESS(0x10000);
 
-DynLibUtils::CMemory GameConfig::GetAddress(std::string_view name) const {
+Memory GameConfig::GetAddress(std::string_view name) const {
 	auto it = m_addresses.find(name);
 	if (it == m_addresses.end())
 		return {};
@@ -175,7 +175,7 @@ DynLibUtils::CMemory GameConfig::GetAddress(std::string_view name) const {
 	return addr;
 }
 
-const DynLibUtils::CModule* GameConfig::GetModule(std::string_view name) const {
+const Module* GameConfig::GetModule(std::string_view name) const {
 	const std::string_view library = GetLibrary(name);
 	if (library.empty())
 		return nullptr;
@@ -203,14 +203,14 @@ std::string_view GameConfig::GetSymbol(std::string_view name) const {
 	return symbol.substr(1);
 }
 
-DynLibUtils::CMemory GameConfig::ResolveSignature(std::string_view name) const {
+Memory GameConfig::ResolveSignature(std::string_view name) const {
 	auto module = GetModule(name);
 	if (!module) {
 		S2_LOGF(LS_WARNING, "Invalid module: {}\n", name);
 		return {};
 	}
 
-	DynLibUtils::CMemory address;
+	Memory address;
 
 	if (IsSymbol(name)) {
 		const std::string_view symbol = GetSymbol(name);
@@ -246,18 +246,18 @@ DynLibUtils::CMemory GameConfig::ResolveSignature(std::string_view name) const {
 
 GameConfigManager::GameConfigManager() {
 	// metamod workaround
-	if (DynLibUtils::CModule("metamod.2.cs2").GetHandle() != nullptr) {
+	if (Module("metamod.2.cs2").GetHandle() != nullptr) {
 #if S2SDK_PLATFORM_WINDOWS
 		int flags = DONT_RESOLVE_DLL_REFERENCES;
 #else
 		int flags = RTLD_LAZY | RTLD_NOLOAD;
 #endif
-		DynLibUtils::CModule engine2;
+		Module engine2;
 		engine2.LoadFromPath(utils::GameDirectory() + S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2", flags);
 		if (engine2) {
 			m_modules.emplace("engine2", std::move(engine2));
 		}
-		DynLibUtils::CModule server;
+		Module server;
 		engine2.LoadFromPath(utils::GameDirectory() + S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server", flags);
 		if (server) {
 			m_modules.emplace("server", std::move(server));
@@ -305,13 +305,13 @@ GameConfig* GameConfigManager::GetGameConfig(uint32_t id) {
 	return nullptr;
 }
 
-DynLibUtils::CModule* GameConfigManager::GetModule(std::string_view name) {
+Module* GameConfigManager::GetModule(std::string_view name) {
 	auto it = m_modules.find(name);
 	if (it != m_modules.end()) {
-		return &std::get<DynLibUtils::CModule>(*it);
+		return &std::get<Module>(*it);
 	}
 
-	return &m_modules.try_emplace(name, DynLibUtils::CModule{name}).first->second;
+	return &m_modules.try_emplace(name, Module{name}).first->second;
 }
 
 GameConfigManager g_GameConfigManager;

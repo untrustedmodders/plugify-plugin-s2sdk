@@ -29,7 +29,7 @@ extern "C" PLUGIN_API void* GetModule(const plg::string& name) {
  * @param decorated Whether the table name is decorated.
  * @return A pointer to the virtual table.
  */
-extern "C" PLUGIN_API void* GetModuleVirtualTableByName(DynLibUtils::CModule* module, const plg::string& tableName, bool decorated) {
+extern "C" PLUGIN_API void* GetModuleVirtualTableByName(Module* module, const plg::string& tableName, bool decorated) {
 	return module->GetVirtualTableByName(tableName, decorated);
 }
 
@@ -40,7 +40,7 @@ extern "C" PLUGIN_API void* GetModuleVirtualTableByName(DynLibUtils::CModule* mo
  * @param functionName Name of the function.
  * @return A pointer to the function.
  */
-extern "C" PLUGIN_API void* GetModuleFunctionByName(DynLibUtils::CModule* module, const plg::string& functionName) {
+extern "C" PLUGIN_API void* GetModuleFunctionByName(Module* module, const plg::string& functionName) {
 	return module->GetFunctionByName(functionName);
 }
 
@@ -51,7 +51,7 @@ extern "C" PLUGIN_API void* GetModuleFunctionByName(DynLibUtils::CModule* module
  * @param sectionName Name of the section.
  * @return The name of the section as a string.
  */
-extern "C" PLUGIN_API plg::string GetModuleSectionNameByName(DynLibUtils::CModule* module, const plg::string& sectionName) {
+extern "C" PLUGIN_API plg::string GetModuleSectionNameByName(Module* module, const plg::string& sectionName) {
 	auto section = module->GetSectionByName(sectionName);
 	if (!section) {
 		S2_LOGF(LS_WARNING, "Failed to get the module section by '{}' name.\n", sectionName);
@@ -68,7 +68,7 @@ extern "C" PLUGIN_API plg::string GetModuleSectionNameByName(DynLibUtils::CModul
  * @param sectionName Name of the section.
  * @return A pointer to the base address of the section.
  */
-extern "C" PLUGIN_API void* GetModuleSectionBaseByName(DynLibUtils::CModule* module, const plg::string& sectionName) {
+extern "C" PLUGIN_API void* GetModuleSectionBaseByName(Module* module, const plg::string& sectionName) {
 	auto section = module->GetSectionByName(sectionName);
 	if (!section) {
 		S2_LOGF(LS_WARNING, "Failed to get the module section base by '{}' name.\n", sectionName);
@@ -85,7 +85,7 @@ extern "C" PLUGIN_API void* GetModuleSectionBaseByName(DynLibUtils::CModule* mod
  * @param sectionName Name of the section.
  * @return The size of the section as a 64-bit unsigned integer.
  */
-extern "C" PLUGIN_API uint64_t GetModuleSectionSizeByName(DynLibUtils::CModule* module, const plg::string& sectionName) {
+extern "C" PLUGIN_API uint64_t GetModuleSectionSizeByName(Module* module, const plg::string& sectionName) {
 	auto section = module->GetSectionByName(sectionName);
 	if (!section) {
 		S2_LOGF(LS_WARNING, "Failed to get the module section size by '{}' name.\n", sectionName);
@@ -101,7 +101,7 @@ extern "C" PLUGIN_API uint64_t GetModuleSectionSizeByName(DynLibUtils::CModule* 
  * @param module Pointer to the module.
  * @return A pointer to the module handle.
  */
-extern "C" PLUGIN_API void* GetModuleHandle(DynLibUtils::CModule* module) {
+extern "C" PLUGIN_API void* GetModuleHandle(Module* module) {
 	return module->GetHandle();
 }
 
@@ -111,7 +111,7 @@ extern "C" PLUGIN_API void* GetModuleHandle(DynLibUtils::CModule* module) {
  * @param module Pointer to the module.
  * @return A pointer to the module base address.
  */
-extern "C" PLUGIN_API void* GetModuleBase(DynLibUtils::CModule* module) {
+extern "C" PLUGIN_API void* GetModuleBase(Module* module) {
 	return module->GetBase();
 }
 
@@ -121,7 +121,7 @@ extern "C" PLUGIN_API void* GetModuleBase(DynLibUtils::CModule* module) {
  * @param module Pointer to the module.
  * @return The file path of the module as a string.
  */
-extern "C" PLUGIN_API plg::string GetModulePath(DynLibUtils::CModule* module) {
+extern "C" PLUGIN_API plg::string GetModulePath(Module* module) {
 	return module->GetPath();
 }
 
@@ -131,7 +131,7 @@ extern "C" PLUGIN_API plg::string GetModulePath(DynLibUtils::CModule* module) {
  * @param module Pointer to the module.
  * @return The name of the module as a string.
  */
-extern "C" PLUGIN_API plg::string GetModuleName(DynLibUtils::CModule* module) {
+extern "C" PLUGIN_API plg::string GetModuleName(Module* module) {
 	return module->GetName();
 }
 
@@ -141,7 +141,7 @@ extern "C" PLUGIN_API plg::string GetModuleName(DynLibUtils::CModule* module) {
  * @param module Pointer to the module.
  * @return The last error message as a string.
  */
-extern "C" PLUGIN_API plg::string GetModuleLastError(DynLibUtils::CModule* module) {
+extern "C" PLUGIN_API plg::string GetModuleLastError(Module* module) {
 	return module->GetLastError();
 }
 

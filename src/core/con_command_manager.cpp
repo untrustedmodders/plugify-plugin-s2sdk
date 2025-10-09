@@ -7,7 +7,6 @@
 
 #include <icvar.h>
 #include <igameevents.h>
-#undef CreateEvent
 
 static void CommandCallback(const CCommandContext&, const CCommand&) {
 }
@@ -81,7 +80,7 @@ bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::stri
 	ConCommandCreation_t setup;
 	setup.m_pszName = commandInfo.name.c_str();
 	setup.m_pszHelpString = commandInfo.description.c_str();
-	setup.m_nFlags = SanitiseConVarFlags(flags);
+	setup.m_nFlags = SanitiseConVarFlags(static_cast<uint64>(flags));
 	setup.m_CBInfo = { &CommandCallback };
 	setup.m_CompletionCBInfo = {};
 
