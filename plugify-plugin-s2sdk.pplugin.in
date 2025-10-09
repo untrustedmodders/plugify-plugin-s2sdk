@@ -7925,115 +7925,37 @@
       }
     },
     {
-      "name": "PrecacheGeneric",
+      "name": "Precache",
       "group": "Engine",
-      "description": "Precaches a given generic file.",
-      "funcName": "PrecacheGeneric",
+      "description": "Precaches a given file.",
+      "funcName": "Precache",
       "paramTypes": [
         {
-          "name": "model",
+          "name": "resource",
           "type": "string",
           "ref": false,
-          "description": "The name of the model to be precached."
+          "description": "The name of the resource to be precached."
         }
       ],
       "retType": {
-        "type": "int32",
-        "description": "An integer identifier for the generic file."
+        "type": "void"
       }
     },
     {
-      "name": "IsGenericPrecache",
+      "name": "IsPrecached",
       "group": "Engine",
-      "description": "Checks if a specified generic file is precached.",
-      "funcName": "IsGenericPrecache",
+      "description": "Checks if a specified file is precached.",
+      "funcName": "IsPrecached",
       "paramTypes": [
         {
-          "name": "model",
+          "name": "resource",
           "type": "string",
           "ref": false,
-          "description": "The name of the generic file to check."
+          "description": "The name of the file to check."
         }
       ],
       "retType": {
         "type": "bool"
-      }
-    },
-    {
-      "name": "PrecacheModel",
-      "group": "Engine",
-      "description": "Precaches a specified model.",
-      "funcName": "PrecacheModel",
-      "paramTypes": [
-        {
-          "name": "model",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the model to be precached."
-        }
-      ],
-      "retType": {
-        "type": "int32",
-        "description": "An integer identifier for the model."
-      }
-    },
-    {
-      "name": "IsModelPrecache",
-      "group": "Engine",
-      "description": "Checks if a specified model is precached.",
-      "funcName": "IsModelPrecache",
-      "paramTypes": [
-        {
-          "name": "model",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the model to check."
-        }
-      ],
-      "retType": {
-        "type": "bool"
-      }
-    },
-    {
-      "name": "PrecacheSound",
-      "group": "Engine",
-      "description": "Precaches a specified sound.",
-      "funcName": "PrecacheSound",
-      "paramTypes": [
-        {
-          "name": "sound",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the sound to be precached."
-        },
-        {
-          "name": "preload",
-          "type": "bool",
-          "ref": false,
-          "description": "A boolean indicating if the sound should be preloaded."
-        }
-      ],
-      "retType": {
-        "type": "bool",
-        "description": "True if the sound is successfully precached, false otherwise."
-      }
-    },
-    {
-      "name": "IsSoundPrecached",
-      "group": "Engine",
-      "description": "Checks if a specified sound is precached.",
-      "funcName": "IsSoundPrecached",
-      "paramTypes": [
-        {
-          "name": "sound",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the sound to check."
-        }
-      ],
-      "retType": {
-        "type": "bool",
-        "description": "True if the sound is precached, false otherwise."
       }
     },
     {
@@ -15854,6 +15776,318 @@
       }
     },
     {
+      "name": "OnRoundTerminate_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnRoundTerminate_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnRoundTerminateCallback",
+            "funcName": "OnRoundTerminateCallback",
+            "description": "Called right before a round terminates.",
+            "paramTypes": [
+              {
+                "name": "delay",
+                "type": "float",
+                "ref": false,
+                "description": "Time in seconds to wait before the next round starts."
+              },
+              {
+                "name": "reason",
+                "type": "int32",
+                "ref": false,
+                "description": "The reason for ending the round, as defined by the CSRoundEndReason enum.",
+                "enum": {
+                  "name": "CSRoundEndReason",
+                  "description": "Enum representing the possible reasons for a round ending in Counter-Strike.",
+                  "values": [
+                    {
+                      "value": 1,
+                      "name": "TargetBombed",
+                      "description": "Target successfully bombed."
+                    },
+                    {
+                      "value": 2,
+                      "name": "VIPEscaped",
+                      "description": "The VIP has escaped (not present in CS:GO)."
+                    },
+                    {
+                      "value": 3,
+                      "name": "VIPKilled",
+                      "description": "VIP has been assassinated (not present in CS:GO)."
+                    },
+                    {
+                      "value": 4,
+                      "name": "TerroristsEscaped",
+                      "description": "The terrorists have escaped."
+                    },
+                    {
+                      "value": 5,
+                      "name": "CTStoppedEscape",
+                      "description": "The CTs have prevented most of the terrorists from escaping."
+                    },
+                    {
+                      "value": 6,
+                      "name": "TerroristsStopped",
+                      "description": "Escaping terrorists have all been neutralized."
+                    },
+                    {
+                      "value": 7,
+                      "name": "BombDefused",
+                      "description": "The bomb has been defused."
+                    },
+                    {
+                      "value": 8,
+                      "name": "CTWin",
+                      "description": "Counter-Terrorists win."
+                    },
+                    {
+                      "value": 9,
+                      "name": "TerroristWin",
+                      "description": "Terrorists win."
+                    },
+                    {
+                      "value": 10,
+                      "name": "Draw",
+                      "description": "Round draw."
+                    },
+                    {
+                      "value": 11,
+                      "name": "HostagesRescued",
+                      "description": "All hostages have been rescued."
+                    },
+                    {
+                      "value": 12,
+                      "name": "TargetSaved",
+                      "description": "Target has been saved."
+                    },
+                    {
+                      "value": 13,
+                      "name": "HostagesNotRescued",
+                      "description": "Hostages have not been rescued."
+                    },
+                    {
+                      "value": 14,
+                      "name": "TerroristsNotEscaped",
+                      "description": "Terrorists have not escaped."
+                    },
+                    {
+                      "value": 15,
+                      "name": "VIPNotEscaped",
+                      "description": "VIP has not escaped (not present in CS:GO)."
+                    },
+                    {
+                      "value": 16,
+                      "name": "GameStart",
+                      "description": "Game commencing."
+                    },
+                    {
+                      "value": 17,
+                      "name": "TerroristsSurrender",
+                      "description": "Terrorists surrender."
+                    },
+                    {
+                      "value": 18,
+                      "name": "CTSurrender",
+                      "description": "CTs surrender."
+                    },
+                    {
+                      "value": 19,
+                      "name": "TerroristsPlanted",
+                      "description": "Terrorists planted the bomb."
+                    },
+                    {
+                      "value": 20,
+                      "name": "CTsReachedHostage",
+                      "description": "CTs reached the hostage."
+                    },
+                    {
+                      "value": 21,
+                      "name": "SurvivalWin",
+                      "description": "Survival mode win."
+                    },
+                    {
+                      "value": 22,
+                      "name": "SurvivalDraw",
+                      "description": "Survival mode draw."
+                    }
+                  ]
+                }
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnRoundTerminated_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnRoundTerminate_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnRoundTerminateCallback",
+            "funcName": "OnRoundTerminateCallback",
+            "description": "Called right before a round terminates.",
+            "paramTypes": [
+              {
+                "name": "delay",
+                "type": "float",
+                "ref": false,
+                "description": "Time in seconds to wait before the next round starts."
+              },
+              {
+                "name": "reason",
+                "type": "int32",
+                "ref": false,
+                "description": "The reason for ending the round, as defined by the CSRoundEndReason enum.",
+                "enum": {
+                  "name": "CSRoundEndReason",
+                  "description": "Enum representing the possible reasons for a round ending in Counter-Strike.",
+                  "values": [
+                    {
+                      "value": 1,
+                      "name": "TargetBombed",
+                      "description": "Target successfully bombed."
+                    },
+                    {
+                      "value": 2,
+                      "name": "VIPEscaped",
+                      "description": "The VIP has escaped (not present in CS:GO)."
+                    },
+                    {
+                      "value": 3,
+                      "name": "VIPKilled",
+                      "description": "VIP has been assassinated (not present in CS:GO)."
+                    },
+                    {
+                      "value": 4,
+                      "name": "TerroristsEscaped",
+                      "description": "The terrorists have escaped."
+                    },
+                    {
+                      "value": 5,
+                      "name": "CTStoppedEscape",
+                      "description": "The CTs have prevented most of the terrorists from escaping."
+                    },
+                    {
+                      "value": 6,
+                      "name": "TerroristsStopped",
+                      "description": "Escaping terrorists have all been neutralized."
+                    },
+                    {
+                      "value": 7,
+                      "name": "BombDefused",
+                      "description": "The bomb has been defused."
+                    },
+                    {
+                      "value": 8,
+                      "name": "CTWin",
+                      "description": "Counter-Terrorists win."
+                    },
+                    {
+                      "value": 9,
+                      "name": "TerroristWin",
+                      "description": "Terrorists win."
+                    },
+                    {
+                      "value": 10,
+                      "name": "Draw",
+                      "description": "Round draw."
+                    },
+                    {
+                      "value": 11,
+                      "name": "HostagesRescued",
+                      "description": "All hostages have been rescued."
+                    },
+                    {
+                      "value": 12,
+                      "name": "TargetSaved",
+                      "description": "Target has been saved."
+                    },
+                    {
+                      "value": 13,
+                      "name": "HostagesNotRescued",
+                      "description": "Hostages have not been rescued."
+                    },
+                    {
+                      "value": 14,
+                      "name": "TerroristsNotEscaped",
+                      "description": "Terrorists have not escaped."
+                    },
+                    {
+                      "value": 15,
+                      "name": "VIPNotEscaped",
+                      "description": "VIP has not escaped (not present in CS:GO)."
+                    },
+                    {
+                      "value": 16,
+                      "name": "GameStart",
+                      "description": "Game commencing."
+                    },
+                    {
+                      "value": 17,
+                      "name": "TerroristsSurrender",
+                      "description": "Terrorists surrender."
+                    },
+                    {
+                      "value": 18,
+                      "name": "CTSurrender",
+                      "description": "CTs surrender."
+                    },
+                    {
+                      "value": 19,
+                      "name": "TerroristsPlanted",
+                      "description": "Terrorists planted the bomb."
+                    },
+                    {
+                      "value": 20,
+                      "name": "CTsReachedHostage",
+                      "description": "CTs reached the hostage."
+                    },
+                    {
+                      "value": 21,
+                      "name": "SurvivalWin",
+                      "description": "Survival mode win."
+                    },
+                    {
+                      "value": 22,
+                      "name": "SurvivalDraw",
+                      "description": "Survival mode draw."
+                    }
+                  ]
+                }
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnEntitySpawned_Register",
       "group": "Listeners",
       "description": "Register callback to event.",
@@ -16635,6 +16869,71 @@
       "retType": {
         "type": "ptr64",
         "description": "A pointer to the game rules object."
+      }
+    },
+    {
+      "name": "GetGameTeamManager",
+      "group": "Gamerules",
+      "description": "Retrieves the team manager instance for a specified team.",
+      "funcName": "GetGameTeamManager",
+      "paramTypes": [
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The numeric identifier of the team."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the corresponding CTeam instance, or nullptr if the team was not found."
+      }
+    },
+    {
+      "name": "GetGameTeamScore",
+      "group": "Gamerules",
+      "description": "Retrieves the current score of a specified team.",
+      "funcName": "GetGameTeamScore",
+      "paramTypes": [
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The numeric identifier of the team."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The current score of the team, or -1 if the team could not be found."
+      }
+    },
+    {
+      "name": "GetGamePlayerCount",
+      "group": "Gamerules",
+      "description": "Retrieves the number of players on a specified team.",
+      "funcName": "GetGamePlayerCount",
+      "paramTypes": [
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The numeric identifier of the team (e.g., CS_TEAM_T, CS_TEAM_CT, CS_TEAM_SPECTATOR)."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The number of players on the team, or -1 if game rules are unavailable."
+      }
+    },
+    {
+      "name": "GetGameTotalRoundsPlayed",
+      "group": "Gamerules",
+      "description": "Returns the total number of rounds played in the current match.",
+      "funcName": "GetGameTotalRoundsPlayed",
+      "paramTypes": [],
+      "retType": {
+        "type": "int32",
+        "description": "The total number of rounds played, or -1 if the game rules are unavailable."
       }
     },
     {
