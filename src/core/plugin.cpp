@@ -539,7 +539,7 @@ void Source2SDK::OnPluginStart() {
 		DynLibUtils::CVirtualTable vtable(table);
 		s_BuildGameSessionManifest.Hook(vtable, [](IGameSystem* pThis, const EventBuildGameSessionManifest_t& msg) {
 			msg.m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
-
+			for (const auto& resource : g_Precached) {
 			s_BuildGameSessionManifest.Call(pThis, msg);
 		});
 	}

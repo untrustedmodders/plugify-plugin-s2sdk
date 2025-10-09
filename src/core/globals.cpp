@@ -57,11 +57,13 @@ namespace globals {
 		}
 		g_pGameEventManager = *p_ppGameEventManager;
 
+#if defined (CS2)
 		g_pScripts = g_pGameConfig->GetAddress("&s_pScripts").RCast<CUtlVector<void*>*>();
 		if (!g_pScripts) {
 			S2_LOG(LS_ERROR, "s_pScripts not found!\n");
 			return;
 		}
+#endif
 
 		g_pCVar = static_cast<ICvar*>(QueryInterface("tier0", CVAR_INTERFACE_VERSION));
 		g_pSchemaSystem = static_cast<ISchemaSystem*>(QueryInterface("schemasystem", SCHEMASYSTEM_INTERFACE_VERSION));

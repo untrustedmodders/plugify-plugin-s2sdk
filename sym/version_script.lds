@@ -164,12 +164,8 @@
         GetGameFrameTime;
         GetEngineTime;
         GetMaxClients;
-        PrecacheGeneric;
-        IsGenericPrecache;
-        PrecacheModel;
-        IsModelPrecache;
-        PrecacheSound;
-        IsSoundPrecached;
+        Precache;
+        IsPrecached;
         GetEconItemSystem;
         IsServerPaused;
         QueueTaskForNextFrame;

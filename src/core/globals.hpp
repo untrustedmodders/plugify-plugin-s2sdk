@@ -64,6 +64,7 @@ inline CBaseEntity* g_pPointScript = nullptr;
 inline std::map<int, CTeam*> g_pTeamManagers;
 //inline ISteamHTTP* g_http = nullptr;
 inline CSteamGameServerAPIContext g_SteamAPI = {};
+inline plg::set<plg::string> g_Precached;
 
 class CoreConfig;
 class GameConfig;

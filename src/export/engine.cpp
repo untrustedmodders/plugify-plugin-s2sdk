@@ -143,62 +143,22 @@ extern "C" PLUGIN_API int GetMaxClients() {
 }
 
 /**
- * @brief Precaches a given generic file.
+ * @brief Precaches a given file.
  *
- * @param model The name of the model to be precached.
+ * @param resource The name of the resource to be precached.
  * @return An integer identifier for the generic file.
  */
-extern "C" PLUGIN_API int PrecacheGeneric(const plg::string& model) {
-	return g_pEngineServer->PrecacheGeneric(model.c_str());
+extern "C" PLUGIN_API void Precache(const plg::string& resource) {
+	g_Precached.insert(resource);
 }
 
 /**
- * @brief Checks if a specified generic file is precached.
+ * @brief Checks if a specified file is precached.
  *
- * @param model The name of the generic file to check.
+ * @param resource The name of the file to check.
  */
-extern "C" PLUGIN_API bool IsGenericPrecache(const plg::string& model) {
-	return g_pEngineServer->IsGenericPrecached(model.c_str());
-}
-
-/**
- * @brief Precaches a specified model.
- *
- * @param model The name of the model to be precached.
- * @return An integer identifier for the model.
- */
-extern "C" PLUGIN_API int PrecacheModel(const plg::string& model) {
-	return g_pEngineServer->PrecacheGeneric(model.c_str());
-}
-
-/**
- * @brief Checks if a specified model is precached.
- *
- * @param model The name of the model to check.
- */
-extern "C" PLUGIN_API bool IsModelPrecache(const plg::string& model) {
-	return g_pEngineServer->IsGenericPrecached(model.c_str());
-}
-
-/**
- * @brief Precaches a specified sound.
- *
- * @param sound The name of the sound to be precached.
- * @param preload A boolean indicating if the sound should be preloaded.
- * @return True if the sound is successfully precached, false otherwise.
- */
-extern "C" PLUGIN_API bool PrecacheSound(const plg::string& sound, bool preload) {
-	return false;//g_pEngineSound->PrecacheSound(sound.c_str(), preload);
-}
-
-/**
- * @brief Checks if a specified sound is precached.
- *
- * @param sound The name of the sound to check.
- * @return True if the sound is precached, false otherwise.
- */
-extern "C" PLUGIN_API bool IsSoundPrecached(const plg::string& sound) {
-	return false;//g_pEngineSound->IsSoundPrecached(sound.c_str());
+extern "C" PLUGIN_API bool IsPrecached(const plg::string& resource) {
+	return g_Precached.contains(resource.c_str());
 }
 
 /**
