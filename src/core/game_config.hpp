@@ -58,7 +58,7 @@ public:
 private:
 	plg::map<uint32_t, GameConfig> m_configs;
 	plg::map<plg::string, Module> m_modules;
-	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
+	static inline std::atomic<uint32_t> s_nextId{static_cast<uint32_t>(-1)};
 };
 
 extern GameConfigManager g_GameConfigManager;
