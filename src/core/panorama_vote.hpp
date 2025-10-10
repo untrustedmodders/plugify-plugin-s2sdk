@@ -81,11 +81,11 @@ protected:
 
 private:
 	CHandle<CVoteController> m_voteController;
-	bool m_voteInProgress{};
 	YesNoVoteHandler m_voteHandler{};
 	YesNoVoteResult m_voteResult{};
 	uint64 m_recipients{static_cast<uint64>(-1)};
-	int m_voterCount{};
+	bool m_voteInProgress{};
+	//int m_voterCount{};
 	int m_voteCount{};
 	int m_currentVoteCaller{};
 	int m_currentVoteFailReason{};
@@ -93,7 +93,7 @@ private:
 	std::string m_currentVoteDetailStr;
 	std::string m_currentVotePassTitle;
 	std::string m_currentVotePassDetailStr;
-	std::array<CPlayerSlot, MAXPLAYERS> m_voters = {};
+	std::inplace_vector<CPlayerSlot, MAXPLAYERS> m_voters;
 };
 
 extern CPanoramaVoteHandler g_PanoramaVoteHandler;

@@ -49,15 +49,9 @@ void CPanoramaVoteHandler::RemovePlayerFromVote(CPlayerSlot slot) {
 	if (!m_voteInProgress)
 		return;
 
-	bool found = false;
-	for (int i = 0; i < m_voterCount; i++)
-		if (m_voters[i] == slot)
-			found = true;
-		else if (found)
-			m_voters[i - 1] = m_voters[i];
-
-	if (found) {
-		m_voters[--m_voterCount] = -1;
+	auto it = std::find(m_voters.begin(), m_voters.end(), slot);
+	if (it != m_voters.end()) {
+		m_voters.erase(it);
 	}
 }
 
@@ -65,14 +59,8 @@ bool CPanoramaVoteHandler::IsPlayerInVotePool(CPlayerSlot slot) const {
 	if (!m_voteInProgress)
 		return false;
 
-	if (slot < 0 || slot > MAXPLAYERS)
-		return false;
-
-	for (int i = 0; i < m_voterCount; i++)
-		if (m_voters[i] == slot)
-			return true;
-
-	return false;
+	auto it = std::find(m_voters.begin(), m_voters.end(), slot);
+	return it != m_voters.end();
 }
 
 // Removes a client's vote and redraws the vote
@@ -102,7 +90,7 @@ void CPanoramaVoteHandler::UpdateVoteCounts() const {
 		event->SetInt("vote_option3", m_voteController->m_nVoteOptionCount[VOTE_OPTION3]);
 		event->SetInt("vote_option4", m_voteController->m_nVoteOptionCount[VOTE_OPTION4]);
 		event->SetInt("vote_option5", m_voteController->m_nVoteOptionCount[VOTE_OPTION5]);
-		event->SetInt("potentialVotes", m_voterCount);
+		event->SetInt("potentialVotes", static_cast<int>(m_voters.size()));
 
 		g_pGameEventManager->FireEvent(event, false);
 	}
@@ -140,7 +128,7 @@ bool CPanoramaVoteHandler::SendYesNoVote(double duration, int caller,
 
 	InitVoters(&filter);
 
-	m_voteController->m_nPotentialVotes = m_voterCount;
+	m_voteController->m_nPotentialVotes = static_cast<int>(m_voters.size());
 	m_voteController->m_bIsYesNoVote = true;
 	m_voteController->m_iActiveIssueIndex = 2;
 
@@ -191,10 +179,9 @@ void CPanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
 
 void CPanoramaVoteHandler::InitVoters(IRecipientFilter* filter) {
 	// Clear any old info
-	m_voterCount = 0;
+	m_voters.clear();
 
 	for (int i = 0; i < MAXPLAYERS; ++i) {
-		m_voters[i] = -1;
 		m_voteController->m_nVotesCast[i] = VOTE_UNCAST;
 	}
 
@@ -202,11 +189,10 @@ void CPanoramaVoteHandler::InitVoters(IRecipientFilter* filter) {
 		m_voteController->m_nVoteOptionCount[i] = 0;
 	}
 
-	m_voterCount = filter->GetRecipientCount();
 	const CPlayerBitVec& recipients = filter->GetRecipients();
-	for (int i = 0, j = 0; i < m_voterCount; ++i, ++j) {
-		if (recipients.IsBitSet(j)) {
-			m_voters[i] = j;
+	for (int i = 0; i < filter->GetRecipientCount(); ++i) {
+		if (recipients.IsBitSet(i)) {
+			m_voters.push_back(i);
 		}
 	}
 }
@@ -216,7 +202,7 @@ void CPanoramaVoteHandler::CheckForEarlyVoteClose() const {
 	votes += m_voteController->m_nVoteOptionCount[VOTE_OPTION1];
 	votes += m_voteController->m_nVoteOptionCount[VOTE_OPTION2];
 
-	if (votes >= m_voterCount) {
+	if (votes >= m_voters.size()) {
 		// Do this next frame to prevent a crash
 		g_ServerManager.AddTaskForNextFrame([](const plg::vector<plg::any>&) {
 			g_PanoramaVoteHandler.EndVote(VoteEndReason::AllVotes);
@@ -263,7 +249,7 @@ void CPanoramaVoteHandler::EndVote(VoteEndReason reason) {
 		return;
 	}
 
-	int numClients = m_voterCount;
+	int numClients = static_cast<int>(m_voters.size());
 	int yesVotes = m_voteController->m_nVoteOptionCount[VOTE_OPTION1];
 	int noVotes = m_voteController->m_nVoteOptionCount[VOTE_OPTION2];
 	int numVotes = yesVotes + noVotes;
@@ -271,12 +257,12 @@ void CPanoramaVoteHandler::EndVote(VoteEndReason reason) {
 	plg::vector<int> clientInfoSlot;
 	plg::vector<int> clientInfoItem;
 
-	clientInfoSlot.reserve(numClients);
-	clientInfoItem.reserve(numClients);
+	clientInfoSlot.reserve(m_voters.size());
+	clientInfoItem.reserve(m_voters.size());
 
-	for (int i = 0; i < numClients; ++i) {
-		clientInfoSlot.emplace_back(m_voters[i]);
-		clientInfoItem.emplace_back(m_voteController->m_nVotesCast[m_voters[i]]);
+	for (const auto& slot : m_voters) {
+		clientInfoSlot.push_back(slot);
+		clientInfoItem.push_back(m_voteController->m_nVotesCast[slot]);
 	}
 
 	bool passed = m_voteResult(numVotes, yesVotes, noVotes, numClients, clientInfoSlot, clientInfoItem);
