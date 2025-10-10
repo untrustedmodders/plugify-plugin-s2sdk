@@ -108,7 +108,7 @@ namespace {
 }// namespace
 
 namespace schema {
-	int32_t FindChainOffset(const char* className, uint32_t classNameHash) {
+	int32_t FindChainOffset(const char* className, size_t classNameHash) {
 		return GetOffset(className, classNameHash, "__m_pChainEntity", g_ChainKey).offset;
 	}
 
