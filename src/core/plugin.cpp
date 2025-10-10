@@ -370,7 +370,7 @@ poly::ReturnAction Hook_TerminateRound(poly::IHook& hook, poly::Params& params, 
 	auto delay = poly::GetArgument<float>(params, 1);
 	auto reason = static_cast<int>(poly::GetArgument<uint32_t>(params, 2));
 
-	pGameRules->m_bGameRestart = true;
+	pGameRules->m_bGameRestart = false;
 
 	GetOnRoundTerminatedListenerManager().Notify(delay, reason);
 
