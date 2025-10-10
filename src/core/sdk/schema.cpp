@@ -28,9 +28,9 @@
 
 extern CGlobalVars* gpGlobals;
 
-using SchemaKeyValueMap = std::unordered_map<uint32_t, SchemaKey>;
-using SchemaTableMap = std::unordered_map<uint32_t, SchemaKeyValueMap>;
-static constexpr uint32_t g_ChainKey = hash_32_fnv1a_const("__m_pChainEntity");
+using SchemaKeyValueMap = std::unordered_map<size_t, SchemaKey>;
+using SchemaTableMap = std::unordered_map<size_t, SchemaKeyValueMap>;
+static constexpr size_t g_ChainKey = plg::hasher("__m_pChainEntity");
 
 void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 nNetworkStateChangedOffset) {
 	NetworkStateChanged_t data(nOffset);
@@ -70,7 +70,7 @@ namespace {
 		return false;
 	}
 
-	bool InitSchemaFieldsForClass(SchemaTableMap& tableMap, const char* className, uint32_t classKey) {
+	bool InitSchemaFieldsForClass(SchemaTableMap& tableMap, const char* className, size_t classKey) {
 		CSchemaSystemTypeScope* pType = g_pSchemaSystem->FindTypeScopeForModule(S2SDK_LIBRARY_PREFIX "server" S2SDK_LIBRARY_SUFFIX);
 		if (!pType)
 			return false;
@@ -95,7 +95,7 @@ namespace {
 			int size = 0;
 			uint8 alignment = 0;
 			field.m_pType->GetSizeAndAlignment(size, alignment);
-			keyValueMap.emplace(hash_32_fnv1a_const(field.m_pszName), SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), size, field.m_pType});
+			keyValueMap.emplace(plg::hasher(field.m_pszName), SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), size, field.m_pType});
 
 			//S2_LOGF(LS_DEBUG, "{}::{} found at -> 0x{:x} - {}\reworn", className, field.m_pszName, field.m_nSingleInheritanceOffset, &field);
 		}
@@ -112,7 +112,7 @@ namespace schema {
 		return GetOffset(className, classNameHash, "__m_pChainEntity", g_ChainKey).offset;
 	}
 
-	SchemaKey GetOffset(const char* className, uint32_t classKey, const char* memberName, uint32_t memberKey) {
+	SchemaKey GetOffset(const char* className, size_t classKey, const char* memberName, size_t memberKey) {
 		static SchemaTableMap schemaTableMap;
 
 		auto tableIt = schemaTableMap.find(classKey);

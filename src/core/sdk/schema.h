@@ -83,8 +83,8 @@ namespace schema {
 		Class
 	};
 
-	int32_t FindChainOffset(const char* className, uint32_t classNameHash);
-	SchemaKey GetOffset(const char* className, uint32_t classKey, const char* memberName, uint32_t memberKey);
+	int32_t FindChainOffset(const char* className, size_t classNameHash);
+	SchemaKey GetOffset(const char* className, size_t classKey, const char* memberName, size_t memberKey);
 	void NetworkStateChanged(intptr_t chainEntity, uint localOffset, int arrayIndex = 0xFFFFFFFF);
 
 	ElementType GetElementType(CSchemaType* type);
@@ -103,20 +103,17 @@ void SafeNetworkStateChanged(intptr_t pEntity, int offset, int chainOffset);
 
 class CBaseEntity;
 
-constexpr uint32_t val_32_const = 0x811c9dc5;
-constexpr uint32_t prime_32_const = 0x1000193;
-constexpr uint64_t val_64_const = 0xcbf29ce484222325;
-constexpr uint64_t prime_64_const = 0x100000001b3;
-
-inline constexpr uint32_t hash_32_fnv1a_const(const char* const str, const uint32_t value = val_32_const) noexcept
-{
-	return (str[0] == '\0') ? value : hash_32_fnv1a_const(&str[1], (value ^ uint32_t(str[0])) * prime_32_const);
+namespace plg {
+	constexpr std::size_t hasher(std::string_view sv) noexcept {
+		std::size_t hash = active_hash_traits::fnv_basis; // FNV-1a
+		for (const auto& c : sv) {
+			hash ^= static_cast<uint8_t>(c);
+			hash *= active_hash_traits::fnv_prime;
+		}
+		return hash;
+	}
 }
 
-inline constexpr uint64_t hash_64_fnv1a_const(const char* const str, const uint64_t value = val_64_const) noexcept
-{
-	return (str[0] == '\0') ? value : hash_64_fnv1a_const(&str[1], (value ^ uint64_t(str[0])) * prime_64_const);
-}
 #define SCHEMA_FIELD_OFFSET(type, varName, extra_offset)                                                                     \
 	PLUGIFY_NO_UNIQUE_ADDRESS class varName##_prop                                                                           \
 	{                                                                                                                        \
@@ -190,7 +187,7 @@ inline constexpr uint64_t hash_64_fnv1a_const(const char* const str, const uint6
 	private:                                                                                                                 \
 		/*Prevent accidentally copying this wrapper class instead of the underlying field*/                                  \
 		varName##_prop(const varName##_prop&) = delete;                                                                      \
-		static constexpr auto m_varNameHash = hash_32_fnv1a_const(#varName);                                                 \
+		static constexpr auto m_varNameHash = plg::hasher(#varName);                                                           \
 	} varName;
 
 #define SCHEMA_FIELD_POINTER_OFFSET(type, varName, extra_offset)                                                             \
@@ -241,7 +238,7 @@ inline constexpr uint64_t hash_64_fnv1a_const(const char* const str, const uint6
 	private:                                                                                                                 \
 		/*Prevent accidentally copying this wrapper class instead of the underlying field*/                                  \
 		varName##_prop(const varName##_prop&) = delete;                                                                      \
-		static constexpr auto m_varNameHash = hash_32_fnv1a_const(#varName);                                                 \
+		static constexpr auto m_varNameHash = plg::hasher(#varName);                                                           \
 	} varName;
 
 // Use this when you want the member's value itself
@@ -257,7 +254,7 @@ inline constexpr uint64_t hash_64_fnv1a_const(const char* const str, const uint6
 	private:																		\
 		typedef ClassName ThisClass;												\
 		static constexpr const char* m_className = #ClassName;						\
-		static constexpr uint32_t m_classNameHash = hash_32_fnv1a_const(#ClassName);\
+		static constexpr size_t m_classNameHash = plg::hasher(#ClassName);            \
 		static constexpr int m_networkStateChangedOffset = offset;					\
 	public:
 
