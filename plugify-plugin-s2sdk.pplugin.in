@@ -15776,10 +15776,10 @@
       }
     },
     {
-      "name": "OnRoundTerminate_Register",
+      "name": "OnRoundTerminated_Register",
       "group": "Listeners",
       "description": "Register callback to event.",
-      "funcName": "OnRoundTerminate_Register",
+      "funcName": "OnRoundTerminated_Register",
       "paramTypes": [
         {
           "name": "callback",
@@ -15787,8 +15787,8 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": {
-            "name": "OnRoundTerminateCallback",
-            "funcName": "OnRoundTerminateCallback",
+            "name": "OnRoundTerminatedCallback",
+            "funcName": "OnRoundTerminatedCallback",
             "description": "Called right before a round terminates.",
             "paramTypes": [
               {
@@ -15935,7 +15935,7 @@
       "name": "OnRoundTerminated_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
-      "funcName": "OnRoundTerminate_Unregister",
+      "funcName": "OnRoundTerminated_Unregister",
       "paramTypes": [
         {
           "name": "callback",
@@ -15943,8 +15943,8 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": {
-            "name": "OnRoundTerminateCallback",
-            "funcName": "OnRoundTerminateCallback",
+            "name": "OnRoundTerminatedCallback",
+            "funcName": "OnRoundTerminatedCallback",
             "description": "Called right before a round terminates.",
             "paramTypes": [
               {
