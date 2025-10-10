@@ -29,7 +29,7 @@ enum CSRoundEndReason {
 
 class CCSGameRules : public CGameRules {
 public:
-	DECLARE_SCHEMA_CLASS(CCSGameRules)
+	DECLARE_SCHEMA_CLASS_INLINE(CCSGameRules)
 
 	SCHEMA_FIELD(float, m_fMatchStartTime)
 	SCHEMA_FIELD(float, m_flGameStartTime)

@@ -24,5 +24,5 @@
 
 class CGameRules {
 public:
-	DECLARE_SCHEMA_CLASS(CGameRules)
+	DECLARE_SCHEMA_CLASS_INLINE(CGameRules)
 };
