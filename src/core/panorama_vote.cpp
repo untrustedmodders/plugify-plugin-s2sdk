@@ -89,7 +89,7 @@ bool CPanoramaVoteHandler::RedrawVoteToClient(CPlayerSlot slot) {
 	}
 
 	CRecipientFilter filter;
-	filter.AddRecipient(CPlayerSlot(slot));
+	filter.AddRecipient(slot); // CPlayerSlot()
 	SendVoteStartUM(&filter);
 
 	return true;
@@ -184,7 +184,7 @@ void CPanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
 	data->set_details_str(m_currentVoteDetailStr);
 	data->set_is_yes_no_vote(true);
 
-	g_pGameEventSystem->PostEventAbstract(-1, false, filter, pNetMsg, data, 0);
+	data->Send(filter->GetRecipients());
 
 	delete data;
 }
@@ -301,7 +301,7 @@ void CPanoramaVoteHandler::SendVoteFailed() const {
 	} else {
 		filter.SetRecipients(m_recipients);
 	}
-	g_pGameEventSystem->PostEventAbstract(-1, false, &filter, pNetMsg, data, 0);
+	data->Send(filter.GetRecipients());
 
 	delete data;
 }
@@ -322,7 +322,7 @@ void CPanoramaVoteHandler::SendVotePassed() const {
 	} else {
 		filter.SetRecipients(m_recipients);
 	}
-	g_pGameEventSystem->PostEventAbstract(-1, false, &filter, pNetMsg, data, 0);
+	data->Send(filter.GetRecipients());
 
 	delete data;
 }

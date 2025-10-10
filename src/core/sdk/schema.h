@@ -187,7 +187,7 @@ namespace plg {
 	private:                                                                                                                 \
 		/*Prevent accidentally copying this wrapper class instead of the underlying field*/                                  \
 		varName##_prop(const varName##_prop&) = delete;                                                                      \
-		static constexpr auto m_varNameHash = plg::hasher(#varName);                                                           \
+		static constexpr auto m_varNameHash = plg::hasher(#varName);                                                         \
 	} varName;
 
 #define SCHEMA_FIELD_POINTER_OFFSET(type, varName, extra_offset)                                                             \
@@ -238,7 +238,7 @@ namespace plg {
 	private:                                                                                                                 \
 		/*Prevent accidentally copying this wrapper class instead of the underlying field*/                                  \
 		varName##_prop(const varName##_prop&) = delete;                                                                      \
-		static constexpr auto m_varNameHash = plg::hasher(#varName);                                                           \
+		static constexpr auto m_varNameHash = plg::hasher(#varName);                                                         \
 	} varName;
 
 // Use this when you want the member's value itself
@@ -254,7 +254,7 @@ namespace plg {
 	private:																		\
 		typedef ClassName ThisClass;												\
 		static constexpr const char* m_className = #ClassName;						\
-		static constexpr size_t m_classNameHash = plg::hasher(#ClassName);            \
+		static constexpr size_t m_classNameHash = plg::hasher(#ClassName);          \
 		static constexpr int m_networkStateChangedOffset = offset;					\
 	public:
 

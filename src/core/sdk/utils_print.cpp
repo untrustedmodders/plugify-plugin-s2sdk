@@ -181,35 +181,35 @@ bool utils::CFormat(char* buffer, uint64_t buffer_size, const char* text) {
 	return true;
 }
 
-void utils::ClientPrintFilter(IRecipientFilter* filter, int msg_dest, const char* msg_name) {
+void ClientPrint(std::optional<CPlayerSlot> playerSlot, HudDest dest, const char* message) {
 	INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("TextMsg");
 	auto* data = pNetMsg->AllocateMessage()->As<CUserMessageTextMsg_t>();
 
-	data->set_dest(msg_dest);
-	data->add_param(msg_name);
+	data->set_dest(static_cast<uint32_t>(dest));
+	data->add_param(message);
 
-	g_pGameEventSystem->PostEventAbstract(-1, false, filter, pNetMsg, data, 0);
+	if (playerSlot){
+		data->Send(*playerSlot);
+	} else {
+		data->SendToAllClients();
+	}
 	delete data;
 }
 
 void utils::PrintConsole(CPlayerSlot slot, const char* message) {
-	CSingleRecipientFilter filter(slot);
-	ClientPrintFilter(&filter, HUD_PRINTCONSOLE, message);
+	ClientPrint(slot, HudDest::Console, message);
 }
 
 void utils::PrintChat(CPlayerSlot slot, const char* message) {
-	CSingleRecipientFilter filter(slot);
-	ClientPrintFilter(&filter, HUD_PRINTTALK, message);
+	ClientPrint(slot, HudDest::Chat, message);
 }
 
 void utils::PrintCentre(CPlayerSlot slot, const char* message) {
-	CSingleRecipientFilter filter(slot);
-	ClientPrintFilter(&filter, HUD_PRINTCENTER, message);
+	ClientPrint(slot, HudDest::Center, message);
 }
 
 void utils::PrintAlert(CPlayerSlot slot, const char* message) {
-	CSingleRecipientFilter filter(slot);
-	ClientPrintFilter(&filter, HUD_PRINTALERT, message);
+	ClientPrint(slot, HudDest::Alert, message);
 }
 
 void utils::PrintHtmlCentre(CPlayerSlot slot, const char* message, int duration) {
@@ -229,27 +229,19 @@ void utils::PrintHtmlCentre(CPlayerSlot slot, const char* message, int duration)
 }
 
 void utils::PrintConsoleAll(const char* message) {
-	CRecipientFilter filter;
-	filter.AddAllPlayers();
-	ClientPrintFilter(&filter, HUD_PRINTCONSOLE, message);
+	ClientPrint(std::nullopt, HudDest::Console, message);
 }
 
 void utils::PrintChatAll(const char* message) {
-	CRecipientFilter filter;
-	filter.AddAllPlayers();
-	ClientPrintFilter(&filter, HUD_PRINTTALK, message);
+	ClientPrint(std::nullopt, HudDest::Chat, message);
 }
 
 void utils::PrintCentreAll(const char* message) {
-	CRecipientFilter filter;
-	filter.AddAllPlayers();
-	ClientPrintFilter(&filter, HUD_PRINTCENTER, message);
+	ClientPrint(std::nullopt, HudDest::Center, message);
 }
 
 void utils::PrintAlertAll(const char* message) {
-	CRecipientFilter filter;
-	filter.AddAllPlayers();
-	ClientPrintFilter(&filter, HUD_PRINTALERT, message);
+	ClientPrint(std::nullopt, HudDest::Alert, message);
 }
 
 void utils::PrintHtmlCentreAll(const char* message, int duration) {
@@ -266,19 +258,18 @@ void utils::PrintHtmlCentreAll(const char* message, int duration) {
 }
 
 void utils::CPrintChat(CPlayerSlot slot, const char* message) {
-	CSingleRecipientFilter filter(slot);
-	if (char coloredBuffer[512]; CFormat(coloredBuffer, sizeof(coloredBuffer), message)) {
-		ClientPrintFilter(&filter, HUD_PRINTTALK, coloredBuffer);
+	char coloredBuffer[MAX_LOGGING_MESSAGE_LENGTH];
+	if (CFormat(coloredBuffer, sizeof(coloredBuffer), message)) {
+		ClientPrint(slot, HudDest::Chat, coloredBuffer);
 	} else {
 		S2_LOGF(LS_WARNING, "utils::CPrintChat did not have enough space to print: {}\n", message);
 	}
 }
 
 void utils::CPrintChatAll(const char* message) {
-	CRecipientFilter filter;
-	filter.AddAllPlayers();
-	if (char coloredBuffer[512]; CFormat(coloredBuffer, sizeof(coloredBuffer), message)) {
-		ClientPrintFilter(&filter, HUD_PRINTTALK, coloredBuffer);
+	char coloredBuffer[MAX_LOGGING_MESSAGE_LENGTH]; 
+	if (CFormat(coloredBuffer, sizeof(coloredBuffer), message)) {
+		ClientPrint(std::nullopt, HudDest::Chat, coloredBuffer);
 	} else {
 		S2_LOGF(LS_WARNING, "utils::CPrintChatAll did not have enough space to print: {}\n", message);
 	}

@@ -15,11 +15,13 @@
 #define CS_TEAM_T 2
 #define CS_TEAM_CT 3
 
-#define HUD_PRINTNOTIFY 1
-#define HUD_PRINTCONSOLE 2
-#define HUD_PRINTTALK 3
-#define HUD_PRINTCENTER 4
-#define HUD_PRINTALERT 6
+enum class HudDest : uint32_t {
+	Notify = 1,
+	Console = 2,
+	Chat = 3,
+	Center = 4,
+	Alert = 6,
+};
 
 #define MAXPLAYERS 64
 

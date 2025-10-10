@@ -209,8 +209,7 @@ void utils::SendConVarValue(CPlayerSlot slot, const char* name, const char* valu
 		data->set_name(name);
 		data->set_value(value);
 
-		CSingleRecipientFilter filter(slot);
-		g_pGameEventSystem->PostEventAbstract(-1, false, &filter, pNetMsg, msg, 0);
+		msg->Send(slot);
 		delete msg;
 	}
 }
@@ -224,8 +223,7 @@ void utils::SendMultipleConVarValues(CPlayerSlot slot, const char** names, const
 			data->set_name(names[i]);
 			data->set_value(value[i]);
 		}
-		CSingleRecipientFilter filter(slot);
-		g_pGameEventSystem->PostEventAbstract(-1, false, &filter, pNetMsg, msg, 0);
+		msg->Send(slot);
 		delete msg;
 	}
 }
@@ -240,8 +238,7 @@ int utils::SendCvarValueQueryToClient(CPlayerSlot slot, const char* cvarName, in
 		msg->set_cookie(queryCvarCookie);
 		msg->set_cvar_name(cvarName);
 
-		CSingleRecipientFilter filter(slot);
-		g_pGameEventSystem->PostEventAbstract(-1, false, &filter, pNetMsg, msg, 0);
+		msg->Send(slot);
 
 		delete msg;
 
