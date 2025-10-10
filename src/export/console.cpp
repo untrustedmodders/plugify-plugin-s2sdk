@@ -1,4 +1,5 @@
 #include <core/sdk/utils.h>
+#include <core/con_command_manager.hpp>
 #include <plugin_export.h>
 
 PLUGIFY_WARN_PUSH()
@@ -119,4 +120,27 @@ extern "C" PLUGIN_API void PrintToChatColored(int playerSlot, const plg::string&
  */
 extern "C" PLUGIN_API void PrintToChatColoredAll(const plg::string& message) {
 	utils::CPrintChatAll(message.c_str());
+}
+
+/**
+ * @brief Sends a reply message to a player or to the server console depending on the command context.
+ *
+ * @param ctx         The context from which the command was called (e.g., Console or Chat).
+ * @param playerSlot  The slot/index of the player receiving the message.
+ *                    A negative value indicates a server-level message (no specific player).
+ * @param message     The message string to be sent as a reply.
+ */
+extern "C" PLUGIN_API void ReplyToCommand(CommandCallingContext ctx, int playerSlot, const plg::string& message) {
+	if (playerSlot < 0) {
+		ConMsg("%s", message.c_str());
+		return;
+	}
+	switch (ctx) {
+		case CommandCallingContext::Console:
+			utils::PrintConsole(playerSlot, message.c_str());
+			return;
+		case CommandCallingContext::Chat:
+			utils::PrintChat(playerSlot, message.c_str());
+			return;
+	}
 }
