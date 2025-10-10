@@ -1,7 +1,7 @@
 #include <tier0/logging.h>
 #include <convar.h>
 
-plg::string g_ServerCommandBuffer; // TODO: need to be thread_local ?
+plg::string g_ServerCommandBuffer;
 std::atomic<bool> g_ShouldCatchSpew = false;
 
 class LoggingListener final : public ILoggingListener {

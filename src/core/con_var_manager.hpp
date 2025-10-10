@@ -73,6 +73,7 @@ public:
 	template<typename T>
 	ConVarRef CreateConVar(const plg::string& name, const plg::string& description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
 		if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
+			S2_LOGF(LS_DEBUG, "[ConVarManager::CreateConVar]: ConVar '{}' is empty or already exists\n", name);
 			return {};
 		}
 

@@ -97,10 +97,10 @@ void EventManager::FireEvent(EventInfo* info, bool dontBroadcast) {
 }
 
 EventInfo* EventManager::CreateEvent(const plg::string& name, bool force) {
-	EventInfo* info;
 	IGameEvent* event = g_pGameEventManager->CreateEvent(name.c_str(), force);
 
 	if (event) {
+		EventInfo* info;
 		if (m_freeEvents.empty()) {
 			info = new EventInfo{};
 		} else {

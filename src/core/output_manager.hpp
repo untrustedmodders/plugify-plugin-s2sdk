@@ -26,7 +26,7 @@ public:
 
 private:
 	plg::map<OutputKey, CallbackPair> m_hookMap;
-	std::vector<CallbackPair*> m_vecCallbackPairs;
+	plg::inplace_vector<CallbackPair*, 4> m_vecCallbackPairs;
 };
 
 extern EntityOutputManager g_OutputManager;
