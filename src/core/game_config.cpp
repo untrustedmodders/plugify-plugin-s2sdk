@@ -258,7 +258,7 @@ GameConfigManager::GameConfigManager() {
 			m_modules.emplace("engine2", std::move(engine2));
 		}
 		Module server;
-		engine2.LoadFromPath(utils::GameDirectory() + S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server", flags);
+		server.LoadFromPath(utils::GameDirectory() + S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server", flags);
 		if (server) {
 			m_modules.emplace("server", std::move(server));
 		}
