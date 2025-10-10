@@ -366,11 +366,11 @@ poly::ReturnAction Hook_FireOutputInternal(poly::IHook& hook, poly::Params& para
 
 #if defined (CS2)
 poly::ReturnAction Hook_TerminateRound(poly::IHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto pGameRules = poly::GetArgument<CCSGameRules*>(params, 0);
+	//auto pGameRules = poly::GetArgument<CCSGameRules*>(params, 0);
 	auto delay = poly::GetArgument<float>(params, 1);
 	auto reason = static_cast<int>(poly::GetArgument<uint32_t>(params, 2));
 
-	pGameRules->m_bGameRestart = false;
+	g_pGameRules->m_bGameRestart = false;
 
 	GetOnRoundTerminatedListenerManager().Notify(delay, reason);
 
@@ -582,14 +582,16 @@ void Source2SDK::OnPluginStart() {
 	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)((uint8_t*)(v8IsolateExitPtr) + fix), Hook_IsolateExit, Post);
 
 	{
-		using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
 		Module v8("plugify-module-v8");
-		auto resolve = v8.GetFunctionByName("SetModuleResolver").RCast<SetModuleResolverFn>();
-		if (!resolve) {
-			S2_LOG(LS_ERROR, "SetModuleResolver not found!\n");
-			return;
+		if (v8.IsValid()) {
+			using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
+			auto resolve = v8.GetFunctionByName("SetModuleResolver").RCast<SetModuleResolverFn>();
+			if (!resolve) {
+				S2_LOG(LS_ERROR, "SetModuleResolver not found!\n");
+				return;
+			}
+			resolve(addresses::CSScriptResolveModule);
 		}
-		resolve(addresses::CSScriptResolveModule);
 	}
 #endif
 
