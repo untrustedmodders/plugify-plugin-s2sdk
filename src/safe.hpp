@@ -275,7 +275,7 @@ namespace plg {
 	        return *this;
 	    }
 
-	    safe_map operator=(safe_map&& other) noexcept {
+	    safe_map& operator=(safe_map&& other) noexcept {
 	        if (this != &other) {
 	            std::unique_lock lock1(mutex_, std::defer_lock);
 	            std::unique_lock lock2(other.mutex_, std::defer_lock);
@@ -379,7 +379,7 @@ namespace plg {
 	        return map_.erase(key);
 	    }
 
-	    void swap(safe_map& other) {
+	    void swap(safe_map& other) noexcept {
 	        if (this != &other) {
 	            std::unique_lock lock1(mutex_, std::defer_lock);
 	            std::unique_lock lock2(other.mutex_, std::defer_lock);
