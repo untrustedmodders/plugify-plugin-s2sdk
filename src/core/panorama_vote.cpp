@@ -10,7 +10,7 @@
 #include <cstrike15_usermessages.pb.h>
 #include <cstrike15/usermessages.h>
 
-void CPanoramaVoteHandler::Reset() {
+void PanoramaVoteHandler::Reset() {
 	m_voteInProgress = false;
 	m_voteController = nullptr;
 	m_voteHandler = nullptr;
@@ -19,7 +19,7 @@ void CPanoramaVoteHandler::Reset() {
 	m_currentVoteDetailStr.clear();
 }
 
-void CPanoramaVoteHandler::Init() {
+void PanoramaVoteHandler::Init() {
 	if (m_voteInProgress)
 		return;
 
@@ -30,7 +30,7 @@ void CPanoramaVoteHandler::Init() {
 }
 
 // Called by vote_cast event
-void CPanoramaVoteHandler::VoteCast(IGameEvent *event) {
+void PanoramaVoteHandler::VoteCast(IGameEvent *event) {
 	if (!m_voteController || !m_voteInProgress)
 		return;
 
@@ -45,7 +45,7 @@ void CPanoramaVoteHandler::VoteCast(IGameEvent *event) {
 	CheckForEarlyVoteClose();
 }
 
-void CPanoramaVoteHandler::RemovePlayerFromVote(CPlayerSlot slot) {
+void PanoramaVoteHandler::RemovePlayerFromVote(CPlayerSlot slot) {
 	if (!m_voteInProgress)
 		return;
 
@@ -55,7 +55,7 @@ void CPanoramaVoteHandler::RemovePlayerFromVote(CPlayerSlot slot) {
 	}
 }
 
-bool CPanoramaVoteHandler::IsPlayerInVotePool(CPlayerSlot slot) const {
+bool PanoramaVoteHandler::IsPlayerInVotePool(CPlayerSlot slot) const {
 	if (!m_voteInProgress)
 		return false;
 
@@ -64,7 +64,7 @@ bool CPanoramaVoteHandler::IsPlayerInVotePool(CPlayerSlot slot) const {
 }
 
 // Removes a client's vote and redraws the vote
-bool CPanoramaVoteHandler::RedrawVoteToClient(CPlayerSlot slot) {
+bool PanoramaVoteHandler::RedrawVoteToClient(CPlayerSlot slot) {
 	if (!m_voteController)
 		return false;
 
@@ -83,7 +83,7 @@ bool CPanoramaVoteHandler::RedrawVoteToClient(CPlayerSlot slot) {
 	return true;
 }
 
-void CPanoramaVoteHandler::UpdateVoteCounts() const {
+void PanoramaVoteHandler::UpdateVoteCounts() const {
 	if (IGameEvent* event = g_pGameEventManager->CreateEvent("vote_changed")) {
 		event->SetInt("vote_option1", m_voteController->m_nVoteOptionCount[VOTE_OPTION1]);
 		event->SetInt("vote_option2", m_voteController->m_nVoteOptionCount[VOTE_OPTION2]);
@@ -96,11 +96,11 @@ void CPanoramaVoteHandler::UpdateVoteCounts() const {
 	}
 }
 
-bool CPanoramaVoteHandler::IsVoteInProgress() const {
+bool PanoramaVoteHandler::IsVoteInProgress() const {
 	return m_voteInProgress;
 }
 
-bool CPanoramaVoteHandler::SendYesNoVote(double duration, int caller,
+bool PanoramaVoteHandler::SendYesNoVote(double duration, int caller,
 	const plg::string& voteTitle, const plg::string& detailStr,
 	const plg::string& votePassTitle, const plg::string& detailPassStr,
 	int voteFailReason, uint64 recipients, YesNoVoteResult result,
@@ -161,7 +161,7 @@ bool CPanoramaVoteHandler::SendYesNoVote(double duration, int caller,
 	return true;
 }
 
-void CPanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
+void PanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
 	INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteStart");
 	auto data = pNetMsg->AllocateMessage()->As<CCSUsrMsg_VoteStart_t>();
 
@@ -177,7 +177,7 @@ void CPanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
 	delete data;
 }
 
-void CPanoramaVoteHandler::InitVoters(IRecipientFilter* filter) {
+void PanoramaVoteHandler::InitVoters(IRecipientFilter* filter) {
 	// Clear any old info
 	m_voters.clear();
 
@@ -197,7 +197,7 @@ void CPanoramaVoteHandler::InitVoters(IRecipientFilter* filter) {
 	}
 }
 
-void CPanoramaVoteHandler::CheckForEarlyVoteClose() const {
+void PanoramaVoteHandler::CheckForEarlyVoteClose() const {
 	int votes = 0;
 	votes += m_voteController->m_nVoteOptionCount[VOTE_OPTION1];
 	votes += m_voteController->m_nVoteOptionCount[VOTE_OPTION2];
@@ -210,7 +210,7 @@ void CPanoramaVoteHandler::CheckForEarlyVoteClose() const {
 	}
 }
 
-void CPanoramaVoteHandler::EndVote(VoteEndReason reason) {
+void PanoramaVoteHandler::EndVote(VoteEndReason reason) {
 	if (!m_voteInProgress)
 		return;
 
@@ -273,7 +273,7 @@ void CPanoramaVoteHandler::EndVote(VoteEndReason reason) {
 	}
 }
 
-void CPanoramaVoteHandler::SendVoteFailed() const {
+void PanoramaVoteHandler::SendVoteFailed() const {
 	INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteFailed");
 
 	auto data = pNetMsg->AllocateMessage()->As<CCSUsrMsg_VoteFailed_t>();
@@ -292,7 +292,7 @@ void CPanoramaVoteHandler::SendVoteFailed() const {
 	delete data;
 }
 
-void CPanoramaVoteHandler::SendVotePassed() const {
+void PanoramaVoteHandler::SendVotePassed() const {
 	INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VotePass");
 
 	auto data = pNetMsg->AllocateMessage()->As<CCSUsrMsg_VotePass_t>();
@@ -321,4 +321,4 @@ GAME_EVENT_F(round_start) {
 	g_PanoramaVoteHandler.Init();
 }
 
-CPanoramaVoteHandler g_PanoramaVoteHandler;
+PanoramaVoteHandler g_PanoramaVoteHandler;

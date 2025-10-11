@@ -33,7 +33,7 @@ using YesNoVoteHandler = void(*)(VoteAction, int, int);
 // Return true for vote to pass, false to fail
 using YesNoVoteResult = bool(*)(int numVotes, int yesVotes, int noVotes, int numClients, const plg::vector<int>& clientInfoSlot, const plg::vector<int>& clientInfoItem);
 
-class CPanoramaVoteHandler
+class PanoramaVoteHandler
 {
 public:
 	void Reset();
@@ -96,4 +96,4 @@ private:
 	std::inplace_vector<CPlayerSlot, MAXPLAYERS> m_voters;
 };
 
-extern CPanoramaVoteHandler g_PanoramaVoteHandler;
+extern PanoramaVoteHandler g_PanoramaVoteHandler;
