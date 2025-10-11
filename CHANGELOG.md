@@ -1,5 +1,32 @@
 # Changelog
 
+## [2.1.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.1.0...v2.1.1) (2025-10-11)
+
+
+### Bug Fixes
+
+* `GearSlot` ([3ab38ef](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3ab38efbcce3eea785834aad8dce486423b1206c))
+* `m_bGameRestart` for TerminateRound ([0c09579](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0c09579f4de6bfef0020168a192327413272363c))
+* add missing type ([f0b88cf](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f0b88cfec99b450177aa19d40e3ab13aa3e79617))
+* add new methods to manifests ([0dfb9f7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0dfb9f7ea5754029206d92af0af0ec83a7a7c3e9))
+* add ReplyToCommand ([6fac901](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6fac90131d246febaa98502c2c328d9c1a7938bb))
+* add terminate round listener ([1cf38ec](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1cf38eccd88bbd67bac09e08404d93bcd655d760))
+* Added show_survival_respawn_status workaround ([7ccaae6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7ccaae6b609dc99ae3199b1988fa5a92d3a644f8))
+* change DECLARE_SCHEMA_CLASS ([901cd79](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/901cd79118511072187f7e716b5b309acaf8e724))
+* improve hasher for schema ([4a1ac91](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4a1ac914ddb985117b9c6104b0a62274ba04ecdc))
+* linux crash ([ea719ae](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ea719ae0a43bcd3e4adee3cdb7d78ebf9701f86d))
+* refactor schema ([bb6f734](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bb6f7345d2760f589bc3fca46c0fd58237a86a2f))
+* replace PostEventAbstract by CNetMessage ([52d6e25](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/52d6e25a01cb54dadfb42eadcfa44bb9ea11cd1b))
+* rework precache ([9948a7c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9948a7c0b6685f2535a8ff6c8eb1bf044edcacb0))
+* small refactor ([fc6769a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fc6769a1c42c86a305b41bd979403c27daf0434c))
+* small refactor ([ea79ab6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ea79ab60e830ab87c4e77b96ac01fd4e0d3bcf6f))
+* some vote update ([4ab9d14](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4ab9d1468fd209fc23169dc59e53d81fa257e909))
+* typo ([65ca3d0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/65ca3d03ee50a7c9be82ab790596dcb1b2778b33))
+* update manifest, add for gamedata new signatures, update external libs ([dc252fb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dc252fb043bdd170a03fbfbef08f8c44e628e411))
+* update sdk ([c5766fa](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c5766faa4b24727718f938c767a27712b95c26e4))
+* use atomics on counter ([f1a2d2c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f1a2d2ce19ba204cf93bcabf8be3a2bdd8254a1b))
+* wrong assembly load ([f45a70f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f45a70fc919be02cfce509879da5484307b8ea51))
+
 ## [2.1.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.0.3...v2.1.0) (2025-10-06)
 
 
