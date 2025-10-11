@@ -20,6 +20,10 @@ extern "C" PLUGIN_API CCSWeaponBaseVData* GetWeaponVDataFromKey(const plg::strin
 	return addresses::GetCSWeaponDataFromKey(-1, name.c_str());
 }
 
+/*extern "C" PLUGIN_API CCSWeaponBaseVData* GetItemDefinitionByName(const plg::string& name) {
+	return addresses::GetItemDefinitionByName(name.c_str());
+}*/
+
 /**
  * @brief Retrieves the weapon VData for a given weapon.
  *
@@ -91,10 +95,10 @@ extern "C" PLUGIN_API gear_slot_t GetWeaponGearSlot(int entityHandle) {
  * @param entityHandle The handle of the entity from which to retrieve the weapon def index.
  * @return The weapon definition index as a `uint16_t`, or 0 if the entity handle is invalid.
  */
-extern "C" PLUGIN_API uint16_t GetWeaponDefIndex(int entityHandle) {
+extern "C" PLUGIN_API uint16_t GetWeaponItemDefinition(int entityHandle) {
 	CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!pWeapon) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetWeaponDefIndex' on invalid entity handle: {}\n", entityHandle);
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetWeaponItemDefinition' on invalid entity handle: {}\n", entityHandle);
 		return 0;
 	}
 

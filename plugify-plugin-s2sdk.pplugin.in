@@ -516,7 +516,33 @@
       ],
       "retType": {
         "type": "int32",
-        "description": "int The team index of the client."
+        "description": "The team index of the client.",
+        "enum": {
+          "name": "CSTeam",
+          "description": "Enum representing the possible teams in Counter-Strike.",
+          "values": [
+            {
+              "value": 0,
+              "name": "None",
+              "description": "No team."
+            },
+            {
+              "value": 1,
+              "name": "Spectator",
+              "description": "Spectator team."
+            },
+            {
+              "value": 2,
+              "name": "T",
+              "description": "Terrorist team."
+            },
+            {
+              "value": 3,
+              "name": "CT",
+              "description": "Counter-Terrorist team."
+            }
+          ]
+        }
       }
     },
     {
@@ -608,6 +634,194 @@
             "type": "vec3",
             "description": "A QAngle where the client's eye angle will be stored."
         }
+    },
+    {
+      "name": "SetClientTeam",
+      "group": "Clients",
+      "description": "Sets a client's team index.",
+      "funcName": "SetClientTeam",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The team index to set.",
+          "enum": {
+            "name": "CSTeam",
+            "description": "Enum representing the possible teams in Counter-Strike.",
+            "values": [
+              {
+                "value": 0,
+                "name": "None",
+                "description": "No team."
+              },
+              {
+                "value": 1,
+                "name": "Spectator",
+                "description": "Spectator team."
+              },
+              {
+                "value": 2,
+                "name": "T",
+                "description": "Terrorist team."
+              },
+              {
+                "value": 3,
+                "name": "CT",
+                "description": "Counter-Terrorist team."
+              }
+            ]
+          }
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
+      }
+    },
+    {
+      "name": "SetClientHealth",
+      "group": "Clients",
+      "description": "Sets the client's health.",
+      "funcName": "SetClientHealth",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "health",
+          "type": "int32",
+          "ref": false,
+          "description": "The health value to set."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
+      }
+    },
+    {
+      "name": "SetClientArmor",
+      "group": "Clients",
+      "description": "Sets the client's armor value.",
+      "funcName": "SetClientArmor",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "armor",
+          "type": "int32",
+          "ref": false,
+          "description": "The armor value to set."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
+      }
+    },
+    {
+      "name": "SetClientAbsOrigin",
+      "group": "Clients",
+      "description": "Sets the client's absolute origin vector.",
+      "funcName": "SetClientAbsOrigin",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new origin vector to set."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
+      }
+    },
+    {
+      "name": "SetClientAbsAngles",
+      "group": "Clients",
+      "description": "Sets the client's absolute rotation angles.",
+      "funcName": "SetClientAbsAngles",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "angles",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new rotation angles to set."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
+      }
+    },
+    {
+      "name": "SetClientEyeAngles",
+      "group": "Clients",
+      "description": "Sets the client's eye rotation angles.",
+      "funcName": "SetClientEyeAngles",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "angles",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new eye angles to set."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
+      }
+    },
+    {
+      "name": "GetClientPawn",
+      "group": "Clients",
+      "description": "Retrieves the pawn entity pointer associated with a client.",
+      "funcName": "GetClientPawn",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the client's pawn entity, or null if invalid."
+      }
     },
     {
       "name": "ProcessTargetString",
@@ -9242,10 +9456,10 @@
       }
     },
     {
-      "name": "GetTeamEntity",
+      "name": "GetEntityTeam",
       "group": "Entities",
       "description": "Retrieves the team number of an entity.",
-      "funcName": "GetTeamEntity",
+      "funcName": "GetEntityTeam",
       "paramTypes": [
         {
           "name": "entityHandle",
@@ -9286,10 +9500,10 @@
       }
     },
     {
-      "name": "SetTeamEntity",
+      "name": "SetEntityTeam",
       "group": "Entities",
       "description": "Sets the team number of an entity.",
-      "funcName": "SetTeamEntity",
+      "funcName": "SetEntityTeam",
       "paramTypes": [
         {
           "name": "entityHandle",
@@ -20359,10 +20573,10 @@
       }
     },
     {
-      "name": "GetWeaponDefIndex",
+      "name": "GetWeaponItemDefinition",
       "group": "Weapons",
       "description": "Retrieves the weapon definition index for a given entity handle.",
-      "funcName": "GetWeaponDefIndex",
+      "funcName": "GetWeaponItemDefinition",
       "paramTypes": [
         {
           "name": "entityHandle",

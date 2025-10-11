@@ -636,7 +636,7 @@ extern "C" PLUGIN_API void SetEntityHealth(int entityHandle, int health) {
  * @param entityHandle The handle of the entity whose team number is to be retrieved.
  * @return The team number of the entity, or 0 if the entity is invalid.
  */
-extern "C" PLUGIN_API int GetTeamEntity(int entityHandle) {
+extern "C" PLUGIN_API int GetEntityTeam(int entityHandle) {
 	CBaseEntity* pEntity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!pEntity) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'GetTeamEntity' on invalid entity handle: {}\n", entityHandle);
@@ -655,7 +655,7 @@ extern "C" PLUGIN_API int GetTeamEntity(int entityHandle) {
  * @param entityHandle The handle of the entity whose team number is to be set.
  * @param team The new team number to set for the entity.
  */
-extern "C" PLUGIN_API void SetTeamEntity(int entityHandle, int team) {
+extern "C" PLUGIN_API void SetEntityTeam(int entityHandle, int team) {
 	CBaseEntity* pEntity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!pEntity) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'SetTeamEntity' on invalid entity handle: {}\n", entityHandle);

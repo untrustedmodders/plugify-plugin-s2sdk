@@ -451,10 +451,27 @@ extern "C" PLUGIN_API bool IsFakeClient(int playerSlot) {
 extern "C" PLUGIN_API int GetClientTeam(int playerSlot) {
 	auto pController = utils::GetController(playerSlot);
 	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityHealth' on invalid player slot: {}\n", playerSlot);
 		return 0;
 	}
 
 	return pController->m_iTeamNum;
+}
+
+/**
+ * @brief Sets a client's team index.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param team The team index to set.
+ */
+extern "C" PLUGIN_API void SetClientTeam(int playerSlot, int team) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientTeam' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	pController->m_iTeamNum = team;
 }
 
 /**
@@ -466,10 +483,27 @@ extern "C" PLUGIN_API int GetClientTeam(int playerSlot) {
 extern "C" PLUGIN_API int GetClientHealth(int playerSlot) {
 	auto pController = utils::GetController(playerSlot);
 	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientHealth' on invalid player slot: {}\n", playerSlot);
 		return 0;
 	}
 
 	return pController->m_iHealth;
+}
+
+/**
+ * @brief Sets the client's health.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param health The health value to set.
+ */
+extern "C" PLUGIN_API void SetClientHealth(int playerSlot, int health) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientHealth' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	pController->m_iHealth = health;
 }
 
 /**
@@ -481,10 +515,27 @@ extern "C" PLUGIN_API int GetClientHealth(int playerSlot) {
 extern "C" PLUGIN_API int GetClientArmor(int playerSlot) {
 	auto pController = utils::GetController(playerSlot);
 	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientArmor' on invalid player slot: {}\n", playerSlot);
 		return 0;
 	}
 
 	return pController->GetCurrentPawn()->m_ArmorValue;
+}
+
+/**
+ * @brief Sets the client's armor value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param armor The armor value to set.
+ */
+extern "C" PLUGIN_API void SetClientArmor(int playerSlot, int armor) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientArmor' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	pController->GetCurrentPawn()->m_ArmorValue = armor;
 }
 
 /**
@@ -496,11 +547,40 @@ extern "C" PLUGIN_API int GetClientArmor(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientAbsOrigin(int playerSlot) {
 	auto pController = utils::GetController(playerSlot);
 	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientAbsOrigin' on invalid player slot: {}\n", playerSlot);
 		return {};
 	}
-
-	const Vector& vec = pController->m_CBodyComponent->m_pSceneNode->m_vecAbsOrigin;
+	
+	auto pNode = pController->m_CBodyComponent->m_pSceneNode();
+	if (!pNode) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientAbsOrigin' on invalid player node: {}\n", playerSlot);
+		return {};
+	}
+	
+	const Vector& vec = pNode->m_vecAbsOrigin;
 	return *reinterpret_cast<const plg::vec3*>(&vec);
+}
+
+/**
+ * @brief Sets the client's origin vector.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param origin The new origin vector to set.
+ */
+extern "C" PLUGIN_API void SetClientAbsOrigin(int playerSlot, const plg::vec3& origin) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientAbsOrigin' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+	
+	auto pNode = pController->m_CBodyComponent->m_pSceneNode();
+	if (!pNode) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player node: {}\n", playerSlot);
+		return;
+	}
+	
+	pNode->m_vecAbsOrigin = *reinterpret_cast<const Vector*>(&origin);
 }
 
 /**
@@ -512,11 +592,40 @@ extern "C" PLUGIN_API plg::vec3 GetClientAbsOrigin(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientAbsAngles(int playerSlot) {
 	auto pController = utils::GetController(playerSlot);
 	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientAbsAngles' on invalid player slot: {}\n", playerSlot);
 		return {};
 	}
-
-	const QAngle& ang = pController->m_CBodyComponent->m_pSceneNode->m_angRotation;
+	
+	auto pNode = pController->m_CBodyComponent->m_pSceneNode();
+	if (!pNode) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientAbsAngles' on invalid player node: {}\n", playerSlot);
+		return {};
+	}
+	
+	const QAngle& ang = pNode->m_angRotation;
 	return *reinterpret_cast<const plg::vec3*>(&ang);
+}
+
+/**
+ * @brief Sets the client's absolute rotation angles.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param angles The new rotation angles to set.
+ */
+extern "C" PLUGIN_API void SetClientAbsAngles(int playerSlot, const plg::vec3& angles) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	auto pNode = pController->m_CBodyComponent->m_pSceneNode();
+	if (!pNode) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player node: {}\n", playerSlot);
+		return;
+	}
+	
+	pNode->m_angRotation = *reinterpret_cast<const QAngle*>(&angles);
 }
 
 /**
@@ -528,11 +637,56 @@ extern "C" PLUGIN_API plg::vec3 GetClientAbsAngles(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientEyeAngles(int playerSlot) {
 	auto pController = utils::GetController(playerSlot);
 	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientEyeAngles' on invalid player slot: {}\n", playerSlot);
 		return {};
 	}
 
-	const QAngle& ang = static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->m_angEyeAngles;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientEyeAngles' on invalid player pawn: {}\n", playerSlot);
+		return {};
+	}
+
+	const QAngle& ang = pPawn->m_angEyeAngles;
 	return *reinterpret_cast<const plg::vec3*>(&ang);
+}
+
+/**
+ * @brief Sets the client's eye angles.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param angles The new eye angles to set.
+ */
+extern "C" PLUGIN_API void SetClientEyeAngles(int playerSlot, const plg::vec3& angles) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientEyeAngles' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientEyeAngles' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	pPawn->m_angEyeAngles = *reinterpret_cast<const QAngle*>(&angles);
+}
+
+/**
+ * @brief Retrieves the pawn entity pointer associated with a client.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return A pointer to the client's pawn entity, or nullptr if the client or controller is invalid.
+ */
+extern "C" PLUGIN_API void* GetClientPawn(int playerSlot) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientPawn' on invalid player slot: {}\n", playerSlot);
+		return nullptr;
+	}
+
+	return pController->GetCurrentPawn();
 }
 
 /**
@@ -663,6 +817,7 @@ extern "C" PLUGIN_API int GetClientActiveWeapon(int playerSlot) {
 
 	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
 	if (!pWeaponServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientActiveWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return INVALID_EHANDLE_INDEX;
 	}
 
@@ -719,6 +874,7 @@ extern "C" PLUGIN_API void StripWeapons(int playerSlot, bool removeSuit) {
 
 	CCSPlayer_ItemServices* pItemServices = pController->GetCurrentPawn()->m_pItemServices;
 	if (!pItemServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'StripWeapons' on m_pItemServices: {}\n", playerSlot);
 		return;
 	}
 
@@ -748,6 +904,7 @@ extern "C" PLUGIN_API void DropWeapon(int playerSlot, int weaponHandle, const pl
 
 	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
 	if (!pWeaponServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'DropWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return;
 	}
 
@@ -775,6 +932,7 @@ extern "C" PLUGIN_API void BumpWeapon(int playerSlot, int weaponHandle) {
 
 	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
 	if (!pWeaponServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SwitchWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return;
 	}
 
@@ -802,6 +960,7 @@ extern "C" PLUGIN_API void SwitchWeapon(int playerSlot, int weaponHandle) {
 
 	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
 	if (!pWeaponServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SwitchWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return;
 	}
 
@@ -829,6 +988,7 @@ extern "C" PLUGIN_API void RemoveWeapon(int playerSlot, int weaponHandle) {
 
 	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
 	if (!pWeaponServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'RemoveWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return;
 	}
 
@@ -856,7 +1016,7 @@ extern "C" PLUGIN_API int GiveNamedItem(int playerSlot, const plg::string& itemN
 
 	CBaseEntity* pWeapon = pItemServices->GiveNamedItem(itemName.c_str());
 	if (!pWeapon) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GiveNamedItem' with invalid item: {}\n", itemName);
+		S2_LOGF(LS_WARNING, "Cannot execute 'GiveNamedItem' on m_pItemServices: {}\n", itemName);
 		return INVALID_EHANDLE_INDEX;
 	}
 
@@ -884,6 +1044,7 @@ extern "C" PLUGIN_API uint64_t GetClientButtons(int playerSlot, int buttonIndex)
 
 	CPlayer_MovementServices* pMovementServices = pController->GetCurrentPawn()->m_pMovementServices;
 	if (!pMovementServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientButtons' on m_pMovementServices: {}\n", playerSlot);
 		return 0;
 	}
 
@@ -905,6 +1066,7 @@ extern "C" PLUGIN_API int GetClientMoney(int playerSlot) {
 
 	CCSPlayerController_InGameMoneyServices* pInGameMoneyServices = pController->m_pInGameMoneyServices;
 	if (!pInGameMoneyServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientMoney' on m_pInGameMoneyServices: {}\n", playerSlot);
 		return 0;
 	}
 
@@ -926,6 +1088,7 @@ extern "C" PLUGIN_API void SetClientMoney(int playerSlot, int money) {
 
 	CCSPlayerController_InGameMoneyServices* pInGameMoneyServices = pController->m_pInGameMoneyServices;
 	if (!pInGameMoneyServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientMoney' on m_pInGameMoneyServices: {}\n", playerSlot);
 		return;
 	}
 
@@ -947,6 +1110,7 @@ extern "C" PLUGIN_API int GetClientKills(int playerSlot) {
 
 	CCSPlayerController_ActionTrackingServices* pActionTrackingServices = pController->m_pActionTrackingServices;
 	if (!pActionTrackingServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientKills' on m_pActionTrackingServices: {}\n", playerSlot);
 		return 0;
 	}
 
@@ -968,6 +1132,7 @@ extern "C" PLUGIN_API void SetClientKills(int playerSlot, int kills) {
 
 	CCSPlayerController_ActionTrackingServices* pActionTrackingServices = pController->m_pActionTrackingServices;
 	if (!pActionTrackingServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientKills' on m_pActionTrackingServices: {}\n", playerSlot);
 		return;
 	}
 
@@ -989,6 +1154,7 @@ extern "C" PLUGIN_API int GetClientDeaths(int playerSlot) {
 
 	CCSPlayerController_ActionTrackingServices* pActionTrackingServices = pController->m_pActionTrackingServices;
 	if (!pActionTrackingServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientDeaths' on m_pActionTrackingServices: {}\n", playerSlot);
 		return 0;
 	}
 
@@ -1010,6 +1176,7 @@ extern "C" PLUGIN_API void SetClientDeaths(int playerSlot, int deaths) {
 
 	CCSPlayerController_ActionTrackingServices* pActionTrackingServices = pController->m_pActionTrackingServices;
 	if (!pActionTrackingServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientDeaths' on m_pActionTrackingServices: {}\n", playerSlot);
 		return;
 	}
 
@@ -1031,6 +1198,7 @@ extern "C" PLUGIN_API int GetClientAssists(int playerSlot) {
 
 	CCSPlayerController_ActionTrackingServices* pActionTrackingServices = pController->m_pActionTrackingServices;
 	if (!pActionTrackingServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientAssists' on m_pActionTrackingServices: {}\n", playerSlot);
 		return 0;
 	}
 
@@ -1052,6 +1220,7 @@ extern "C" PLUGIN_API void SetClientAssists(int playerSlot, int assists) {
 
 	CCSPlayerController_ActionTrackingServices* pActionTrackingServices = pController->m_pActionTrackingServices;
 	if (!pActionTrackingServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientAssists' on m_pActionTrackingServices: {}\n", playerSlot);
 		return;
 	}
 
@@ -1073,6 +1242,7 @@ extern "C" PLUGIN_API int GetClientDamage(int playerSlot) {
 
 	CCSPlayerController_ActionTrackingServices* pActionTrackingServices = pController->m_pActionTrackingServices;
 	if (!pActionTrackingServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientDamage' on m_pActionTrackingServices: {}\n", playerSlot);
 		return 0;
 	}
 
@@ -1094,6 +1264,7 @@ extern "C" PLUGIN_API void SetClientDamage(int playerSlot, int damage) {
 
 	CCSPlayerController_ActionTrackingServices* pActionTrackingServices = pController->m_pActionTrackingServices;
 	if (!pActionTrackingServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientDamage' on m_pActionTrackingServices: {}\n", playerSlot);
 		return;
 	}
 
