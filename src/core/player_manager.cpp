@@ -456,8 +456,7 @@ TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target
 			if (!player || !player->IsController() || !player->IsConnected())
 				continue;
 
-			std::string_view playerName(player->GetPlayerName());
-			if (playerName.find(playerName) != std::string_view::npos) {
+			if (target.find(player->GetPlayerName()) != std::string_view::npos) {
 				targetType = TargetType::PLAYER;
 				clients.emplace_back(i);
 				break;

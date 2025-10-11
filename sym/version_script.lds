@@ -30,11 +30,18 @@
         IsClientAlive;
         IsFakeClient;
         GetClientTeam;
+        SetClientTeam;
         GetClientHealth;
+        SetClientHealth;
         GetClientArmor;
+        SetClientArmor;
         GetClientAbsOrigin;
+        SetClientAbsOrigin;
         GetClientAbsAngles;
+        SetClientAbsAngles;
         GetClientEyeAngles;
+        SetClientEyeAngles;
+        GetClientPawn;
         ProcessTargetString;
         ChangeClientTeam;
         SwitchClientTeam;
@@ -207,8 +214,8 @@
         SetEntityRenderMode;
         GetEntityHealth;
         SetEntityHealth;
-        GetTeamEntity;
-        SetTeamEntity;
+        GetEntityTeam;
+        SetEntityTeam;
         GetEntityOwner;
         SetEntityOwner;
         GetEntityParent;
@@ -482,7 +489,7 @@
         GetWeaponType;
         GetWeaponCategory;
         GetWeaponGearSlot;
-        GetWeaponDefIndex;
+        GetWeaponItemDefinition;
 
         *_Register;
         *_Unregister;

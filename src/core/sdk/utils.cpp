@@ -75,7 +75,7 @@ CBasePlayerController* utils::GetController(CBaseEntity* entity) {
 	if (name == "observer") {
 		CBasePlayerPawn* pawn = static_cast<CBasePlayerPawn*>(entity);
 		if (!pawn->m_hController().IsValid() || pawn->m_hController() == nullptr) {
-			for (int i = 0; i <= gpGlobals->maxClients; ++i) {
+			for (int i = 0; i < gpGlobals->maxClients; ++i) {
 				CPlayerController* controller = static_cast<CPlayerController*>(utils::GetController(CPlayerSlot(i)));
 				if (controller && controller->GetObserverPawn() && controller->GetObserverPawn() == entity) {
 					return controller;
@@ -89,7 +89,7 @@ CBasePlayerController* utils::GetController(CBaseEntity* entity) {
 		CBasePlayerPawn* pawn = static_cast<CBasePlayerPawn*>(entity);
 		if (!pawn->m_hController().IsValid() || pawn->m_hController() == nullptr) {
 			// Seems like the pawn lost its controller, we can try looping through the controllers to find this pawn instead.
-			for (int i = 0; i <= gpGlobals->maxClients; ++i) {
+			for (int i = 0; i < gpGlobals->maxClients; ++i) {
 				CPlayerController* controller = static_cast<CPlayerController*>(utils::GetController(CPlayerSlot(i)));
 				if (controller && controller->GetPlayerPawn() && controller->GetPlayerPawn() == entity) {
 					return controller;
@@ -196,7 +196,7 @@ void utils::ReplicateConVar(const ConVarRefAbstract& conVar, const char* value) 
 	if (!gpGlobals)
 		return;
 
-	for (int i = 0; i <= gpGlobals->maxClients; ++i) {
+	for (int i = 0; i < gpGlobals->maxClients; ++i) {
 		utils::SendConVarValue(CPlayerSlot(i), conVar.GetName(), value);
 	}
 }

@@ -100,6 +100,7 @@ class CServerSideClientBase;
 class CNetMessage;
 class CCSWeaponBaseVData;
 class CCLCMsg_RespondCvarValue_t;
+class CEconItemSchema;
 
 namespace addresses {
 	inline IGameEventListener2* (*GetLegacyGameEventListener)(CPlayerSlot slot);
@@ -143,6 +144,8 @@ namespace addresses {
 	inline void (*CGameRules_TerminateRound)(CGameRules* pGameRules, float delay, unsigned int reason, int64 a4, unsigned int a5);
 
 	inline CCSWeaponBaseVData* (*GetCSWeaponDataFromKey)(int, const char*);
+
+	//inline int16_t (*GetItemDefinitionByName)(CEconItemSchema*, const char*);
 
 	inline v8::MaybeLocal<v8::Module> (*CSScriptResolveModule)(v8::Local<v8::Context> context, v8::Local<v8::String> specifier, v8::Local<v8::FixedArray> import_assertions, v8::Local<v8::Module> referrer);
 
