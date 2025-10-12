@@ -1,0 +1,54 @@
+[
+  {
+    "name": "Classic Zombie",
+    "model": "",
+    "claw": "",
+    "health": 2500,
+    "armor": 100,
+    "speed": 0.9,
+    "gravity": 0.8,
+    "knockback": 1.0,
+    "female": false,
+    "bodyid": 0,
+    "clawid": 0
+  },
+  {
+    "name": "Fast Zombie",
+    "model": "",
+    "claw": "",
+    "health": 1800,
+    "armor": 50,
+    "speed": 1.3,
+    "gravity": 0.85,
+    "knockback": 1.2,
+    "female": false,
+    "bodyid": 1,
+    "clawid": 1
+  },
+  {
+    "name": "Tank Zombie",
+    "model": "",
+    "claw": "",
+    "health": 5000,
+    "armor": 200,
+    "speed": 0.7,
+    "gravity": 0.9,
+    "knockback": 0.6,
+    "female": false,
+    "bodyid": 2,
+    "clawid": 2
+  },
+  {
+    "name": "Nurse Zombie",
+    "model": "",
+    "claw": "",
+    "health": 2200,
+    "armor": 80,
+    "speed": 1.0,
+    "gravity": 0.8,
+    "knockback": 1.1,
+    "female": true,
+    "bodyid": 3,
+    "clawid": 3
+  }
+]
