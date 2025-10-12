@@ -1,7 +1,7 @@
-import { Plugin } from 'plugify'
-import * as s2 from ':s2sdk'
-import * as pl from ':polyhook'
-const fs = require('fs')
+import { Plugin } from 'plugify';
+import * as pl from ':polyhook';
+import * as s2 from ':s2sdk';
+const fs = require('fs');
 
 /**
  * Player data class
@@ -49,11 +49,11 @@ export class ZombieMod extends Plugin {
         this.initCvars()
         this.hookFuncs()
 
-        g_ZombieClasses = LoadZombieClasses(this.location + "/zombieclasses.json")
-        for (let i = 0; i < g_ZombieClasses.length; i++) {
-            if (g_ZombieClasses.model !== "")
+        g_ZombieClasses = LoadZombieClasses(`${this.location}/zombieclasses.json`)
+        for (const zombieClass of g_ZombieClasses) {
+            if (zombieClass.model !== "")
                 s2.Precache(g_ZombieClasses.model)
-            if (g_ZombieClasses.claw !== "")
+            if (zombieClass.claw !== "")
                 s2.Precache(g_ZombieClasses.claw)
         }
     }
@@ -69,20 +69,24 @@ export class ZombieMod extends Plugin {
         //s2.OnClientPutInServer_Unregister(OnClientPutInServer)
         s2.OnClientDisconnect_Post_Unregister(OnClientDisconnected)
     }
-    
-    initCvars() {
-        zm_delay_time = s2.CreateConVarInt32("zm_delay_time", "30", "Time before any game mode starts in seconds", 0, true, 0, false, 0)
-        zm_infect_ratio = s2.CreateConVarFloat("zm_infect_ratio", "0.25", "Infect ratio (zombie count = ratio * player count)", 0, true, 0.0, true, 1.0)
 
-        zm_human_health = s2.CreateConVarInt32("zm_human_health", "100", "Health amount for human", 0, true, 0, false, 0)
-        zm_human_armor = s2.CreateConVarInt32("zm_human_armor", "100", "Armor amount for human", 0, true, 0, false, 0)
-        zm_human_speed = s2.CreateConVarFloat("zm_human_speed", "1.0", "Speed amount for human", 0, true, 0.0, false, 0.0)
-        zm_human_gravity = s2.CreateConVarFloat("zm_human_gravity", "1.0", "Gravity amount for human", 0, true, 0.0, false, 0.0)
+    initCvars() {
+        zm_delay_time = s2.CreateConVarInt32("zm_delay_time", 30, "Time before any game mode starts in seconds", 0, true, 0, false, 0)
+        zm_infect_ratio = s2.CreateConVarFloat("zm_infect_ratio", 0.25, "Infect ratio (zombie count = ratio * player count)", 0, true, 0.0, true, 1.0)
+
+        zm_human_health = s2.CreateConVarInt32("zm_human_health", 100, "Health amount for human", 0, true, 0, false, 0)
+        zm_human_armor = s2.CreateConVarInt32("zm_human_armor", 100, "Armor amount for human", 0, true, 0, false, 0)
+        zm_human_speed = s2.CreateConVarFloat("zm_human_speed", 1.0, "Speed amount for human", 0, true, 0.0, false, 0.0)
+        zm_human_gravity = s2.CreateConVarFloat("zm_human_gravity", 1.0, "Gravity amount for human", 0, true, 0.0, false, 0.0)
+
+        s2.ServerCommand("mp_give_player_c4 0")
     }
-    
+
     hookFuncs() {
-        const gameConfig = s2.LoadGameConfigFile(this.extensionsDir + "/plugify-plugin-s2sdk/gamedata.jsonc")
+        const gameConfig = s2.LoadGameConfigFile([`gamedata.jsonc`])
         const canAcquireAddress = s2.GetGameConfigMemSig(gameConfig, "CCSPlayer_ItemServices_CanAcquire")
+
+        const preHook = pl.CallbackType.Pre
 
         // CPlayer_ItemServices::CanAcquire( CEconItemView *pItem, AcquireMethod::Type acquireMethod, uint16 *pLimit )
         const canAcquireFunc = pl.HookDetour(canAcquireAddress, pl.DataType.Int8, [pl.DataType.Pointer, pl.DataType.Pointer, pl.DataType.Int32, pl.DataType.Pointer], -1)
@@ -91,7 +95,7 @@ export class ZombieMod extends Plugin {
             return
         }
 
-        pl.AddCallback(canAcquireFunc, pl.CallbackType.Pre, OnCanAcquire)
+        pl.AddCallback(canAcquireFunc, preHook, OnCanAcquire)
     }
 }
 
@@ -154,7 +158,7 @@ function OnTimerTick(timer, userData) {
                     if (g_Counter <= 20) {
                         // Print counter
                         const message = `Zombie coming: ${g_Counter}`
-                        s2.PrintCentreHtmlAll(message)
+                        s2.PrintCentreHtmlAll(message, 1)
                     }
                 }
                 // If else, then start game
@@ -163,7 +167,7 @@ function OnTimerTick(timer, userData) {
                     EventStartMode()
 
                     // Print info
-                    s2.PrintCentreHtmlAll("Game started!")
+                    s2.PrintCentreHtmlAll("Game started!", 5)
                 }
 
                 // Subtract second
@@ -193,7 +197,7 @@ function GetRandomInt(min, max) {
  * @returns {boolean} True if the client is alive, false otherwise.
  */
 function IsPlayerAlive(player) {
-    return s2.IsClientInGame(player) && s2.IsClientAlive(player)
+    return s2.IsClientInGame(player.m_iSlot) && s2.IsClientAlive(player.m_iSlot)
 }
 
 /**
@@ -250,7 +254,7 @@ function EventStartMode() {
         }
 
         // Switch team
-        s2.SetClientTeam(player.m_iSlot, s2.CSTeam.CT)
+        s2.SwitchClientTeam(player.m_iSlot, s2.CSTeam.CT)
     }
 
     // Call forward
@@ -268,6 +272,8 @@ function OnRoundPreStart(name, event, dontBroadcast) {
 
     // Restore default time for main event timer
     g_Counter = s2.GetConVarInt32(zm_delay_time)
+
+    return s2.ResultType.Continue
 }
 
 /**
@@ -281,6 +287,8 @@ function OnRoundEnd(name, event, dontBroadcast) {
 
     // Move all clients to random teams
     BalanceTeams()
+
+    return s2.ResultType.Continue
 }
 
 /**
@@ -293,12 +301,12 @@ function OnPlayerSpawn(name, event, dontBroadcast) {
     // Validate client
     const player = g_Players[playerSlot]
     if (!player) {
-        return
+        return s2.ResultType.Continue
     }
 
     // If player is dead, then stop
     if (!IsPlayerAlive(player)) {
-        return
+        return s2.ResultType.Continue
     }
 
     // Reset variables
@@ -307,12 +315,14 @@ function OnPlayerSpawn(name, event, dontBroadcast) {
 
     // After spawned
     s2.QueueTaskForNextFrame(OnPlayerSpawnPost, [player.m_iSlot])
+
+    return s2.ResultType.Continue
 }
 
 /**
  * Event callback after (player_spawn).
  */
-function OnPlayerSpawnPost(userData: any[]) {
+function OnPlayerSpawnPost(userData) {
     const playerSlot = userData[0]
 
     // If round started, then infect
@@ -321,6 +331,7 @@ function OnPlayerSpawnPost(userData: any[]) {
         InfectPlayer(playerSlot)
     } else {
         // Set client properties
+        s2.SetClientMaxHealth(playerSlot, s2.GetConVarInt32(zm_human_health))
         s2.SetClientHealth(playerSlot, s2.GetConVarInt32(zm_human_health))
         s2.SetClientArmor(playerSlot, s2.GetConVarInt32(zm_human_armor))
         s2.SetClientSpeed(playerSlot, s2.GetConVarFloat(zm_human_speed))
@@ -339,12 +350,12 @@ function OnPlayerHurt(name, event, dontBroadcast) {
     // Validate client
     const player = g_Players[attackerSlot]
     if (!player) {
-        return
+        return s2.ResultType.Continue
     }
 
     // If player is dead, then stop
     if (!IsPlayerAlive(player)) {
-        return
+        return s2.ResultType.Continue
     }
 
     // Verify that the attacker is zombie
@@ -352,6 +363,8 @@ function OnPlayerHurt(name, event, dontBroadcast) {
         // Infect victim
         InfectPlayer(playerSlot)
     }
+
+    return s2.ResultType.Continue
 }
 
 /**
@@ -369,8 +382,8 @@ function IsKnife(defIndex) {
  */
 function OnCanAcquire(hook, params, count, ret, type) {
     // CPlayer_ItemServices::CanAcquire( CEconItemView *pItem, AcquireMethod::Type acquireMethod, uint16 *pLimit )
-    const playerPtr = pl.GetArgumentPointer(params, 0)
-    const playerSlot = s2.EntPointerToPlayerSlot(playerPtr)
+    const itemServicesPtr = pl.GetArgumentPointer(params, 0)
+    const playerSlot = s2.PlayerServicesToPlayerSlot(itemServicesPtr)
 
     // Validate client
     const player = g_Players[playerSlot]
@@ -432,6 +445,7 @@ function InfectPlayer(playerSlot) {
     player.m_nZombieClass = GetRandomInt(0, g_ZombieClasses.length - 1)
 
     // Set client properties
+    s2.SetClientMaxHealth(player.m_iSlot, ZombieGetHealth(player.m_nZombieClass))
     s2.SetClientHealth(player.m_iSlot, ZombieGetHealth(player.m_nZombieClass))
     s2.SetClientSpeed(player.m_iSlot, ZombieGetSpeed(player.m_nZombieClass))
     s2.SetClientGravity(player.m_iSlot, ZombieGetGravity(player.m_nZombieClass))
@@ -444,7 +458,7 @@ function InfectPlayer(playerSlot) {
     }
 
     // Force to switch team
-    s2.SetClientTeam(player.m_iSlot, s2.CSTeam.T)
+    s2.SwitchClientTeam(player.m_iSlot, s2.CSTeam.T)
 
     // Call forward
     //ForwardOnClientInfect(playerSlot)
@@ -466,7 +480,7 @@ function BalanceTeams() {
         }
 
         // Switch team
-        s2.SetClientTeam(player.m_iSlot, !(i % 2) ? s2.CSTeam.T : s2.CSTeam.CT)
+        s2.SwitchClientTeam(player.m_iSlot, !(i % 2) ? s2.CSTeam.T : s2.CSTeam.CT)
     }
 }
 

@@ -1,14 +1,21 @@
 {
 	"$schema": "https://raw.githubusercontent.com/untrustedmodders/plugify/refs/heads/main/schemas/plugin.schema.json",
 	"version": "0.1.0",
-	"name": "sample_plugin",
-	"description": "Node test",
+	"name": "zm",
+	"description": "Zombie Mod",
 	"author": "untrustedmodders",
 	"website": "https://github.com/untrustedmodders/",
 	"license": "MIT",
-	"entry": "sample_plugin.SamplePlugin",
+	"entry": "zombie_mod.ZombieMod",
 	"platforms": [],
 	"language": "javascript",
-	"dependencies": [],
+	"dependencies": [
+	    {
+          "name": "s2sdk"
+        },
+        {
+          "name": "polyhook"
+        }
+	],
 	"methods": []
 }
