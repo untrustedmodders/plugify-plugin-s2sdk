@@ -62,6 +62,7 @@ class CCSPlayerPawn : public CCSPlayerPawnBase {
 public:
 	DECLARE_SCHEMA_CLASS(CCSPlayerPawn);
 
+	SCHEMA_FIELD(int, m_ArmorValue)
 	SCHEMA_FIELD(float, m_flVelocityModifier)
 	SCHEMA_FIELD(CCSPlayer_ActionTrackingServices*, m_pActionTrackingServices)
 

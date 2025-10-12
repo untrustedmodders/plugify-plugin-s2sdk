@@ -82,12 +82,17 @@ public:
 			return *std::get<ConVarInfoPtr>(*it)->conVar;
 		}
 
+		auto flgs = static_cast<uint64>(flags);
+		if (flgs == FCVAR_NONE) {
+			flgs |= ConVar_GetDefaultFlags();
+		}
+
 		auto& conVarInfo = *m_cnvLookup.emplace(name, std::make_unique<ConVarInfo>(name, description)).first->second;
 		auto conVar = std::make_unique<ConVarRef>(name.c_str());
 		if (conVar->IsValidRef()) {
 			conVarInfo.conVar = std::move(conVar);
 		} else {
-			conVarInfo.conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(conVarInfo.name.c_str(), static_cast<uint64_t>(flags), conVarInfo.description.c_str(), defaultVal, hasMin, min, hasMax, max, &ChangeCallback));
+			conVarInfo.conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(conVarInfo.name.c_str(), SanitiseConVarFlags(flgs), conVarInfo.description.c_str(), defaultVal, hasMin, min, hasMax, max, &ChangeCallback));
 		}
 		m_cnvCache.emplace(conVarInfo.conVar.get(), &conVarInfo);
 		return *conVarInfo.conVar;
@@ -158,3 +163,18 @@ private:
 	plg::map<const ConVarRef*, const ConVarInfo*> m_cnvCache;
 	ListenerManager<ConVarChangeListenerCallback> m_global;
 };
+
+inline ConVarFlag operator|(ConVarFlag lhs, ConVarFlag rhs) noexcept {
+	using underlying = std::underlying_type_t<ConVarFlag>;
+	return static_cast<ConVarFlag>(static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+}
+
+inline bool operator&(ConVarFlag lhs, ConVarFlag rhs) noexcept {
+	using underlying = std::underlying_type_t<ConVarFlag>;
+	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
+}
+
+inline ConVarFlag& operator|=(ConVarFlag& lhs, ConVarFlag rhs) noexcept {
+	lhs = lhs | rhs;
+	return lhs;
+}

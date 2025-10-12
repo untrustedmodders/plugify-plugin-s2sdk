@@ -158,6 +158,7 @@ namespace schema {
 			default:
 				return Single;
 		}
+		PLUGIFY_UNREACHABLE();
 	}
 
 	std::pair<ElementType, int> IsIntType(CSchemaType* type) {
@@ -271,6 +272,7 @@ namespace schema {
 				return {Invalid, -1};
 			}
 		}
+		PLUGIFY_UNREACHABLE();
 	}
 
 	std::pair<ElementType, int> IsFloatType(CSchemaType* type) {
@@ -334,6 +336,7 @@ namespace schema {
 			default:
 				return {Invalid, -1};
 		}
+		PLUGIFY_UNREACHABLE();
 	}
 
 	ElementType IsPlainType(CSchemaType* type, size_t size) {
@@ -359,10 +362,12 @@ namespace schema {
 					default:
 						return Invalid;
 				}
+				PLUGIFY_UNREACHABLE();
 			}
 			default:
 				return Invalid;
 		}
+		PLUGIFY_UNREACHABLE();
 	}
 
 	ElementType IsAtomicType(CSchemaType* type, size_t size) {
@@ -388,9 +393,11 @@ namespace schema {
 					default:
 						return Invalid;
 				}
+				PLUGIFY_UNREACHABLE();
 			}
 			default:
 				return Invalid;
 		}
+		PLUGIFY_UNREACHABLE();
 	}
 }// namespace schema

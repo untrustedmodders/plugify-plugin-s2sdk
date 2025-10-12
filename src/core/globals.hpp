@@ -72,8 +72,8 @@ inline plg::set<plg::string> g_Precached;
 class CoreConfig;
 class GameConfig;
 
-extern std::unique_ptr<CoreConfig> g_pCoreConfig;
-extern std::unique_ptr<GameConfig> g_pGameConfig;
+extern CoreConfig* g_pCoreConfig;
+extern GameConfig* g_pGameConfig;
 
 namespace globals {
 	void Initialize(std::map<plg::string, plg::string> paths);

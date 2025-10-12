@@ -271,9 +271,13 @@ GameConfigManager::GameConfigManager() {
 
 uint32_t GameConfigManager::LoadGameConfigFile(plg::vector<plg::string> paths) {
 	for (auto& [id, config] : m_configs) {
-		if (config.GetPaths() == paths) {
-			++config.m_refCount;
-			return id;
+		for (const auto& fullPath : config.GetPaths()) {
+			for (const auto& path : paths) {
+				if (fullPath.ends_with(path)) {
+					++config.m_refCount;
+					return id;
+				}
+			}
 		}
 	}
 

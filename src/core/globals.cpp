@@ -19,12 +19,12 @@
 		return; \
 	} \
 
-std::unique_ptr<CoreConfig> g_pCoreConfig = nullptr;
-std::unique_ptr<GameConfig> g_pGameConfig = nullptr;
+CoreConfig* g_pCoreConfig = nullptr;
+GameConfig* g_pGameConfig = nullptr;
 
 namespace globals {
 	void Initialize(std::map<plg::string, plg::string> paths) {
-		g_pCoreConfig = std::make_unique<CoreConfig>(plg::vector{
+		g_pCoreConfig = new CoreConfig(plg::vector{
 				paths["base"] + "/settings.jsonc",
 				paths["configs"] + "/settings.jsonc",
 				paths["data"] + "/settings.jsonc"
@@ -33,12 +33,13 @@ namespace globals {
 			S2_LOG(LS_ERROR, "Failed to load settings configuration!\n");
 			return;
 		}
-		g_pGameConfig = std::make_unique<GameConfig>(S2SDK_GAME_NAME, plg::vector{
+		uint32_t id = g_GameConfigManager.LoadGameConfigFile(plg::vector{
 				paths["base"] + "/gamedata.jsonc",
 				paths["configs"] + "/gamedata.jsonc",
 				paths["data"] + "/gamedata.jsonc"
 		});
-		if (!g_pGameConfig->Initialize()) {
+		g_pGameConfig = g_GameConfigManager.GetGameConfig(id);
+		if (!g_pGameConfig) {
 			S2_LOG(LS_ERROR, "Failed to load gamedata configuration!\n");
 			return;
 		}
@@ -108,8 +109,9 @@ namespace globals {
 	}
 
 	void Terminate() {
-		g_pGameConfig.reset();
-		g_pCoreConfig.reset();
+		delete g_pCoreConfig;
+		g_pCoreConfig = nullptr;
+		g_pGameConfig = nullptr;
 	}
 
 	PlatModule_t FindModule(std::string_view name) {

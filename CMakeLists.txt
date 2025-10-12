@@ -189,10 +189,10 @@ endif()
 if(MACOS)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/sym/exported_symbols.lds")
 elseif(LINUX)
-#    target_link_options(${PROJECT_NAME} PRIVATE
-#            -Wl,--wrap=_ZNSs4_Rep20_S_empty_rep_storageE
-#            -Wl,--wrap=_ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE
-#    )
+    target_link_options(${PROJECT_NAME} PRIVATE
+            #-Wl,--wrap=_ZNSs12_S_empty_repEv
+            #-Wl,--wrap=_ZNSbIwSt11char_traitsIwESaIwEE12_S_empty_repEv
+    )
     target_link_libraries(${PROJECT_NAME} PRIVATE "-Wl,--version-script,${CMAKE_CURRENT_SOURCE_DIR}/sym/version_script.lds")
 endif()
 

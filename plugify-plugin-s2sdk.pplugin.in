@@ -145,6 +145,24 @@
       }
     },
     {
+      "name": "PlayerServicesToPlayerSlot",
+      "group": "Clients",
+      "description": "Retrieves the player slot from a given player service.",
+      "funcName": "PlayerServicesToPlayerSlot",
+      "paramTypes": [
+        {
+          "name": "servicePtr",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The service pointer. Like CCSPlayer_ItemServices, CCSPlayer_WeaponServices ect."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The player slot if valid, otherwise -1."
+      }
+    },
+    {
       "name": "GetClientAuthId",
       "group": "Clients",
       "description": "Retrieves a client's authentication string (SteamID).",
@@ -1633,7 +1651,7 @@
       "name": "TeleportClient",
       "group": "Clients",
       "description": "Teleports a client to a specified location and orientation.",
-      "funcName": "TeleportEntity",
+      "funcName": "TeleportClient",
       "paramTypes": [
         {
           "name": "playerSlot",

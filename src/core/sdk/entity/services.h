@@ -200,7 +200,12 @@ public:
 	SCHEMA_FIELD(int, m_iAccount)
 };
 
-class CCSPlayer_ItemServices {
+class CPlayer_ItemServices : public CPlayerPawnComponent {
+public:
+	DECLARE_SCHEMA_CLASS(CPlayer_ItemServices);
+};
+
+class CCSPlayer_ItemServices : public CPlayer_ItemServices {
 public:
 	DECLARE_SCHEMA_CLASS(CCSPlayer_ItemServices);
 
@@ -231,7 +236,12 @@ public:
 	virtual CBaseEntity* GiveNamedItem(const char* pchName) = 0;
 	// Recommended to use CCSPlayer_WeaponServices::DropWeapon instead (parameter is ignored here)
 	virtual void DropActiveWeapon(CBasePlayerWeapon* pWeapon) = 0;
-	virtual void StripPlayerWeapons(bool removeSuit) = 0;
+	virtual void StripPlayerWeapons(bool removeSuit = false) = 0;
+
+	void RemoveWeapons()
+	{
+		StripPlayerWeapons();
+	}
 };
 
 class CCSPlayer_DamageReactServices : public CPlayerPawnComponent {

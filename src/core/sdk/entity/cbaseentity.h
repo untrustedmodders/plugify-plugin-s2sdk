@@ -29,7 +29,7 @@
 #include "globaltypes.h"
 #include "services.h"
 
-extern std::unique_ptr<GameConfig> g_pGameConfig;
+extern GameConfig* g_pGameConfig;
 
 class CGameSceneNode {
 public:

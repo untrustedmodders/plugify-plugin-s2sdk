@@ -152,6 +152,26 @@ extern "C" PLUGIN_API int ClientIndexToPlayerSlot(int clientIndex) {
 }
 
 /**
+ * @brief Retrieves the player slot from a given player service.
+ *
+ * @param service The service pointer. Like CCSPlayer_ItemServices, CCSPlayer_WeaponServices ect.
+ * @return The player slot if valid, otherwise -1.
+ */
+extern "C" PLUGIN_API int PlayerServicesToPlayerSlot(CPlayerPawnComponent* service) {
+	auto pPawn = service->GetPawn();
+	if (!pPawn) {
+		return -1;
+	}
+
+	auto pController = pPawn->GetController();
+	if (!pController) {
+		return -1;
+	}
+
+	return pController->GetPlayerSlot();
+}
+
+/**
  * @brief Retrieves a client's authentication string (SteamID).
  *
  * @param playerSlot The index of the player's slot whose authentication string is being retrieved.
@@ -551,7 +571,7 @@ extern "C" PLUGIN_API float GetClientSpeed(int playerSlot) {
 		return 0;
 	}
 
-	return pController->GetCurrentPawn()->m_flVelocityModifier;
+	return static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->m_flVelocityModifier;
 }
 
 /**
@@ -567,7 +587,7 @@ extern "C" PLUGIN_API void SetClientSpeed(int playerSlot, float speed) {
 		return;
 	}
 
-	pController->GetCurrentPawn()->m_flVelocityModifier = speed;
+	static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->m_flVelocityModifier = speed;
 }
 
 /**
@@ -615,7 +635,7 @@ extern "C" PLUGIN_API int GetClientArmor(int playerSlot) {
 		return 0;
 	}
 
-	return pController->GetCurrentPawn()->m_ArmorValue;
+	return static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->m_ArmorValue;
 }
 
 /**
@@ -631,7 +651,7 @@ extern "C" PLUGIN_API void SetClientArmor(int playerSlot, int armor) {
 		return;
 	}
 
-	pController->GetCurrentPawn()->m_ArmorValue = armor;
+	static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->m_ArmorValue = armor;
 }
 
 /**

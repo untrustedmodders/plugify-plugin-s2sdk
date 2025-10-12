@@ -10,6 +10,7 @@
         ClientPtrToPlayerSlot;
         PlayerSlotToClientIndex;
         ClientIndexToPlayerSlot;
+        PlayerServicesToPlayerSlot;
         GetClientAuthId;
         GetClientAccountId;
         GetClientSteamID64;
@@ -44,6 +45,8 @@
         GetClientAbsOrigin;
         SetClientAbsOrigin;
         GetClientAbsAngles;
+        GetClientAbsVelocity;
+        SetClientAbsVelocity;
         SetClientAbsAngles;
         GetClientEyeAngles;
         SetClientEyeAngles;
@@ -223,6 +226,8 @@
         SetEntityRenderMode;
         GetEntityHealth;
         SetEntityHealth;
+        GetEntityMaxHealth;
+        SetEntityMaxHealth;
         GetEntityTeam;
         SetEntityTeam;
         GetEntityOwner;

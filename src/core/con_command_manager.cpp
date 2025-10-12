@@ -84,7 +84,7 @@ bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::stri
 	setup.m_CBInfo = { &CommandCallback };
 	setup.m_CompletionCBInfo = {};
 
-	commandInfo.commandRef = g_pCVar->RegisterConCommand(setup, FCVAR_RELEASE | FCVAR_SERVER_CAN_EXECUTE | FCVAR_GAMEDLL);
+	commandInfo.commandRef = g_pCVar->RegisterConCommand(setup, ConVar_GetDefaultFlags());
 	commandInfo.command = commandInfo.commandRef.GetRawData();
 	commandInfo.adminFlags = adminFlags;
 

@@ -110,12 +110,7 @@ CBasePlayerController* utils::GetController(CPlayerSlot slot) {
 		return nullptr;
 	}
 
-	CBaseEntity* ent = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityIndex(slot + 1)));
-	if (!ent) {
-		return nullptr;
-	}
-
-	return ent->IsController() ? static_cast<CBasePlayerController*>(ent) : nullptr;
+	return static_cast<CBasePlayerController*>(g_pGameEntitySystem->GetEntityInstance(CEntityIndex(slot + 1)));
 }
 
 CPlayerSlot utils::GetEntityPlayerSlot(CBaseEntity* entity) {

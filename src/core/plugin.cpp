@@ -39,8 +39,8 @@ CGameEntitySystem* GameEntitySystem() {
 namespace {
 DynLibUtils::CVTFHookAuto<&CServerSideClientBase::ProcessRespondCvarValue> s_ProcessRespondCvarValue;
 DynLibUtils::CVTFHookAuto<&IGameSystem::BuildGameSessionManifest> s_BuildGameSessionManifest;
-void* _ZNSs4_Rep20_S_empty_rep_storageE_ptr;
-void* _ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE_ptr;
+void* string_S_empty_rep_storage = nullptr;
+void* wstring_S_empty_rep_storage = nullptr;
 
 constexpr auto CS_SCRIPT_PATH = "maps/editor/zoo/scripts/hello.vjs";
 
@@ -485,14 +485,32 @@ poly::ReturnAction Hook_PreloadLibrary(poly::IHook& hook, poly::Params& params, 
 	return poly::ReturnAction::Ignored;
 }
 #else
+#include <dlfcn.h>
+/*using GetRepStorageFn = void*(*)();
 extern "C" {
-	void* __wrap__ZNSs4_Rep20_S_empty_rep_storageE() {
-		return _ZNSs4_Rep20_S_empty_rep_storageE_ptr;
+	void* __wrap__ZNSs12_S_empty_repEv() {
+		if (string_S_empty_rep_storage == nullptr) {
+			char path[MAX_PATH]{};
+			strcpy(path, Plat_GetGameDirectory());
+			strcat(path, "/bin/linuxsteamrt64/libtier0.so");
+			void* tier0 = dlopen(path, RTLD_LAZY | RTLD_NOLOAD);
+			string_S_empty_rep_storage = reinterpret_cast<GetRepStorageFn>(dlsym(tier0, "_ZNSs4_Rep12_S_empty_repEv"))();
+			dlclose(tier0);
+		}
+		return string_S_empty_rep_storage;
 	}
-	void* __wrap__ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE() {
-		return _ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE_ptr;
+	void* __wrap__ZNSbIwSt11char_traitsIwESaIwEE12_S_empty_repEv() {
+		if (wstring_S_empty_rep_storage == nullptr) {
+			char path[MAX_PATH]{};
+			strcpy(path, Plat_GetGameDirectory());
+			strcat(path, "/bin/linuxsteamrt64/libtier0.so");
+			void* tier0 = dlopen(path, RTLD_LAZY | RTLD_NOLOAD);
+			wstring_S_empty_rep_storage = reinterpret_cast<GetRepStorageFn>(dlsym(tier0, "_ZNSbIwSt11char_traitsIwESaIwEE4_Rep12_S_empty_repEv"))();
+			dlclose(tier0);
+		}
+		return wstring_S_empty_rep_storage;
 	}
-}
+}*/
 #endif
 }
 
@@ -598,11 +616,6 @@ void Source2SDK::OnPluginStart() {
 #if S2SDK_PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);
 	g_PH.AddHookDetourFunc<PreloadLibrary>("PreloadLibrary", Hook_PreloadLibrary, Pre);
-#else
-	using GetRepStorageFn = void*(*)();
-	auto tier0 = g_GameConfigManager.GetModule("tier0");
-	_ZNSs4_Rep20_S_empty_rep_storageE_ptr = tier0->GetFunctionByName("_ZNSs4_Rep12_S_empty_repEv").RCast<GetRepStorageFn>()();
-	_ZNSbIwSt11char_traitsIwESaIwEE4_Rep20_S_empty_rep_storageE_ptr = tier0->GetFunctionByName("_ZNSbIwSt11char_traitsIwESaIwEE4_Rep12_S_empty_repEv").RCast<GetRepStorageFn>()();
 #endif
 
 	OnServerStartup();// for late load*/
@@ -644,4 +657,20 @@ void Source2SDK::OnServerStartup() {
 	//g_MultiAddonManager.OnStartupServer();
 
 	RegisterEventListeners();
+
+	ConVarFlag flags = ConVarFlag::LinkedConcommand | ConVarFlag::Release | ConVarFlag::ClientCanExecute;
+	auto result = g_CommandManager.AddValveCommand("test_vote", "", flags);
+	g_CommandManager.AddCommandListener("test_vote", [](int caller, CommandCallingContext context, const plg::vector<plg::string>& arguments) {
+		g_PanoramaVoteHandler.SendYesNoVote(30, caller, "#SFUI_vote_swap_teams", "", "#SFUI_vote_swap_teams", "", 0, static_cast<uint64>(-1), [](int numVotes, int yesVotes, int noVotes, int numClients, const plg::vector<int>& clientInfoSlot, const plg::vector<int>& clientInfoItem) {
+			if (yesVotes > noVotes) {
+				utils::PrintChatAll("HUI!!!!!!!!!");
+				return true;
+			}
+			return false;
+		}, [](VoteAction, int, int) {
+
+		});
+		return ResultType::Continue;
+	}, HookMode::Post);
 }
+
