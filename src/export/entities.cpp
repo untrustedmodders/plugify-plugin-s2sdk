@@ -628,6 +628,44 @@ extern "C" PLUGIN_API void SetEntityHealth(int entityHandle, int health) {
 }
 
 /**
+ * @brief Retrieves the max health of an entity.
+ *
+ * This function returns the current max health of the specified entity.
+ * If the entity is invalid, it returns 0.
+ *
+ * @param entityHandle The handle of the entity whose max health is to be retrieved.
+ * @return The max health of the entity, or 0 if the entity is invalid.
+ */
+extern "C" PLUGIN_API int GetEntityMaxHealth(int entityHandle) {
+	CBaseEntity* pEntity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
+	if (!pEntity) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityMaxHealth' on invalid entity handle: {}\n", entityHandle);
+		return 0;
+	}
+
+	return pEntity->m_iMaxHealth;
+}
+
+/**
+ * @brief Sets the max health of an entity.
+ *
+ * This function updates the max health of the specified entity.
+ * If the entity is invalid, the function does nothing.
+ *
+ * @param entityHandle The handle of the entity whose max health is to be set.
+ * @param maxHealth The new max health value to set for the entity.
+ */
+extern "C" PLUGIN_API void SetEntityMaxHealth(int entityHandle, int maxHealth) {
+	CBaseEntity* pEntity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
+	if (!pEntity) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityMaxHealth' on invalid entity handle: {}\n", entityHandle);
+		return;
+	}
+
+	pEntity->m_iMaxHealth = maxHealth;
+}
+
+/**
  * @brief Retrieves the team number of an entity.
  *
  * This function returns the team number of the specified entity.

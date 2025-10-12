@@ -507,6 +507,102 @@ extern "C" PLUGIN_API void SetClientHealth(int playerSlot, int health) {
 }
 
 /**
+ * @brief Returns the client's max health.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The max health value of the client.
+ */
+extern "C" PLUGIN_API int GetClientMaxHealth(int playerSlot) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientMaxHealth' on invalid player slot: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pController->m_iMaxHealth;
+}
+
+/**
+ * @brief Sets the client's max health.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param maxHealth The max health value to set.
+ */
+extern "C" PLUGIN_API void SetClientMaxHealth(int playerSlot, int maxHealth) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientMaxHealth' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	pController->m_iMaxHealth = maxHealth;
+}
+
+/**
+ * @brief Returns the client's speed value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The speed value of the client.
+ */
+extern "C" PLUGIN_API float GetClientSpeed(int playerSlot) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientSpeed' on invalid player slot: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pController->GetCurrentPawn()->m_flVelocityModifier;
+}
+
+/**
+ * @brief Sets the client's speed value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param speed The speed value to set.
+ */
+extern "C" PLUGIN_API void SetClientSpeed(int playerSlot, float speed) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientSpeed' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	pController->GetCurrentPawn()->m_flVelocityModifier = speed;
+}
+
+/**
+ * @brief Returns the client's gravity value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The gravity value of the client.
+ */
+extern "C" PLUGIN_API float GetClientGravity(int playerSlot) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientGravity' on invalid player slot: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pController->m_flGravityScale;
+}
+
+/**
+ * @brief Sets the client's gravity value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param gravity The gravity value to set.
+ */
+extern "C" PLUGIN_API void SetClientGravity(int playerSlot, float gravity) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientGravity' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	pController->m_flGravityScale = gravity;
+}
+
+/**
  * @brief Returns the client's armor value.
  *
  * @param playerSlot The index of the player's slot.
@@ -626,6 +722,45 @@ extern "C" PLUGIN_API void SetClientAbsAngles(int playerSlot, const plg::vec3& a
 	}
 	
 	pNode->m_angRotation = *reinterpret_cast<const QAngle*>(&angles);
+}
+
+/**
+ * @brief Retrieves the absolute velocity of a client.
+ *
+ * This function gets the absolute velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The handle of the client whose absolute velocity is to be retrieved.
+ * @return A vector where the absolute velocity will be stored.
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientAbsVelocity(int playerSlot) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientAbsVelocity' on invalid player slot: {}\n", playerSlot);
+		return {};
+	}
+
+	const Vector& vec = pController->m_vecAbsVelocity;
+	return *reinterpret_cast<const plg::vec3*>(&vec);
+}
+
+/**
+ * @brief Sets the absolute velocity of a client.
+ *
+ * This function updates the absolute velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The handle of the client whose absolute velocity is to be set.
+ * @param velocity The new absolute velocity to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientAbsVelocity(int playerSlot, const Vector& velocity) {
+	auto pController = utils::GetController(playerSlot);
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientAbsVelocity' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	pController->m_vecAbsVelocity = velocity;
 }
 
 /**
@@ -800,6 +935,44 @@ extern "C" PLUGIN_API void BanClient(int playerSlot, float duration, bool kick) 
  */
 extern "C" PLUGIN_API void BanIdentity(uint64_t steamId, float duration, bool kick) {
 	g_pEngineServer->BanClient(CSteamID(static_cast<uint64>(steamId)), duration, kick);
+}
+
+/**
+ * @brief Retrieves the model name of a client.
+ *
+ * This function gets the model name of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param pplayerSlot The index of the player's slot.
+ * @return A string where the model name will be stored.
+ */
+extern "C" PLUGIN_API plg::string GetClientModel(int playerSlot) {
+	auto pEntity = static_cast<CBaseModelEntity*>(static_cast<CBaseEntity*>(utils::GetController(playerSlot)));
+	if (!pEntity) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientModel' on invalid player slot: {}\n", playerSlot);
+		return {};
+	}
+
+	return pEntity->GetModelName();
+}
+
+/**
+ * @brief Sets the model name of a client.
+ *
+ * This function updates the model name of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param model The new model name to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientModel(int playerSlot, const plg::string& model) {
+	auto pEntity = static_cast<CBaseModelEntity*>(static_cast<CBaseEntity*>(utils::GetController(playerSlot)));
+	if (!pEntity) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientModel' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	pEntity->SetModel(model.c_str());
 }
 
 /**
@@ -1269,4 +1442,25 @@ extern "C" PLUGIN_API void SetClientDamage(int playerSlot, int damage) {
 	}
 
 	pActionTrackingServices->m_matchStats().m_iDamage = damage;
+}
+
+/**
+ * @brief Teleports a client to a specified location and orientation.
+ *
+ * This function teleports the specified client to the given absolute position,
+ * with an optional new orientation and velocity. If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param origin A pointer to a Vector representing the new absolute position. Can be nullptr.
+ * @param angles A pointer to a QAngle representing the new orientation. Can be nullptr.
+ * @param velocity A pointer to a Vector representing the new velocity. Can be nullptr.
+ */
+extern "C" PLUGIN_API void TeleportClient(int playerSlot, const Vector* origin, const QAngle* angles, const Vector* velocity) {
+	auto pController = static_cast<CPlayerController*>(utils::GetController(playerSlot));
+	if (!pController) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'TeleportClient' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	pController->Teleport(origin, angles, velocity);
 }

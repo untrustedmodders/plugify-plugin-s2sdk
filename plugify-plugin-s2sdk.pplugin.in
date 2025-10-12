@@ -516,124 +516,8 @@
       ],
       "retType": {
         "type": "int32",
-        "description": "The team index of the client.",
-        "enum": {
-          "name": "CSTeam",
-          "description": "Enum representing the possible teams in Counter-Strike.",
-          "values": [
-            {
-              "value": 0,
-              "name": "None",
-              "description": "No team."
-            },
-            {
-              "value": 1,
-              "name": "Spectator",
-              "description": "Spectator team."
-            },
-            {
-              "value": 2,
-              "name": "T",
-              "description": "Terrorist team."
-            },
-            {
-              "value": 3,
-              "name": "CT",
-              "description": "Counter-Terrorist team."
-            }
-          ]
-        }
+        "description": "The team index of the client."
       }
-    },
-    {
-      "name": "GetClientHealth",
-      "group": "Clients",
-      "description": "Returns the client's health.",
-      "funcName": "GetClientHealth",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        }
-      ],
-      "retType": {
-        "type": "int32",
-        "description": "int The health value of the client."
-      }
-    },
-    {
-      "name": "GetClientArmor",
-      "group": "Clients",
-      "description": "Returns the client's armor value.",
-      "funcName": "GetClientArmor",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        }
-      ],
-      "retType": {
-        "type": "int32",
-        "description": "int The armor value of the client."
-      }
-    },
-    {
-      "name": "GetClientAbsOrigin",
-      "group": "Clients",
-      "description": "Retrieves the client's origin vector.",
-      "funcName": "GetClientAbsOrigin",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        }
-      ],
-      "retType": {
-        "type": "vec3",
-        "description": "A Vector where the client's origin will be stored."
-      }
-    },
-    {
-      "name": "GetClientAbsAngles",
-      "group": "Clients",
-      "description": "Retrieves the client's position angle.",
-      "funcName": "GetClientAbsAngles",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        }
-      ],
-      "retType": {
-        "type": "vec3",
-        "description": "A QAngle where the client's position angle will be stored."
-      }
-    },
-    {
-        "name": "GetClientEyeAngles",
-        "group": "Clients",
-        "description": "Retrieves the client's eye angle.",
-        "funcName": "GetClientEyeAngles",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the player's slot."
-            }
-        ],
-        "retType": {
-            "type": "vec3",
-            "description": "A QAngle where the client's eye angle will be stored."
-        }
     },
     {
       "name": "SetClientTeam",
@@ -651,38 +535,29 @@
           "name": "team",
           "type": "int32",
           "ref": false,
-          "description": "The team index to set.",
-          "enum": {
-            "name": "CSTeam",
-            "description": "Enum representing the possible teams in Counter-Strike.",
-            "values": [
-              {
-                "value": 0,
-                "name": "None",
-                "description": "No team."
-              },
-              {
-                "value": 1,
-                "name": "Spectator",
-                "description": "Spectator team."
-              },
-              {
-                "value": 2,
-                "name": "T",
-                "description": "Terrorist team."
-              },
-              {
-                "value": 3,
-                "name": "CT",
-                "description": "Counter-Terrorist team."
-              }
-            ]
-          }
+          "description": "The team index to set."
         }
       ],
       "retType": {
-        "type": "void",
-        "description": "No return value."
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientHealth",
+      "group": "Clients",
+      "description": "Returns the client's health.",
+      "funcName": "GetClientHealth",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The health value of the client."
       }
     },
     {
@@ -705,8 +580,148 @@
         }
       ],
       "retType": {
-        "type": "void",
-        "description": "No return value."
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientMaxHealth",
+      "group": "Clients",
+      "description": "Returns the client's max health.",
+      "funcName": "GetClientMaxHealth",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The max health value of the client."
+      }
+    },
+    {
+      "name": "SetClientMaxHealth",
+      "group": "Clients",
+      "description": "Sets the client's max health.",
+      "funcName": "SetClientMaxHealth",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "maxHealth",
+          "type": "int32",
+          "ref": false,
+          "description": "The max health value to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientSpeed",
+      "group": "Clients",
+      "description": "Returns the client's speed value.",
+      "funcName": "GetClientSpeed",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The speed value of the client."
+      }
+    },
+    {
+      "name": "SetClientSpeed",
+      "group": "Clients",
+      "description": "Sets the client's speed value.",
+      "funcName": "SetClientSpeed",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "speed",
+          "type": "float",
+          "ref": false,
+          "description": "The speed value to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientGravity",
+      "group": "Clients",
+      "description": "Returns the client's gravity value.",
+      "funcName": "GetClientGravity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The gravity value of the client."
+      }
+    },
+    {
+      "name": "SetClientGravity",
+      "group": "Clients",
+      "description": "Sets the client's gravity value.",
+      "funcName": "SetClientGravity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "gravity",
+          "type": "float",
+          "ref": false,
+          "description": "The gravity value to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientArmor",
+      "group": "Clients",
+      "description": "Returns the client's armor value.",
+      "funcName": "GetClientArmor",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The armor value of the client."
       }
     },
     {
@@ -729,14 +744,31 @@
         }
       ],
       "retType": {
-        "type": "void",
-        "description": "No return value."
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientAbsOrigin",
+      "group": "Clients",
+      "description": "Retrieves the client's origin vector.",
+      "funcName": "GetClientAbsOrigin",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A Vector where the client's origin will be stored."
       }
     },
     {
       "name": "SetClientAbsOrigin",
       "group": "Clients",
-      "description": "Sets the client's absolute origin vector.",
+      "description": "Sets the client's origin vector.",
       "funcName": "SetClientAbsOrigin",
       "paramTypes": [
         {
@@ -753,8 +785,25 @@
         }
       ],
       "retType": {
-        "type": "void",
-        "description": "No return value."
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientAbsAngles",
+      "group": "Clients",
+      "description": "Retrieves the client's position angle.",
+      "funcName": "GetClientAbsAngles",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A QAngle where the client's position angle will be stored."
       }
     },
     {
@@ -777,14 +826,72 @@
         }
       ],
       "retType": {
-        "type": "void",
-        "description": "No return value."
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientAbsVelocity",
+      "group": "Clients",
+      "description": "Retrieves the absolute velocity of a client.",
+      "funcName": "GetClientAbsVelocity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the client whose absolute velocity is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the absolute velocity will be stored."
+      }
+    },
+    {
+      "name": "SetClientAbsVelocity",
+      "group": "Clients",
+      "description": "Sets the absolute velocity of a client.",
+      "funcName": "SetClientAbsVelocity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the client whose absolute velocity is to be set."
+        },
+        {
+          "name": "velocity",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new absolute velocity to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientEyeAngles",
+      "group": "Clients",
+      "description": "Retrieves the client's eye angle.",
+      "funcName": "GetClientEyeAngles",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A QAngle where the client's eye angle will be stored."
       }
     },
     {
       "name": "SetClientEyeAngles",
       "group": "Clients",
-      "description": "Sets the client's eye rotation angles.",
+      "description": "Sets the client's eye angles.",
       "funcName": "SetClientEyeAngles",
       "paramTypes": [
         {
@@ -801,8 +908,7 @@
         }
       ],
       "retType": {
-        "type": "void",
-        "description": "No return value."
+        "type": "void"
       }
     },
     {
@@ -820,7 +926,7 @@
       ],
       "retType": {
         "type": "ptr64",
-        "description": "A pointer to the client's pawn entity, or null if invalid."
+        "description": "A pointer to the client's pawn entity, or nullptr if the client or controller is invalid."
       }
     },
     {
@@ -1060,6 +1166,46 @@
           "type": "bool",
           "ref": false,
           "description": "If true, the client will be kicked immediately after being banned."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientModel",
+      "group": "Clients",
+      "description": "Retrieves the model name of a client.",
+      "funcName": "GetClientModel",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "A string where the model name will be stored."
+      }
+    },
+    {
+      "name": "SetClientModel",
+      "group": "Clients",
+      "description": "Sets the model name of a client.",
+      "funcName": "SetClientModel",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "model",
+          "type": "string",
+          "ref": false,
+          "description": "The new model name to set for the client."
         }
       ],
       "retType": {
@@ -1481,6 +1627,42 @@
         "retType": {
             "type": "void"
         }
+    },
+
+    {
+      "name": "TeleportClient",
+      "group": "Clients",
+      "description": "Teleports a client to a specified location and orientation.",
+      "funcName": "TeleportEntity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the client."
+        },
+        {
+          "name": "origin",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to a Vector representing the new absolute position. Can be nullptr."
+        },
+        {
+          "name": "angles",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to a QAngle representing the new orientation. Can be nullptr."
+        },
+        {
+          "name": "velocity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to a Vector representing the new velocity. Can be nullptr."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
     },
     {
       "name": "AddAdminCommand",
@@ -9449,6 +9631,47 @@
           "type": "int32",
           "ref": false,
           "description": "The new health value to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityMaxHealth",
+      "group": "Entities",
+      "description": "Retrieves the max health of an entity.",
+      "funcName": "GetEntityMaxHealth",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose max health is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The max health of the entity, or 0 if the entity is invalid."
+      }
+    },
+    {
+      "name": "SetEntityMaxHealth",
+      "group": "Entities",
+      "description": "Sets the max health of an entity.",
+      "funcName": "SetEntityMaxHealth",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose max health is to be set."
+        },
+        {
+          "name": "maxHealth",
+          "type": "int32",
+          "ref": false,
+          "description": "The new max health value to set for the entity."
         }
       ],
       "retType": {
@@ -20592,7 +20815,7 @@
           "name": "WeaponDefIndex",
           "description": "Enum representing different weapon definition indices.",
           "values": [
-            { "value": 0, "name": "InvDefInd" },
+            { "value": 0, "name": "Invalid" },
             { "value": 1, "name": "Deagle" },
             { "value": 2, "name": "Elite" },
             { "value": 3, "name": "FiveSeven" },
@@ -20607,7 +20830,6 @@
             { "value": 16, "name": "M4A1" },
             { "value": 17, "name": "MAC10" },
             { "value": 19, "name": "P90" },
-            { "value": 20, "name": "ZoneRepulsor" },
             { "value": 23, "name": "MP5SD" },
             { "value": 24, "name": "UMP45" },
             { "value": 25, "name": "XM1014" },
@@ -20622,11 +20844,10 @@
             { "value": 34, "name": "MP9" },
             { "value": 35, "name": "Nova" },
             { "value": 36, "name": "P250" },
-            { "value": 37, "name": "Shield" },
             { "value": 38, "name": "SCAR20" },
             { "value": 39, "name": "SG556" },
             { "value": 40, "name": "SSG08" },
-            { "value": 41, "name": "KnifeEgg" },
+            { "value": 41, "name": "KnifeGG" },
             { "value": 42, "name": "Knife" },
             { "value": 43, "name": "Flashbang" },
             { "value": 44, "name": "HEGrenade" },
@@ -20638,32 +20859,32 @@
             { "value": 50, "name": "Kevlar" },
             { "value": 51, "name": "AssaultSuit" },
             { "value": 52, "name": "HeavyAssaultSuit" },
-            { "value": 54, "name": "NVG" },
             { "value": 55, "name": "Defuser" },
-            { "value": 56, "name": "Cutters" },
-            { "value": 57, "name": "HealthShot" },
-            { "value": 58, "name": "MusicKitDefault" },
             { "value": 59, "name": "KnifeT" },
             { "value": 60, "name": "M4A1Silencer" },
             { "value": 61, "name": "USPSilencer" },
-            { "value": 62, "name": "RecipeTradeUp" },
             { "value": 63, "name": "CZ75A" },
             { "value": 64, "name": "Revolver" },
-            { "value": 65, "name": "RemoveKeychainTool" },
-            { "value": 68, "name": "TagGrenade" },
-            { "value": 69, "name": "Fists" },
-            { "value": 70, "name": "BreachCharge" },
-            { "value": 72, "name": "Tablet" },
-            { "value": 74, "name": "Melee" },
-            { "value": 75, "name": "Axe" },
-            { "value": 76, "name": "Hammer" },
-            { "value": 78, "name": "Spanner" },
-            { "value": 80, "name": "KnifeGhost" },
-            { "value": 81, "name": "Firebomb" },
-            { "value": 82, "name": "Diversion" },
-            { "value": 83, "name": "FragGrenade" },
-            { "value": 84, "name": "Snowball" },
-            { "value": 85, "name": "BumpMine" }
+            { "value": 500, "name": "Bayonet" },
+            { "value": 503, "name": "KnifeCSS" },
+            { "value": 505, "name": "KnifeFlip" },
+            { "value": 506, "name": "KnifeGut" },
+            { "value": 507, "name": "KnifeKarambit" },
+            { "value": 508, "name": "KnifeM9Bayonet" },
+            { "value": 509, "name": "KnifeTactical" },
+            { "value": 512, "name": "KnifeFalchion" },
+            { "value": 514, "name": "KnifeBowie" },
+            { "value": 515, "name": "KnifeButterfly" },
+            { "value": 516, "name": "KnifePush" },
+            { "value": 517, "name": "KnifeCord" },
+            { "value": 518, "name": "KnifeCanis" },
+            { "value": 519, "name": "KnifeUrsus" },
+            { "value": 520, "name": "KnifeGypsyJackknife" },
+            { "value": 521, "name": "KnifeOutdoor" },
+            { "value": 522, "name": "KnifeStiletto" },
+            { "value": 523, "name": "KnifeWidowmaker" },
+            { "value": 525, "name": "KnifeSkeleton" },
+            { "value": 526, "name": "KnifeKukri" }
           ]
         }
       }

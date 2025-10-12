@@ -37,7 +37,8 @@ public:
 	SCHEMA_FIELD(CPlayer_ObserverServices*, m_pObserverServices)
 	SCHEMA_FIELD(CHandle<CBasePlayerController>, m_hController)
 
-	SCHEMA_FIELD(int, m_ArmorValue) // csgo
+	SCHEMA_FIELD(int, m_ArmorValue)
+	SCHEMA_FIELD(float, m_flVelocityModifier)
 
 	void CommitSuicide(bool bExplode, bool bForce) {
 		m_bTakesDamage = true;

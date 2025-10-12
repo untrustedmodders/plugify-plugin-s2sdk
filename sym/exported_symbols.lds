@@ -28,11 +28,24 @@ IsClientSourceTV
 IsClientAlive
 IsFakeClient
 GetClientTeam
+SetClientTeam
 GetClientHealth
+SetClientHealth
+GetClientMaxHealth
+SetClientMaxHealth
+GetClientSpeed
+SetClientSpeed
+GetClientGravity
+SetClientGravity
 GetClientArmor
+SetClientArmor
 GetClientAbsOrigin
+SetClientAbsOrigin
 GetClientAbsAngles
+SetClientAbsAngles
 GetClientEyeAngles
+SetClientEyeAngles
+GetClientPawn
 ProcessTargetString
 ChangeClientTeam
 SwitchClientTeam
@@ -41,6 +54,8 @@ ForcePlayerSuicide
 KickClient
 BanClient
 BanIdentity
+GetClientModel
+SetClientModel
 GetClientActiveWeapon
 GetClientWeapons
 StripWeapons
@@ -60,6 +75,7 @@ GetClientAssists
 SetClientAssists
 GetClientDamage
 SetClientDamage
+TeleportClient
 
 AddAdminCommand
 AddConsoleCommand
@@ -205,8 +221,8 @@ GetEntityRenderMode
 SetEntityRenderMode
 GetEntityHealth
 SetEntityHealth
-GetTeamEntity
-SetTeamEntity
+GetEntityTeam
+SetEntityTeam
 GetEntityOwner
 SetEntityOwner
 GetEntityParent
@@ -480,7 +496,7 @@ GetWeaponVData
 GetWeaponType
 GetWeaponCategory
 GetWeaponGearSlot
-GetWeaponDefIndex
+GetWeaponItemDefinition
 
 *_Register
 *_Unregister

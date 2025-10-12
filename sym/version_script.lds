@@ -33,6 +33,12 @@
         SetClientTeam;
         GetClientHealth;
         SetClientHealth;
+        GetClientMaxHealth;
+        SetClientMaxHealth;
+        GetClientSpeed;
+        SetClientSpeed;
+        GetClientGravity;
+        SetClientGravity;
         GetClientArmor;
         SetClientArmor;
         GetClientAbsOrigin;
@@ -50,6 +56,8 @@
         KickClient;
         BanClient;
         BanIdentity;
+        GetClientModel;
+        SetClientModel;
         GetClientActiveWeapon;
         GetClientWeapons;
         StripWeapons;
@@ -69,6 +77,7 @@
         SetClientAssists;
         GetClientDamage;
         SetClientDamage;
+        TeleportClient;
 
         AddAdminCommand;
         AddConsoleCommand;
