@@ -475,7 +475,13 @@ extern "C" PLUGIN_API int GetClientTeam(int playerSlot) {
 		return 0;
 	}
 
-	return pController->m_iTeamNum;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientTeam' on invalid player pawn: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pPawn->m_iTeamNum;
 }
 
 /**
@@ -491,6 +497,13 @@ extern "C" PLUGIN_API void SetClientTeam(int playerSlot, int team) {
 		return;
 	}
 
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientTeam' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	pPawn->m_iTeamNum = team;
 	pController->m_iTeamNum = team;
 }
 
@@ -507,7 +520,13 @@ extern "C" PLUGIN_API int GetClientHealth(int playerSlot) {
 		return 0;
 	}
 
-	return pController->m_iHealth;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientHealth' on invalid player pawn: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pPawn->m_iHealth;
 }
 
 /**
@@ -523,6 +542,13 @@ extern "C" PLUGIN_API void SetClientHealth(int playerSlot, int health) {
 		return;
 	}
 
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientHealth' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	pPawn->m_iHealth = health;
 	pController->m_iHealth = health;
 }
 
@@ -539,7 +565,13 @@ extern "C" PLUGIN_API int GetClientMaxHealth(int playerSlot) {
 		return 0;
 	}
 
-	return pController->m_iMaxHealth;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientMaxHealth' on invalid player pawn: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pPawn->m_iMaxHealth;
 }
 
 /**
@@ -555,6 +587,13 @@ extern "C" PLUGIN_API void SetClientMaxHealth(int playerSlot, int maxHealth) {
 		return;
 	}
 
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientMaxHealth' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	pPawn->m_iMaxHealth = maxHealth;
 	pController->m_iMaxHealth = maxHealth;
 }
 
@@ -571,7 +610,13 @@ extern "C" PLUGIN_API float GetClientSpeed(int playerSlot) {
 		return 0;
 	}
 
-	return static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->m_flVelocityModifier;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientSpeed' on invalid player pawn: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pPawn->m_flVelocityModifier;
 }
 
 /**
@@ -587,7 +632,13 @@ extern "C" PLUGIN_API void SetClientSpeed(int playerSlot, float speed) {
 		return;
 	}
 
-	static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->m_flVelocityModifier = speed;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientSpeed' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	pPawn->m_flVelocityModifier = speed;
 }
 
 /**
@@ -603,7 +654,13 @@ extern "C" PLUGIN_API float GetClientGravity(int playerSlot) {
 		return 0;
 	}
 
-	return pController->m_flGravityScale;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientGravity' on invalid player pawn: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pPawn->m_flGravityScale;
 }
 
 /**
@@ -619,7 +676,13 @@ extern "C" PLUGIN_API void SetClientGravity(int playerSlot, float gravity) {
 		return;
 	}
 
-	pController->m_flGravityScale = gravity;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientGravity' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	pPawn->m_flGravityScale = gravity;
 }
 
 /**
@@ -635,7 +698,13 @@ extern "C" PLUGIN_API int GetClientArmor(int playerSlot) {
 		return 0;
 	}
 
-	return static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->m_ArmorValue;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientArmor' on invalid player pawn: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pPawn->m_ArmorValue;
 }
 
 /**
@@ -651,7 +720,13 @@ extern "C" PLUGIN_API void SetClientArmor(int playerSlot, int armor) {
 		return;
 	}
 
-	static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->m_ArmorValue = armor;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SetClientArmor' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	pPawn->m_ArmorValue = armor;
 }
 
 /**
@@ -886,7 +961,7 @@ extern "C" PLUGIN_API void SwitchClientTeam(int playerSlot, int team) {
 		return;
 	}
 
-	pController->SwitchTeam(team);
+	pController->UpdateTeam(team);
 }
 
 /**
@@ -901,9 +976,15 @@ extern "C" PLUGIN_API void RespawnClient(int playerSlot) {
 		return;
 	}
 
-	if (pController->GetCurrentPawn()->IsAlive()) {
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'RespawnClient' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	if (pPawn->IsAlive()) {
 		// TODO: Fix players spawning under spawn positions
-		static_cast<CPlayerPawn*>(pController->GetCurrentPawn())->Respawn();
+		pPawn->Respawn();
 	} else {
 		static_cast<CPlayerController*>(pController)->Respawn();
 	}
@@ -923,7 +1004,13 @@ extern "C" PLUGIN_API void ForcePlayerSuicide(int playerSlot, bool explode, bool
 		return;
 	}
 
-	pController->GetCurrentPawn()->CommitSuicide(explode, force);
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'ForcePlayerSuicide' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	pPawn->CommitSuicide(explode, force);
 }
 
 /**
@@ -1008,7 +1095,13 @@ extern "C" PLUGIN_API int GetClientActiveWeapon(int playerSlot) {
 		return INVALID_EHANDLE_INDEX;
 	}
 
-	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientActiveWeapon' on invalid player pawn: {}\n", playerSlot);
+		return INVALID_EHANDLE_INDEX;
+	}
+
+	CCSPlayer_WeaponServices* pWeaponServices = pPawn->m_pWeaponServices;
 	if (!pWeaponServices) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientActiveWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return INVALID_EHANDLE_INDEX;
@@ -1030,7 +1123,13 @@ extern "C" PLUGIN_API plg::vector<int> GetClientWeapons(int playerSlot) {
 		return {};
 	}
 
-	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientActiveWeapon' on invalid player pawn: {}\n", playerSlot);
+		return {};
+	}
+
+	CCSPlayer_WeaponServices* pWeaponServices = pPawn->m_pWeaponServices;
 	if (!pWeaponServices) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientWeapons' on m_pWeaponServices: {}\n", playerSlot);
 		return {};
@@ -1065,7 +1164,13 @@ extern "C" PLUGIN_API void StripWeapons(int playerSlot, bool removeSuit) {
 		return;
 	}
 
-	CCSPlayer_ItemServices* pItemServices = pController->GetCurrentPawn()->m_pItemServices;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'StripWeapons' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	CCSPlayer_ItemServices* pItemServices = pPawn->m_pItemServices;
 	if (!pItemServices) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'StripWeapons' on m_pItemServices: {}\n", playerSlot);
 		return;
@@ -1089,13 +1194,19 @@ extern "C" PLUGIN_API void DropWeapon(int playerSlot, int weaponHandle, const pl
 		return;
 	}
 
-	CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
+	auto pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
 	if (!pWeapon) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'DropWeapon' on invalid weapon handle: {}\n", weaponHandle);
 		return;
 	}
 
-	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'DropWeapon' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	CCSPlayer_WeaponServices* pWeaponServices = pPawn->m_pWeaponServices;
 	if (!pWeaponServices) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'DropWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return;
@@ -1123,7 +1234,13 @@ extern "C" PLUGIN_API void BumpWeapon(int playerSlot, int weaponHandle) {
 		return;
 	}
 
-	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SwitchWeapon' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	CCSPlayer_WeaponServices* pWeaponServices = pPawn->m_pWeaponServices;
 	if (!pWeaponServices) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'SwitchWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return;
@@ -1145,13 +1262,19 @@ extern "C" PLUGIN_API void SwitchWeapon(int playerSlot, int weaponHandle) {
 		return;
 	}
 
-	CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
+	auto pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
 	if (!pWeapon) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'SwitchWeapon' on invalid weapon handle: {}\n", weaponHandle);
 		return;
 	}
 
-	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'SwitchWeapon' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	CCSPlayer_WeaponServices* pWeaponServices = pPawn->m_pWeaponServices;
 	if (!pWeaponServices) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'SwitchWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return;
@@ -1173,13 +1296,19 @@ extern "C" PLUGIN_API void RemoveWeapon(int playerSlot, int weaponHandle) {
 		return;
 	}
 
-	CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
+	auto pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
 	if (!pWeapon) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'RemovePlayerItem' on invalid weapon handle: {}\n", weaponHandle);
 		return;
 	}
 
-	CCSPlayer_WeaponServices* pWeaponServices = pController->GetCurrentPawn()->m_pWeaponServices;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'RemovePlayerItem' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	CCSPlayer_WeaponServices* pWeaponServices = pPawn->m_pWeaponServices;
 	if (!pWeaponServices) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'RemoveWeapon' on m_pWeaponServices: {}\n", playerSlot);
 		return;
@@ -1202,8 +1331,15 @@ extern "C" PLUGIN_API int GiveNamedItem(int playerSlot, const plg::string& itemN
 		return INVALID_EHANDLE_INDEX;
 	}
 
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GiveNamedItem' on invalid player pawn: {}\n", playerSlot);
+		return INVALID_EHANDLE_INDEX;
+	}
+
 	CCSPlayer_ItemServices* pItemServices = pController->GetCurrentPawn()->m_pItemServices;
 	if (!pItemServices) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GiveNamedItem' on m_pItemServices: {}\n", playerSlot);
 		return INVALID_EHANDLE_INDEX;
 	}
 
@@ -1235,7 +1371,13 @@ extern "C" PLUGIN_API uint64_t GetClientButtons(int playerSlot, int buttonIndex)
 		return 0;
 	}
 
-	CPlayer_MovementServices* pMovementServices = pController->GetCurrentPawn()->m_pMovementServices;
+	auto pPawn = static_cast<CPlayerPawn*>(pController->GetCurrentPawn());
+	if (!pPawn) {
+		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientButtons' on invalid player pawn: {}\n", playerSlot);
+		return INVALID_EHANDLE_INDEX;
+	}
+
+	CPlayer_MovementServices* pMovementServices = pPawn->m_pMovementServices;
 	if (!pMovementServices) {
 		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientButtons' on m_pMovementServices: {}\n", playerSlot);
 		return 0;
@@ -1482,5 +1624,5 @@ extern "C" PLUGIN_API void TeleportClient(int playerSlot, const Vector* origin, 
 		return;
 	}
 
-	pController->Teleport(origin, angles, velocity);
+	pController->GetPlayerPawn()->Teleport(origin, angles, velocity);
 }

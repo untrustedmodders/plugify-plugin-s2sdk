@@ -73,23 +73,37 @@ public:
 			return;
 
 		if (iTeam == CS_TEAM_SPECTATOR) {
+			//GetCurrentPawn()->m_iTeamNum = iTeam;
 			ChangeTeam(iTeam);
 		} else {
+			//GetPlayerPawn()->m_iTeamNum = iTeam;
 			addresses::CCSPlayerController_SwitchTeam(this, iTeam);
 		}
 	}
 
 	// Respawns the player if the player is not alive, does nothing otherwise.
 	void Respawn() {
-		CCSPlayerPawn* pawn = m_hPlayerPawn();
+		CCSPlayerPawn* pawn = GetPlayerPawn();
 		if (!pawn || pawn->IsAlive())
 			return;
 
 		SetPawn(pawn);
-		if (m_iTeamNum != CS_TEAM_CT && m_iTeamNum != CS_TEAM_T) {
-			SwitchTeam(RandomInt(CS_TEAM_T, CS_TEAM_CT));
-		}
 		static int offset = g_pGameConfig->GetOffset("ControllerRespawn");
 		CALL_VIRTUAL(void, offset, this);
+	}
+
+	void UpdateTeam(int iTeam) {
+		CCSPlayerPawn* pawn = GetPlayerPawn();
+		if (!pawn || pawn->IsAlive())
+			return;
+
+		const auto absOrigin = pawn->GetAbsOrigin();
+		const auto absRotation = pawn->GetAbsRotation();
+		const auto absAbsVelocity = pawn->m_vecAbsVelocity();
+		SwitchTeam(iTeam);
+		SetPawn(pawn);
+		static int offset = g_pGameConfig->GetOffset("ControllerRespawn");
+		CALL_VIRTUAL(void, offset, this);
+		pawn->Teleport(&absOrigin, &absRotation, &absAbsVelocity);
 	}
 };
