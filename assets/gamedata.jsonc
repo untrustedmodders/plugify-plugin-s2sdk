@@ -226,23 +226,23 @@
       },
       // 9 functions after one with "Physics_SimulateEntity""Server Game"
       "IsEntityPawn": {
-        "win64": 161,
-        "linuxsteamrt64": 160
+        "win64": 172,
+        "linuxsteamrt64": 171
       },
       // Right after IsEntityPawn
       "IsEntityController": {
-        "win64": 162,
-        "linuxsteamrt64": 161
+        "win64": 173,
+        "linuxsteamrt64": 172
       },
       // String: "%s<%i><%s><%s>"ChangeTeam() CTMDBG..."
       "ControllerChangeTeam": {
-        "win64": 100,
-        "linuxsteamrt64": 99
+        "win64": 106,
+        "linuxsteamrt64": 105
       },
       // Player controller respawn function offset
       "ControllerRespawn": {
-        "win64": 244,
-        "linuxsteamrt64": 246
+        "win64": 275,
+        "linuxsteamrt64": 277
       },
       // teleport_trigger_debug cvar
       "StartTouch": {
