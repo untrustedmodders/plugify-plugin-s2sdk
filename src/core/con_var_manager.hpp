@@ -1,11 +1,11 @@
 #pragma once
 
 #include "listener_manager.hpp"
-#include <core/sdk/utils.h>
 
 #include <convar.h>
+#include <icvar.h>
 
-using ConVarChangeListenerCallback = void (*)(ConVarRefAbstract conVar, const plg::string& newValue, const plg::string& oldValue);
+using ConVarChangeListenerCallback = void (*)(uint64 conVarHandle, const plg::string& newValue, const plg::string& oldValue);
 
 enum class ConVarFlag : uint64_t {
 	None = 0, // The default, no flags at all
@@ -131,10 +131,10 @@ public:
 
 		auto& conVarInfo = *it->second;
 
-		if constexpr (std::is_same_v<T, bool>) {
-			conVarInfo.hook.Notify(*ref, *pNewValue ? "true" : "false", *pOldValue ? "true" : "false");
-		} else if constexpr (std::is_same_v<T, CUtlString>) {
-			conVarInfo.hook.Notify(*ref, pNewValue->Get(), pOldValue->Get());
+		if constexpr (std::is_same_v<T, CUtlString>) {
+			plg::string newValue(pNewValue->Get(), static_cast<size_t>(pNewValue->Length()));
+			plg::string oldValue(pOldValue->Get(), static_cast<size_t>(pOldValue->Length()));
+			conVarInfo.hook.Notify(*ref, newValue, oldValue);
 		} else if constexpr (std::is_same_v<T, Color>) {
 			plg::string newValue = std::format("{} {} {} {}", pNewValue->r(), pNewValue->g(), pNewValue->b(), pNewValue->a());
 			plg::string oldValue = std::format("{} {} {} {}", pOldValue->r(), pOldValue->g(), pOldValue->b(), pOldValue->a());
@@ -152,7 +152,9 @@ public:
 			plg::string oldValue = std::format("{} {} {} {}", pOldValue->x, pOldValue->y, pOldValue->z, pOldValue->w);
 			conVarInfo.hook.Notify(*ref, newValue, oldValue);
 		} else {
-			conVarInfo.hook.Notify(*ref, plg::to_string(*pNewValue), plg::to_string(*pOldValue));
+			plg::string newValue = std::format("{}", *pNewValue);
+			plg::string oldValue = std::format("{}", *pOldValue);
+			conVarInfo.hook.Notify(*ref, newValue, oldValue);
 		}
 	}
 
@@ -172,7 +174,7 @@ public:
 	);
 
 private:
-	static void UpdateConVarValue(const ConVarRefAbstract& conVar, std::string_view value);
+	static void UpdateConVarValue(ConVarRefAbstract conVar, std::string_view value);
 
 private:
 	plg::map<plg::string, ConVarInfoPtr, plg::case_insensitive_equal> m_cnvLookup;
@@ -194,3 +196,4 @@ inline ConVarFlag& operator|=(ConVarFlag& lhs, ConVarFlag rhs) noexcept {
 	lhs = lhs | rhs;
 	return lhs;
 }
+

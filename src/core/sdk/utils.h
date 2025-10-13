@@ -1,7 +1,6 @@
 #pragma once
 
 #include "schema.h"
-#include <convar.h>
 #include <eiface.h>
 #include <iserver.h>
 
@@ -12,16 +11,7 @@
 class CBaseEntity;
 class CServerSideClientBase;
 
-#include <variant>
-
-#include <icvar.h>
-#include <tier1/convar.h>
-
 namespace utils {
-	// ConVars
-	void SendConVarValue(CPlayerSlot slot, const char* name, const char* value);
-	void SendMultipleConVarValues(CPlayerSlot slot, const char** names, const char** values, uint32_t size);
-
 	CBaseEntity* FindEntityByClassname(CEntityInstance* start, const char* name);
 
 	CBasePlayerController* GetController(CBaseEntity* entity);
@@ -38,151 +28,23 @@ namespace utils {
 	// c can be PI (for radians) or 180.0 (for degrees);
 	float GetAngleDifference(float x, float y, float c, bool relative = false);
 
-	void NotifyConVar(const ConVarRefAbstract& conVar, const char* value);
-	void ReplicateConVar(const ConVarRefAbstract& conVar, const char* value);
-
-	inline void SetConVarString(ConVarRefAbstract conVar, const plg::string& value, bool replicate, bool notify) {
-		conVar.SetString(value.c_str(), -1);
-		if (replicate) ReplicateConVar(conVar, value.c_str());
-		if (notify) NotifyConVar(conVar, value.c_str());
-	}
-
-
-	inline void SetConVarStringByHandle(uint64 conVarHandle, const plg::string& value, bool replicate, bool notify) {
-		ConVarRef conVarRef(conVarHandle);
-	
-		if (!conVarRef.IsValidRef()) {
-			S2_LOG(LS_WARNING, "Invalid convar handle.\n");
-			return;
-		}
-
-		auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-		if (conVarData == nullptr) {
-			S2_LOG(LS_WARNING, "Invalid convar handle. Ensure the ConVarRef is correctly initialized and not null.\n");
-			return;
-		}
-
-		ConVarRefAbstract conVar(conVarRef, conVarData);
-
-		SetConVarString(conVar, value, replicate, notify);
-	}
-
-	template<typename T>
-	void SetConVarInternal(ConVarRefAbstract conVar, const T& value, bool replicate, bool notify) {
-		conVar.SetAs<T>(value);
-
-		if (notify || replicate) {
-			if constexpr (std::same_as<T, CUtlString>) {
-				if (replicate) ReplicateConVar(conVar, value.Get());
-				if (notify) NotifyConVar(conVar, value.Get());
-			} else {
-				std::string val;
-				if constexpr (std::is_same_v<T, Color>) {
-					val = std::format("{} {} {} {}", value.r(), value.g(), value.b(), value.a());
-				} else if constexpr (std::is_same_v<T, Vector2D>) {
-					val = std::format("{} {}", value.x, value.y);
-				} else if constexpr (std::is_same_v<T, Vector> || std::is_same_v<T, QAngle>) {
-					val = std::format("{} {} {}", value.x, value.y, value.z);
-				} else if constexpr (std::is_same_v<T, Vector4D>) {
-					val = std::format("{} {} {} {}", value.x, value.y, value.z, value.w);
-				} else {
-					val = std::to_string(value);
-				}
-				if (replicate) ReplicateConVar(conVar, val.c_str());
-				if (notify) NotifyConVar(conVar, val.c_str());
-			}
-		}
-	}
-
-	template<typename T>
-	void SetConVar(ConVarRefAbstract conVar, const T& value, bool replicate, bool notify) {
-		if (conVar.GetType() != TranslateConVarType<T>()) {
-			S2_LOGF(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
-			return;
-		}
-
-		SetConVarInternal<T>(conVar, value, replicate, notify);
-	}
-
-	template<typename T>
-	void SetConVarByHandle(uint64 conVarHandle, const T& value, bool replicate, bool notify) {
-		ConVarRef conVarRef(conVarHandle);
-
-		if (!conVarRef.IsValidRef()) {
-			S2_LOG(LS_WARNING, "Invalid convar handle.\n");
-			return;
-		}
-
-		auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-		if (conVarData == nullptr) {
-			S2_LOG(LS_WARNING, "Invalid convar handle. Ensure the ConVarRef is correctly initialized and not null.\n");
-			return;
-		}
-
-		ConVarRefAbstract conVar(conVarRef, conVarData);
-
-		SetConVar<T>(conVar, value, replicate, notify);
-	}
-
-	template<typename T>
-	void SetConVarValue(ConVarRefAbstract conVar, const plg::string& value) {
-		if (conVar.GetType() != TranslateConVarType<T>()) {
-			S2_LOGF(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
-			return;
-		}
-
-		conVar.SetString(value.c_str());
-	}
-
-	template<typename T>
-	T GetConVarValue(ConVarRefAbstract conVar) {
-		if (conVar.GetType() != TranslateConVarType<T>()) {
-			S2_LOGF(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
-			return {};
-		}
-
-		return conVar.GetAs<T>();
-	}
-
-	template<typename T>
-	T GetConVarValueByHandle(uint64 conVarHandle) {
-		ConVarRef conVarRef(conVarHandle);
-	
-		if (!conVarRef.IsValidRef()) {
-			S2_LOG(LS_WARNING, "Invalid convar handle.\n");
-			return {};
-		}
-
-		auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-		if (conVarData == nullptr) {
-			S2_LOG(LS_WARNING, "Invalid convar handle. Ensure the ConVarRef is correctly initialized and not null.\n");
-			return {};
-		}
-
-		ConVarRefAbstract conVar(conVarRef, conVarData);
-
-		return GetConVarValue<T>(conVar);
-	}
-
-	int SendCvarValueQueryToClient(CPlayerSlot slot, const char* cvarName, int queryCvarCookieOverride = -1);
-
 	// Print functions
 	bool CFormat(char* buffer, uint64_t buffer_size, const char* text);
 	void ClientPrintFilter(IRecipientFilter* filter, int msgDest, const char* msgName);
-	void PrintConsole(CPlayerSlot slot, const char* message);
-	void PrintChat(CPlayerSlot slot, const char* message);
-	void PrintCentre(CPlayerSlot slot, const char* message);
-	void PrintAlert(CPlayerSlot slot, const char* message);
-	void PrintHtmlCentre(CPlayerSlot slot, const char* message, int duration);// This one uses HTML formatting.
-	void PrintConsoleAll(const char* message);
-	void PrintChatAll(const char* message);
-	void PrintCentreAll(const char* message);
-	void PrintAlertAll(const char* message);
-	void PrintHtmlCentreAll(const char* message, int duration);// This one uses HTML formatting.
+	void PrintConsole(CPlayerSlot slot, std::string_view message);
+	void PrintChat(CPlayerSlot slot, std::string_view message);
+	void PrintCentre(CPlayerSlot slot, std::string_view message);
+	void PrintAlert(CPlayerSlot slot, std::string_view message);
+	void PrintHtmlCentre(CPlayerSlot slot, std::string_view message, int duration);// This one uses HTML formatting.
+	void PrintConsoleAll(std::string_view message);
+	void PrintChatAll(std::string_view message);
+	void PrintCentreAll(std::string_view message);
+	void PrintAlertAll(std::string_view message);
+	void PrintHtmlCentreAll(std::string_view message, int duration);// This one uses HTML formatting.
 
 	// Color print
-	void CPrintChat(CPlayerSlot slot, const char* message);
-	void CPrintChatAll(const char* message);
+	void CPrintChat(CPlayerSlot slot, std::string_view message);
+	void CPrintChatAll(std::string_view message);
 
 	// Sounds
 	void PlaySoundToClient(CPlayerSlot player, int channel, const char* soundName, float volume, soundlevel_t soundLevel, int flags, int pitch, const Vector& origin, float soundTime);

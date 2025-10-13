@@ -135,10 +135,11 @@ CFormatResult AddSpace(CFormatContext* ctx) {
 bool utils::CFormat(char* buffer, uint64_t buffer_size, const char* text) {
 	assert(buffer_size != 0);
 
-	CFormatContext ctx;
-	ctx.current = text;
-	ctx.result = buffer;
-	ctx.result_end = buffer + buffer_size;
+	CFormatContext ctx {
+		.current = text,
+		.result = buffer,
+		.result_end = buffer + buffer_size,
+	};
 
 	if (AddSpace(&ctx) != CFORMAT_OK)
 		return false;
@@ -181,12 +182,12 @@ bool utils::CFormat(char* buffer, uint64_t buffer_size, const char* text) {
 	return true;
 }
 
-void ClientPrint(std::optional<CPlayerSlot> playerSlot, HudDest dest, const char* message) {
+void ClientPrint(std::optional<CPlayerSlot> playerSlot, HudDest dest, std::string_view message) {
 	INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("TextMsg");
 	auto* data = pNetMsg->AllocateMessage()->As<CUserMessageTextMsg_t>();
 
 	data->set_dest(static_cast<uint32_t>(dest));
-	data->add_param(message);
+	data->add_param(std::string(message));
 
 	if (playerSlot){
 		data->Send(*playerSlot);
@@ -196,29 +197,29 @@ void ClientPrint(std::optional<CPlayerSlot> playerSlot, HudDest dest, const char
 	delete data;
 }
 
-void utils::PrintConsole(CPlayerSlot slot, const char* message) {
+void utils::PrintConsole(CPlayerSlot slot, std::string_view message) {
 	ClientPrint(slot, HudDest::Console, message);
 }
 
-void utils::PrintChat(CPlayerSlot slot, const char* message) {
+void utils::PrintChat(CPlayerSlot slot, std::string_view message) {
 	ClientPrint(slot, HudDest::Chat, message);
 }
 
-void utils::PrintCentre(CPlayerSlot slot, const char* message) {
+void utils::PrintCentre(CPlayerSlot slot, std::string_view message) {
 	ClientPrint(slot, HudDest::Center, message);
 }
 
-void utils::PrintAlert(CPlayerSlot slot, const char* message) {
+void utils::PrintAlert(CPlayerSlot slot, std::string_view message) {
 	ClientPrint(slot, HudDest::Alert, message);
 }
 
-void utils::PrintHtmlCentre(CPlayerSlot slot, const char* message, int duration) {
+void utils::PrintHtmlCentre(CPlayerSlot slot, std::string_view message, int duration) {
 	IGameEvent* event = g_pGameEventManager->CreateEvent("show_survival_respawn_status");
 	if (!event) {
 		return;
 	}
 
-	event->SetString("loc_token", message);
+	event->SetString("loc_token", message.data());
 	event->SetInt("duration", duration);
 	event->SetInt("userid", slot);
 
@@ -228,47 +229,47 @@ void utils::PrintHtmlCentre(CPlayerSlot slot, const char* message, int duration)
 	g_pGameEventManager->FreeEvent(event);
 }
 
-void utils::PrintConsoleAll(const char* message) {
+void utils::PrintConsoleAll(std::string_view message) {
 	ClientPrint(std::nullopt, HudDest::Console, message);
 }
 
-void utils::PrintChatAll(const char* message) {
+void utils::PrintChatAll(std::string_view message) {
 	ClientPrint(std::nullopt, HudDest::Chat, message);
 }
 
-void utils::PrintCentreAll(const char* message) {
+void utils::PrintCentreAll(std::string_view message) {
 	ClientPrint(std::nullopt, HudDest::Center, message);
 }
 
-void utils::PrintAlertAll(const char* message) {
+void utils::PrintAlertAll(std::string_view message) {
 	ClientPrint(std::nullopt, HudDest::Alert, message);
 }
 
-void utils::PrintHtmlCentreAll(const char* message, int duration) {
+void utils::PrintHtmlCentreAll(std::string_view message, int duration) {
 	IGameEvent* event = g_pGameEventManager->CreateEvent("show_survival_respawn_status", true);
 	if (!event) {
 		return;
 	}
 
-	event->SetString("loc_token", message);
+	event->SetString("loc_token", message.data());
 	event->SetInt("duration", duration);
 	event->SetInt("userid", -1);
 
 	g_pGameEventManager->FireEvent(event);
 }
 
-void utils::CPrintChat(CPlayerSlot slot, const char* message) {
+void utils::CPrintChat(CPlayerSlot slot, std::string_view message) {
 	char coloredBuffer[MAX_LOGGING_MESSAGE_LENGTH];
-	if (CFormat(coloredBuffer, sizeof(coloredBuffer), message)) {
+	if (CFormat(coloredBuffer, sizeof(coloredBuffer), message.data())) {
 		ClientPrint(slot, HudDest::Chat, coloredBuffer);
 	} else {
 		S2_LOGF(LS_WARNING, "utils::CPrintChat did not have enough space to print: {}\n", message);
 	}
 }
 
-void utils::CPrintChatAll(const char* message) {
+void utils::CPrintChatAll(std::string_view message) {
 	char coloredBuffer[MAX_LOGGING_MESSAGE_LENGTH]; 
-	if (CFormat(coloredBuffer, sizeof(coloredBuffer), message)) {
+	if (CFormat(coloredBuffer, sizeof(coloredBuffer), message.data())) {
 		ClientPrint(std::nullopt, HudDest::Chat, coloredBuffer);
 	} else {
 		S2_LOGF(LS_WARNING, "utils::CPrintChatAll did not have enough space to print: {}\n", message);

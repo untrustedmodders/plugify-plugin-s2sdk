@@ -16,8 +16,6 @@
 
 #include <tier0/memdbgon.h>
 
-#undef CreateEvent
-
 /*bool utils::TraceLine(const Vector& vecStart, const Vector& vecEnd, CEntityInstance* ignore1, CGameTrace* tr, uint64 traceLayer, uint64 excludeLayer) {
 	Ray_t ray;
 	CTraceFilter filter;
@@ -169,78 +167,6 @@ float utils::GetAngleDifference(float source, float target, float c, bool relati
 	if (relative)
 		return fmod((fmod(target - source, 2 * c) + 3 * c), 2 * c) - c;
 	return fmod(fabs(target - source) + c, 2 * c) - c;
-}
-
-void utils::NotifyConVar(const ConVarRefAbstract& conVar, const char* value) {
-	IGameEvent* pEvent = g_pGameEventManager->CreateEvent("server_cvar");
-	if (pEvent == nullptr) {
-		return;
-	}
-
-	pEvent->SetString("cvarname", conVar.GetName());
-	if (conVar.IsFlagSet(FCVAR_PROTECTED)) {
-		pEvent->SetString("cvarvalue", "***PROTECTED***");
-	} else {
-		pEvent->SetString("cvarvalue", value);
-	}
-
-	g_pGameEventManager->FireEvent(pEvent);
-}
-
-void utils::ReplicateConVar(const ConVarRefAbstract& conVar, const char* value) {
-	if (!gpGlobals)
-		return;
-
-	for (int i = 0; i < gpGlobals->maxClients; ++i) {
-		utils::SendConVarValue(CPlayerSlot(i), conVar.GetName(), value);
-	}
-}
-
-void utils::SendConVarValue(CPlayerSlot slot, const char* name, const char* value) {
-	if (g_pEngineServer->GetPlayerNetInfo(slot)) {
-		static INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("CNETMsg_SetConVar");
-		auto msg = pNetMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
-		CMsg_CVars_CVar* data = msg->mutable_convars()->add_cvars();
-		data->set_name(name);
-		data->set_value(value);
-
-		msg->Send(slot);
-		delete msg;
-	}
-}
-
-void utils::SendMultipleConVarValues(CPlayerSlot slot, const char** names, const char** value, uint32_t size) {
-	if (g_pEngineServer->GetPlayerNetInfo(slot)) {
-		static INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("CNETMsg_SetConVar");
-		auto msg = pNetMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
-		for (uint32_t i = 0; i < size; ++i) {
-			CMsg_CVars_CVar* data = msg->mutable_convars()->add_cvars();
-			data->set_name(names[i]);
-			data->set_value(value[i]);
-		}
-		msg->Send(slot);
-		delete msg;
-	}
-}
-
-int utils::SendCvarValueQueryToClient(CPlayerSlot slot, const char* cvarName, int queryCvarCookieOverride) {
-	if (g_pEngineServer->GetPlayerNetInfo(slot)) {
-		static INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("CSVCMsg_GetCvarValue");
-		static int iQueryCvarCookieCounter = 0;
-		int queryCvarCookie = queryCvarCookieOverride == -1 ? ++iQueryCvarCookieCounter : queryCvarCookieOverride;
-
-		auto msg = pNetMsg->AllocateMessage()->As<CSVCMsg_GetCvarValue_t>();
-		msg->set_cookie(queryCvarCookie);
-		msg->set_cvar_name(cvarName);
-
-		msg->Send(slot);
-
-		delete msg;
-
-		return queryCvarCookie;
-	}
-
-	return -1;
 }
 
 bool utils::IsSpawnValid(const Vector& origin) {

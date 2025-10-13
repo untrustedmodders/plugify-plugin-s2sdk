@@ -4,6 +4,7 @@
 #include <core/core_config.hpp>
 #include <core/game_config.hpp>
 #include <core/sdk/utils.h>
+#include <core/sdk/cvars.h>
 #include <core/sdk/virtual.h>
 #include <plg/plugin.hpp>
 #include <plugin_export.h>
@@ -394,20 +395,12 @@ extern "C" PLUGIN_API void UnhookConVarChange(const plg::string& name, ConVarCha
  * @return True if the flag is set; otherwise, false.
  */
 extern "C" PLUGIN_API bool IsConVarFlagSet(uint64 conVarHandle, ConVarFlag flag) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		return conVar->IsFlagSet(static_cast<int64>(flag));
+	} else {
+		S2_LOG(LS_WARNING, conVar.error().c_str());
 		return false;
 	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return false;
-	}
-
-	return conVarData->IsFlagSet(static_cast<int64>(flag));
 }
 
 /**
@@ -417,20 +410,11 @@ extern "C" PLUGIN_API bool IsConVarFlagSet(uint64 conVarHandle, ConVarFlag flag)
  * @param flags The flags to be added.
  */
 extern "C" PLUGIN_API void AddConVarFlags(uint64 conVarHandle, ConVarFlag flags) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
-		return;
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		conVar->AddFlags(static_cast<int64>(flags));
+	} else {
+		S2_LOG(LS_WARNING, conVar.error().c_str());
 	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return;
-	}
-
-	conVarData->AddFlags(static_cast<int64>(flags));
 }
 
 /**
@@ -440,20 +424,11 @@ extern "C" PLUGIN_API void AddConVarFlags(uint64 conVarHandle, ConVarFlag flags)
  * @param flags The flags to be removed.
  */
 extern "C" PLUGIN_API void RemoveConVarFlags(uint64 conVarHandle, ConVarFlag flags) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
-		return;
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		conVar->RemoveFlags(static_cast<int64>(flags));
+	} else {
+		S2_LOG(LS_WARNING, conVar.error().c_str());
 	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return;
-	}
-
-	conVarData->RemoveFlags(static_cast<int64>(flags));
 }
 
 /**
@@ -463,20 +438,12 @@ extern "C" PLUGIN_API void RemoveConVarFlags(uint64 conVarHandle, ConVarFlag fla
  * @return The current flags set on the console variable.
  */
 extern "C" PLUGIN_API ConVarFlag GetConVarFlags(uint64 conVarHandle) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		return static_cast<ConVarFlag>(conVar->GetFlags());
+	} else {
+		S2_LOG(LS_WARNING, conVar.error().c_str());
 		return ConVarFlag::None;
 	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return ConVarFlag::None;
-	}
-
-	return static_cast<ConVarFlag>(conVarData->GetFlags());
 }
 
 /**
@@ -487,27 +454,18 @@ extern "C" PLUGIN_API ConVarFlag GetConVarFlags(uint64 conVarHandle) {
  * @return The bound value.
  */
 extern "C" PLUGIN_API plg::string GetConVarBounds(uint64 conVarHandle, bool max) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
-		return {};
-	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return {};
-	}
-
-	CBufferStringN<512> buffer;
-
-	if (max) {
-		conVarData->MaxValueToString(buffer);
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		CBufferStringN<512> buffer;
+		if (max) {
+			conVar->GetConVarData()->MaxValueToString(buffer);
+		} else {
+			conVar->GetConVarData()->MinValueToString(buffer);
+		}
+		return { buffer.Get(), static_cast<size_t>(buffer.Length()) };
 	} else {
-		conVarData->MinValueToString(buffer);
+		S2_LOG(LS_WARNING, conVar.error().c_str());
+		return {};
 	}
-	return buffer.Get();
 }
 
 /**
@@ -518,23 +476,14 @@ extern "C" PLUGIN_API plg::string GetConVarBounds(uint64 conVarHandle, bool max)
  * @param value The value to set as the bound.
  */
 extern "C" PLUGIN_API void SetConVarBounds(uint64 conVarHandle, bool max, const plg::string& value) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
-		return;
-	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return;
-	}
-
-	if (max) {
-		conVarData->UpdateMinValueString(value.c_str());
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		if (max) {
+			conVar->GetConVarData()->UpdateMinValueString(value.c_str());
+		} else {
+			conVar->GetConVarData()->UpdateMaxValueString(value.c_str());
+		}
 	} else {
-		conVarData->UpdateMaxValueString(value.c_str());
+		S2_LOG(LS_WARNING, conVar.error().c_str());
 	}
 }
 
@@ -545,24 +494,14 @@ extern "C" PLUGIN_API void SetConVarBounds(uint64 conVarHandle, bool max, const 
  * @return The output value in string format.
  */
 extern "C" PLUGIN_API plg::string GetConVarDefault(uint64 conVarHandle) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		CBufferStringN<512> buffer;
+		conVar->GetConVarData()->DefaultValueToString(buffer);
+		return { buffer.Get(), static_cast<size_t>(buffer.Length()) };
+	} else {
+		S2_LOG(LS_WARNING, conVar.error().c_str());
 		return {};
 	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return {};
-	}
-
-	CBufferStringN<512> buffer;
-
-	conVarData->DefaultValueToString(buffer);
-
-	return buffer.Get();
 }
 
 /**
@@ -572,24 +511,14 @@ extern "C" PLUGIN_API plg::string GetConVarDefault(uint64 conVarHandle) {
  * @return The output value in string format.
  */
 extern "C" PLUGIN_API plg::string GetConVarValue(uint64 conVarHandle) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		CBufferStringN<512> buffer;
+		conVar->GetConVarData()->ValueToString(-1, buffer);
+		return { buffer.Get(), static_cast<size_t>(buffer.Length()) };
+	} else {
+		S2_LOG(LS_WARNING, conVar.error().c_str());
 		return {};
 	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return {};
-	}
-
-	CBufferStringN<512> buffer;
-
-	conVarData->ValueToString(-1, buffer);
-
-	return buffer.Get();
 }
 
 /**
@@ -599,20 +528,7 @@ extern "C" PLUGIN_API plg::string GetConVarValue(uint64 conVarHandle) {
  * @return The output value.
  */
 extern "C" PLUGIN_API plg::any GetConVar(uint64 conVarHandle) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
-		return {};
-	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return {};
-	}
-
-	return conVarData->ValueOrDefault(-1);
+	return cvars::GetConVarValueByHandle(conVarHandle);
 }
 
 /**
@@ -622,7 +538,7 @@ extern "C" PLUGIN_API plg::any GetConVar(uint64 conVarHandle) {
  * @return The current boolean value of the console variable.
  */
 extern "C" PLUGIN_API bool GetConVarBool(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<bool>(conVarHandle);
+	return cvars::GetConVarValueByHandle<bool>(conVarHandle);
 }
 
 /**
@@ -632,7 +548,7 @@ extern "C" PLUGIN_API bool GetConVarBool(uint64 conVarHandle) {
  * @return The current int16 value of the console variable.
  */
 extern "C" PLUGIN_API int16 GetConVarInt16(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<int16>(conVarHandle);
+	return cvars::GetConVarValueByHandle<int16>(conVarHandle);
 }
 
 /**
@@ -642,7 +558,7 @@ extern "C" PLUGIN_API int16 GetConVarInt16(uint64 conVarHandle) {
  * @return The current uint16 value of the console variable.
  */
 extern "C" PLUGIN_API uint16 GetConVarUInt16(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<uint16>(conVarHandle);
+	return cvars::GetConVarValueByHandle<uint16>(conVarHandle);
 }
 
 /**
@@ -652,7 +568,7 @@ extern "C" PLUGIN_API uint16 GetConVarUInt16(uint64 conVarHandle) {
  * @return The current int32 value of the console variable.
  */
 extern "C" PLUGIN_API int32 GetConVarInt32(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<int32>(conVarHandle);
+	return cvars::GetConVarValueByHandle<int32>(conVarHandle);
 }
 
 /**
@@ -662,7 +578,7 @@ extern "C" PLUGIN_API int32 GetConVarInt32(uint64 conVarHandle) {
  * @return The current uint32 value of the console variable.
  */
 extern "C" PLUGIN_API uint32 GetConVarUInt32(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<uint32>(conVarHandle);
+	return cvars::GetConVarValueByHandle<uint32>(conVarHandle);
 }
 
 /**
@@ -672,7 +588,7 @@ extern "C" PLUGIN_API uint32 GetConVarUInt32(uint64 conVarHandle) {
  * @return The current int64 value of the console variable.
  */
 extern "C" PLUGIN_API int64 GetConVarInt64(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<int64>(conVarHandle);
+	return cvars::GetConVarValueByHandle<int64>(conVarHandle);
 }
 
 /**
@@ -682,7 +598,7 @@ extern "C" PLUGIN_API int64 GetConVarInt64(uint64 conVarHandle) {
  * @return The current uint64 value of the console variable.
  */
 extern "C" PLUGIN_API uint64 GetConVarUInt64(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<uint64>(conVarHandle);
+	return cvars::GetConVarValueByHandle<uint64>(conVarHandle);
 }
 
 /**
@@ -692,7 +608,7 @@ extern "C" PLUGIN_API uint64 GetConVarUInt64(uint64 conVarHandle) {
  * @return The current float value of the console variable.
  */
 extern "C" PLUGIN_API float GetConVarFloat(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<float>(conVarHandle);
+	return cvars::GetConVarValueByHandle<float>(conVarHandle);
 }
 
 /**
@@ -702,7 +618,7 @@ extern "C" PLUGIN_API float GetConVarFloat(uint64 conVarHandle) {
  * @return The current double value of the console variable.
  */
 extern "C" PLUGIN_API double GetConVarDouble(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<double>(conVarHandle);
+	return cvars::GetConVarValueByHandle<double>(conVarHandle);
 }
 
 /**
@@ -712,7 +628,8 @@ extern "C" PLUGIN_API double GetConVarDouble(uint64 conVarHandle) {
  * @return The current string value of the console variable.
  */
 extern "C" PLUGIN_API plg::string GetConVarString(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<CUtlString>(conVarHandle).Get();
+	const CUtlString& str = cvars::GetConVarValueByHandle<CUtlString>(conVarHandle);
+	return { str.Get(), static_cast<size_t>(str.Length()) };
 }
 
 /**
@@ -722,7 +639,8 @@ extern "C" PLUGIN_API plg::string GetConVarString(uint64 conVarHandle) {
  * @return The current Color value of the console variable.
  */
 extern "C" PLUGIN_API int GetConVarColor(uint64 conVarHandle) {
-	return utils::GetConVarValueByHandle<Color>(conVarHandle).GetRawColor();
+	const Color& color = cvars::GetConVarValueByHandle<Color>(conVarHandle);
+	return color.GetRawColor();
 }
 
 /**
@@ -732,7 +650,7 @@ extern "C" PLUGIN_API int GetConVarColor(uint64 conVarHandle) {
  * @return The current Vector2D value of the console variable.
  */
 extern "C" PLUGIN_API plg::vec2 GetConVarVector2(uint64 conVarHandle) {
-	const Vector2D& vec = utils::GetConVarValueByHandle<Vector2D>(conVarHandle);
+	const Vector2D& vec = cvars::GetConVarValueByHandle<Vector2D>(conVarHandle);
 	return *reinterpret_cast<const plg::vec2*>(&vec);
 }
 
@@ -743,7 +661,7 @@ extern "C" PLUGIN_API plg::vec2 GetConVarVector2(uint64 conVarHandle) {
  * @return The current Vector value of the console variable.
  */
 extern "C" PLUGIN_API plg::vec3 GetConVarVector(uint64 conVarHandle) {
-	const Vector& vec = utils::GetConVarValueByHandle<Vector>(conVarHandle);
+	const Vector& vec = cvars::GetConVarValueByHandle<Vector>(conVarHandle);
 	return *reinterpret_cast<const plg::vec3*>(&vec);
 }
 
@@ -754,7 +672,7 @@ extern "C" PLUGIN_API plg::vec3 GetConVarVector(uint64 conVarHandle) {
  * @return The current Vector4D value of the console variable.
  */
 extern "C" PLUGIN_API plg::vec4 GetConVarVector4(uint64 conVarHandle) {
-	const Vector4D& vec = utils::GetConVarValueByHandle<Vector4D>(conVarHandle);
+	const Vector4D& vec = cvars::GetConVarValueByHandle<Vector4D>(conVarHandle);
 	return *reinterpret_cast<const plg::vec4*>(&vec);
 }
 
@@ -765,7 +683,7 @@ extern "C" PLUGIN_API plg::vec4 GetConVarVector4(uint64 conVarHandle) {
  * @return The current QAngle value of the console variable.
  */
 extern "C" PLUGIN_API plg::vec3 GetConVarQAngle(uint64 conVarHandle) {
-	const QAngle& ang = utils::GetConVarValueByHandle<QAngle>(conVarHandle);
+	const QAngle& ang = cvars::GetConVarValueByHandle<QAngle>(conVarHandle);
 	return *reinterpret_cast<const plg::vec3*>(&ang);
 }
 
@@ -778,7 +696,7 @@ extern "C" PLUGIN_API plg::vec3 GetConVarQAngle(uint64 conVarHandle) {
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarValue(uint64 conVarHandle, const plg::string& value, bool replicate, bool notify) {
-	utils::SetConVarStringByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarStringByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -790,133 +708,7 @@ extern "C" PLUGIN_API void SetConVarValue(uint64 conVarHandle, const plg::string
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVar(uint64 conVarHandle, const plg::any& value, bool replicate, bool notify) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
-		return;
-	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return;
-	}
-
-	ConVarRefAbstract conVar(conVarRef, conVarData);
-
-	switch (conVarData->GetType()) {
-		case EConVarType_Bool:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>)
-					utils::SetConVar(conVar, static_cast<bool>(v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_Int16:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>)
-					utils::SetConVar(conVar, static_cast<int16>(v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_UInt16:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>)
-					utils::SetConVar(conVar, static_cast<uint16>(v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_Int32:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>)
-					utils::SetConVar(conVar, static_cast<int32>(v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_UInt32:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>)
-					utils::SetConVar(conVar, static_cast<uint32>(v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_Int64:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>)
-					utils::SetConVar(conVar, static_cast<int64>(v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_UInt64:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>)
-					utils::SetConVar(conVar, static_cast<uint64>(v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_Float32:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>)
-					utils::SetConVar(conVar, static_cast<float>(v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_Float64:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>)
-					utils::SetConVar(conVar, static_cast<double>(v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_String:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_same_v<T, plg::string>)
-					utils::SetConVar(conVar, CUtlString(v.c_str(), static_cast<int>(v.size())), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_Color:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_arithmetic_v<T>) {
-					int color = static_cast<int>(v);
-					utils::SetConVar(conVar, *reinterpret_cast<Color*>(&color), replicate, notify);
-				}
-			}, value);
-			break;
-		case EConVarType_Vector2:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_same_v<T, plg::vec2> || std::is_same_v<T, plg::vec3> || std::is_same_v<T, plg::vec4>)
-					utils::SetConVar<Vector2D>(conVar, *reinterpret_cast<const Vector2D*>(&v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_Vector3:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_same_v<T, plg::vec3> || std::is_same_v<T, plg::vec4>)
-					utils::SetConVar<Vector>(conVar, *reinterpret_cast<const Vector*>(&v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_Vector4:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_same_v<T, plg::vec4>)
-					utils::SetConVar<Vector4D>(conVar, *reinterpret_cast<const Vector4D*>(&v), replicate, notify);
-			}, value);
-			break;
-		case EConVarType_Qangle:
-			plg::visit([&](const auto& v) {
-				using T = std::decay_t<decltype(v)>;
-				if constexpr (std::is_same_v<T, plg::vec3> || std::is_same_v<T, plg::vec4>)
-					utils::SetConVar<QAngle>(conVar, *reinterpret_cast<const QAngle*>(&v), replicate, notify);
-			}, value);
-			break;
-		default:
-			S2_LOGF(LS_WARNING, "Invalid convar type: {}\n", conVarHandle);
-			return;
-	}
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -928,7 +720,7 @@ extern "C" PLUGIN_API void SetConVar(uint64 conVarHandle, const plg::any& value,
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarBool(uint64 conVarHandle, bool value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -940,7 +732,7 @@ extern "C" PLUGIN_API void SetConVarBool(uint64 conVarHandle, bool value, bool r
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarInt16(uint64 conVarHandle, int16 value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -952,7 +744,7 @@ extern "C" PLUGIN_API void SetConVarInt16(uint64 conVarHandle, int16 value, bool
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarUInt16(uint64 conVarHandle, uint16 value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -964,7 +756,7 @@ extern "C" PLUGIN_API void SetConVarUInt16(uint64 conVarHandle, uint16 value, bo
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarInt32(uint64 conVarHandle, int32 value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -976,7 +768,7 @@ extern "C" PLUGIN_API void SetConVarInt32(uint64 conVarHandle, int32 value, bool
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarUInt32(uint64 conVarHandle, uint32 value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -988,7 +780,7 @@ extern "C" PLUGIN_API void SetConVarUInt32(uint64 conVarHandle, uint32 value, bo
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarInt64(uint64 conVarHandle, int64 value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -1000,7 +792,7 @@ extern "C" PLUGIN_API void SetConVarInt64(uint64 conVarHandle, int64 value, bool
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarUInt64(uint64 conVarHandle, uint64 value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -1012,7 +804,7 @@ extern "C" PLUGIN_API void SetConVarUInt64(uint64 conVarHandle, uint64 value, bo
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarFloat(uint64 conVarHandle, float value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -1024,7 +816,7 @@ extern "C" PLUGIN_API void SetConVarFloat(uint64 conVarHandle, float value, bool
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarDouble(uint64 conVarHandle, double value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -1036,7 +828,7 @@ extern "C" PLUGIN_API void SetConVarDouble(uint64 conVarHandle, double value, bo
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarString(uint64 conVarHandle, const plg::string& value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, CUtlString(value.c_str(), static_cast<int>(value.size())), replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, CUtlString(value.c_str(), static_cast<int>(value.size())), replicate, notify);
 }
 
 /**
@@ -1048,7 +840,7 @@ extern "C" PLUGIN_API void SetConVarString(uint64 conVarHandle, const plg::strin
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarColor(uint64 conVarHandle, int value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, *reinterpret_cast<Color*>(&value), replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, *reinterpret_cast<Color*>(&value), replicate, notify);
 }
 
 /**
@@ -1060,7 +852,7 @@ extern "C" PLUGIN_API void SetConVarColor(uint64 conVarHandle, int value, bool r
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarVector2(uint64 conVarHandle, const Vector2D& value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -1072,7 +864,7 @@ extern "C" PLUGIN_API void SetConVarVector2(uint64 conVarHandle, const Vector2D&
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarVector3(uint64 conVarHandle, const Vector& value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -1084,7 +876,7 @@ extern "C" PLUGIN_API void SetConVarVector3(uint64 conVarHandle, const Vector& v
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarVector4(uint64 conVarHandle, const Vector4D& value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -1096,7 +888,7 @@ extern "C" PLUGIN_API void SetConVarVector4(uint64 conVarHandle, const Vector4D&
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarQAngle(uint64 conVarHandle, const QAngle& value, bool replicate, bool notify) {
-	utils::SetConVarByHandle(conVarHandle, value, replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, value, replicate, notify);
 }
 
 /**
@@ -1107,25 +899,11 @@ extern "C" PLUGIN_API void SetConVarQAngle(uint64 conVarHandle, const QAngle& va
  * @param value The value to send to the client.
  */
 extern "C" PLUGIN_API void SendConVarValue(int playerSlot, uint64 conVarHandle, const plg::string& value) {
-	ConVarRef conVarRef(conVarHandle);
-
-	if (!conVarRef.IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}\n", conVarHandle);
-		return;
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		cvars::SendConVarValue(playerSlot, conVar->GetName(), value.c_str());
+	} else {
+		S2_LOG(LS_WARNING, conVar.error().c_str());
 	}
-
-	if (!utils::IsPlayerSlot(playerSlot)) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SendConVarValue' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto* conVarData = g_pCVar->GetConVarData(conVarRef);
-	if (conVarData == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid convar handle: {}. Ensure the ConVarRef is correctly initialized and not null.\n", conVarHandle);
-		return;
-	}
-
-	utils::SendConVarValue(playerSlot, conVarData->GetName(), value.c_str());
 }
 
 /**
