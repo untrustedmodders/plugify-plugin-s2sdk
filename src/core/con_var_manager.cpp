@@ -289,7 +289,7 @@ void ConVarManager::UpdateConVarValue(
 		}
 
 		case EConVarType_Int16: {
-			if (const auto number = utils::StringToNumber<int16_t>(value)) {
+			if (const auto number = utils::StringToNumber<int16>(value)) {
 				utils::SetConVar(conVar, *number, replicate, notify);
 			} else {
 				S2_LOGF(LS_WARNING, "Failed to parse Int16 value for ConVar '{}': '{}' is not a valid integer (range: {} to {})\n",
@@ -299,7 +299,7 @@ void ConVarManager::UpdateConVarValue(
 		}
 
 		case EConVarType_UInt16: {
-			if (const auto number = utils::StringToNumber<uint16_t>(value)) {
+			if (const auto number = utils::StringToNumber<uint16>(value)) {
 				utils::SetConVar(conVar, *number, replicate, notify);
 			} else {
 				S2_LOGF(LS_WARNING, "Failed to parse UInt16 value for ConVar '{}': '{}' is not a valid unsigned integer (range: 0 to {})\n",
@@ -309,7 +309,7 @@ void ConVarManager::UpdateConVarValue(
 		}
 
 		case EConVarType_Int32: {
-			if (const auto number = utils::StringToNumber<int32_t>(value)) {
+			if (const auto number = utils::StringToNumber<int32>(value)) {
 				utils::SetConVar(conVar, *number, replicate, notify);
 			} else {
 				S2_LOGF(LS_WARNING, "Failed to parse Int32 value for ConVar '{}': '{}' is not a valid integer (range: {} to {})\n",
@@ -319,7 +319,7 @@ void ConVarManager::UpdateConVarValue(
 		}
 
 		case EConVarType_UInt32: {
-			if (const auto number = utils::StringToNumber<uint32_t>(value)) {
+			if (const auto number = utils::StringToNumber<uint32>(value)) {
 				utils::SetConVar(conVar, *number, replicate, notify);
 			} else {
 				S2_LOGF(LS_WARNING, "Failed to parse UInt32 value for ConVar '{}': '{}' is not a valid unsigned integer (range: 0 to {})\n",
@@ -329,7 +329,7 @@ void ConVarManager::UpdateConVarValue(
 		}
 
 		case EConVarType_Int64: {
-			if (const auto number = utils::StringToNumber<int64_t>(value)) {
+			if (const auto number = utils::StringToNumber<int64>(value)) {
 				utils::SetConVar(conVar, *number, replicate, notify);
 			} else {
 				S2_LOGF(LS_WARNING, "Failed to parse Int64 value for ConVar '{}': '{}' is not a valid integer (range: {} to {})\n",
@@ -339,7 +339,7 @@ void ConVarManager::UpdateConVarValue(
 		}
 
 		case EConVarType_UInt64: {
-			if (const auto number = utils::StringToNumber<uint64_t>(value)) {
+			if (const auto number = utils::StringToNumber<uint64>(value)) {
 				utils::SetConVar(conVar, *number, replicate, notify);
 			} else {
 				S2_LOGF(LS_WARNING, "Failed to parse UInt64 value for ConVar '{}': '{}' is not a valid unsigned integer (range: 0 to {})\n",
