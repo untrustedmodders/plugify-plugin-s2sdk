@@ -299,7 +299,7 @@ const fs::path& utils::GameDirectory() {
 	return gameDirectory;
 }
 
-std::vector<std::string_view> utils::split(std::string_view strv, std::string_view delims) {
+std::vector<std::string_view> utils::SplitString(std::string_view strv, std::string_view delims) {
 	std::vector<std::string_view> output;
 	size_t first = 0;
 

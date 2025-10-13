@@ -8176,6 +8176,43 @@
         "description": "A cookie that uniquely identifies the query. Returns -1 on failure, such as when used on a bot."
       }
     },
+
+    {
+      "name": "AutoExecConfig",
+      "group": "Cvars",
+      "description": " Specifies that the given config file should be executed.",
+      "funcName": "AutoExecConfig",
+      "paramTypes": [
+        {
+          "name": "conVarHandles",
+          "type": "uint64[]",
+          "ref": false,
+          "description": "The index of the fake client to replicate the value to."
+        },
+        {
+          "name": "autoCreate",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, and the config file does not exist, such a config file will be automatically created and populated with information from the plugin's registered cvars."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "Name of the config file, excluding the .cfg extension. Cannot be empty."
+        },
+        {
+          "name": "folder",
+          "type": "string",
+          "ref": false,
+          "description": "Folder under cfg/ to use. By default this is \"plugify.\" Can be empty."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True on success, false otherwise."
+      }
+    },
     {
       "name": "GetServerLanguage",
       "group": "Cvars",

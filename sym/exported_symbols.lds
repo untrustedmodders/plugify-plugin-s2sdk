@@ -168,6 +168,7 @@ SendConVarValue
 GetClientConVarValue
 SetFakeClientConVarValue
 QueryClientConVar
+AutoExecConfig
 GetServerLanguage
 
 FindModule

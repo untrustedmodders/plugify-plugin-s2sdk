@@ -171,6 +171,7 @@
         SetFakeClientConVarValue;
         QueryClientConVar;
         GetServerLanguage;
+        AutoExecConfig;
 
         FindModule;
         FindInterface;

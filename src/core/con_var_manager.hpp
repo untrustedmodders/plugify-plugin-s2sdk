@@ -124,7 +124,7 @@ public:
 	void UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
 
 	template<typename T>
-	static void ChangeCallback(CConVar<T>* ref, const CSplitScreenSlot slot, const T* pNewValue, const T* pOldValue) {
+	static void ChangeCallback(CConVar<T>* ref, const CSplitScreenSlot, const T* pNewValue, const T* pOldValue) {
 		auto it = g_ConVarManager.m_cnvCache.find(ref);
 		if (it == g_ConVarManager.m_cnvCache.end())
 			return;
@@ -156,7 +156,23 @@ public:
 		}
 	}
 
-	static void ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot slot, const char* pNewValue, const char* pOldValue, void*);
+	static void ChangeGlobal(
+		ConVarRefAbstract* ref,
+		CSplitScreenSlot slot,
+		const char* pNewValue,
+		const char* pOldValue,
+		void*
+	);
+
+	static bool AutoExecConfig(
+	    std::span<const uint64> conVarHandles,
+	    bool autoCreate,
+	    std::string_view name,
+	    std::string_view folder
+	);
+
+private:
+	static void UpdateConVarValue(const ConVarRefAbstract& conVar, std::string_view value);
 
 private:
 	plg::map<plg::string, ConVarInfoPtr, plg::case_insensitive_equal> m_cnvLookup;

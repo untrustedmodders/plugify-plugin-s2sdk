@@ -193,12 +193,12 @@ namespace utils {
 
 	const fs::path& GameDirectory();
 
-	std::vector<std::string_view> split(std::string_view strv, std::string_view delims);
+	std::vector<std::string_view> SplitString(std::string_view strv, std::string_view delims);
 
 	template<typename T>
-	std::optional<T> string_to_int(std::string_view str, int base = 10) {
+	std::optional<T> StringToNumber(std::string_view str) {
 		T value;
-		auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, base);
+		auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value);
 		if (ec == std::errc()) {
 			return value;
 		}
@@ -206,10 +206,10 @@ namespace utils {
 	}
 
 	template<typename T>
-	std::vector<T> string_to_vector(std::string_view str) {
+	std::vector<T> StringToVector(std::string_view str, std::string_view delims = " ") {
 		std::vector<T> vec;
-		for (const auto& item : split(str, ",")) {
-			if (auto value = string_to_int<T>(item)) {
+		for (const auto& item : SplitString(str, delims)) {
+			if (auto value = StringToNumber<T>(item)) {
 				vec.emplace_back(*value);
 			}
 		}
@@ -217,7 +217,7 @@ namespace utils {
 	}
 
 	template<typename T>
-	plg::string vector_to_string(const std::vector<T>& vec) {
+	plg::string VectorToString(const std::vector<T>& vec) {
 		if (vec.empty()) {
 			return {};
 		}
