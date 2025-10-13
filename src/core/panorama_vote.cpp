@@ -101,8 +101,8 @@ bool PanoramaVoteHandler::IsVoteInProgress() const {
 }
 
 bool PanoramaVoteHandler::SendYesNoVote(double duration, int caller,
-	const plg::string& voteTitle, const plg::string& detailStr,
-	const plg::string& votePassTitle, const plg::string& detailPassStr,
+	std::string_view voteTitle, std::string_view detailStr,
+	std::string_view votePassTitle, std::string_view detailPassStr,
 	int voteFailReason, uint64 recipients, YesNoVoteResult result,
 	YesNoVoteHandler handler = nullptr) {
 	if (!m_voteController|| m_voteInProgress)

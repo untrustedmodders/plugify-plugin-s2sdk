@@ -24,7 +24,7 @@ extern "C" PLUGIN_API void PrintToServer(const plg::string& msg) {
  * @param message The message to be sent to the client's console.
  */
 extern "C" PLUGIN_API void PrintToConsole(int playerSlot, const plg::string& message) {
-	utils::PrintConsole(playerSlot, message.c_str());
+	utils::PrintConsole(playerSlot, message);
 }
 
 /**
@@ -33,7 +33,7 @@ extern "C" PLUGIN_API void PrintToConsole(int playerSlot, const plg::string& mes
  * @param message The message to be printed in the chat area.
  */
 extern "C" PLUGIN_API void PrintToChat(int playerSlot, const plg::string& message) {
-	utils::PrintChat(playerSlot, message.c_str());
+	utils::PrintChat(playerSlot, message);
 }
 
 /**
@@ -42,7 +42,7 @@ extern "C" PLUGIN_API void PrintToChat(int playerSlot, const plg::string& messag
  * @param message The message to be printed in the center of the screen.
  */
 extern "C" PLUGIN_API void PrintCenterText(int playerSlot, const plg::string& message) {
-	utils::PrintCentre(playerSlot, message.c_str());
+	utils::PrintCentre(playerSlot, message);
 }
 
 /**
@@ -51,7 +51,7 @@ extern "C" PLUGIN_API void PrintCenterText(int playerSlot, const plg::string& me
  * @param message The message to be printed in the alert box.
  */
 extern "C" PLUGIN_API void PrintAlertText(int playerSlot, const plg::string& message) {
-	utils::PrintAlert(playerSlot, message.c_str());
+	utils::PrintAlert(playerSlot, message);
 }
 
 /**
@@ -61,7 +61,7 @@ extern "C" PLUGIN_API void PrintAlertText(int playerSlot, const plg::string& mes
  * @param duration The duration of the message in seconds.
  */
 extern "C" PLUGIN_API void PrintCentreHtml(int playerSlot, const plg::string& message, int duration) {
-	utils::PrintHtmlCentre(playerSlot, message.c_str(), duration);
+	utils::PrintHtmlCentre(playerSlot, message, duration);
 }
 
 /**
@@ -69,7 +69,7 @@ extern "C" PLUGIN_API void PrintCentreHtml(int playerSlot, const plg::string& me
  * @param message The message to be sent to all clients' consoles.
  */
 extern "C" PLUGIN_API void PrintToConsoleAll(const plg::string& message) {
-	utils::PrintConsoleAll(message.c_str());
+	utils::PrintConsoleAll(message);
 }
 
 /**
@@ -77,7 +77,7 @@ extern "C" PLUGIN_API void PrintToConsoleAll(const plg::string& message) {
  * @param message The message to be printed in the chat area for all clients.
  */
 extern "C" PLUGIN_API void PrintToChatAll(const plg::string& message) {
-	utils::PrintChatAll(message.c_str());
+	utils::PrintChatAll(message);
 }
 
 /**
@@ -85,7 +85,7 @@ extern "C" PLUGIN_API void PrintToChatAll(const plg::string& message) {
  * @param message The message to be printed in the center of the screen for all clients.
  */
 extern "C" PLUGIN_API void PrintCenterTextAll(const plg::string& message) {
-	utils::PrintCentreAll(message.c_str());
+	utils::PrintCentreAll(message);
 }
 
 /**
@@ -93,7 +93,7 @@ extern "C" PLUGIN_API void PrintCenterTextAll(const plg::string& message) {
  * @param message The message to be printed in an alert box for all clients.
  */
 extern "C" PLUGIN_API void PrintAlertTextAll(const plg::string& message) {
-	utils::PrintAlertAll(message.c_str());
+	utils::PrintAlertAll(message);
 }
 
 /**
@@ -102,7 +102,7 @@ extern "C" PLUGIN_API void PrintAlertTextAll(const plg::string& message) {
  * @param duration The duration of the message in seconds.
  */
 extern "C" PLUGIN_API void PrintCentreHtmlAll(const plg::string& message, int duration) {
-	utils::PrintHtmlCentreAll(message.c_str(), duration);
+	utils::PrintHtmlCentreAll(message, duration);
 }
 
 /**
@@ -111,7 +111,7 @@ extern "C" PLUGIN_API void PrintCentreHtmlAll(const plg::string& message, int du
  * @param message The message to be printed in the chat area with color.
  */
 extern "C" PLUGIN_API void PrintToChatColored(int playerSlot, const plg::string& message) {
-	utils::CPrintChat(playerSlot, message.c_str());
+	utils::CPrintChat(playerSlot, message);
 }
 
 /**
@@ -119,7 +119,7 @@ extern "C" PLUGIN_API void PrintToChatColored(int playerSlot, const plg::string&
  * @param message The colored message to be printed in the chat area for all clients.
  */
 extern "C" PLUGIN_API void PrintToChatColoredAll(const plg::string& message) {
-	utils::CPrintChatAll(message.c_str());
+	utils::CPrintChatAll(message);
 }
 
 /**
@@ -137,10 +137,10 @@ extern "C" PLUGIN_API void ReplyToCommand(CommandCallingContext ctx, int playerS
 	}
 	switch (ctx) {
 		case CommandCallingContext::Console:
-			utils::PrintConsole(playerSlot, message.c_str());
+			utils::PrintConsole(playerSlot, message);
 			return;
 		case CommandCallingContext::Chat:
-			utils::PrintChat(playerSlot, message.c_str());
+			utils::PrintChat(playerSlot, message);
 			return;
 	}
 }

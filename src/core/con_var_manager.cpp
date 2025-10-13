@@ -82,65 +82,6 @@ void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot slot, 
 	g_ConVarManager.m_global.Notify(*ref, pNewValue, pOldValue);
 }
 
-struct ConVal {
-	CVValue_t* cv;
-	EConVarType type;
-};
-
-// format support
-#ifdef FMT_HEADER_ONLY
-namespace fmt {
-#else
-namespace std {
-#endif
-template<>
-struct formatter<ConVal> {
-	constexpr auto parse(std::format_parse_context& ctx) {
-		return ctx.begin();
-	}
-
-	template<class FormatContext>
-	auto format(const ConVal& cv, FormatContext& ctx) const {
-		switch (const auto& [value, type] = cv ;type) {
-			case EConVarType_Bool:
-				return std::format_to(ctx.out(), "{}", value->m_bValue);
-			case EConVarType_Int16:
-				return std::format_to(ctx.out(), "{}", value->m_i16Value);
-			case EConVarType_UInt16:
-				return std::format_to(ctx.out(), "{}", value->m_u16Value);
-			case EConVarType_Int32:
-				return std::format_to(ctx.out(), "{}", value->m_i32Value);
-			case EConVarType_UInt32:
-				return std::format_to(ctx.out(), "{}", value->m_u32Value);
-			case EConVarType_Int64:
-				return std::format_to(ctx.out(), "{}", value->m_i64Value);
-			case EConVarType_UInt64:
-				return std::format_to(ctx.out(), "{}", value->m_u64Value);
-			case EConVarType_Float32:
-				return std::format_to(ctx.out(), "{}", value->m_fl32Value);
-			case EConVarType_Float64:
-				return std::format_to(ctx.out(), "{}", value->m_fl64Value);
-			case EConVarType_String:
-				return std::format_to(ctx.out(), "{}", std::string_view(value->m_StringValue.Get(), static_cast<size_t>(value->m_StringValue.Length())));
-			case EConVarType_Color:
-				return std::format_to(ctx.out(), "{} {} {} {}", value->m_clrValue.r(), value->m_clrValue.g(), value->m_clrValue.b(), value->m_clrValue.a());
-			case EConVarType_Vector2:
-				return std::format_to(ctx.out(), "{} {}", value->m_vec2Value.x, value->m_vec2Value.y);
-			case EConVarType_Vector3:
-				return std::format_to(ctx.out(), "{} {} {}", value->m_vec3Value.x, value->m_vec3Value.y, value->m_vec3Value.z);
-			case EConVarType_Vector4:
-				return std::format_to(ctx.out(), "{} {} {} {}", value->m_vec4Value.x, value->m_vec4Value.y, value->m_vec4Value.z, value->m_vec4Value.w);
-			case EConVarType_Qangle:
-				return std::format_to(ctx.out(), "{} {} {}", value->m_angValue.x, value->m_angValue.y, value->m_angValue.z);
-			case EConVarType_Invalid:
-			case EConVarType_MAX:
-			default:
-				return std::format_to(ctx.out(), "<invalid>");
-		}
-	}
-};
-}// namespace std
-
 class ConVarConfigGenerator {
 public:
     static void FormatConVarData(std::ofstream& os, const ConVarData* conVarData) {

@@ -101,8 +101,8 @@ public:
 private:
 	int m_slot{-1};
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
-	std::string m_language;
-	std::string m_operatingSystem;
+	plg::string m_language;
+	plg::string m_operatingSystem;
 	plg::map<int, CvarQuery> m_queryCallback;
 };
 
@@ -129,7 +129,7 @@ public:
 	void OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnectionReason reason);
 	void OnClientActive(CPlayerSlot slot, bool loadGame) const;
 
-	bool QueryCvarValue(CPlayerSlot slot, const plg::string& convarName, CvarValueCallback callback, const plg::vector<plg::any>& data);
+	bool QueryCvarValue(CPlayerSlot slot, std::string_view convarName, CvarValueCallback callback, const plg::vector<plg::any>& data);
 	void OnRespondCvarValue(CServerSideClientBase* client, const CCLCMsg_RespondCvarValue_t& msg);
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(PlayerManager, OnValidateAuthTicket, ValidateAuthTicketResponse_t, m_CallbackValidateAuthTicketResponse);

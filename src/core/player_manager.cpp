@@ -2,6 +2,7 @@
 #include <core/sdk/entity/cplayercontroller.h>
 #include <core/sdk/entity/cplayerpawn.h>
 #include <core/sdk/utils.h>
+#include <core/sdk/cvars.h>
 #include <eiface.h>
 #include <inetchannelinfo.h>
 #include <iserver.h>
@@ -223,8 +224,8 @@ bool PlayerManager::OnClientConnect_Post(CPlayerSlot slot, bool origRet) {
 
 void PlayerManager::OnClientConnected(CPlayerSlot slot, bool fakePlayer) {
 	if (!fakePlayer) {
-		utils::SendCvarValueQueryToClient(slot, "cl_language", CLIENT_LANGUAGE_ID);
-		utils::SendCvarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
+		cvars::SendConVarValueQueryToClient(slot, "cl_language", CLIENT_LANGUAGE_ID);
+		cvars::SendConVarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
 	}
 	GetOnClientConnectedListenerManager().Notify(slot);
 }
@@ -256,9 +257,9 @@ void PlayerManager::OnClientActive(CPlayerSlot slot, bool loadGame) const {
 	GetOnClientActiveListenerManager().Notify(slot, loadGame);
 }
 
-bool PlayerManager::QueryCvarValue(CPlayerSlot slot, const plg::string& convarName, CvarValueCallback callback, const plg::vector<plg::any>& data) {
+bool PlayerManager::QueryCvarValue(CPlayerSlot slot, std::string_view convarName, CvarValueCallback callback, const plg::vector<plg::any>& data) {
 	if (Player* player = ToPlayer(slot)) {
-		int queryCvarCookie = utils::SendCvarValueQueryToClient(slot, convarName.c_str());
+		int queryCvarCookie = cvars::SendConVarValueQueryToClient(slot, convarName);
 		if (queryCvarCookie != -1) {
 			player->QueryCvar(queryCvarCookie, CvarQuery{callback, data});
 			return true;
@@ -439,7 +440,7 @@ TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target
 			clients.emplace_back(i);
 		}
 	} else if (target.starts_with('#')) {
-		if (auto slot = utils::StringToNumber<int>(target.substr(1))) {
+		if (auto slot = plg::cast_to<int>(target.substr(1))) {
 			targetType = TargetType::PLAYER;
 			CBasePlayerController* player = utils::GetController(*slot);
 			if (player && player->IsController() && player->IsConnected()) {

@@ -28,7 +28,7 @@ PLUGIFY_WARN_IGNORE(4190)
  * @return A handle to the created console variable.
  */
 extern "C" PLUGIN_API uint64_t CreateConVar(const plg::string& name, const plg::string& defaultValue, const plg::string& description, ConVarFlag flags) {
-	return g_ConVarManager.CreateConVar<CUtlString>(name.c_str(), description, defaultValue.data(), flags);
+	return g_ConVarManager.CreateConVar<CUtlString>(name, description, defaultValue.data(), flags);
 }
 
 /**
@@ -455,13 +455,19 @@ extern "C" PLUGIN_API ConVarFlag GetConVarFlags(uint64 conVarHandle) {
  */
 extern "C" PLUGIN_API plg::string GetConVarBounds(uint64 conVarHandle, bool max) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
-		CBufferStringN<512> buffer;
+		auto* conVarData = conVar->GetConVarData();
 		if (max) {
-			conVar->GetConVarData()->MaxValueToString(buffer);
+			if (conVarData->HasMaxValue()) {
+				return std::format("{}", ConVal{conVarData->MaxValue(), conVarData->GetType()});
+			}
+			S2_LOGF(LS_WARNING, "No max value for ConVar {}\n", conVar->GetName());
 		} else {
-			conVar->GetConVarData()->MinValueToString(buffer);
+			if (conVarData->HasMinValue()) {
+				return std::format("{}", ConVal{conVarData->MinValue(), conVarData->GetType()});
+			}
+			S2_LOGF(LS_WARNING, "No min value for ConVar {}\n", conVar->GetName());
 		}
-		return { buffer.Get(), static_cast<size_t>(buffer.Length()) };
+		return {};
 	} else {
 		S2_LOG(LS_WARNING, conVar.error().c_str());
 		return {};
@@ -477,10 +483,19 @@ extern "C" PLUGIN_API plg::string GetConVarBounds(uint64 conVarHandle, bool max)
  */
 extern "C" PLUGIN_API void SetConVarBounds(uint64 conVarHandle, bool max, const plg::string& value) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		auto* conVarData = conVar->GetConVarData();
 		if (max) {
-			conVar->GetConVarData()->UpdateMinValueString(value.c_str());
+			if (conVarData->HasMaxValue()) {
+				conVarData->TypeTraits()->StringToValue(value.c_str(), conVarData->MaxValue());
+				return;
+			}
+			S2_LOGF(LS_WARNING, "No max value for ConVar {}\n", conVar->GetName());
 		} else {
-			conVar->GetConVarData()->UpdateMaxValueString(value.c_str());
+			if (conVarData->HasMinValue()) {
+				conVarData->TypeTraits()->StringToValue(value.c_str(), conVarData->MinValue());
+				return;
+			}
+			S2_LOGF(LS_WARNING, "No min value for ConVar {}\n", conVar->GetName());
 		}
 	} else {
 		S2_LOG(LS_WARNING, conVar.error().c_str());
@@ -495,9 +510,12 @@ extern "C" PLUGIN_API void SetConVarBounds(uint64 conVarHandle, bool max, const 
  */
 extern "C" PLUGIN_API plg::string GetConVarDefault(uint64 conVarHandle) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
-		CBufferStringN<512> buffer;
-		conVar->GetConVarData()->DefaultValueToString(buffer);
-		return { buffer.Get(), static_cast<size_t>(buffer.Length()) };
+		auto* conVarData = conVar->GetConVarData();
+		if (conVarData->HasDefaultValue()) {
+			return std::format("{}", ConVal{conVarData->DefaultValue(), conVarData->GetType()});
+		}
+		S2_LOGF(LS_WARNING, "No default value for ConVar {}\n", conVar->GetName());
+		return {};
 	} else {
 		S2_LOG(LS_WARNING, conVar.error().c_str());
 		return {};
@@ -512,9 +530,8 @@ extern "C" PLUGIN_API plg::string GetConVarDefault(uint64 conVarHandle) {
  */
 extern "C" PLUGIN_API plg::string GetConVarValue(uint64 conVarHandle) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
-		CBufferStringN<512> buffer;
-		conVar->GetConVarData()->ValueToString(-1, buffer);
-		return { buffer.Get(), static_cast<size_t>(buffer.Length()) };
+		auto* conVarData = conVar->GetConVarData();
+		return std::format("{}", ConVal{conVarData->DefaultValue(), conVarData->GetType()});
 	} else {
 		S2_LOG(LS_WARNING, conVar.error().c_str());
 		return {};
@@ -900,7 +917,7 @@ extern "C" PLUGIN_API void SetConVarQAngle(uint64 conVarHandle, const QAngle& va
  */
 extern "C" PLUGIN_API void SendConVarValue(int playerSlot, uint64 conVarHandle, const plg::string& value) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
-		cvars::SendConVarValue(playerSlot, conVar->GetName(), value.c_str());
+		cvars::SendConVarValue(playerSlot, conVar->GetName(), value);
 	} else {
 		S2_LOG(LS_WARNING, conVar.error().c_str());
 	}

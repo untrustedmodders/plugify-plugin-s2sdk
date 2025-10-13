@@ -8,7 +8,7 @@
 namespace pb = google::protobuf;
 
 #define GETCHECK_FIELD()                                                                           \
-	const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(fieldName);         \
+	const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(std::string(fieldName)); \
 	if (!field) {                                                                                  \
 		S2_LOGF(                                                                                   \
 		    LS_WARNING,                                                                            \
@@ -125,7 +125,7 @@ public:
 	}
 
 	int16_t GetMessageID() const { return m_msgSerializable->GetNetMessageInfo()->m_MessageId; }
-	const char* GetMessageName() const { return m_msgSerializable->GetUnscopedName(); }
+	std::string_view GetMessageName() const { return m_msgSerializable->GetUnscopedName(); }
 	const CNetMessage* GetNetMessage() const { return m_netMessage; }
 	const pb::Message* GetProtobufMessage() const { return m_msg; }
 	INetworkMessageInternal* GetSerializableMessage() const { return m_msgSerializable; }
@@ -150,13 +150,13 @@ private:
 	bool m_manuallyAllocated{};
 
 public:
-	bool HasField(const char* fieldName) {
+	bool HasField(std::string_view fieldName) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_NOT_REPEATED();
 		return m_msg->GetReflection()->HasField(*m_msg, field);
 	}
 
-	bool GetEnum(const char* fieldName, int* out) {
+	bool GetEnum(std::string_view fieldName, int* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(ENUM);
 		CHECK_FIELD_NOT_REPEATED();
@@ -165,7 +165,7 @@ public:
 		return true;
 	}
 
-	bool SetEnum(const char* fieldName, int value) {
+	bool SetEnum(std::string_view fieldName, int value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(ENUM);
 		CHECK_FIELD_NOT_REPEATED();
@@ -176,7 +176,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedEnum(const char* fieldName, int index, int* out) {
+	bool GetRepeatedEnum(std::string_view fieldName, int index, int* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(ENUM);
 		CHECK_FIELD_REPEATED();
@@ -186,7 +186,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedEnum(const char* fieldName, int index, int value) {
+	bool SetRepeatedEnum(std::string_view fieldName, int index, int value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(ENUM);
 		CHECK_FIELD_REPEATED();
@@ -198,7 +198,7 @@ public:
 		return true;
 	}
 
-	bool AddEnum(const char* fieldName, int value) {
+	bool AddEnum(std::string_view fieldName, int value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(ENUM);
 		CHECK_FIELD_REPEATED();
@@ -209,7 +209,7 @@ public:
 		return true;
 	}
 
-	bool GetInt32(const char* fieldName, int32_t* out) {
+	bool GetInt32(std::string_view fieldName, int32_t* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT32);
 		CHECK_FIELD_NOT_REPEATED();
@@ -218,7 +218,7 @@ public:
 		return true;
 	}
 
-	bool SetInt32(const char* fieldName, int32_t value) {
+	bool SetInt32(std::string_view fieldName, int32_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT32);
 		CHECK_FIELD_NOT_REPEATED();
@@ -227,7 +227,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedInt32(const char* fieldName, int index, int32_t* out) {
+	bool GetRepeatedInt32(std::string_view fieldName, int index, int32_t* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT32);
 		CHECK_FIELD_REPEATED();
@@ -237,7 +237,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedInt32(const char* fieldName, int index, int32_t value) {
+	bool SetRepeatedInt32(std::string_view fieldName, int index, int32_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT32);
 		CHECK_FIELD_REPEATED();
@@ -247,7 +247,7 @@ public:
 		return true;
 	}
 
-	bool AddInt32(const char* fieldName, int32_t value) {
+	bool AddInt32(std::string_view fieldName, int32_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT32);
 		CHECK_FIELD_REPEATED();
@@ -256,7 +256,7 @@ public:
 		return true;
 	}
 
-	bool GetInt64(const char* fieldName, int64_t* out) {
+	bool GetInt64(std::string_view fieldName, int64_t* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT64);
 		CHECK_FIELD_NOT_REPEATED();
@@ -265,7 +265,7 @@ public:
 		return true;
 	}
 
-	bool SetInt64(const char* fieldName, int64_t value) {
+	bool SetInt64(std::string_view fieldName, int64_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT64);
 		CHECK_FIELD_NOT_REPEATED();
@@ -274,7 +274,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedInt64(const char* fieldName, int index, int64_t* out) {
+	bool GetRepeatedInt64(std::string_view fieldName, int index, int64_t* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT64);
 		CHECK_FIELD_REPEATED();
@@ -284,7 +284,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedInt64(const char* fieldName, int index, int64_t value) {
+	bool SetRepeatedInt64(std::string_view fieldName, int index, int64_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT64);
 		CHECK_FIELD_REPEATED();
@@ -294,7 +294,7 @@ public:
 		return true;
 	}
 
-	bool AddInt64(const char* fieldName, int64_t value) {
+	bool AddInt64(std::string_view fieldName, int64_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT64);
 		CHECK_FIELD_REPEATED();
@@ -303,7 +303,7 @@ public:
 		return true;
 	}
 
-	bool GetUInt32(const char* fieldName, uint32_t* out) {
+	bool GetUInt32(std::string_view fieldName, uint32_t* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT32);
 		CHECK_FIELD_NOT_REPEATED();
@@ -312,7 +312,7 @@ public:
 		return true;
 	}
 
-	bool SetUInt32(const char* fieldName, uint32_t value) {
+	bool SetUInt32(std::string_view fieldName, uint32_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT32);
 		CHECK_FIELD_NOT_REPEATED();
@@ -321,7 +321,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedUInt32(const char* fieldName, int index, uint32_t* out) {
+	bool GetRepeatedUInt32(std::string_view fieldName, int index, uint32_t* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT32);
 		CHECK_FIELD_REPEATED();
@@ -331,7 +331,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedUInt32(const char* fieldName, int index, uint32_t value) {
+	bool SetRepeatedUInt32(std::string_view fieldName, int index, uint32_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT32);
 		CHECK_FIELD_REPEATED();
@@ -341,7 +341,7 @@ public:
 		return true;
 	}
 
-	bool AddUInt32(const char* fieldName, uint32_t value) {
+	bool AddUInt32(std::string_view fieldName, uint32_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT32);
 		CHECK_FIELD_REPEATED();
@@ -350,7 +350,7 @@ public:
 		return true;
 	}
 
-	bool GetUInt64(const char* fieldName, uint64_t* out) {
+	bool GetUInt64(std::string_view fieldName, uint64_t* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT64);
 		CHECK_FIELD_NOT_REPEATED();
@@ -359,7 +359,7 @@ public:
 		return true;
 	}
 
-	bool SetUInt64(const char* fieldName, uint64_t value) {
+	bool SetUInt64(std::string_view fieldName, uint64_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT64);
 		CHECK_FIELD_NOT_REPEATED();
@@ -368,7 +368,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedUInt64(const char* fieldName, int index, uint64_t* out) {
+	bool GetRepeatedUInt64(std::string_view fieldName, int index, uint64_t* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT64);
 		CHECK_FIELD_REPEATED();
@@ -378,7 +378,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedUInt64(const char* fieldName, int index, uint64_t value) {
+	bool SetRepeatedUInt64(std::string_view fieldName, int index, uint64_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT64);
 		CHECK_FIELD_REPEATED();
@@ -388,7 +388,7 @@ public:
 		return true;
 	}
 
-	bool AddUInt64(const char* fieldName, uint64_t value) {
+	bool AddUInt64(std::string_view fieldName, uint64_t value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT64);
 		CHECK_FIELD_REPEATED();
@@ -397,7 +397,7 @@ public:
 		return true;
 	}
 
-	bool GetBool(const char* fieldName, bool* out) {
+	bool GetBool(std::string_view fieldName, bool* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(BOOL);
 		CHECK_FIELD_NOT_REPEATED();
@@ -406,7 +406,7 @@ public:
 		return true;
 	}
 
-	bool SetBool(const char* fieldName, bool value) {
+	bool SetBool(std::string_view fieldName, bool value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(BOOL);
 		CHECK_FIELD_NOT_REPEATED();
@@ -415,7 +415,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedBool(const char* fieldName, int index, bool* out) {
+	bool GetRepeatedBool(std::string_view fieldName, int index, bool* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(BOOL);
 		CHECK_FIELD_REPEATED();
@@ -425,7 +425,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedBool(const char* fieldName, int index, bool value) {
+	bool SetRepeatedBool(std::string_view fieldName, int index, bool value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(BOOL);
 		CHECK_FIELD_REPEATED();
@@ -435,7 +435,7 @@ public:
 		return true;
 	}
 
-	bool AddBool(const char* fieldName, bool value) {
+	bool AddBool(std::string_view fieldName, bool value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(BOOL);
 		CHECK_FIELD_REPEATED();
@@ -444,7 +444,7 @@ public:
 		return true;
 	}
 
-	bool GetFloat(const char* fieldName, float* out) {
+	bool GetFloat(std::string_view fieldName, float* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(FLOAT);
 		CHECK_FIELD_NOT_REPEATED();
@@ -453,7 +453,7 @@ public:
 		return true;
 	}
 
-	bool SetFloat(const char* fieldName, float value) {
+	bool SetFloat(std::string_view fieldName, float value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(FLOAT);
 		CHECK_FIELD_NOT_REPEATED();
@@ -462,7 +462,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedFloat(const char* fieldName, int index, float* out) {
+	bool GetRepeatedFloat(std::string_view fieldName, int index, float* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(FLOAT);
 		CHECK_FIELD_REPEATED();
@@ -472,7 +472,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedFloat(const char* fieldName, int index, float value) {
+	bool SetRepeatedFloat(std::string_view fieldName, int index, float value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(FLOAT);
 		CHECK_FIELD_REPEATED();
@@ -482,7 +482,7 @@ public:
 		return true;
 	}
 
-	bool AddFloat(const char* fieldName, float value) {
+	bool AddFloat(std::string_view fieldName, float value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(FLOAT);
 		CHECK_FIELD_REPEATED();
@@ -491,7 +491,7 @@ public:
 		return true;
 	}
 
-	bool GetDouble(const char* fieldName, double* out) {
+	bool GetDouble(std::string_view fieldName, double* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(DOUBLE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -500,7 +500,7 @@ public:
 		return true;
 	}
 
-	bool SetDouble(const char* fieldName, double value) {
+	bool SetDouble(std::string_view fieldName, double value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(DOUBLE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -509,7 +509,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedDouble(const char* fieldName, int index, double* out) {
+	bool GetRepeatedDouble(std::string_view fieldName, int index, double* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(DOUBLE);
 		CHECK_FIELD_REPEATED();
@@ -519,7 +519,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedDouble(const char* fieldName, int index, double value) {
+	bool SetRepeatedDouble(std::string_view fieldName, int index, double value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(DOUBLE);
 		CHECK_FIELD_REPEATED();
@@ -529,7 +529,7 @@ public:
 		return true;
 	}
 
-	bool AddDouble(const char* fieldName, double value) {
+	bool AddDouble(std::string_view fieldName, double value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(DOUBLE);
 		CHECK_FIELD_REPEATED();
@@ -538,7 +538,7 @@ public:
 		return true;
 	}
 
-	bool GetString(const char* fieldName, plg::string& out) {
+	bool GetString(std::string_view fieldName, plg::string& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(STRING);
 		CHECK_FIELD_NOT_REPEATED();
@@ -548,16 +548,16 @@ public:
 		return true;
 	}
 
-	bool SetString(const char* fieldName, std::string value) {
+	bool SetString(std::string_view fieldName, std::string_view value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(STRING);
 		CHECK_FIELD_NOT_REPEATED();
 
-		m_msg->GetReflection()->SetString(m_msg, field, std::move(value));
+		m_msg->GetReflection()->SetString(m_msg, field, std::string(value));
 		return true;
 	}
 
-	bool GetRepeatedString(const char* fieldName, int index, plg::string& out) {
+	bool GetRepeatedString(std::string_view fieldName, int index, plg::string& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(STRING);
 		CHECK_FIELD_REPEATED();
@@ -568,27 +568,27 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedString(const char* fieldName, int index, std::string value) {
+	bool SetRepeatedString(std::string_view fieldName, int index, std::string_view value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(STRING);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		m_msg->GetReflection()->SetRepeatedString(m_msg, field, index, std::move(value));
+		m_msg->GetReflection()->SetRepeatedString(m_msg, field, index, std::string(value));
 
 		return true;
 	}
 
-	bool AddString(const char* fieldName, const char* value) {
+	bool AddString(std::string_view fieldName, std::string_view value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(STRING);
 		CHECK_FIELD_REPEATED();
 
-		m_msg->GetReflection()->AddString(m_msg, field, value);
+		m_msg->GetReflection()->AddString(m_msg, field, std::string(value));
 		return true;
 	}
 
-	bool GetColor(const char* fieldName, Color* out) {
+	bool GetColor(std::string_view fieldName, Color* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -599,7 +599,7 @@ public:
 		return true;
 	}
 
-	bool SetColor(const char* fieldName, const Color& value) {
+	bool SetColor(std::string_view fieldName, const Color& value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -613,7 +613,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedColor(const char* fieldName, int index, Color* out) {
+	bool GetRepeatedColor(std::string_view fieldName, int index, Color* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -625,7 +625,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedColor(const char* fieldName, int index, const Color& value) {
+	bool SetRepeatedColor(std::string_view fieldName, int index, const Color& value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -640,7 +640,7 @@ public:
 		return true;
 	}
 
-	bool AddColor(const char* fieldName, const Color& value) {
+	bool AddColor(std::string_view fieldName, const Color& value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -654,7 +654,7 @@ public:
 		return true;
 	}
 
-	bool GetVector2D(const char* fieldName, Vector2D* out) {
+	bool GetVector2D(std::string_view fieldName, Vector2D* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -665,7 +665,7 @@ public:
 		return true;
 	}
 
-	bool SetVector2D(const char* fieldName, const Vector2D& vec) {
+	bool SetVector2D(std::string_view fieldName, const Vector2D& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -677,7 +677,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedVector2D(const char* fieldName, int index, Vector2D* out) {
+	bool GetRepeatedVector2D(std::string_view fieldName, int index, Vector2D* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -689,7 +689,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedVector2D(const char* fieldName, int index, const Vector2D& vec) {
+	bool SetRepeatedVector2D(std::string_view fieldName, int index, const Vector2D& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -702,7 +702,7 @@ public:
 		return true;
 	}
 
-	bool AddVector2D(const char* fieldName, const Vector2D& vec) {
+	bool AddVector2D(std::string_view fieldName, const Vector2D& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -714,7 +714,7 @@ public:
 		return true;
 	}
 
-	bool GetVector(const char* fieldName, Vector* out) {
+	bool GetVector(std::string_view fieldName, Vector* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -725,7 +725,7 @@ public:
 		return true;
 	}
 
-	bool SetVector(const char* fieldName, const Vector& vec) {
+	bool SetVector(std::string_view fieldName, const Vector& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -738,7 +738,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedVector(const char* fieldName, int index, Vector* out) {
+	bool GetRepeatedVector(std::string_view fieldName, int index, Vector* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -750,7 +750,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedVector(const char* fieldName, int index, const Vector& vec) {
+	bool SetRepeatedVector(std::string_view fieldName, int index, const Vector& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -764,7 +764,7 @@ public:
 		return true;
 	}
 
-	bool AddVector(const char* fieldName, const Vector& vec) {
+	bool AddVector(std::string_view fieldName, const Vector& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -777,7 +777,7 @@ public:
 		return true;
 	}
 
-	bool GetQAngle(const char* fieldName, QAngle* out) {
+	bool GetQAngle(std::string_view fieldName, QAngle* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -788,7 +788,7 @@ public:
 		return true;
 	}
 
-	bool SetQAngle(const char* fieldName, const QAngle& vec) {
+	bool SetQAngle(std::string_view fieldName, const QAngle& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -801,7 +801,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedQAngle(const char* fieldName, int index, QAngle* out) {
+	bool GetRepeatedQAngle(std::string_view fieldName, int index, QAngle* out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -813,7 +813,7 @@ public:
 		return true;
 	}
 
-	bool SetRepeatedQAngle(const char* fieldName, int index, const QAngle& vec) {
+	bool SetRepeatedQAngle(std::string_view fieldName, int index, const QAngle& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -827,7 +827,7 @@ public:
 		return true;
 	}
 
-	bool AddQAngle(const char* fieldName, const QAngle& vec) {
+	bool AddQAngle(std::string_view fieldName, const QAngle& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -840,7 +840,7 @@ public:
 		return true;
 	}
 
-	bool GetMessage(const char* fieldName, pb::Message** message) {
+	bool GetMessage(std::string_view fieldName, pb::Message** message) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
@@ -850,7 +850,7 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedMessage(const char* fieldName, int index, const pb::Message** message) {
+	bool GetRepeatedMessage(std::string_view fieldName, int index, const pb::Message** message) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -862,7 +862,7 @@ public:
 		return true;
 	}
 
-	bool AddMessage(const char* fieldName, pb::Message** message) {
+	bool AddMessage(std::string_view fieldName, pb::Message** message) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
@@ -872,8 +872,8 @@ public:
 		return true;
 	}
 
-	int GetRepeatedFieldCount(const char* fieldName) {
-		const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(fieldName);
+	int GetRepeatedFieldCount(std::string_view fieldName) {
+		const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(std::string(fieldName));
 		if (!field) return -1;
 
 		if (field->label() != pb::FieldDescriptor::LABEL_REPEATED) return -1;
@@ -881,7 +881,7 @@ public:
 		return m_msg->GetReflection()->FieldSize(*m_msg, field);
 	}
 
-	bool RemoveRepeatedFieldValue(const char* fieldName, int index) {
+	bool RemoveRepeatedFieldValue(std::string_view fieldName, int index) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
@@ -897,5 +897,5 @@ public:
 		return true;
 	}
 
-	std::string GetDebugString() { return m_msg->DebugString(); }
+	plg::string GetDebugString() const { return m_msg->DebugString(); }
 };

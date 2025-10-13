@@ -158,7 +158,7 @@ extern "C" PLUGIN_API void Precache(const plg::string& resource) {
  * @param resource The name of the file to check.
  */
 extern "C" PLUGIN_API bool IsPrecached(const plg::string& resource) {
-	return g_Precached.contains(resource.c_str());
+	return g_Precached.contains(resource);
 }
 
 /**

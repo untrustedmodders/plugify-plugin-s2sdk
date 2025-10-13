@@ -2,6 +2,7 @@
 
 #include "schema.h"
 #include <eiface.h>
+#include <igameevents.h>
 #include <iserver.h>
 
 #if S2SDK_PLATFORM_LINUX || S2SDK_PLATFORM_APPLE
@@ -52,6 +53,10 @@ namespace utils {
 	// Return true if the spawn found is truly valid (not in the ground or out of bounds)
 	bool IsSpawnValid(const Vector& origin);
 	bool FindValidSpawn(Vector& origin, QAngle& angles);
+
+	inline GameEventKeySymbol_t MakeEventKeySymbol(std::string_view key) {
+		return GameEventKeySymbol_t::Make(key.data(), static_cast<int>(key.size()));
+	}
 
 	const fs::path& GameDirectory();
 

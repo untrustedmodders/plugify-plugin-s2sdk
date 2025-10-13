@@ -1,5 +1,6 @@
 #include <core/event_manager.hpp>
 #include <entity2/entitysystem.h>
+#include <core/sdk/utils.h>
 #include <plugin_export.h>
 
 PLUGIFY_WARN_PUSH()
@@ -75,7 +76,7 @@ extern "C" PLUGIN_API void CancelCreatedEvent(EventInfo* info) {
  * @return The boolean value associated with the key.
  */
 extern "C" PLUGIN_API bool GetEventBool(EventInfo* info, const plg::string& key) {
-	return info->event->GetBool(GameEventKeySymbol_t::Make(key.c_str()));
+	return info->event->GetBool(utils::MakeEventKeySymbol(key));
 }
 
 /**
@@ -85,7 +86,7 @@ extern "C" PLUGIN_API bool GetEventBool(EventInfo* info, const plg::string& key)
  * @return The float value associated with the key.
  */
 extern "C" PLUGIN_API float GetEventFloat(EventInfo* info, const plg::string& key) {
-	return info->event->GetFloat(GameEventKeySymbol_t::Make(key.c_str()));
+	return info->event->GetFloat(utils::MakeEventKeySymbol(key));
 }
 
 /**
@@ -95,7 +96,7 @@ extern "C" PLUGIN_API float GetEventFloat(EventInfo* info, const plg::string& ke
  * @return The integer value associated with the key.
  */
 extern "C" PLUGIN_API int GetEventInt(EventInfo* info, const plg::string& key) {
-	return info->event->GetInt(GameEventKeySymbol_t::Make(key.c_str()));
+	return info->event->GetInt(utils::MakeEventKeySymbol(key));
 }
 
 /**
@@ -105,7 +106,7 @@ extern "C" PLUGIN_API int GetEventInt(EventInfo* info, const plg::string& key) {
  * @return The long integer value associated with the key.
  */
 extern "C" PLUGIN_API uint64_t GetEventUInt64(EventInfo* info, const plg::string& key) {
-	return info->event->GetUint64(GameEventKeySymbol_t::Make(key.c_str()));
+	return info->event->GetUint64(utils::MakeEventKeySymbol(key));
 }
 
 /**
@@ -115,7 +116,7 @@ extern "C" PLUGIN_API uint64_t GetEventUInt64(EventInfo* info, const plg::string
  * @return A string where the result will be stored.
  */
 extern "C" PLUGIN_API plg::string GetEventString(EventInfo* info, const plg::string& key) {
-	return info->event->GetString(GameEventKeySymbol_t::Make(key.c_str()));
+	return info->event->GetString(utils::MakeEventKeySymbol(key));
 }
 
 /**
@@ -125,7 +126,7 @@ extern "C" PLUGIN_API plg::string GetEventString(EventInfo* info, const plg::str
  * @return The pointer value associated with the key.
  */
 extern "C" PLUGIN_API void* GetEventPtr(EventInfo* info, const plg::string& key) {
-	return info->event->GetPtr(GameEventKeySymbol_t::Make(key.c_str()));
+	return info->event->GetPtr(utils::MakeEventKeySymbol(key));
 }
 
 /**
@@ -135,7 +136,7 @@ extern "C" PLUGIN_API void* GetEventPtr(EventInfo* info, const plg::string& key)
  * @return A pointer to the player controller associated with the key.
  */
 extern "C" PLUGIN_API CEntityInstance* GetEventPlayerController(EventInfo* info, const plg::string& key) {
-	return info->event->GetPlayerController(GameEventKeySymbol_t::Make(key.c_str()));
+	return info->event->GetPlayerController(utils::MakeEventKeySymbol(key));
 }
 
 /**
@@ -145,7 +146,7 @@ extern "C" PLUGIN_API CEntityInstance* GetEventPlayerController(EventInfo* info,
  * @return The player index associated with the key.
  */
 extern "C" PLUGIN_API int GetEventPlayerIndex(EventInfo* info, const plg::string& key) {
-	return info->event->GetPlayerSlot(GameEventKeySymbol_t::Make(key.c_str())).Get();
+	return info->event->GetPlayerSlot(utils::MakeEventKeySymbol(key)).Get();
 }
 
 /**
@@ -155,7 +156,7 @@ extern "C" PLUGIN_API int GetEventPlayerIndex(EventInfo* info, const plg::string
  * @return A pointer to the player pawn associated with the key.
  */
 extern "C" PLUGIN_API CEntityInstance* GetEventPlayerPawn(EventInfo* info, const plg::string& key) {
-	return info->event->GetPlayerPawn(GameEventKeySymbol_t::Make(key.c_str()));
+	return info->event->GetPlayerPawn(utils::MakeEventKeySymbol(key));
 }
 
 /**
@@ -165,7 +166,7 @@ extern "C" PLUGIN_API CEntityInstance* GetEventPlayerPawn(EventInfo* info, const
  * @return A pointer to the entity associated with the key.
  */
 extern "C" PLUGIN_API CEntityInstance* GetEventEntity(EventInfo* info, const plg::string& key) {
-	return info->event->GetEntity(GameEventKeySymbol_t::Make(key.c_str()));
+	return info->event->GetEntity(utils::MakeEventKeySymbol(key));
 }
 
 /**
@@ -175,7 +176,7 @@ extern "C" PLUGIN_API CEntityInstance* GetEventEntity(EventInfo* info, const plg
  * @return The entity index associated with the key.
  */
 extern "C" PLUGIN_API int GetEventEntityIndex(EventInfo* info, const plg::string& key) {
-	return info->event->GetEntityIndex(GameEventKeySymbol_t::Make(key.c_str())).Get();
+	return info->event->GetEntityIndex(utils::MakeEventKeySymbol(key)).Get();
 }
 
 /**
@@ -185,7 +186,7 @@ extern "C" PLUGIN_API int GetEventEntityIndex(EventInfo* info, const plg::string
  * @return The entity handle associated with the key.
  */
 extern "C" PLUGIN_API int GetEventEntityHandle(EventInfo* info, const plg::string& key) {
-	return info->event->GetEHandle(GameEventKeySymbol_t::Make(key.c_str())).ToInt();
+	return info->event->GetEHandle(utils::MakeEventKeySymbol(key)).ToInt();
 }
 
 /**
@@ -204,7 +205,7 @@ extern "C" PLUGIN_API plg::string GetEventName(EventInfo* info) {
  * @param value The boolean value to set.
  */
 extern "C" PLUGIN_API void SetEventBool(EventInfo* info, const plg::string& key, bool value) {
-	info->event->SetBool(GameEventKeySymbol_t::Make(key.c_str()), value);
+	info->event->SetBool(utils::MakeEventKeySymbol(key), value);
 }
 
 /**
@@ -214,7 +215,7 @@ extern "C" PLUGIN_API void SetEventBool(EventInfo* info, const plg::string& key,
  * @param value The float value to set.
  */
 extern "C" PLUGIN_API void SetEventFloat(EventInfo* info, const plg::string& key, float value) {
-	info->event->SetFloat(GameEventKeySymbol_t::Make(key.c_str()), value);
+	info->event->SetFloat(utils::MakeEventKeySymbol(key), value);
 }
 
 /**
@@ -224,7 +225,7 @@ extern "C" PLUGIN_API void SetEventFloat(EventInfo* info, const plg::string& key
  * @param value The integer value to set.
  */
 extern "C" PLUGIN_API void SetEventInt(EventInfo* info, const plg::string& key, int value) {
-	info->event->SetInt(GameEventKeySymbol_t::Make(key.c_str()), value);
+	info->event->SetInt(utils::MakeEventKeySymbol(key), value);
 }
 
 /**
@@ -234,7 +235,7 @@ extern "C" PLUGIN_API void SetEventInt(EventInfo* info, const plg::string& key, 
  * @param value The long integer value to set.
  */
 extern "C" PLUGIN_API void SetEventUInt64(EventInfo* info, const plg::string& key, uint64_t value) {
-	info->event->SetUint64(GameEventKeySymbol_t::Make(key.c_str()), value);
+	info->event->SetUint64(utils::MakeEventKeySymbol(key), value);
 }
 
 /**
@@ -244,7 +245,7 @@ extern "C" PLUGIN_API void SetEventUInt64(EventInfo* info, const plg::string& ke
  * @param value The string value to set.
  */
 extern "C" PLUGIN_API void SetEventString(EventInfo* info, const plg::string& key, const plg::string& value) {
-	info->event->SetString(GameEventKeySymbol_t::Make(key.c_str()), value.c_str());
+	info->event->SetString(utils::MakeEventKeySymbol(key), value.c_str());
 }
 
 /**
@@ -254,7 +255,7 @@ extern "C" PLUGIN_API void SetEventString(EventInfo* info, const plg::string& ke
  * @param value The pointer value to set.
  */
 extern "C" PLUGIN_API void SetEventPtr(EventInfo* info, const plg::string& key, void* value) {
-	info->event->SetPtr(GameEventKeySymbol_t::Make(key.c_str()), value);
+	info->event->SetPtr(utils::MakeEventKeySymbol(key), value);
 }
 
 /**
@@ -269,7 +270,7 @@ extern "C" PLUGIN_API void SetEventPlayerController(EventInfo* info, const plg::
 		return;
 	}
 
-	info->event->SetPlayer(GameEventKeySymbol_t::Make(key.c_str()), pEntity);
+	info->event->SetPlayer(utils::MakeEventKeySymbol(key), pEntity);
 }
 
 /**
@@ -279,7 +280,7 @@ extern "C" PLUGIN_API void SetEventPlayerController(EventInfo* info, const plg::
  * @param value The player index value to set.
  */
 extern "C" PLUGIN_API void SetEventPlayerIndex(EventInfo* info, const plg::string& key, int value) {
-	info->event->SetPlayer(GameEventKeySymbol_t::Make(key.c_str()), CPlayerSlot(value));
+	info->event->SetPlayer(utils::MakeEventKeySymbol(key), CPlayerSlot(value));
 }
 
 /**
@@ -294,7 +295,7 @@ extern "C" PLUGIN_API void SetEventEntity(EventInfo* info, const plg::string& ke
 		return;
 	}
 
-	info->event->SetEntity(GameEventKeySymbol_t::Make(key.c_str()), pEntity);
+	info->event->SetEntity(utils::MakeEventKeySymbol(key), pEntity);
 }
 
 /**
@@ -304,7 +305,7 @@ extern "C" PLUGIN_API void SetEventEntity(EventInfo* info, const plg::string& ke
  * @param value The entity index value to set.
  */
 extern "C" PLUGIN_API void SetEventEntityIndex(EventInfo* info, const plg::string& key, int value) {
-	info->event->SetEntity(GameEventKeySymbol_t::Make(key.c_str()), CEntityIndex(value));
+	info->event->SetEntity(utils::MakeEventKeySymbol(key), CEntityIndex(value));
 }
 
 /**
@@ -314,7 +315,7 @@ extern "C" PLUGIN_API void SetEventEntityIndex(EventInfo* info, const plg::strin
  * @param value The entity handle value to set.
  */
 extern "C" PLUGIN_API void SetEventEntityHandle(EventInfo* info, const plg::string& key, int value) {
-	info->event->SetEntity(GameEventKeySymbol_t::Make(key.c_str()), CEntityHandle((uint32) value).Get());
+	info->event->SetEntity(utils::MakeEventKeySymbol(key), CEntityHandle((uint32) value).Get());
 }
 
 /**

@@ -35,6 +35,17 @@ struct SchemaKey {
 	CSchemaType* type{};
 };
 
+namespace plg {
+	constexpr std::size_t hasher(std::string_view sv) noexcept {
+		std::size_t hash = active_hash_traits::fnv_basis; // FNV-1a
+		for (const auto& c : sv) {
+			hash ^= static_cast<uint8_t>(c);
+			hash *= active_hash_traits::fnv_prime;
+		}
+		return hash;
+	}
+}
+
 namespace schema {
 	static std::unordered_set<plg::string> CS2BadList = {
 			"m_bIsValveDS",
@@ -87,6 +98,13 @@ namespace schema {
 	SchemaKey GetOffset(const char* className, size_t classKey, const char* memberName, size_t memberKey);
 	void NetworkStateChanged(intptr_t chainEntity, uint localOffset, int arrayIndex = 0xFFFFFFFF);
 
+	inline int32_t FindChainOffset(std::string_view className) {
+		return FindChainOffset(className.data(), plg::hasher(className));
+	}
+	inline SchemaKey GetOffset(std::string_view className, std::string_view memberName) {
+		return GetOffset(className.data(), plg::hasher(className), memberName.data(), plg::hasher(memberName));
+	}
+
 	ElementType GetElementType(CSchemaType* type);
 	std::pair<ElementType, int> IsIntType(CSchemaType* type);
 	std::pair<ElementType, int> IsFloatType(CSchemaType* type);
@@ -102,17 +120,6 @@ void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32_t nN
 void SafeNetworkStateChanged(intptr_t pEntity, int offset, int chainOffset);
 
 class CBaseEntity;
-
-namespace plg {
-	constexpr std::size_t hasher(std::string_view sv) noexcept {
-		std::size_t hash = active_hash_traits::fnv_basis; // FNV-1a
-		for (const auto& c : sv) {
-			hash ^= static_cast<uint8_t>(c);
-			hash *= active_hash_traits::fnv_prime;
-		}
-		return hash;
-	}
-}
 
 #define SCHEMA_FIELD_OFFSET(type, varName, extra_offset)                                              \
 	PLUGIFY_NO_UNIQUE_ADDRESS class varName##_prop {                                                  \

@@ -14,8 +14,8 @@ using HookCallback = ListenerManager<EventListenerCallback>;
 
 struct EventHook {
 	plg::string name;
-	std::unique_ptr<HookCallback> preHook;
-	std::unique_ptr<HookCallback> postHook;
+	std::unique_ptr<HookCallback> preHook = nullptr;
+	std::unique_ptr<HookCallback> postHook = nullptr;
 	uint32_t refCount{};
 	bool postCopy{};
 };
