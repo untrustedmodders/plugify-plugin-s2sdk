@@ -8187,7 +8187,7 @@
           "name": "conVarHandles",
           "type": "uint64[]",
           "ref": false,
-          "description": "The index of the fake client to replicate the value to."
+          "description": "List of handles to the console variable data."
         },
         {
           "name": "autoCreate",
