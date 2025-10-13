@@ -294,8 +294,8 @@ bool utils::FindValidSpawn(Vector& origin, QAngle& angles) {
 	return foundValidSpawn;
 }
 
-const plg::string& utils::GameDirectory() {
-	static plg::string gameDirectory(Plat_GetGameDirectory());
+const fs::path& utils::GameDirectory() {
+	static fs::path gameDirectory(Plat_GetGameDirectory());
 	return gameDirectory;
 }
 

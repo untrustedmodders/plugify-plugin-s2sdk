@@ -191,7 +191,7 @@ namespace utils {
 	bool IsSpawnValid(const Vector& origin);
 	bool FindValidSpawn(Vector& origin, QAngle& angles);
 
-	const plg::string& GameDirectory();
+	const fs::path& GameDirectory();
 
 	std::vector<std::string_view> split(std::string_view strv, std::string_view delims);
 

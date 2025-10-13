@@ -253,12 +253,12 @@ GameConfigManager::GameConfigManager() {
 		int flags = RTLD_LAZY | RTLD_NOLOAD;
 #endif
 		Module engine2;
-		engine2.LoadFromPath(utils::GameDirectory() + S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2", flags);
+		engine2.LoadFromPath(plg::as_string(utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2"), flags);
 		if (engine2) {
 			m_modules.emplace("engine2", std::move(engine2));
 		}
 		Module server;
-		server.LoadFromPath(utils::GameDirectory() + S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server", flags);
+		server.LoadFromPath(plg::as_string(utils::GameDirectory() / S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server"), flags);
 		if (server) {
 			m_modules.emplace("server", std::move(server));
 		}

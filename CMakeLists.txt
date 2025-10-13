@@ -126,6 +126,7 @@ add_subdirectory(external/sourcesdk)
 
 set(S2SDK_GAME_NAME "csgo" CACHE INTERNAL "Set game name")
 set(S2SDK_COMPILE_DEFINITIONS
+        S2SDK_VERSION="${S2SDK_VERSION}"
         S2SDK_LOGGING_PREFIX="${S2SDK_PACKAGE}"
         S2SDK_GAME_NAME="${S2SDK_GAME_NAME}"
         S2SDK_PLATFORM_WINDOWS=$<BOOL:${WINDOWS}>
@@ -143,16 +144,16 @@ if(WINDOWS)
     set(S2SDK_COMPILE_DEFINITIONS
             ${S2SDK_COMPILE_DEFINITIONS}
             S2SDK_PLATFORM="win64"
-            S2SDK_ROOT_BINARY="/bin/win64/"
-            S2SDK_GAME_BINARY="/csgo/bin/win64/"
+            S2SDK_ROOT_BINARY="bin/win64/"
+            S2SDK_GAME_BINARY="csgo/bin/win64/"
             NOMINMAX=1
     )
 elseif(LINUX)
     set(S2SDK_COMPILE_DEFINITIONS
             ${S2SDK_COMPILE_DEFINITIONS}
             S2SDK_PLATFORM="linuxsteamrt64"
-            S2SDK_ROOT_BINARY="/bin/linuxsteamrt64/"
-            S2SDK_GAME_BINARY="/bin/linuxsteamrt64/../../csgo/bin/linuxsteamrt64/" # Metamod hack
+            S2SDK_ROOT_BINARY="bin/linuxsteamrt64/"
+            S2SDK_GAME_BINARY="bin/linuxsteamrt64/../../csgo/bin/linuxsteamrt64/" # Metamod hack
     )
 endif()
 
@@ -190,8 +191,8 @@ if(MACOS)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/sym/exported_symbols.lds")
 elseif(LINUX)
     target_link_options(${PROJECT_NAME} PRIVATE
-            #-Wl,--wrap=_ZNSs12_S_empty_repEv
-            #-Wl,--wrap=_ZNSbIwSt11char_traitsIwESaIwEE12_S_empty_repEv
+            -Wl,--wrap=_ZNSs12_S_empty_repEv
+            -Wl,--wrap=_ZNSbIwSt11char_traitsIwESaIwEE12_S_empty_repEv
     )
     target_link_libraries(${PROJECT_NAME} PRIVATE "-Wl,--version-script,${CMAKE_CURRENT_SOURCE_DIR}/sym/version_script.lds")
 endif()
@@ -230,4 +231,3 @@ configure_file(
         ${CMAKE_CURRENT_BINARY_DIR}/settings.jsonc
         COPYONLY
 )
-
