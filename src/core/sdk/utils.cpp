@@ -298,22 +298,3 @@ const fs::path& utils::GameDirectory() {
 	static fs::path gameDirectory(Plat_GetGameDirectory());
 	return gameDirectory;
 }
-
-std::vector<std::string_view> utils::SplitString(std::string_view strv, std::string_view delims) {
-	std::vector<std::string_view> output;
-	size_t first = 0;
-
-	while (first < strv.size()) {
-		const size_t second = strv.find_first_of(delims, first);
-
-		if (first != second)
-			output.emplace_back(strv.substr(first, second - first));
-
-		if (second == std::string_view::npos)
-			break;
-
-		first = second + 1;
-	}
-
-	return output;
-}

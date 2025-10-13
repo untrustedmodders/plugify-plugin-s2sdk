@@ -76,7 +76,7 @@ namespace utils {
 				if (replicate) ReplicateConVar(conVar, value.Get());
 				if (notify) NotifyConVar(conVar, value.Get());
 			} else {
-				plg::string val;
+				std::string val;
 				if constexpr (std::is_same_v<T, Color>) {
 					val = std::format("{} {} {} {}", value.r(), value.g(), value.b(), value.a());
 				} else if constexpr (std::is_same_v<T, Vector2D>) {
@@ -192,41 +192,6 @@ namespace utils {
 	bool FindValidSpawn(Vector& origin, QAngle& angles);
 
 	const fs::path& GameDirectory();
-
-	std::vector<std::string_view> SplitString(std::string_view strv, std::string_view delims);
-
-	template<typename T>
-	std::optional<T> StringToNumber(std::string_view str) {
-		T value;
-		auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value);
-		if (ec == std::errc()) {
-			return value;
-		}
-		return std::nullopt;
-	}
-
-	template<typename T>
-	std::vector<T> StringToVector(std::string_view str, std::string_view delims = " ") {
-		std::vector<T> vec;
-		for (const auto& item : SplitString(str, delims)) {
-			if (auto value = StringToNumber<T>(item)) {
-				vec.emplace_back(*value);
-			}
-		}
-		return vec;
-	}
-
-	template<typename T>
-	plg::string VectorToString(const std::vector<T>& vec) {
-		if (vec.empty()) {
-			return {};
-		}
-		plg::string buffer(plg::to_string(vec[0]));
-		for (auto it = std::next(vec.begin()); it != vec.end(); ++it) {
-			std::format_to(std::back_inserter(buffer), ",{}", *it);
-		}
-		return buffer;
-	}
 
 }// namespace utils
 
