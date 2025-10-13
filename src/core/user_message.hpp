@@ -26,7 +26,7 @@ namespace pb = google::protobuf;
 		    "Field '{}' has wrong type: expected {}, got {}\n",                                    \
 		    field->name(),                                                                         \
 		    #type,                                                                                 \
-		    plg::enum_to_string(field->cpp_type())                                                 \
+		    field->cpp_type_name()                                                                 \
 		);                                                                                         \
 		return false;                                                                              \
 	}
