@@ -204,8 +204,8 @@ public:
 	}
 
 	template<typename F>
-	int GetVTableIndex(F func) {
-		return poly::GetVTableIndex((void*&) func);
+	int GetVirtualIndex(F func) {
+		return poly::GetVirtualIndex((void*&) func);
 	}
 
 private:
