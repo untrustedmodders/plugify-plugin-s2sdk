@@ -11,8 +11,8 @@ extern std::vector<CGameEventListener*> g_vecEventListeners;
 class CGameEventListener : public IGameEventListener2
 {
 public:
-	CGameEventListener(FnEventListenerCallback callback, const char* pszEventName) :
-		m_callback(callback), m_eventName(pszEventName)
+	CGameEventListener(FnEventListenerCallback callback, const char* eventName) :
+		m_callback(callback), m_eventName(eventName)
 	{
 		g_vecEventListeners.emplace_back(this);
 	}

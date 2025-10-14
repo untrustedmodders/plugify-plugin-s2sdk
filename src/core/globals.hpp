@@ -108,33 +108,33 @@ namespace addresses {
 
 	inline void (*CBasePlayerController_SetPawn)(CBasePlayerController* controller, CBasePlayerPawn* pawn, bool, bool, bool);
 
-	inline CEntityInstance* (*CGameEntitySystem_FindEntityByClassName)(CEntitySystem* pEntitySystem, CEntityInstance* pStartEntity, const char* szName);
+	inline CEntityInstance* (*CGameEntitySystem_FindEntityByClassName)(CEntitySystem* entitySystem, CEntityInstance* startEntity, const char* szName);
 
-	inline CEntityInstance* (*CGameEntitySystem_FindEntityByName)(CEntitySystem* pEntitySystem, CEntityInstance* pStartEntity, const char* szName, CEntityInstance* pSearchingEntity, CEntityInstance* pActivator, CEntityInstance* pCaller, IEntityFindFilter* pFilter);
+	inline CEntityInstance* (*CGameEntitySystem_FindEntityByName)(CEntitySystem* entitySystem, CEntityInstance* startEntity, const char* name, CEntityInstance* searchingEntity, CEntityInstance* activator, CEntityInstance* caller, IEntityFindFilter* filter);
 
-	inline CEntityInstance* (*CreateEntityByName)(const char* className, int iForceEdictIndex);
+	inline CEntityInstance* (*CreateEntityByName)(const char* className, int forceEdictIndex);
 
-	inline void (*DispatchSpawn)(CEntityInstance* pEntity, CEntityKeyValues* pEntityKeyValues);
+	inline void (*DispatchSpawn)(CEntityInstance* entity, CEntityKeyValues* entityKeyValues);
 
-	inline void (*CBaseModelEntity_SetModel)(CBaseModelEntity* pModel, const char* szModel);
+	inline void (*CBaseModelEntity_SetModel)(CBaseModelEntity* entity, const char* model);
 
 	inline void (*UTIL_Remove)(CEntityInstance*);
 
-	inline void (*CEntityInstance_AcceptInput)(CEntityInstance* pThis, const char* pInputName, CEntityInstance* pActivator, CEntityInstance* pCaller, variant_t* value, int nOutputID);
+	inline void (*CEntityInstance_AcceptInput)(CEntityInstance* self, const char* inputName, CEntityInstance* activator, CEntityInstance* caller, variant_t* value, int outputID);
 
-	inline void (*CEntityIdentity_SetEntityName)(CEntityIdentity* pEntity, const char* pName);
+	inline void (*CEntityIdentity_SetEntityName)(CEntityIdentity* entity, const char* name);
 
-	inline void (*CBaseEntity_EmitSoundParams)(CBaseEntity* pEntity, const char* pszSound, int nPitch, float flVolume, float flDelay);
+	inline void (*CBaseEntity_EmitSoundParams)(CBaseEntity* entity, const char* sound, int pitch, float volume, float delay);
 
-	inline void (*CBaseEntity_SetParent)(CBaseEntity* pEntity, CBaseEntity* pNewParent, CUtlStringToken nBoneOrAttachName, matrix3x4a_t* pOffsetTransform);
+	inline void (*CBaseEntity_SetParent)(CBaseEntity* entity, CBaseEntity* newParent, CUtlStringToken nBoneOrAttachName, matrix3x4a_t* offsetTransform);
 
 	inline SndOpEventGuid_t (*CBaseEntity_EmitSoundFilter)(IRecipientFilter& filter, CEntityIndex ent, const EmitSound_t& params);
 
-	inline void (*CBaseEntity_SetMoveType)(CBaseEntity* pThis, MoveType_t nMoveType, MoveCollide_t nMoveCollide);
+	inline void (*CBaseEntity_SetMoveType)(CBaseEntity* self, MoveType_t moveType, MoveCollide_t moveCollide);
 
-	inline void (*CTakeDamageInfo_Constructor)(CTakeDamageInfo* pThis, CBaseEntity* pInflictor, CBaseEntity* pAttacker, CBaseEntity* pAbility, const Vector* vecDamageForce, const Vector* vecDamagePosition, float flDamage, int bitsDamageType, int iCustomDamage, void* a10);
+	inline void (*CTakeDamageInfo_Constructor)(CTakeDamageInfo* self, CBaseEntity* inflictor, CBaseEntity* attacker, CBaseEntity* ability, const Vector* damageForce, const Vector* damagePosition, float damage, int bitsDamageType, int customDamage, void* a10);
 
-	inline void (*CNetworkStringTable_DeleteAllStrings)(INetworkStringTable* pThis);
+	inline void (*CNetworkStringTable_DeleteAllStrings)(INetworkStringTable* self);
 
 	// cs go
 
@@ -142,21 +142,12 @@ namespace addresses {
 
 	inline void (*CCSPlayerController_SwitchTeam)(CBasePlayerController* controller, int team);
 
-	inline void (*CGameRules_TerminateRound)(CGameRules* pGameRules, float delay, unsigned int reason, int64 a4, unsigned int a5);
+	inline void (*CGameRules_TerminateRound)(CGameRules* gameRules, float delay, unsigned int reason, int64 a4, unsigned int a5);
 
 	inline CCSWeaponBaseVData* (*GetCSWeaponDataFromKey)(int, const char*);
 
 	//inline int16_t (*GetItemDefinitionByName)(CEconItemSchema*, const char*);
 
-	inline v8::MaybeLocal<v8::Module> (*CSScriptResolveModule)(v8::Local<v8::Context> context, v8::Local<v8::String> specifier, v8::Local<v8::FixedArray> import_assertions, v8::Local<v8::Module> referrer);
+	inline v8::MaybeLocal<v8::Module> (*CSScript_ResolveModule)(v8::Local<v8::Context> context, v8::Local<v8::String> specifier, v8::Local<v8::FixedArray> import_assertions, v8::Local<v8::Module> referrer);
 
 }// namespace addresses
-
-using HostStateRequestFn = void* (*)(CHostStateMgr *pMgrDoNotUse, CHostStateRequest* pRequest);
-using ReplyConnectionFn = void (*)(CNetworkGameServerBase *server, CServerSideClient* client);
-using SendNetMessageFn = void* (*)(const CServerSideClientBase*, const CNetMessage* data, uint8 bufType);
-using ProcessRespondCvarValueFn = void* (*)(const CServerSideClientBase*, const CCLCMsg_RespondCvarValue_t& msg);
-
-inline HostStateRequestFn g_pfnSetPendingHostStateRequest;
-inline ReplyConnectionFn g_pfnReplyConnection;
-inline SendNetMessageFn g_pfnSendNetMessage;

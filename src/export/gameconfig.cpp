@@ -44,8 +44,10 @@ extern "C" PLUGIN_API uint32_t LoadGameConfigFile(const plg::vector<plg::string>
 extern "C" PLUGIN_API plg::vector<plg::string> GetGameConfigPaths(uint32_t id) {
 	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
 		return gameConfig->GetPaths();
+	} else {
+		S2_LOGF(LS_WARNING, "Could not get find config: {}\n", id);
+		return {};
 	}
-	return {};
 }
 
 /**
@@ -61,8 +63,10 @@ extern "C" PLUGIN_API plg::vector<plg::string> GetGameConfigPaths(uint32_t id) {
 extern "C" PLUGIN_API plg::string GetGameConfigLibrary(uint32_t id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
 		return gameConfig->GetLibrary(name);
+	} else {
+		S2_LOGF(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
+		return {};
 	}
-	return {};
 }
 
 /**
@@ -78,8 +82,10 @@ extern "C" PLUGIN_API plg::string GetGameConfigLibrary(uint32_t id, const plg::s
 extern "C" PLUGIN_API plg::string GetGameConfigSignature(uint32_t id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
 		return gameConfig->GetSignature(name);
+	} else {
+		S2_LOGF(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
+		return {};
 	}
-	return {};
 }
 
 /**
@@ -95,8 +101,10 @@ extern "C" PLUGIN_API plg::string GetGameConfigSignature(uint32_t id, const plg:
 extern "C" PLUGIN_API plg::string GetGameConfigSymbol(uint32_t id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
 		return gameConfig->GetSymbol(name);
+	} else {
+		S2_LOGF(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
+		return {};
 	}
-	return {};
 }
 
 /**
@@ -112,8 +120,10 @@ extern "C" PLUGIN_API plg::string GetGameConfigSymbol(uint32_t id, const plg::st
 extern "C" PLUGIN_API plg::string GetGameConfigPatch(uint32_t id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
 		return gameConfig->GetPatch(name);
+	} else {
+		S2_LOGF(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
+		return {};
 	}
-	return {};
 }
 
 /**
@@ -128,8 +138,10 @@ extern "C" PLUGIN_API plg::string GetGameConfigPatch(uint32_t id, const plg::str
 extern "C" PLUGIN_API int GetGameConfigOffset(uint32_t id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
 		return gameConfig->GetOffset(name);
+	} else {
+		S2_LOGF(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
+		return -1;
 	}
-	return -1;
 }
 
 /**
@@ -144,8 +156,10 @@ extern "C" PLUGIN_API int GetGameConfigOffset(uint32_t id, const plg::string& na
 extern "C" PLUGIN_API void* GetGameConfigAddress(uint32_t id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
 		return gameConfig->GetAddress(name);
+	} else {
+		S2_LOGF(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
+		return nullptr;
 	}
-	return nullptr;
 }
 
 /**
@@ -160,8 +174,10 @@ extern "C" PLUGIN_API void* GetGameConfigAddress(uint32_t id, const plg::string&
 extern "C" PLUGIN_API void* GetGameConfigMemSig(uint32_t id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
 		return gameConfig->ResolveSignature(name);
+	} else {
+		S2_LOGF(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
+		return nullptr;
 	}
-	return nullptr;
 }
 
 PLUGIFY_WARN_POP()

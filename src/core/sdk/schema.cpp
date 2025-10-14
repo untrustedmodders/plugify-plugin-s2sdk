@@ -37,25 +37,25 @@ void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 nNet
 	CALL_VIRTUAL(void, nNetworkStateChangedOffset, (void*)pNetworkVar, &data);
 }
 
-void EntityNetworkStateChanged(uintptr_t pEntity, uint nOffset) {
+void EntityNetworkStateChanged(uintptr_t entity, uint nOffset) {
 	NetworkStateChanged_t data(nOffset);
-	reinterpret_cast<CEntityInstance*>(pEntity)->NetworkStateChanged(data);
+	reinterpret_cast<CEntityInstance*>(entity)->NetworkStateChanged(data);
 }
 
 void ChainNetworkStateChanged(uintptr_t pNetworkVarChainer, uint nLocalOffset) {
-	if (CEntityInstance* pEntity = reinterpret_cast<CNetworkVarChainer*>(pNetworkVarChainer)->GetObject()) {
-		pEntity->NetworkStateChanged(NetworkStateChanged_t(nLocalOffset, -1, reinterpret_cast<CNetworkVarChainer*>(pNetworkVarChainer)->m_PathIndex));
+	if (CEntityInstance* entity = reinterpret_cast<CNetworkVarChainer*>(pNetworkVarChainer)->GetObject()) {
+		entity->NetworkStateChanged(NetworkStateChanged_t(nLocalOffset, -1, reinterpret_cast<CNetworkVarChainer*>(pNetworkVarChainer)->m_PathIndex));
 	}
 }
 
-void SafeNetworkStateChanged(intptr_t pEntity, int offset, int chainOffset) {
+void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset) {
 	if (chainOffset > 0) {
-		::ChainNetworkStateChanged(pEntity + chainOffset, offset);
+		::ChainNetworkStateChanged(entity + chainOffset, offset);
 	} else {
 		if (chainOffset == 0)
-			::EntityNetworkStateChanged(pEntity, offset);
+			::EntityNetworkStateChanged(entity, offset);
 		else
-			::NetworkVarStateChanged(pEntity, offset, -chainOffset);
+			::NetworkVarStateChanged(entity, offset, -chainOffset);
 	}
 }
 
@@ -137,10 +137,10 @@ namespace schema {
 
 	void NetworkStateChanged(intptr_t chainEntity, uint localOffset, int arrayIndex) {
 		CNetworkVarChainer* chainEnt = reinterpret_cast<CNetworkVarChainer*>(chainEntity);
-		CEntityInstance* pEntity = chainEnt->GetObject();
-		if (pEntity && !(pEntity->m_pEntity->m_flags & EF_IS_CONSTRUCTION_IN_PROGRESS)) {
+		CEntityInstance* entity = chainEnt->GetObject();
+		if (entity && !(entity->m_pEntity->m_flags & EF_IS_CONSTRUCTION_IN_PROGRESS)) {
 			NetworkStateChanged_t data(localOffset, arrayIndex, chainEnt->m_PathIndex);
-			pEntity->NetworkStateChanged(data);
+			entity->NetworkStateChanged(data);
 		}
 	}
 
@@ -164,10 +164,10 @@ namespace schema {
 	std::pair<ElementType, int> IsIntType(CSchemaType* type) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* pElementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
-				switch (pElementType->m_eTypeCategory) {
+				auto* elementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
+				switch (elementType->m_eTypeCategory) {
 					case SCHEMA_TYPE_BUILTIN: {
-						switch (static_cast<CSchemaType_Builtin*>(pElementType)->m_eBuiltinType) {
+						switch (static_cast<CSchemaType_Builtin*>(elementType)->m_eBuiltinType) {
 							case SCHEMA_BUILTIN_TYPE_BOOL:
 								return {Array, static_cast<int>(sizeof(bool))};
 							case SCHEMA_BUILTIN_TYPE_CHAR:
@@ -195,14 +195,14 @@ namespace schema {
 						}
 					}
 					case SCHEMA_TYPE_DECLARED_CLASS: {
-						int nSize = static_cast<CSchemaType_DeclaredClass*>(pElementType)->m_pClassInfo->m_nSize;
+						int nSize = static_cast<CSchemaType_DeclaredClass*>(elementType)->m_pClassInfo->m_nSize;
 						if (nSize <= sizeof(double)) {
 							return {Array, nSize};
 						}
 						return {Invalid, -1};
 					}
 					case SCHEMA_TYPE_DECLARED_ENUM:
-						return {Array, static_cast<CSchemaType_DeclaredEnum*>(pElementType)->m_pEnumInfo->m_nSize};
+						return {Array, static_cast<CSchemaType_DeclaredEnum*>(elementType)->m_pEnumInfo->m_nSize};
 					case SCHEMA_TYPE_POINTER:
 						return {Array, static_cast<int>(sizeof(void*))};
 					default:
@@ -278,11 +278,11 @@ namespace schema {
 	std::pair<ElementType, int> IsFloatType(CSchemaType* type) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* pElementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
-				switch (pElementType->m_eTypeCategory) {
+				auto* elementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
+				switch (elementType->m_eTypeCategory) {
 					case SCHEMA_TYPE_BUILTIN: {
-						auto* pElementTypeBuiltin = static_cast<CSchemaType_Builtin*>(pElementType);
-						switch (pElementTypeBuiltin->m_eBuiltinType) {
+						auto* elementTypeBuiltin = static_cast<CSchemaType_Builtin*>(elementType);
+						switch (elementTypeBuiltin->m_eBuiltinType) {
 							case SCHEMA_BUILTIN_TYPE_FLOAT32:
 								return {Array, static_cast<int>(sizeof(float32))};
 							case SCHEMA_BUILTIN_TYPE_FLOAT64:
@@ -292,7 +292,7 @@ namespace schema {
 						}
 					}
 					case SCHEMA_TYPE_DECLARED_CLASS: {
-						int nSize = static_cast<CSchemaType_DeclaredClass*>(pElementType)->m_pClassInfo->m_nSize;
+						int nSize = static_cast<CSchemaType_DeclaredClass*>(elementType)->m_pClassInfo->m_nSize;
 						if (nSize <= sizeof(double)) {
 							return {Array, nSize};
 						}
@@ -342,9 +342,9 @@ namespace schema {
 	ElementType IsPlainType(CSchemaType* type, size_t size) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* pElementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
-				if (pElementType->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && pElementType->m_eAtomicCategory == SCHEMA_ATOMIC_PLAIN) {
-					if (static_cast<CSchemaType_Atomic*>(pElementType)->m_nSize == size)
+				auto* elementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
+				if (elementType->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && elementType->m_eAtomicCategory == SCHEMA_ATOMIC_PLAIN) {
+					if (static_cast<CSchemaType_Atomic*>(elementType)->m_nSize == size)
 						return Array;
 				}
 				return Invalid;
@@ -373,9 +373,9 @@ namespace schema {
 	ElementType IsAtomicType(CSchemaType* type, size_t size) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* pElementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
-				if (pElementType->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && pElementType->m_eAtomicCategory == SCHEMA_ATOMIC_T) {
-					if (static_cast<CSchemaType_Atomic_T*>(pElementType)->m_nSize == size)
+				auto* elementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
+				if (elementType->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && elementType->m_eAtomicCategory == SCHEMA_ATOMIC_T) {
+					if (static_cast<CSchemaType_Atomic_T*>(elementType)->m_nSize == size)
 						return Array;
 				}
 				return Invalid;

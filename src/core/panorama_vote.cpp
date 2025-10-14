@@ -23,9 +23,9 @@ void PanoramaVoteHandler::Init() {
 	if (m_voteInProgress)
 		return;
 
-	CVoteController* pVoteController = nullptr;
-	while (nullptr != (pVoteController = static_cast<CVoteController *>(utils::FindEntityByClassname(pVoteController, "vote_controller")))) {
-		m_voteController = pVoteController->GetHandle();
+	CVoteController* voteController = nullptr;
+	while (nullptr != (voteController = static_cast<CVoteController *>(utils::FindEntityByClassname(voteController, "vote_controller")))) {
+		m_voteController = voteController->GetHandle();
 	}
 }
 
@@ -162,8 +162,8 @@ bool PanoramaVoteHandler::SendYesNoVote(double duration, int caller,
 }
 
 void PanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
-	INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteStart");
-	auto data = pNetMsg->AllocateMessage()->As<CCSUsrMsg_VoteStart_t>();
+	INetworkMessageInternal *netMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteStart");
+	auto data = netMsg->AllocateMessage()->As<CCSUsrMsg_VoteStart_t>();
 
 	data->set_team(-1);
 	data->set_player_slot(m_currentVoteCaller);
@@ -274,9 +274,9 @@ void PanoramaVoteHandler::EndVote(VoteEndReason reason) {
 }
 
 void PanoramaVoteHandler::SendVoteFailed() const {
-	INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteFailed");
+	INetworkMessageInternal *netMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteFailed");
 
-	auto data = pNetMsg->AllocateMessage()->As<CCSUsrMsg_VoteFailed_t>();
+	auto data = netMsg->AllocateMessage()->As<CCSUsrMsg_VoteFailed_t>();
 
 	data->set_reason(m_currentVoteFailReason);
 	data->set_team(-1);
@@ -293,9 +293,9 @@ void PanoramaVoteHandler::SendVoteFailed() const {
 }
 
 void PanoramaVoteHandler::SendVotePassed() const {
-	INetworkMessageInternal *pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("VotePass");
+	INetworkMessageInternal *netMsg = g_pNetworkMessages->FindNetworkMessagePartial("VotePass");
 
-	auto data = pNetMsg->AllocateMessage()->As<CCSUsrMsg_VotePass_t>();
+	auto data = netMsg->AllocateMessage()->As<CCSUsrMsg_VotePass_t>();
 
 	data->set_team(-1);
 	data->set_vote_type(2); // VOTEISSUE_NEXTLEVEL

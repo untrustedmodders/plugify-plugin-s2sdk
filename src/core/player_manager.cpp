@@ -18,12 +18,12 @@ constexpr int CLIENT_OPERATING_SYSTEMID = INT_MAX - 1;
 
 CBasePlayerController* Player::GetController() const {
 	auto entIndex = GetEntityIndex();
-	CBaseEntity* ent = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(entIndex));
-	if (!ent) {
+	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(entIndex));
+	if (!entity) {
 		return nullptr;
 	}
 
-	return ent->IsController() ? static_cast<CPlayerController*>(ent) : nullptr;
+	return entity->IsController() ? static_cast<CPlayerController*>(entity) : nullptr;
 }
 
 CBasePlayerPawn* Player::GetCurrentPawn() const {
@@ -175,13 +175,13 @@ void PlayerManager::OnSteamAPIActivated() {
 	m_CallbackValidateAuthTicketResponse.Register(this, &PlayerManager::OnValidateAuthTicket);
 }
 
-void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* pResponse) {
-	if (pResponse->m_eAuthSessionResponse != k_EAuthSessionResponseOK)
+void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* response) {
+	if (response->m_eAuthSessionResponse != k_EAuthSessionResponseOK)
 		return;
 
 	for (const Player& player : m_players) {
 		CSteamID steamID = player.GetSteamId();
-		if (steamID == pResponse->m_SteamID) {
+		if (steamID == response->m_SteamID) {
 			GetOnClientAuthenticatedListenerManager().Notify(player.GetPlayerSlot(), steamID.GetAccountID());
 			return;
 		}
@@ -317,17 +317,17 @@ Player* PlayerManager::ToPlayer(CPlayerSlot slot) const {
 }
 
 Player* PlayerManager::ToPlayer(CEntityIndex entIndex) const {
-	CBaseEntity* ent = static_cast<CBaseEntity*>(GameEntitySystem()->GetEntityInstance(entIndex));
-	if (!ent) {
+	CBaseEntity* entity = static_cast<CBaseEntity*>(GameEntitySystem()->GetEntityInstance(entIndex));
+	if (!entity) {
 		return nullptr;
 	}
 
-	if (ent->IsPawn()) {
-		return ToPlayer(static_cast<CBasePlayerPawn*>(ent));
+	if (entity->IsPawn()) {
+		return ToPlayer(static_cast<CBasePlayerPawn*>(entity));
 	}
 
-	if (ent->IsController()) {
-		return ToPlayer(static_cast<CBasePlayerController*>(ent));
+	if (entity->IsController()) {
+		return ToPlayer(static_cast<CBasePlayerController*>(entity));
 	}
 
 	return nullptr;

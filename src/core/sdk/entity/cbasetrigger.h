@@ -37,9 +37,9 @@ public:
 	SCHEMA_FIELD_POINTER(CUtlVector<CHandle<CBaseEntity>>, m_hTouchingEntities)
 	SCHEMA_FIELD(bool, m_bClientSidePredicted)
 
-	bool PassesTriggerFilters(CBaseEntity* pOther) {
+	bool PassesTriggerFilters(CBaseEntity* other) {
 		static int offset = g_pGameConfig->GetOffset("PassesTriggerFilters");
-		return CALL_VIRTUAL(bool, offset, this, pOther);
+		return CALL_VIRTUAL(bool, offset, this, other);
 	}
 
 	//bool IsStartZone() { return !V_stricmp(this->GetClassname(), "trigger_multiple") && this->m_pEntity->NameMatches("timer_startzone"); }

@@ -161,8 +161,8 @@ public:
 	static void ChangeGlobal(
 		ConVarRefAbstract* ref,
 		CSplitScreenSlot slot,
-		const char* pNewValue,
-		const char* pOldValue,
+		const char* newValue,
+		const char* oldValue,
 		void*
 	);
 

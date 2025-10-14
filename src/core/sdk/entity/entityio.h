@@ -11,7 +11,7 @@ struct EntityIOConnectionDesc_t {
 	CEntityHandle m_hTarget;
 	EntityIOTargetType_t m_nTargetType;
 	int32 m_nTimesToFire;
-	float m_flDelay;
+	float m_delay;
 };
 
 struct EntityIOConnection_t : EntityIOConnectionDesc_t {

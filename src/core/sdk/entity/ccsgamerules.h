@@ -48,8 +48,8 @@ public:
 	SCHEMA_FIELD_POINTER(CUtlVector<SpawnPoint*>, m_CTSpawnPoints)
 	SCHEMA_FIELD_POINTER(CUtlVector<SpawnPoint*>, m_TerroristSpawnPoints)
 
-	void TerminateRound(float flDelay, CSRoundEndReason reason) {
-		addresses::CGameRules_TerminateRound(this, flDelay, reason, 0, 0);
+	void TerminateRound(float delay, CSRoundEndReason reason) {
+		addresses::CGameRules_TerminateRound(this, delay, reason, 0, 0);
 	}
 };
 

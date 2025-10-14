@@ -8,7 +8,7 @@ struct EventInfo {
 	bool dontBroadcast{};
 };
 
-using EventListenerCallback = ResultType (*)(const plg::string& name, EventInfo* pEvent, bool bDontBroadcast);
+using EventListenerCallback = ResultType (*)(const plg::string& name, EventInfo* event, bool dontBroadcast);
 
 using HookCallback = ListenerManager<EventListenerCallback>;
 

@@ -265,12 +265,12 @@ extern "C" PLUGIN_API void SetEventPtr(EventInfo* info, const plg::string& key, 
  * @param value A handle to the player controller to set.
  */
 extern "C" PLUGIN_API void SetEventPlayerController(EventInfo* info, const plg::string& key, int value) {
-	CEntityInstance* pEntity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) value));
-	if (!pEntity) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) value));
+	if (!entity) {
 		return;
 	}
 
-	info->event->SetPlayer(utils::MakeEventKeySymbol(key), pEntity);
+	info->event->SetPlayer(utils::MakeEventKeySymbol(key), entity);
 }
 
 /**

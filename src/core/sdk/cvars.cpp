@@ -15,19 +15,19 @@
 #undef CreateEvent
 
 void cvars::NotifyConVar(ConVarRefAbstract conVar, std::string_view value) {
-	IGameEvent* pEvent = g_pGameEventManager->CreateEvent("server_cvar");
-	if (pEvent == nullptr) {
+	IGameEvent* event = g_pGameEventManager->CreateEvent("server_cvar");
+	if (event == nullptr) {
 		return;
 	}
 
-	pEvent->SetString("cvarname", conVar.GetName());
+	event->SetString("cvarname", conVar.GetName());
 	if (conVar.IsFlagSet(FCVAR_PROTECTED)) {
-		pEvent->SetString("cvarvalue", "***PROTECTED***");
+		event->SetString("cvarvalue", "***PROTECTED***");
 	} else {
-		pEvent->SetString("cvarvalue", value.data());
+		event->SetString("cvarvalue", value.data());
 	}
 
-	g_pGameEventManager->FireEvent(pEvent);
+	g_pGameEventManager->FireEvent(event);
 }
 
 void cvars::ReplicateConVar(ConVarRefAbstract conVar, std::string_view value) {
@@ -41,8 +41,8 @@ void cvars::ReplicateConVar(ConVarRefAbstract conVar, std::string_view value) {
 
 void cvars::SendConVarValue(CPlayerSlot slot, std::string_view name, std::string_view value) {
 	if (g_pEngineServer->GetPlayerNetInfo(slot)) {
-		static INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("CNETMsg_SetConVar");
-		auto msg = pNetMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
+		static INetworkMessageInternal* netMsg = g_pNetworkMessages->FindNetworkMessagePartial("CNETMsg_SetConVar");
+		auto msg = netMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
 		CMsg_CVars_CVar* data = msg->mutable_convars()->add_cvars();
 		data->set_name(std::string(name));
 		data->set_value(std::string(value));
@@ -54,8 +54,8 @@ void cvars::SendConVarValue(CPlayerSlot slot, std::string_view name, std::string
 
 void cvars::SendMultipleConVarValues(CPlayerSlot slot, std::span<const std::string_view> names, std::span<const std::string_view> values, uint32_t size) {
 	if (g_pEngineServer->GetPlayerNetInfo(slot)) {
-		static INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("CNETMsg_SetConVar");
-		auto msg = pNetMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
+		static INetworkMessageInternal* netMsg = g_pNetworkMessages->FindNetworkMessagePartial("CNETMsg_SetConVar");
+		auto msg = netMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
 		for (uint32_t i = 0; i < size; ++i) {
 			CMsg_CVars_CVar* data = msg->mutable_convars()->add_cvars();
 			data->set_name(std::string(names[i]));
@@ -68,11 +68,11 @@ void cvars::SendMultipleConVarValues(CPlayerSlot slot, std::span<const std::stri
 
 int cvars::SendConVarValueQueryToClient(CPlayerSlot slot, std::string_view cvarName, int queryCvarCookieOverride) {
 	if (g_pEngineServer->GetPlayerNetInfo(slot)) {
-		static INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("CSVCMsg_GetCvarValue");
+		static INetworkMessageInternal* netMsg = g_pNetworkMessages->FindNetworkMessagePartial("CSVCMsg_GetCvarValue");
 		static int iQueryCvarCookieCounter = 0;
 		int queryCvarCookie = queryCvarCookieOverride == -1 ? ++iQueryCvarCookieCounter : queryCvarCookieOverride;
 
-		auto msg = pNetMsg->AllocateMessage()->As<CSVCMsg_GetCvarValue_t>();
+		auto msg = netMsg->AllocateMessage()->As<CSVCMsg_GetCvarValue_t>();
 		msg->set_cookie(queryCvarCookie);
 		msg->set_cvar_name(std::string(cvarName));
 

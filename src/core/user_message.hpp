@@ -170,9 +170,9 @@ public:
 		CHECK_FIELD_TYPE(ENUM);
 		CHECK_FIELD_NOT_REPEATED();
 
-		const pb::EnumValueDescriptor* pEnumValue = field->enum_type()->FindValueByNumber(value);
-		if (!pEnumValue) return false;
-		m_msg->GetReflection()->SetEnum(m_msg, field, pEnumValue);
+		const pb::EnumValueDescriptor* enumValue = field->enum_type()->FindValueByNumber(value);
+		if (!enumValue) return false;
+		m_msg->GetReflection()->SetEnum(m_msg, field, enumValue);
 		return true;
 	}
 
@@ -203,9 +203,9 @@ public:
 		CHECK_FIELD_TYPE(ENUM);
 		CHECK_FIELD_REPEATED();
 
-		const pb::EnumValueDescriptor* pEnumValue = field->enum_type()->FindValueByNumber(value);
-		if (!pEnumValue) return false;
-		m_msg->GetReflection()->AddEnum(m_msg, field, pEnumValue);
+		const pb::EnumValueDescriptor* enumValue = field->enum_type()->FindValueByNumber(value);
+		if (!enumValue) return false;
+		m_msg->GetReflection()->AddEnum(m_msg, field, enumValue);
 		return true;
 	}
 

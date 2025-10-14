@@ -68,7 +68,7 @@ enum TakeDamageFlags_t : uint32_t {
 
 // No idea what this is meant to have, but OnTakeDamage_Alive expects this and we only care about pInfo
 struct CTakeDamageInfoContainer {
-	CTakeDamageInfo* pInfo;
+	CTakeDamageInfo* info;
 };
 
 class CTakeDamageInfo {
@@ -80,8 +80,8 @@ public:
 		addresses::CTakeDamageInfo_Constructor(this, nullptr, nullptr, nullptr, &vec3_origin, &vec3_origin, 0.f, 0, 0, nullptr);
 	}
 
-	CTakeDamageInfo(CBaseEntity* pInflictor, CBaseEntity* pAttacker, CBaseEntity* pAbility, float flDamage, DamageTypes_t bitsDamageType) {
-		addresses::CTakeDamageInfo_Constructor(this, pInflictor, pAttacker, pAbility, &vec3_origin, &vec3_origin, flDamage, bitsDamageType, 0, nullptr);
+	CTakeDamageInfo(CBaseEntity* inflictor, CBaseEntity* attacker, CBaseEntity* ability, float damage, DamageTypes_t bitsDamageType) {
+		addresses::CTakeDamageInfo_Constructor(this, inflictor, attacker, ability, &vec3_origin, &vec3_origin, damage, bitsDamageType, 0, nullptr);
 	}
 
 	Vector m_vecDamageForce;

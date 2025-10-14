@@ -219,12 +219,12 @@ extern "C" PLUGIN_API float GetSoundDuration(const plg::string& name) {
  * @param delay The delay before the sound is played.
  */
 extern "C" PLUGIN_API void EmitSound(int entityHandle, const plg::string& sound, int pitch, float volume, float delay) {
-	CBaseEntity* pEntity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
-	if (!pEntity) {
+	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
+	if (!entity) {
 		return;
 	}
 
-	addresses::CBaseEntity_EmitSoundParams(pEntity, sound.c_str(), pitch, volume, delay);
+	addresses::CBaseEntity_EmitSoundParams(entity, sound.c_str(), pitch, volume, delay);
 }
 
 /**

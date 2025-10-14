@@ -155,10 +155,10 @@ private:
 	virtual void unk_21() = 0;
 
 public:
-	virtual bool CanUse(CBasePlayerWeapon* pWeapon) = 0;
-	virtual void Drop(CBasePlayerWeapon* pWeapon, Vector* pVecTarget = nullptr, Vector* pVelocity = nullptr) = 0;
-	virtual int Bump(CBasePlayerWeapon* pWeapon) = 0;				// May return 2 if CSGameRules()->IsPlayingGunGameDeathmatch, meaning that pWeapon will be deleted
-	virtual bool Switch(CBasePlayerWeapon* pWeapon, int a3 = 0) = 0;// If a3 is equal to 3 some code will be executed
+	virtual bool CanUse(CBasePlayerWeapon* weapon) = 0;
+	virtual void Drop(CBasePlayerWeapon* weapon, Vector* vecTarget = nullptr, Vector* velocity = nullptr) = 0;
+	virtual int Bump(CBasePlayerWeapon* weapon) = 0;				// May return 2 if CSGameRules()->IsPlayingGunGameDeathmatch, meaning that weapon will be deleted
+	virtual bool Switch(CBasePlayerWeapon* weapon, int a3 = 0) = 0;// If a3 is equal to 3 some code will be executed
 private:
 	virtual void unk_25() = 0;
 	virtual void unk_26() = 0;
@@ -186,10 +186,10 @@ public:
 	SCHEMA_FIELD(int32_t, m_nTimeToSniperRifle)
 	SCHEMA_FIELD(bool, m_bIsBeingGivenItem)
 	SCHEMA_FIELD(bool, m_bIsPickingUpItemWithUse)
-	SCHEMA_FIELD(bool, m_bPickedUpWeapon)
+	SCHEMA_FIELD(bool, m_bPickedUweapon)
 
-	void RemoveItem(CBasePlayerWeapon* pWeapon) {
-		addresses::CCSPlayer_WeaponServices_RemoveItem(this, pWeapon);
+	void RemoveItem(CBasePlayerWeapon* weapon) {
+		addresses::CCSPlayer_WeaponServices_RemoveItem(this, weapon);
 	}
 };
 
@@ -229,13 +229,13 @@ private:
 	virtual void unk_15() = 0;
 	virtual void unk_16() = 0;
 	virtual void unk_17() = 0;
-	virtual CBaseEntity* _GiveNamedItem(const char* pchName) = 0;
+	virtual CBaseEntity* _GiveNamedItem(const char* name) = 0;
 
 public:
-	virtual bool GiveNamedItemBool(const char* pchName) = 0;
-	virtual CBaseEntity* GiveNamedItem(const char* pchName) = 0;
-	// Recommended to use CCSPlayer_WeaponServices::DropWeapon instead (parameter is ignored here)
-	virtual void DropActiveWeapon(CBasePlayerWeapon* pWeapon) = 0;
+	virtual bool GiveNamedItemBool(const char* name) = 0;
+	virtual CBaseEntity* GiveNamedItem(const char* name) = 0;
+	// Recommended to use CCSPlayer_WeaponServices::Droweapon instead (parameter is ignored here)
+	virtual void DropActiveWeapon(CBasePlayerWeapon* weapon) = 0;
 	virtual void StripPlayerWeapons(bool removeSuit = false) = 0;
 
 	void RemoveWeapons()

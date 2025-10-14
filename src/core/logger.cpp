@@ -34,14 +34,14 @@ void Logger::SetChannelVerbosity(LoggingVerbosity_t verbosity) const {
 	return LoggingSystem_SetChannelVerbosity(m_channelID, verbosity);
 }
 
-void Logger::SetChannelVerbosityByName(const char* pName, LoggingVerbosity_t verbosity) {
+void Logger::SetChannelVerbosityByName(const char* name, LoggingVerbosity_t verbosity) {
 	std::unique_lock lock(m_mutex);
-	return LoggingSystem_SetChannelVerbosityByName(pName, verbosity);
+	return LoggingSystem_SetChannelVerbosityByName(name, verbosity);
 }
 
-void Logger::SetChannelVerbosityByTag(const char* pTag, LoggingVerbosity_t verbosity) {
+void Logger::SetChannelVerbosityByTag(const char* tag, LoggingVerbosity_t verbosity) {
 	std::unique_lock lock(m_mutex);
-	LoggingSystem_SetChannelVerbosityByTag(pTag, verbosity);
+	LoggingSystem_SetChannelVerbosityByTag(tag, verbosity);
 }
 
 int Logger::GetChannelColor() const {

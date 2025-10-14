@@ -183,8 +183,8 @@ bool utils::CFormat(char* buffer, uint64_t buffer_size, const char* text) {
 }
 
 void ClientPrint(std::optional<CPlayerSlot> playerSlot, HudDest dest, std::string_view message) {
-	INetworkMessageInternal* pNetMsg = g_pNetworkMessages->FindNetworkMessagePartial("TextMsg");
-	auto* data = pNetMsg->AllocateMessage()->As<CUserMessageTextMsg_t>();
+	INetworkMessageInternal* netMsg = g_pNetworkMessages->FindNetworkMessagePartial("TextMsg");
+	auto* data = netMsg->AllocateMessage()->As<CUserMessageTextMsg_t>();
 
 	data->set_dest(static_cast<uint32_t>(dest));
 	data->add_param(std::string(message));

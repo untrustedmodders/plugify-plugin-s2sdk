@@ -84,7 +84,7 @@ export class ZombieMod extends Plugin {
 
     hookFuncs() {
         const gameConfig = s2.LoadGameConfigFile([`gamedata.jsonc`])
-        const canAcquireAddress = s2.GetGameConfigMemSig(gameConfig, "CCSPlayer_ItemServices_CanAcquire")
+        const canAcquireAddress = s2.GetGameConfigMemSig(gameConfig, "CCSPlayer_ItemServices::CanAcquire")
 
         const preHook = pl.CallbackType.Pre
 

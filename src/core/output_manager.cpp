@@ -29,16 +29,16 @@ bool EntityOutputManager::UnhookEntityOutput(plg::string classname, plg::string 
 	return false;
 }
 
-ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* pThis, CEntityInstance* pActivator, CEntityInstance* pCaller, float flDelay) {
+ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntityInstance* activator, CEntityInstance* caller, float delay) {
 
-	if (pCaller) {
-		//S2_LOGF(LS_DEBUG, "[EntityOutputManager][FireOutputHook] - {}, {}\n", pThis->m_pDesc->m_pName, pCaller->GetClassname());
+	if (caller) {
+		//S2_LOGF(LS_DEBUG, "[EntityOutputManager][FireOutputHook] - {}, {}\n", self->m_pDesc->m_pName, caller->GetClassname());
 
 		std::array searchKeys{
-				OutputKey{"*", pThis->m_pDesc->m_pName},
+				OutputKey{"*", self->m_pDesc->m_pName},
 				OutputKey{"*", "*"},
-				OutputKey{pCaller->GetClassname(), pThis->m_pDesc->m_pName},
-				OutputKey{pCaller->GetClassname(), "*"}
+				OutputKey{caller->GetClassname(), self->m_pDesc->m_pName},
+				OutputKey{caller->GetClassname(), "*"}
 		};
 
 		m_vecCallbackPairs.clear();
@@ -50,18 +50,18 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* pThis, CEnti
 			}
 		}
 	} else {
-		//S2_LOGF(LS_DEBUG, "[EntityOutputManager][FireOutputHook] - {}, unknown caller\n", pThis->m_pDesc->m_pName);
+		//S2_LOGF(LS_DEBUG, "[EntityOutputManager][FireOutputHook] - {}, unknown caller\n", self->m_pDesc->m_pName);
 	}
 
 	ResultType result = ResultType::Continue;
 
-	int activator = pActivator != nullptr ? pActivator->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
-	int caller = pCaller != nullptr ? pCaller->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
+	int activatorHandle = activator != nullptr ? activator->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
+	int callerHandle = caller != nullptr ? caller->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
 
 	for (const auto& pCallbackPair : m_vecCallbackPairs) {
 		auto& cb = pCallbackPair->callbacks[0];
 		for (size_t i = 0; i < cb.GetCount(); ++i) {
-			auto thisResult = cb.Notify(i, activator, caller, flDelay);
+			auto thisResult = cb.Notify(i, activatorHandle, callerHandle, delay);
 			if (thisResult >= ResultType::Stop) {
 				break;
 			}
@@ -75,13 +75,13 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* pThis, CEnti
 	return result;
 }
 
-ResultType EntityOutputManager::FireOutputInternal_Post(CEntityIOOutput* pThis, CEntityInstance* pActivator, CEntityInstance* pCaller, float flDelay) {
-	int activator = pActivator != nullptr ? pActivator->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
-	int caller = pCaller != nullptr ? pCaller->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
+ResultType EntityOutputManager::FireOutputInternal_Post(CEntityIOOutput* self, CEntityInstance* activator, CEntityInstance* caller, float delay) {
+	int activatorHandle = activator != nullptr ? activator->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
+	int callerHandle = caller != nullptr ? caller->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 
 	for (const auto& pCallbackPair : m_vecCallbackPairs) {
 		auto& cb = pCallbackPair->callbacks[1];
-		cb.Notify(activator, caller, flDelay);
+		cb.Notify(activatorHandle, callerHandle, delay);
 	}
 
 	return ResultType::Continue;

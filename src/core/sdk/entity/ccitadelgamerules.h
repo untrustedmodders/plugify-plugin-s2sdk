@@ -6,7 +6,7 @@ class CCitadelGameRules : public CGameRules {
 public:
     DECLARE_SCHEMA_CLASS(CCitadelGameRules)
 
-    void TerminateRound(float flDelay, int reason) {
+    void TerminateRound(float delay, int reason) {
     }
 };
 

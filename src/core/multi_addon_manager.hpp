@@ -41,9 +41,10 @@ public:
 	void OnGameFrame();
 	void OnPostEvent(INetworkMessageInternal* message, CNetMessage* data, uint64_t* clients);
 
-	void* OnSendNetMessage(CServerSideClient* client, CNetMessage* data, NetChannelBufType_t bufType);
-	void OnHostStateRequest(CHostStateMgr* pMgrDoNotUse, CHostStateRequest* pRequest);
+	void OnSendNetMessage(CServerSideClient* client, CNetMessage* data, NetChannelBufType_t bufType);
+	void OnHostStateRequest(CHostStateMgr* manager, CHostStateRequest* request);
 	void OnReplyConnection(CNetworkGameServerBase* server, CServerSideClient* client);
+	void OnReplyConnection_Post(CNetworkGameServerBase* server, CServerSideClient* client);
 
 public:
 	plg::vector<uint64_t> m_extraAddons;

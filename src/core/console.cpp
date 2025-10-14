@@ -6,8 +6,8 @@ std::atomic<bool> g_ShouldCatchSpew = false;
 
 class LoggingListener final : public ILoggingListener {
 public:
-	void Log(const LoggingContext_t* pContext, const tchar* pMessage) override {
-		g_ServerCommandBuffer = pMessage;
+	void Log(const LoggingContext_t* context, const tchar* message) override {
+		g_ServerCommandBuffer = message;
 	}
 } g_LoggingListener;
 

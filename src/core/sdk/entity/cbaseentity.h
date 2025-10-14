@@ -157,8 +157,8 @@ public:
 	void SetAbsVelocity(const Vector& vecVelocity) { m_vecAbsVelocity = vecVelocity; }
 	void SetBaseVelocity(const Vector& vecVelocity) { m_vecBaseVelocity = vecVelocity; }
 
-	void SetName(const char* pName) {
-		addresses::CEntityIdentity_SetEntityName(m_pEntity, pName);
+	void SetName(const char* name) {
+		addresses::CEntityIdentity_SetEntityName(m_pEntity, name);
 	}
 
 	const char* GetName() {
@@ -201,13 +201,13 @@ public:
 		static int offset = g_pGameConfig->GetOffset("StartTouch");
 		CALL_VIRTUAL(bool, offset, this, pOther);
 	}
-	void Touch(CBaseEntity* pOther) {
+	void Touch(CBaseEntity* other) {
 		static int offset = g_pGameConfig->GetOffset("Touch");
-		CALL_VIRTUAL(bool, offset, this, pOther);
+		CALL_VIRTUAL(bool, offset, this, other);
 	}
-	void EndTouch(CBaseEntity* pOther) {
+	void EndTouch(CBaseEntity* other) {
 		static int offset = g_pGameConfig->GetOffset("EndTouch");
-		CALL_VIRTUAL(bool, offset, this, pOther);
+		CALL_VIRTUAL(bool, offset, this, other);
 	}
 
 	void Teleport(const Vector* newPosition, const QAngle* newAngles, const Vector* newVelocity) {
@@ -290,15 +290,15 @@ public:
 	}
 
 	// Emit a sound event
-	void EmitSound(const char* pszSound, int nPitch = 100, float flVolume = 1.0, float flDelay = 0.0) {
-		addresses::CBaseEntity_EmitSoundParams(this, pszSound, nPitch, flVolume, flDelay);
+	void EmitSound(const char* sound, int pitch = 100, float volume = 1.0, float delay = 0.0) {
+		addresses::CBaseEntity_EmitSoundParams(this, sound, pitch, volume, delay);
 	}
 
-	SndOpEventGuid_t EmitSoundFilter(IRecipientFilter& filter, const char* pszSound, float flVolume = 1.0, float flPitch = 1.0) {
+	SndOpEventGuid_t EmitSoundFilter(IRecipientFilter& filter, const char* sound, float volume = 1.0, float pitch = 1.0) {
 		EmitSound_t params;
-		params.m_pSoundName = pszSound;
-		params.m_flVolume = flVolume;
-		params.m_nPitch = static_cast<int>(flPitch);
+		params.m_pSoundName = sound;
+		params.m_flVolume = volume;
+		params.m_nPitch = static_cast<int>(pitch);
 
 		return addresses::CBaseEntity_EmitSoundFilter(filter, entindex(), params);
 	}
@@ -316,8 +316,8 @@ public:
 		addresses::UTIL_Remove(this);
 	}
 
-	void AcceptInput(const char* pInputName, const variant_t& value = variant_t(), CEntityInstance* pActivator = nullptr, CEntityInstance* pCaller = nullptr, int outputId = 0) {
-		addresses::CEntityInstance_AcceptInput(this, pInputName, pActivator, pCaller, const_cast<variant_t*>(&value), outputId);
+	void AcceptInput(const char* inputName, const variant_t& value = variant_t(), CEntityInstance* activator = nullptr, CEntityInstance* caller = nullptr, int outputId = 0) {
+		addresses::CEntityInstance_AcceptInput(this, inputName, activator, caller, const_cast<variant_t*>(&value), outputId);
 	}
 
 	void SetMoveType(MoveType_t nMoveType) {

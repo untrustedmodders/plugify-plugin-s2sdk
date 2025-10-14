@@ -7,19 +7,19 @@
         "library": "engine2",
         "win64": "48 89 4C 24 ? 53 56 57 48 83 EC ? 48 8B F1"
       },
-      "CCSServerPointScriptEntityEnterScope": {
+      "CCSServer::PointScriptEntityEnterScope": {
         "library": "server",
         "win64": "48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC ? 48 89 11",
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 41 89 F4 53 48 89 FB 48 83 EC ? E8 ? ? ? ? 48 8B 43" // any function with g_Scripts
       },
       // String: "InitialActivate" and "OnActivate"
-      "CCSScriptOnActivate": {
+      "CCSScript::OnActivate": {
         "library": "server",
         "win64": "48 89 5C 24 ? 57 48 83 EC ? 8B FA 48 8B D9 E8 ? ? ? ? 48 8B 43",
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 41 89 F4 53 48 89 FB 48 83 EC ? E8 ? ? ? ? 48 8B 43"
       },
       // String: "Unexpected module request."
-      "CSScriptResolveModule": {
+      "CSScript::ResolveModule": {
         "library": "server",
         "win64": "48 89 54 24 ? 48 89 4C 24 ? 55 53 56 57 41 55 41 56 48 8D AC 24",
         "linuxsteamrt64": "55 48 89 E5 41 57 49 89 F7 41 56 41 55 41 54 53 48 89 FB 48 81 EC A8 01 00 00"
@@ -31,7 +31,7 @@
         "linuxsteamrt64": "55 48 89 E5 41 55 49 89 FD 41 54 48 8D 7D"
       },
       // String: "CCSPlayerPawnBase::SwitchTeam", just keep in mind this is actually CCSPlayerController::SwitchTeam
-      "CCSPlayerController_SwitchTeam": {
+      "CCSPlayerController::SwitchTeam": {
         "library": "server",
         "win64": "40 53 57 48 81 EC ? ? ? ? 48 8B D9 8B FA",
         "linuxsteamrt64": "55 48 89 E5 41 55 41 54 53 48 89 FB 48 83 EC ? 0F B6 87"
@@ -49,13 +49,13 @@
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 49 89 FC 53 48 89 F3 48 83 EC ? 48 83 7F"
       },
       // String: "Sending S2C_CONNECTION to %s [addons:'%s']\n"
-      "ReplyConnection": {
+      "CNetworkGameServer::ReplyConnection": {
         "library": "engine2",
         "win64": "48 8B C4 55 41 55 41 56",
         "linuxsteamrt64": "55 48 8D 05 ? ? ? ? 66 0F EF C0 48 89 E5 41 57 41 56 41 55 41 54 49 89 FC"
       },
       // String: "controller" (2 occurrences) at bottom func with 6 params (v12, a1, 0LL, 0, 0, 0)
-      "CBasePlayerController_SetPawn": {
+      "CBasePlayerController::SetPawn": {
         "library": "server",
         "win64": "44 88 4C 24 ? 53 57",
         "linuxsteamrt64": "55 48 8D 87 ? ? ? ? 48 89 E5 41 57 41 56 41 89 CE 41 55 45 89 CD"
@@ -88,25 +88,25 @@
         "linuxsteamrt64": "48 89 FE 48 85 FF"
       },
       // "InPass" is passed to this
-      "CEntityInstance_AcceptInput": {
+      "CEntityInstance::AcceptInput": {
         "library": "server",
         "win64": "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 49 8B F0 48 8B D9 48 8B 0D",
         "linuxsteamrt64": "55 48 89 E5 41 57 49 89 F7 41 56 41 55 41 54 53 48 89 FB 48 89 F7 48 83 EC"
       },
       // String: "Multisource %s enabled (%d inputs)\n"
-      "CEntityIOOutput_FireOutputInternal": {
+      "CEntityIOOutput::FireOutputInternal": {
         "library": "server",
         "win64": "40 53 56 57 48 83 EC ? 4C 89 64 24",
         "linuxsteamrt64": "55 4C 8B 05 ? ? ? ? 31 D2"
       },
       // String: "%s at (%.3f, %.3f, %.3f) has no model name!\n"
-      "CBaseModelEntity_SetModel": {
+      "CBaseModelEntity::SetModel": {
         "library": "server",
         "win64": "40 55 53 56 57 41 57 48 8B EC 48 83 EC",
         "linuxsteamrt64": "55 48 89 E5 41 55 41 54 49 89 F4 53 48 89 FB 48 83 EC ? E8 ? ? ? ? 48 85 C0 0F 84"
       },
       // String: "TerminateRound"
-      "CGameRules_TerminateRound": {
+      "CGameRules::TerminateRound": {
         "library": "server",
         "win64": "48 8B C4 4C 89 48 ? 48 89 48 ? 55 56",
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 49 89 FE 41 55 41 54 53 48 81 EC ? ? ? ? 48 8D 05 ? ? ? ? F3 0F 11 85"
@@ -118,13 +118,13 @@
         "linuxsteamrt64": "48 8D 05 ? ? ? ? 55 48 89 FA"
       },
       // "multi_manager" is passed to this
-      "CGameEntitySystem_FindEntityByClassName": {
+      "CGameEntitySystem::FindEntityByClassName": {
         "library": "server",
         "win64": "48 83 EC ? 45 33 C9 C6 44 24 ? ? 48 8D 4C 24",
         "linuxsteamrt64": "55 45 31 C0 31 C9 48 89 E5 53"
       },
       // "commentary_semaphore" is passed to this
-      "CGameEntitySystem_FindEntityByName": {
+      "CGameEntitySystem::FindEntityByName": {
         "library": "server",
         "win64": "48 81 EC ? ? ? ? 4D 85 C0 75",
         "linuxsteamrt64": "55 48 89 E5 41 54 53 48 83 EC ? 48 85 D2"
@@ -138,32 +138,32 @@
       // Look for "SetEntityName" or "Set the name of an entity.", that will be the vscript binding definition
       // Scroll a bit down and you'll find something like this (note the offset): *(_QWORD *)(v453 + 64) = sub_1807B0350;
       // that function is just a jump to the one we want
-      "CEntityIdentity_SetEntityName": {
+      "CEntityIdentity::SetEntityName": {
         "library": "server",
         "win64": "48 89 5C 24 ? 57 48 83 EC ? 48 8B D9 4C 8B C2",
         "linuxsteamrt64": "55 48 89 F2 48 89 E5 41 55 41 54 53"
       },
       // String: "Plays/modifies a sound from this entity. changes sound if nPitch and/or flVol or flSoundTime is > 0."
-      "CBaseEntity_EmitSoundParams": {
+      "CBaseEntity::EmitSoundParams": {
         "library": "server",
         "win64": "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 4C 89 74 24 ? 55 48 8D 6C 24 ? 48 81 EC ? ? ? ? 45 33 F6 48 C7 45",
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 49 89 D4 53 48 89 F3 48 83 EC 18 4D 85 C0 0F 95 C2 48 85 F6 40 0F 94 C6 40 08 F2 75 ? 83 F9 01 75 ? 49 89 FE 40 F6 C7 01 75 ? 41 0F B6 54 24 08 80 FA 1E 0F 84 ? ? ? ? 80 FA 02 74 ? 80 FA 4F 75 ? 49 8B 34 24 48 8D 05 CC 1D BC FF"
       },
       // Called right after this in win64 "Entity %s(%s) is ambiguously parented to..."
-      "CBaseEntity_SetParent": {
+      "CBaseEntity::SetParent": {
         "library": "server",
         "win64": "4D 8B D9 48 85 D2 74 ?",
         "linuxsteamrt64": "48 85 F6 74 ? 48 8B 47 ? F6 40 ? ? 75 ? 48 8B 46 ? F6 40 ? ? 75 ? B8"
       },
       // search for "land_%s", this is called after that string is referenced (the one with 4 parameters).
       // (function that calls it also contains "Gear.JumpLand.").
-      "CBaseEntity_EmitSoundFilter": {
+      "CBaseEntity::EmitSoundFilter": {
         "library": "server",
         "win64": "4C 8B DC 49 89 5B ? 49 89 6B ? 49 89 73 ? 49 89 7B ? 41 56 48 83 EC ? 49 C7 43 ? ? ? ? ? 48 8D 05 ? ? ? ? 49 89 43 ? 41 8B F8",
         "linuxsteamrt64": "55 48 8D 05 ? ? ? ? 48 89 E5 41 57 49 89 CF 41 56 41 89 D6"
       },
       // String: "Empty %s (%s) at %.2f, %.2f, %.2f\n"
-      "CBaseEntity_SetMoveType": {
+      "CBaseEntity::SetMoveType": {
         "library": "server",
         "win64": "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 41 0F B6 F0",
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 89 D5 41 54 53 48 89 FB 48 83 EC 48"
@@ -171,14 +171,14 @@
       // Can be found in function with "item_assaultsuit", "item_kevlar", "weapon_knife", "weapon_knife_t", "weapon_taser"
       // for ( ; v8; v8 = sub_180843710(v3, 2LL, 0xFFFFFFFFLL) )
       //   RemoveItem(v3, v8);
-      "CCSPlayer_WeaponServices_RemoveItem": {
+      "CCSPlayer_WeaponServices::RemoveItem": {
         "library": "server",
         "win64": "48 85 D2 0F 84 ? ? ? ? 48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 8B F9 E8",
         "linuxsteamrt64": "48 85 F6 0F 84 ? ? ? ? 55 48 89 E5 41 54 49 89 FC 53 48 89 F3"
       },
       // String: "item_pickup_failed" is called right after checking the result of this function
       // Call: the function is called with 4 parameters, the third is always 0, the fourth is a pointer to a structure/array
-      "CCSPlayer_ItemServices_CanAcquire": {
+      "CCSPlayer_ItemServices::CanAcquire": {
         "library": "server",
         "win64": "44 89 44 24 ? 48 89 54 24 ? 48 89 4C 24 ? 55 53 56 57 41 55 41 56 41 57 48 8B EC",
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 49 89 CD 41 54 49 89 FC 53 48 89 F3 48 83 EC"
@@ -294,7 +294,7 @@
         ]
       },
       "&s_pScripts": {
-        "signature": "CCSServerPointScriptEntityEnterScope",
+        "signature": "CCSServer::PointScriptEntityEnterScope",
         "win64": [
           {
             "read_offs32": 25
@@ -307,7 +307,7 @@
         ]
       },
       "v8::Isolate::Enter": {
-        "signature": "CCSScriptOnActivate",
+        "signature": "CCSScript::OnActivate",
         "win64": [
           {
             "read_offs32": 85
@@ -320,7 +320,7 @@
         ]
       },
       "v8::Isolate::Exit": {
-        "signature": "CCSScriptOnActivate",
+        "signature": "CCSScript::OnActivate",
         "win64": [
           {
             "read_offs32": 331
@@ -366,7 +366,7 @@
         "linuxsteamrt64": "TODO"
       },
       // String: "controller" (2 occurrences) at bottom func with 5 params (v12, a1, 0LL, 0, 0)
-      "CBasePlayerController_SetPawn": {
+      "CBasePlayerController::SetPawn": {
         "library": "server",
         "win64": "48 89 5C 24 18 57 41 54 41 55 41 56 41 57 48 83 EC 30",
         "linuxsteamrt64": "TODO"
@@ -399,19 +399,19 @@
         "linuxsteamrt64": "48 89 FE 48 85 FF 74 ? 48 8D 05 ? ? ? ? 48"
       },
       // "InPass" is passed to this
-      "CEntityInstance_AcceptInput": {
+      "CEntityInstance::AcceptInput": {
         "library": "server",
         "win64": "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 50 49 8B F0",
         "linuxsteamrt64": "TODO"
       },
       // String: "Multisource %s enabled (%d inputs)\n"
-      "CEntityIOOutput_FireOutputInternal": {
+      "CEntityIOOutput::FireOutputInternal": {
         "library": "server",
         "win64": "4C 89 4C 24 20 48 89 4C 24 08 53 56 57 41 55",
         "linuxsteamrt64": "TODO"
       },
       // String: "%s at (%.3f, %.3f, %.3f) has no model name!\n"
-      "CBaseModelEntity_SetModel": {
+      "CBaseModelEntity::SetModel": {
         "library": "server",
         "win64": "48 89 5C 24 10 48 89 74 24 18 48 89 7C 24 20 41 56 48 83 EC 50 48 8B 99 A8 05 00 00",
         "linuxsteamrt64": "TODO"
@@ -423,13 +423,13 @@
         "linuxsteamrt64": "TODO"
       },
       // "multi_manager" is passed to this
-      "CGameEntitySystem_FindEntityByClassName": {
+      "CGameEntitySystem::FindEntityByClassName": {
         "library": "server",
         "win64": "48 83 EC 68 45 33 C9",
         "linuxsteamrt64": "55 45 31 C0 31 C9 48 89 E5 41 54"
       },
       // "commentary_semaphore" is passed to this
-      "CGameEntitySystem_FindEntityByName": {
+      "CGameEntitySystem::FindEntityByName": {
         "library": "server",
         "win64": "48 81 EC 88 ? ? ? 4D 85 C0",
         "linuxsteamrt64": "48 85 D2 74 ? 55 48 89 E5 41 54"
@@ -443,33 +443,33 @@
       // Look for "SetEntityName", that will be the vscript binding definition
       // Scroll a bit down and you'll find something like this (note the offset): *(_QWORD *)(v453 + 64) = sub_1807B0350;
       // that function is just a jump to the one we want
-      "CEntityIdentity_SetEntityName": {
+      "CEntityIdentity::SetEntityName": {
         "library": "server",
         "win64": "48 89 5C 24 10 57 48 83 EC 20 48 8B D9 4C 8B C2",
         "linuxsteamrt64": "55 48 89 F2 48 89 E5 41 54 49 89 FC 48 8D 7D E0 48 83 EC 18 48 8D 05 ? ? ? ? 48 8B 30 E8 ? ? ? ? 48 8B 45 E0"
       },
       // next to "soundname", in win64 it's the last referenced sub while in linuxsteamrt64 it's right after
       // this is a vscript binding though so it may be removed in the future?
-      "CBaseEntity_EmitSoundParams": {
+      "CBaseEntity::EmitSoundParams": {
         "library": "server",
         "win64": "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 4C 89 74 24 20 55 48 8D 6C 24 90 48 81 EC 70 01 00 00 45 33 F6",
         "linuxsteamrt64": ""
       },
       // Called right after this in win64 "Entity %s(%s) is ambiguously parented to..."
-      "CBaseEntity_SetParent": {
+      "CBaseEntity::SetParent": {
         "library": "server",
         "win64": "4D 8B D9 48 85 D2 74 ?",
         "linuxsteamrt64": "48 85 F6 74 ? 48 8B 47 10 F6 40 31 02 75 ? 48 8B 46 10 F6 40 31 02 75 ? B8 ? ? ? ?"
       },
       // search for "land_%s", this is called after that string is referenced (the one with 4 parameters).
       // (function that calls it also contains "T_Default.SuitLand").
-      "CBaseEntity_EmitSoundFilter": {
+      "CBaseEntity::EmitSoundFilter": {
         "library": "server",
         "win64": "4C 8B DC 49 89 5B 08 49 89 6B 10 49 89 73 18 49 89 7B 20 41 56 48 83 EC 70 49 C7 43 C0 7E 01 00 00",
         "linuxsteamrt64": "TODO"
       },
       // "models/dev/error.vmdl", SetMoveType(a1, v4, 0) at the bottom
-      "CBaseEntity_SetMoveType": {
+      "CBaseEntity::SetMoveType": {
         "library": "server",
         "win64": "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 56 48 83 EC 20 41 0F B6 F0",
         "linuxsteamrt64": "TODO"
