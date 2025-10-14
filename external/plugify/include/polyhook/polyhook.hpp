@@ -40,107 +40,23 @@ namespace poly
 		Post  // callback will be executed after the original function
 	};
 
-	class IHook;
+	class PHook;
 	class Params;
 	class Return;
 
-	using CallbackHandler = ReturnAction(IHook&, Params&, int, Return&, CallbackType);
+	using CallbackHandler = ReturnAction(PHook&, Params&, int, Return&, CallbackType);
 
-	class Hook {
-	private:
-		Hook(IHook* pHook, void* pFunc, void* pClass, int index) : m_hook(pHook), m_func(pFunc), m_class(pClass), m_index(index)
-		{}
+	// Abstract base class with common functionality
+	class IHook {
+	protected:
+		IHook(PHook* pHook) : m_hook(pHook) {}
 
 	public:
-		~Hook()
-		{
-			// detour
-			if (!m_class)
-			{
-				using UnhookDetourFn = bool (*)(void*);
-				static UnhookDetourFn func = nullptr;
-				if (func == nullptr) plg::GetMethodPtr2("polyhook.UnhookDetour", reinterpret_cast<void**>(&func));
-				func(m_func);
-			}
-			else if (m_func)
-			{
-				using UnhookVirtualByFuncFn = bool (*)(void*, void*);
-				static UnhookVirtualByFuncFn func = nullptr;
-				if (func == nullptr) plg::GetMethodPtr2("polyhook.UnhookVirtualByFunc", reinterpret_cast<void**>(&func));
-				func(m_class, m_func);
-			}
-			else
-			{
-				using UnhookVirtualFn = bool (*)(void*, int);
-				static UnhookVirtualFn func = nullptr;
-				if (func == nullptr) plg::GetMethodPtr2("polyhook.UnhookVirtual", reinterpret_cast<void**>(&func));
-				func(m_class, m_index);
-			}
-		}
-
-		static std::unique_ptr<Hook> CreateDetourHook(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
-		{
-			using HookDetourFn = IHook* (*)(void*, DataType, const plg::vector<DataType>&, int);
-			static HookDetourFn func = nullptr;
-			if (func == nullptr) plg::GetMethodPtr2("polyhook.HookDetour", reinterpret_cast<void**>(&func));
-			IHook* pHook = func(pFunc, returnType, arguments, varIndex);
-			if (pHook == nullptr) return nullptr;
-			return std::unique_ptr<Hook>(new Hook(pHook, pFunc, nullptr, -1));
-		}
-
-		static std::unique_ptr<Hook> CreateVirtualHook(void* pClass, int index, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
-		{
-			using HookVirtualFn = IHook* (*)(void*, int, DataType, const plg::vector<DataType>&, int);
-			static HookVirtualFn func = nullptr;
-			if (func == nullptr) plg::GetMethodPtr2("polyhook.HookVirtual", reinterpret_cast<void**>(&func));
-			IHook* pHook = func(pClass, index, returnType, arguments, varIndex);
-			if (pHook == nullptr) return nullptr;
-			return std::unique_ptr<Hook>(new Hook(pHook, nullptr, pClass, index));
-		}
-
-		static std::unique_ptr<Hook> CreateHookVirtualByFunc(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
-		{
-			using HookVirtualByFuncFn = IHook* (*)(void*, void*, DataType, const plg::vector<DataType>&, int);
-			static HookVirtualByFuncFn func = nullptr;
-			if (func == nullptr) plg::GetMethodPtr2("polyhook.HookVirtualByFunc", reinterpret_cast<void**>(&func));
-			IHook* pHook = func(pClass, pFunc, returnType, arguments, varIndex);
-			if (pHook == nullptr) return nullptr;
-			return std::unique_ptr<Hook>(new Hook(pHook, pFunc, pClass, -1));
-		}
-
-		static std::unique_ptr<Hook> FindDetour(void* pFunc)
-		{
-			using FindDetourFn = IHook* (*)(void*);
-			static FindDetourFn func = nullptr;
-			if (func == nullptr) plg::GetMethodPtr2("polyhook.FindDetour", reinterpret_cast<void**>(&func));
-			IHook* pHook = func(pFunc);
-			if (pHook == nullptr) return nullptr;
-			return std::unique_ptr<Hook>(new Hook(pHook, pFunc, nullptr, -1));
-		}
-
-		static std::unique_ptr<Hook> FindVirtual(void* pClass, int index)
-		{
-			using FindVirtualFn = IHook* (*)(void*, int);
-			static FindVirtualFn func = nullptr;
-			if (func == nullptr) plg::GetMethodPtr2("polyhook.FindVirtual", reinterpret_cast<void**>(&func));
-			IHook* pHook = func(pClass, index);
-			if (pHook == nullptr) return nullptr;
-			return std::unique_ptr<Hook>(new Hook(pHook, nullptr, pClass, index));
-		}
-
-		static std::unique_ptr<Hook> FindVirtualByFunc(void* pClass, void* pFunc)
-		{
-			using FindVirtualByFuncFn = IHook* (*)(void*, void*);
-			static FindVirtualByFuncFn func = nullptr;
-			if (func == nullptr) plg::GetMethodPtr2("polyhook.FindVirtualByFunc", reinterpret_cast<void**>(&func));
-			IHook* pHook = func(pClass, pFunc);
-			if (pHook == nullptr) return nullptr;
-			return std::unique_ptr<Hook>(new Hook(pHook, pFunc, pClass, -1));
-		}
-
+		virtual ~IHook() = default;
+		
 		bool AddCallback(CallbackType type, CallbackHandler handler) const
 		{
-			using AddCallbackFn = bool (*)(IHook*, CallbackType, CallbackHandler);
+			using AddCallbackFn = bool (*)(PHook*, CallbackType, CallbackHandler);
 			static AddCallbackFn func = nullptr;
 			if (func == nullptr) plg::GetMethodPtr2("polyhook.AddCallback", reinterpret_cast<void**>(&func));
 			return func(m_hook, type, handler);
@@ -148,7 +64,7 @@ namespace poly
 
 		bool RemoveCallback(CallbackType type, CallbackHandler handler) const
 		{
-			using RemoveCallbackFn = bool (*)(IHook*, CallbackType, CallbackHandler);
+			using RemoveCallbackFn = bool (*)(PHook*, CallbackType, CallbackHandler);
 			static RemoveCallbackFn func = nullptr;
 			if (func == nullptr) plg::GetMethodPtr2("polyhook.RemoveCallback", reinterpret_cast<void**>(&func));
 			return func(m_hook, type, handler);
@@ -156,7 +72,7 @@ namespace poly
 
 		bool IsCallbackRegistered(CallbackType type, CallbackHandler handler) const
 		{
-			using IsCallbackRegisteredFn = bool (*)(IHook*, CallbackType, CallbackHandler);
+			using IsCallbackRegisteredFn = bool (*)(PHook*, CallbackType, CallbackHandler);
 			static IsCallbackRegisteredFn func = nullptr;
 			if (func == nullptr) plg::GetMethodPtr2("polyhook.IsCallbackRegistered", reinterpret_cast<void**>(&func));
 			return func(m_hook, type, handler);
@@ -164,7 +80,7 @@ namespace poly
 
 		bool AreCallbacksRegistered() const
 		{
-			using AreCallbacksRegisteredFn = bool (*)(IHook*);
+			using AreCallbacksRegisteredFn = bool (*)(PHook*);
 			static AreCallbacksRegisteredFn func = nullptr;
 			if (func == nullptr) plg::GetMethodPtr2("polyhook.AreCallbacksRegistered", reinterpret_cast<void**>(&func));
 			return func(m_hook);
@@ -172,24 +88,182 @@ namespace poly
 
 		void* GetAddress() const
 		{
-			using GetCallbackAddrFn = void* (*)(IHook*);
+			using GetCallbackAddrFn = void* (*)(PHook*);
 			static GetCallbackAddrFn func = nullptr;
 			if (func == nullptr) plg::GetMethodPtr2("polyhook.GetOriginalAddr", reinterpret_cast<void**>(&func));
 			return func(m_hook);
 		}
 
+	protected:
+		PHook* m_hook;
+	};
+
+	// Detour hook implementation
+	class DetourHook : public IHook {
 	private:
-		IHook* m_hook;
+		DetourHook(PHook* pHook, void* pFunc) : IHook(pHook), m_func(pFunc) {}
+
+	public:
+		~DetourHook() override
+		{
+			using UnhookDetourFn = bool (*)(void*);
+			static UnhookDetourFn func = nullptr;
+			if (func == nullptr) plg::GetMethodPtr2("polyhook.UnhookDetour", reinterpret_cast<void**>(&func));
+			func(m_func);
+		}
+
+		static std::unique_ptr<IHook> Create(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
+		{
+			using HookDetourFn = PHook* (*)(void*, DataType, const plg::vector<DataType>&, int);
+			static HookDetourFn func = nullptr;
+			if (func == nullptr) plg::GetMethodPtr2("polyhook.HookDetour", reinterpret_cast<void**>(&func));
+			PHook* pHook = func(pFunc, returnType, arguments, varIndex);
+			if (pHook == nullptr) return nullptr;
+			return std::unique_ptr<IHook>(new DetourHook(pHook, pFunc));
+		}
+
+		static std::unique_ptr<IHook> Find(void* pFunc)
+		{
+			using FindDetourFn = PHook* (*)(void*);
+			static FindDetourFn func = nullptr;
+			if (func == nullptr) plg::GetMethodPtr2("polyhook.FindDetour", reinterpret_cast<void**>(&func));
+			PHook* pHook = func(pFunc);
+			if (pHook == nullptr) return nullptr;
+			return std::unique_ptr<IHook>(new DetourHook(pHook, pFunc));
+		}
+
+	private:
 		void* m_func;
+	};
+
+	// Template base for virtual hooks by index
+	template<const char* HookName, const char* UnhookName, const char* FindName>
+	class VirtualHookByIndexBase : public IHook {
+	protected:
+		VirtualHookByIndexBase(PHook* pHook, void* pClass, int index) 
+			: IHook(pHook), m_class(pClass), m_index(index) {}
+
+	public:
+		~VirtualHookByIndexBase() override
+		{
+			using UnhookFn = bool (*)(void*, int);
+			static UnhookFn func = nullptr;
+			if (func == nullptr) plg::GetMethodPtr2(UnhookName, reinterpret_cast<void**>(&func));
+			func(m_class, m_index);
+		}
+
+		static std::unique_ptr<IHook> Create(void* pClass, int index, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
+		{
+			using HookFn = PHook* (*)(void*, int, DataType, const plg::vector<DataType>&, int);
+			static HookFn func = nullptr;
+			if (func == nullptr) plg::GetMethodPtr2(HookName, reinterpret_cast<void**>(&func));
+			PHook* pHook = func(pClass, index, returnType, arguments, varIndex);
+			if (pHook == nullptr) return nullptr;
+			return std::unique_ptr<IHook>(new VirtualHookByIndexBase(pHook, pClass, index));
+		}
+
+		static std::unique_ptr<IHook> Find(void* pClass, int index)
+		{
+			using FindFn = PHook* (*)(void*, int);
+			static FindFn func = nullptr;
+			if (func == nullptr) plg::GetMethodPtr2(FindName, reinterpret_cast<void**>(&func));
+			PHook* pHook = func(pClass, index);
+			if (pHook == nullptr) return nullptr;
+			return std::unique_ptr<IHook>(new VirtualHookByIndexBase(pHook, pClass, index));
+		}
+
+	protected:
 		void* m_class;
 		int m_index;
 	};
 
-	inline int GetVTableIndex(void* pFunc)
+	// Template base for virtual hooks by function
+	template<const char* HookName, const char* UnhookName, const char* FindName>
+	class VirtualHookByFuncBase : public IHook {
+	protected:
+		VirtualHookByFuncBase(PHook* pHook, void* pClass, void* pFunc) 
+			: IHook(pHook), m_class(pClass), m_func(pFunc) {}
+
+	public:
+		~VirtualHookByFuncBase() override
+		{
+			using UnhookFn = bool (*)(void*, void*);
+			static UnhookFn func = nullptr;
+			if (func == nullptr) plg::GetMethodPtr2(UnhookName, reinterpret_cast<void**>(&func));
+			func(m_class, m_func);
+		}
+
+		static std::unique_ptr<IHook> Create(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
+		{
+			using HookFn = PHook* (*)(void*, void*, DataType, const plg::vector<DataType>&, int);
+			static HookFn func = nullptr;
+			if (func == nullptr) plg::GetMethodPtr2(HookName, reinterpret_cast<void**>(&func));
+			PHook* pHook = func(pClass, pFunc, returnType, arguments, varIndex);
+			if (pHook == nullptr) return nullptr;
+			return std::unique_ptr<IHook>(new VirtualHookByFuncBase(pHook, pClass, pFunc));
+		}
+
+		static std::unique_ptr<IHook> Find(void* pClass, void* pFunc)
+		{
+			using FindFn = PHook* (*)(void*, void*);
+			static FindFn func = nullptr;
+			if (func == nullptr) plg::GetMethodPtr2(FindName, reinterpret_cast<void**>(&func));
+			PHook* pHook = func(pClass, pFunc);
+			if (pHook == nullptr) return nullptr;
+			return std::unique_ptr<IHook>(new VirtualHookByFuncBase(pHook, pClass, pFunc));
+		}
+
+	protected:
+		void* m_class;
+		void* m_func;
+	};
+
+	// Function name constants
+	namespace HookNames {
+		constexpr char HookVirtualTable[] = "polyhook.HookVirtualTable";
+		constexpr char UnhookVirtualTable[] = "polyhook.UnhookVirtualTable";
+		constexpr char HookVirtualTable2[] = "polyhook.HookVirtualTable2";
+		constexpr char UnhookVirtualTable2[] = "polyhook.UnhookVirtualTable2";
+
+		constexpr char HookVirtualFunc[] = "polyhook.HookVirtualFunc";
+		constexpr char UnhookVirtualFunc[] = "polyhook.UnhookVirtualFunc";
+		constexpr char HookVirtualFunc2[] = "polyhook.HookVirtualFunc2";
+		constexpr char UnhookVirtualFunc2[] = "polyhook.UnhookVirtualFunc2";
+
+		constexpr char FindVirtual[] = "polyhook.FindVirtual";
+		constexpr char FindVirtual2[] = "polyhook.FindVirtual2";
+	}
+
+	// Concrete hook classes - now just type aliases!
+	using VTableHook = VirtualHookByIndexBase<
+		HookNames::HookVirtualTable,
+		HookNames::UnhookVirtualTable,
+		HookNames::FindVirtual
+	>;
+
+	using VTableHook2 = VirtualHookByFuncBase<
+		HookNames::HookVirtualTable2,
+		HookNames::UnhookVirtualTable2,
+		HookNames::FindVirtual2
+	>;
+
+	using VFuncHook = VirtualHookByIndexBase<
+		HookNames::HookVirtualFunc,
+		HookNames::UnhookVirtualFunc,
+		HookNames::FindVirtual
+	>;
+
+	using VFuncHook2 = VirtualHookByFuncBase<
+		HookNames::HookVirtualFunc2,
+		HookNames::UnhookVirtualFunc2,
+		HookNames::FindVirtual2
+	>;
+
+	inline int GetVirtualIndex(void* pFunc)
 	{
-		using GetVTableIndexFn = int (*)(void*);
-		static GetVTableIndexFn func = nullptr;
-		if (func == nullptr) plg::GetMethodPtr2("polyhook.GetVTableIndex", reinterpret_cast<void**>(&func));
+		using GetVirtualIndexFn = int (*)(void*);
+		static GetVirtualIndexFn func = nullptr;
+		if (func == nullptr) plg::GetMethodPtr2("polyhook.GetVirtualIndex", reinterpret_cast<void**>(&func));
 		return func(pFunc);
 	}
 

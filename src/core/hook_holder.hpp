@@ -8,7 +8,7 @@
 class HookHolder {
 public:
 	template<typename F, typename C>
-	void* AddHookMemFunc(F func, void* ptr, const C& callback, int varIndex = -1) {
+	void* AddHookVTableFunc(F func, void* ptr, const C& callback, int varIndex = -1) {
 		std::pair name{(void*&) func, ptr};
 
 		auto it = m_vhooks.find(name);
@@ -21,18 +21,54 @@ public:
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		auto ihook = poly::Hook::FindVirtualByFunc(ptr, (void*&) func);
+		auto ihook = poly::VTableHook2::Find(ptr, (void*&) func);
 		if (ihook != nullptr) {
 			callback(*ihook);
 			return ihook->GetAddress();
 		}
 
-		ihook = poly::Hook::CreateHookVirtualByFunc(ptr, (void*&) func, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		ihook = poly::VTableHook2::Create(ptr, (void*&) func, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 #if PLUGIFY_IS_DEBUG
-			S2_LOGF(LS_WARNING, "Could not hook member function \"{}\".\n", ptr);
+			S2_LOGF(LS_WARNING, "Could not hook table function \"{}\".\n", ptr);
 #else
-			S2_LOGF(LS_WARNING, "Could not hook member function \"{}\".\n", typeid(func).name());
+			S2_LOGF(LS_WARNING, "Could not hook table function \"{}\".\n", typeid(func).name());
+#endif
+			return nullptr;
+		}
+
+		callback(*ihook);
+		void* orig = ihook->GetAddress();
+		m_vhooks.emplace(name, std::move(ihook));
+		return orig;
+	}
+
+	template<typename F, typename C>
+	void* AddHookVFuncFunc(F func, void* ptr, const C& callback, int varIndex = -1) {
+		std::pair name{(void*&) func, ptr};
+
+		auto it = m_vhooks.find(name);
+		if (it != m_vhooks.end()) {
+			callback(*it->second);
+			return it->second->GetAddress();
+		}
+
+		using trait = poly::details::function_traits<F>;
+		auto args = trait::args();
+		auto ret = trait::ret();
+
+		auto ihook = poly::VFuncHook2::Find(ptr, (void*&) func);
+		if (ihook != nullptr) {
+			callback(*ihook);
+			return ihook->GetAddress();
+		}
+
+		ihook = poly::VFuncHook2::Create(ptr, (void*&) func, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		if (ihook == nullptr) {
+#if PLUGIFY_IS_DEBUG
+			S2_LOGF(LS_WARNING, "Could not hook virtual function \"{}\".\n", ptr);
+#else
+			S2_LOGF(LS_WARNING, "Could not hook virtual function \"{}\".\n", typeid(func).name());
 #endif
 			return nullptr;
 		}
@@ -57,7 +93,7 @@ public:
 			return nullptr;
 		}
 
-		auto ihook = poly::Hook::FindDetour(addr);
+		auto ihook = poly::DetourHook::Find(addr);
 		if (ihook != nullptr) {
 			callback(*ihook);
 			return ihook->GetAddress();
@@ -67,7 +103,7 @@ public:
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		ihook = poly::Hook::CreateDetourHook(addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		ihook = poly::DetourHook::Create(addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 			S2_LOGF(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;
@@ -89,7 +125,7 @@ public:
 			return it->second->GetAddress();
 		}
 
-		auto ihook = poly::Hook::FindDetour((void*)addr);
+		auto ihook = poly::DetourHook::Find((void*)addr);
 		if (ihook != nullptr) {
 			callback(*ihook);
 			return ihook->GetAddress();
@@ -99,7 +135,7 @@ public:
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		ihook = poly::Hook::CreateDetourHook((void*)addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		ihook = poly::DetourHook::Create((void*)addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 			S2_LOGF(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;
@@ -113,8 +149,16 @@ public:
 
 	template<typename F, int V = -1, typename C, typename... T>
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
-	void* AddHookMemFunc(F func, void* ptr, C callback, T... types) {
-		return AddHookMemFunc<F>(func, ptr, [&](const poly::Hook& hook) {
+	void* AddHookVTableFunc(F func, void* ptr, C callback, T... types) {
+		return AddHookVTableFunc<F>(func, ptr, [&](const poly::IHook& hook) {
+			([&]() { hook.AddCallback(types, callback); }(), ...);
+		}, V);
+	}
+
+	template<typename F, int V = -1, typename C, typename... T>
+		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
+	void* AddHookVFuncFunc(F func, void* ptr, C callback, T... types) {
+		return AddHookVFuncFunc<F>(func, ptr, [&](const poly::IHook& hook) {
 			([&]() { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
@@ -122,7 +166,7 @@ public:
 	template<typename F, int V = -1, typename C, typename... T>
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookDetourFunc(std::string_view name, C callback, T... types) {
-		return AddHookDetourFunc<F>(name, [&](const poly::Hook& hook) {
+		return AddHookDetourFunc<F>(name, [&](const poly::IHook& hook) {
 			([&]() { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
@@ -130,7 +174,7 @@ public:
 	template<typename F, int V = -1, typename C, typename... T>
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookDetourFunc(uintptr_t addr, C callback, T... types) {
-		return AddHookDetourFunc<F>(addr, [&](const poly::Hook& hook) {
+		return AddHookDetourFunc<F>(addr, [&](const poly::IHook& hook) {
 			([&]() { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
@@ -145,7 +189,7 @@ public:
 	}
 
 	template<typename F>
-	bool RemoveHookMemFunc(F func, void* ptr) {
+	bool RemoveHookVirtualFunc(F func, void* ptr) {
 		auto it = m_vhooks.find({(void*&) func, ptr});
 		if (it != m_vhooks.end()) {
 			m_vhooks.erase(it);
@@ -165,8 +209,8 @@ public:
 	}
 
 private:
-	std::unordered_map<plg::string, std::unique_ptr<poly::Hook>, plg::string_hash, std::equal_to<>> m_dhooks;
-	std::unordered_map<std::pair<void*, void*>, std::unique_ptr<poly::Hook>, plg::pair_hash<void*, void*>> m_vhooks;
+	std::unordered_map<plg::string, std::unique_ptr<poly::IHook>, plg::string_hash, std::equal_to<>> m_dhooks;
+	std::unordered_map<std::pair<void*, void*>, std::unique_ptr<poly::IHook>, plg::pair_hash<void*, void*>> m_vhooks;
 };
 
 extern HookHolder g_PH;
