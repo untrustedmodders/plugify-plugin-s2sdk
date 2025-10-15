@@ -52,9 +52,9 @@ export class ZombieMod extends Plugin {
         g_ZombieClasses = LoadZombieClasses(`${this.location}/zombieclasses.json`)
         for (const zombieClass of g_ZombieClasses) {
             if (zombieClass.model !== "")
-                s2.Precache(g_ZombieClasses.model)
+                s2.Precache(zombieClass.model)
             if (zombieClass.claw !== "")
-                s2.Precache(g_ZombieClasses.claw)
+                s2.Precache(zombieClass.claw)
         }
     }
     
@@ -80,6 +80,9 @@ export class ZombieMod extends Plugin {
         zm_human_gravity = s2.CreateConVarFloat("zm_human_gravity", 1.0, "Gravity amount for human", 0, true, 0.0, false, 0.0)
 
         s2.ServerCommand("mp_give_player_c4 0")
+
+        const cvars = [zm_delay_time, zm_infect_ratio, zm_human_health, zm_human_armor, zm_human_speed, zm_human_gravity]
+        s2.AutoExecConfig(cvars, true, "zombiemod", "")
     }
 
     hookFuncs() {
@@ -452,9 +455,9 @@ function InfectPlayer(playerSlot) {
     s2.SetClientArmor(player.m_iSlot, ZombieGetArmor(player.m_nZombieClass))
 
     // Set model to the client
-    const sModel = ZombieGetModel(player.m_nZombieClass)
-    if (sModel !== "") {
-        s2.SetClientModel(player.m_iSlot, sModel)
+    const model = ZombieGetModel(player.m_nZombieClass)
+    if (model !== "") {
+        s2.SetClientModel(player.m_iSlot, model)
     }
 
     // Force to switch team
