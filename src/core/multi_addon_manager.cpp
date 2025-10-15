@@ -34,14 +34,14 @@ struct ClientAddonInfo {
 std::unordered_map<uint64, ClientAddonInfo> g_ClientAddons;
 
 CConVar<CUtlString> s2_extra_addons("s2_extra_addons", FCVAR_NONE, "The workshop IDs of extra addons separated by commas, addons will be downloaded (if not present) and mounted", CUtlString(""),
-	[](CConVar<CUtlString> *cvar, CSplitScreenSlot slot, const CUtlString *new_val, const CUtlString *old_val)
+	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
 	{
 		g_MultiAddonManager.m_extraAddons = plg::parse<PublishedFileId_t>(new_val->Get(), " ");
 		g_MultiAddonManager.RefreshAddons();
 	});
 
 CConVar<CUtlString> s2_client_extra_addons("s2_client_extra_addons", FCVAR_NONE, "The workshop IDs of extra client addons that will be applied to all clients, separated by commas", CUtlString(""),
-	[](CConVar<CUtlString> *cvar, CSplitScreenSlot slot, const CUtlString *new_val, const CUtlString *old_val)
+	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
 	{
 		g_MultiAddonManager.m_globalClientAddons = plg::parse<PublishedFileId_t>(new_val->Get(), " ");
 	});
