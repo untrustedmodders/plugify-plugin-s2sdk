@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <source_location>
 #include <string>
 
 #include <tier0/dbg.h>
@@ -27,6 +28,32 @@ public:
 	void SetChannelVerbosityByName(const char* name, LoggingVerbosity_t verbosity);
 	void SetChannelVerbosityByTag(const char* tag, LoggingVerbosity_t verbosity);
 	static void RegisterTags(LoggingChannelID_t) {}
+
+	static inline const Color WHITE = Color(255, 255, 255, 255);
+	static inline const Color RED = Color(255, 0, 0, 255);
+	static inline const Color YELLOW = Color(255, 255, 0, 255);
+
+	void Log(std::string_view message, LoggingSeverity_t severity, std::source_location loc = std::source_location::current()) const {
+		LoggingRareOptions_t options {
+			.m_File = loc.file_name(),
+			.m_Line = static_cast<int>(loc.line()),
+			.m_Function = loc.function_name(),
+		};
+		std::unique_lock lock(m_mutex);
+		switch (severity) {
+			case LS_ERROR:
+				LoggingSystem_Log(m_channelID, LS_ERROR, options, RED, message.data());
+				break;
+			case LS_WARNING:
+				LoggingSystem_Log(m_channelID, LS_WARNING,  options,YELLOW, message.data());
+				break;
+			case LS_MESSAGE:
+				LoggingSystem_Log(m_channelID, LS_MESSAGE, options, WHITE, message.data());
+				break;
+			default:
+				break;
+		}
+	}
 
 	LoggingResponse_t Log(LoggingSeverity_t severity, const char* content) const;
 	LoggingResponse_t Log(LoggingSeverity_t severity, const Color& color, const char* content) const;

@@ -64,7 +64,7 @@ public:
 	}
 
 	void ChangeTeam(int iTeam) {
-		static int offset = g_pGameConfig->GetOffset("ControllerChangeTeam");
+		static int offset = g_pGameConfig->GetOffset("CCSPlayerController_ChangeTeam");
 		CALL_VIRTUAL(void, offset, this, iTeam);
 	}
 
@@ -88,7 +88,7 @@ public:
 			return;
 
 		SetPawn(pawn);
-		static int offset = g_pGameConfig->GetOffset("ControllerRespawn");
+		static int offset = g_pGameConfig->GetOffset("CCSPlayerController_Respawn");
 		CALL_VIRTUAL(void, offset, this);
 	}
 
@@ -102,7 +102,7 @@ public:
 		const auto absAbsVelocity = pawn->m_vecAbsVelocity();
 		SwitchTeam(iTeam);
 		SetPawn(pawn);
-		static int offset = g_pGameConfig->GetOffset("ControllerRespawn");
+		static int offset = g_pGameConfig->GetOffset("CCSPlayerController_Respawn");
 		CALL_VIRTUAL(void, offset, this);
 		pawn->Teleport(&absOrigin, &absRotation, &absAbsVelocity);
 	}

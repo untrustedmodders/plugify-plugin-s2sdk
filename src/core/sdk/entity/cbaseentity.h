@@ -136,6 +136,8 @@ public:
 	SCHEMA_FIELD_POINTER(CUtlStringToken, m_nSubclassID)
 	SCHEMA_FIELD(float, m_flFriction)
 	SCHEMA_FIELD(float, m_flGravityScale)
+	SCHEMA_FIELD(bool, m_bGravityDisabled)
+	SCHEMA_FIELD(bool, m_bGravityActuallyDisabled)
 	SCHEMA_FIELD(float, m_flTimeScale)
 	SCHEMA_FIELD(float, m_flSpeed)
 	SCHEMA_FIELD(CUtlString, m_sUniqueHammerID);
@@ -179,12 +181,12 @@ public:
 	}
 
 	bool IsPawn() {
-		static int offset = g_pGameConfig->GetOffset("IsEntityPawn");
+		static int offset = g_pGameConfig->GetOffset("IsPlayerPawn");
 		return CALL_VIRTUAL(bool, offset, this);
 	}
 
 	bool IsController() {
-		static int offset = g_pGameConfig->GetOffset("IsEntityController");
+		static int offset = g_pGameConfig->GetOffset("IsPlayerController");
 		return CALL_VIRTUAL(bool, offset, this);
 	}
 
@@ -197,7 +199,7 @@ public:
 		CALL_VIRTUAL(void, offset, this);
 	}
 
-	void StartTouch(CBaseEntity* pOther) {
+	/*void StartTouch(CBaseEntity* pOther) {
 		static int offset = g_pGameConfig->GetOffset("StartTouch");
 		CALL_VIRTUAL(bool, offset, this, pOther);
 	}
@@ -208,7 +210,7 @@ public:
 	void EndTouch(CBaseEntity* other) {
 		static int offset = g_pGameConfig->GetOffset("EndTouch");
 		CALL_VIRTUAL(bool, offset, this, other);
-	}
+	}*/
 
 	void Teleport(const Vector* newPosition, const QAngle* newAngles, const Vector* newVelocity) {
 		static int offset = g_pGameConfig->GetOffset("Teleport");
@@ -223,8 +225,8 @@ public:
 		return *reinterpret_cast<CEntitySubclassVDataBase**>(reinterpret_cast<uint8*>(subclassID) + 4);
 	}
 
-	void DispatchSpawn(CEntityKeyValues* pEntityKeyValues = nullptr) {
-		addresses::DispatchSpawn(this, pEntityKeyValues);
+	void DispatchSpawn(CEntityKeyValues* kv = nullptr) {
+		addresses::DispatchSpawn(this, kv);
 	}
 
 	void DispatchSpawn(const plg::vector<plg::string>& keys, const plg::vector<plg::any>& values) {

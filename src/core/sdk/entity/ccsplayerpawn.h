@@ -67,7 +67,7 @@ public:
 	SCHEMA_FIELD(CCSPlayer_ActionTrackingServices*, m_pActionTrackingServices)
 
 	void Respawn() {
-		static int offset = g_pGameConfig->GetOffset("Respawn");
+		static int offset = g_pGameConfig->GetOffset("CCSPlayerController_Respawn");
 		CALL_VIRTUAL(void, offset, this);
 	}
 };
