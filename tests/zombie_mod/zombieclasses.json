@@ -1,8 +1,8 @@
 [
   {
     "name": "Classic Zombie",
-    "model": "characters/models/kolka/2025/zombiertx/zombie.vmdl_c",
-    "claw": "characters/models/kolka/2025/zombiertx/zombie_arms.vmdl_c",
+    "model": "",
+    "claw": "",
     "health": 2500,
     "armor": 100,
     "speed": 0.9,
