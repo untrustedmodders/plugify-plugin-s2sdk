@@ -125,50 +125,28 @@ class CPlayer_WeaponServices : public CPlayerPawnComponent {
 public:
 	DECLARE_SCHEMA_CLASS(CPlayer_WeaponServices);
 
-private:
-	virtual void unk_00() = 0;
-#if S2SDK_PLATFORM_LINUX
-	virtual void unk_01() = 0;
-#endif
-public:
-	virtual ~CPlayer_WeaponServices() = 0;
-
-private:
-	virtual void unk_03() = 0;
-	virtual void unk_04() = 0;
-	virtual void unk_05() = 0;
-	virtual void unk_06() = 0;
-	virtual void unk_07() = 0;
-	virtual void unk_08() = 0;
-	virtual void unk_09() = 0;
-	virtual void unk_10() = 0;
-	virtual void unk_11() = 0;
-	virtual void unk_12() = 0;
-	virtual void unk_13() = 0;
-	virtual void unk_14() = 0;
-	virtual void unk_15() = 0;
-	virtual void unk_16() = 0;
-	virtual void unk_17() = 0;
-	virtual void unk_18() = 0;
-	virtual void unk_19() = 0;
-	virtual void unk_20() = 0;
-	virtual void unk_21() = 0;
-
-public:
-	virtual bool CanUse(CBasePlayerWeapon* weapon) = 0;
-	virtual void Drop(CBasePlayerWeapon* weapon, Vector* vecTarget = nullptr, Vector* velocity = nullptr) = 0;
-	virtual int Bump(CBasePlayerWeapon* weapon) = 0;				// May return 2 if CSGameRules()->IsPlayingGunGameDeathmatch, meaning that weapon will be deleted
-	virtual bool Switch(CBasePlayerWeapon* weapon, int a3 = 0) = 0;// If a3 is equal to 3 some code will be executed
-private:
-	virtual void unk_25() = 0;
-	virtual void unk_26() = 0;
-	virtual void unk_27() = 0;
-	virtual void unk_28() = 0;
-	virtual void unk_29() = 0;
-
-public:
 	SCHEMA_FIELD_POINTER(CUtlVector<CHandle<CBasePlayerWeapon>>, m_hMyWeapons)
 	SCHEMA_FIELD(CHandle<CBasePlayerWeapon>, m_hActiveWeapon)
+
+	bool CanUse(CBasePlayerWeapon* weapon) {
+		static int offset = g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::CanUse");
+		return CALL_VIRTUAL(bool, offset, this, weapon);
+	}
+
+	void DropWeapon(CBasePlayerWeapon* weapon, Vector* vecTarget = nullptr, Vector* velocity = nullptr) {
+		static int offset = g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::DropWeapon");
+		CALL_VIRTUAL(void, offset, this, weapon, vecTarget, velocity);
+	}
+
+	int SelectItem(CBasePlayerWeapon* weapon) {
+		static int offset = g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::SelectItem");
+		return CALL_VIRTUAL(int, offset, this, weapon);
+	}
+
+	bool SwitchWeapon(CBasePlayerWeapon* weapon, int a3 = 0) {
+		static int offset = g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::SwitchWeapon");
+		return CALL_VIRTUAL(int, offset, this, weapon, a3);
+	}
 };
 
 class CCSPlayer_WeaponServices : public CPlayer_WeaponServices {
@@ -209,38 +187,14 @@ class CCSPlayer_ItemServices : public CPlayer_ItemServices {
 public:
 	DECLARE_SCHEMA_CLASS(CCSPlayer_ItemServices);
 
-	virtual ~CCSPlayer_ItemServices() = 0;
+	CBaseEntity* GiveNamedItem(const char* name) {
+		static int offset = g_pGameConfig->GetOffset("CCSPlayer_ItemServices::GiveNamedItem");
+		return CALL_VIRTUAL(CBaseEntity*, offset, this, name);
+	}
 
-private:
-	virtual void unk_01() = 0;
-	virtual void unk_02() = 0;
-	virtual void unk_03() = 0;
-	virtual void unk_04() = 0;
-	virtual void unk_05() = 0;
-	virtual void unk_06() = 0;
-	virtual void unk_07() = 0;
-	virtual void unk_08() = 0;
-	virtual void unk_09() = 0;
-	virtual void unk_10() = 0;
-	virtual void unk_11() = 0;
-	virtual void unk_12() = 0;
-	virtual void unk_13() = 0;
-	virtual void unk_14() = 0;
-	virtual void unk_15() = 0;
-	virtual void unk_16() = 0;
-	virtual void unk_17() = 0;
-	virtual CBaseEntity* _GiveNamedItem(const char* name) = 0;
-
-public:
-	virtual bool GiveNamedItemBool(const char* name) = 0;
-	virtual CBaseEntity* GiveNamedItem(const char* name) = 0;
-	// Recommended to use CCSPlayer_WeaponServices::Droweapon instead (parameter is ignored here)
-	virtual void DropActiveWeapon(CBasePlayerWeapon* weapon) = 0;
-	virtual void StripPlayerWeapons(bool removeSuit = false) = 0;
-
-	void RemoveWeapons()
-	{
-		StripPlayerWeapons();
+	int RemoveWeapons(bool removeSuit = false) {
+		static int offset = g_pGameConfig->GetOffset("CCSPlayer_ItemServices::RemoveAllItems");
+		return CALL_VIRTUAL(int, offset, this, removeSuit);
 	}
 };
 

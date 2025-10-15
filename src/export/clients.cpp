@@ -1173,26 +1173,26 @@ extern "C" PLUGIN_API plg::vector<int> GetClientWeapons(int playerSlot) {
  * @param playerSlot The index of the player's slot.
  * @param removeSuit A boolean indicating whether to also remove the client's suit.
  */
-extern "C" PLUGIN_API void StripWeapons(int playerSlot, bool removeSuit) {
+extern "C" PLUGIN_API void RemoveWeapons(int playerSlot, bool removeSuit) {
 	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
 	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'StripWeapons' on invalid player slot: {}\n", playerSlot);
+		plg::print(LS_WARNING, "Cannot execute 'RemoveWeapons' on invalid player slot: {}\n", playerSlot);
 		return;
 	}
 
 	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
 	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'StripWeapons' on invalid player pawn: {}\n", playerSlot);
+		plg::print(LS_WARNING, "Cannot execute 'RemoveWeapons' on invalid player pawn: {}\n", playerSlot);
 		return;
 	}
 
 	CCSPlayer_ItemServices* itemServices = pawn->m_pItemServices;
 	if (!itemServices) {
-		plg::print(LS_WARNING, "Cannot execute 'StripWeapons' on m_pItemServices: {}\n", playerSlot);
+		plg::print(LS_WARNING, "Cannot execute 'RemoveWeapons' on m_pItemServices: {}\n", playerSlot);
 		return;
 	}
 
-	itemServices->StripPlayerWeapons(removeSuit);
+	itemServices->RemoveWeapons(removeSuit);
 }
 
 /**
@@ -1228,41 +1228,41 @@ extern "C" PLUGIN_API void DropWeapon(int playerSlot, int weaponHandle, const pl
 		return;
 	}
 
-	weaponServices->Drop(pWeapon, reinterpret_cast<Vector*>(const_cast<plg::vec3*>(&target)), reinterpret_cast<Vector*>(const_cast<plg::vec3*>(&velocity)));
+	weaponServices->DropWeapon(pWeapon, reinterpret_cast<Vector*>(const_cast<plg::vec3*>(&target)), reinterpret_cast<Vector*>(const_cast<plg::vec3*>(&velocity)));
 }
 
 /**
- * @brief Bumps a player's weapon.
+ * @brief Selects a player's weapon.
  *
  * @param playerSlot The index of the player's slot.
  * @param weaponHandle The handle of weapon to bump.
  */
-extern "C" PLUGIN_API void BumpWeapon(int playerSlot, int weaponHandle) {
+extern "C" PLUGIN_API void SelectWeapon(int playerSlot, int weaponHandle) {
 	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
 	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SwitchWeapon' on invalid player slot: {}\n", playerSlot);
+		plg::print(LS_WARNING, "Cannot execute 'SelectItem' on invalid player slot: {}\n", playerSlot);
 		return;
 	}
 
 	CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
 	if (!pWeapon) {
-		plg::print(LS_WARNING, "Cannot execute 'SwitchWeapon' on invalid weapon handle: {}\n", weaponHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SelectItem' on invalid weapon handle: {}\n", weaponHandle);
 		return;
 	}
 
 	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
 	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SwitchWeapon' on invalid player pawn: {}\n", playerSlot);
+		plg::print(LS_WARNING, "Cannot execute 'SelectItem' on invalid player pawn: {}\n", playerSlot);
 		return;
 	}
 
 	CCSPlayer_WeaponServices* weaponServices = pawn->m_pWeaponServices;
 	if (!weaponServices) {
-		plg::print(LS_WARNING, "Cannot execute 'SwitchWeapon' on m_pWeaponServices: {}\n", playerSlot);
+		plg::print(LS_WARNING, "Cannot execute 'SelectItem' on m_pWeaponServices: {}\n", playerSlot);
 		return;
 	}
 
-	weaponServices->Bump(pWeapon);
+	weaponServices->SelectItem(pWeapon);
 }
 
 /**
@@ -1296,7 +1296,7 @@ extern "C" PLUGIN_API void SwitchWeapon(int playerSlot, int weaponHandle) {
 		return;
 	}
 
-	weaponServices->Switch(pWeapon);
+	weaponServices->SwitchWeapon(pWeapon);
 }
 
 /**

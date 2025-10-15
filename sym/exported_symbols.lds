@@ -61,9 +61,9 @@ GetClientModel
 SetClientModel
 GetClientActiveWeapon
 GetClientWeapons
-StripWeapons
+RemoveWeapons
 DropWeapon
-BumpWeapon
+SelectWeapon
 SwitchWeapon
 RemoveWeapon
 GiveNamedItem

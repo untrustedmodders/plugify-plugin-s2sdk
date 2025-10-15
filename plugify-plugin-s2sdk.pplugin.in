@@ -1302,10 +1302,10 @@
         }
     },
     {
-        "name": "StripWeapons",
+        "name": "RemoveWeapons",
         "group": "Clients",
         "description": "Removes all weapons from a client, with an option to remove the suit as well.",
-        "funcName": "StripWeapons",
+        "funcName": "RemoveWeapons",
         "paramTypes": [
             {
                 "name": "playerSlot",
@@ -1325,10 +1325,10 @@
         }
     },
     {
-        "name": "BumpWeapon",
+        "name": "SelectWeapon",
         "group": "Clients",
-        "description": "Bumps a player's weapon.",
-        "funcName": "BumpWeapon",
+        "description": "Selects a player's weapon.",
+        "funcName": "SelectWeapon",
         "paramTypes": [
             {
                 "name": "playerSlot",

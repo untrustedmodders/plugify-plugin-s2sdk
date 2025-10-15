@@ -207,38 +207,63 @@
         "linuxsteamrt64": 80
       },
       // 2 functions after one with "targethealthfrac"
-      "CollisionRulesChanged": {
-        "win64": 189,
-        "linuxsteamrt64": 188
+      "CBaseEntity::CollisionRulesChanged": {
+        "win64": 191,
+        "linuxsteamrt64": 191
       },
       // 9 functions after one with "Physics_SimulateEntity" "Server Game"
-      "IsPlayerPawn": {
-        "win64": 172,
-        "linuxsteamrt64": 171
+      "CBaseEntity::IsPlayerPawn": {
+        "win64": 174,
+        "linuxsteamrt64": 173
       },
       // Right after IsEntityPawn
-      "IsPlayerController": {
-        "win64": 173,
-        "linuxsteamrt64": 172
+      "CBaseEntity::IsPlayerController": {
+        "win64": 175,
+        "linuxsteamrt64": 174
       },
       // String: "%s<%i><%s><%s>"ChangeTeam() CTMDBG..."
-      "CCSPlayerController_ChangeTeam": {
+      "CBaseEntity::ChangeTeam": {
         "win64": 109,
         "linuxsteamrt64": 108
       },
       // Look for the kill command, go through its callback and you should a find call like this, with v9 being a pawn pointer:
       // return (*(*v9 + 2976LL))(v9, v27, 0LL);
       // 2976 (372 * 8) is the offset
-      "CBasePlayerPawn_CommitSuicide": {
+      "CBasePlayerPawn::CommitSuicide": {
         "win64": 408,
-        "linuxsteamrt64": 408
+        "linuxsteamrt64": 410
+      },
+      "CCSPlayer_WeaponServices::CanUse": {
+        "win64": 22,
+        "linuxsteamrt64": 23
+      },
+      "CCSPlayer_WeaponServices::DropWeapon": {
+        "win64": 23,
+        "linuxsteamrt64": 24
+      },
+      "CCSPlayer_WeaponServices::SelectItem": {
+        "win64": 25,
+        "linuxsteamrt64": 26
+      },
+      "CCSPlayer_WeaponServices::SwitchWeapon": {
+        "win64": 19,
+        "linuxsteamrt64": 20
+      },
+      "CCSPlayer_ItemServices::GiveNamedItem": {
+        "win64": 18,
+        "linuxsteamrt64": 19
+      },
+      "CCSPlayer_ItemServices::RemoveAllItems": {
+        "win64": 22,
+        "linuxsteamrt64": 23
       },
       // Player controller respawn function offset
-      "CCSPlayerController_Respawn": {
+      "CBasePlayerController::RoundRespawn": {
         "win64": 277,
         "linuxsteamrt64": 279
       },
-      "CBaseEntity_Teleport": {
+      // String "can't teleport object (%s) as it has a parent (%s)!" The vfunc call this
+      "CBaseEntity::Teleport": {
         "win64": 168,
         "linuxsteamrt64": 167
       },

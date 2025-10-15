@@ -440,7 +440,7 @@ function InfectPlayer(playerSlot) {
     }
 
     // Remove all weapons and give knife
-    s2.StripWeapons(player.m_iSlot, true)
+    s2.RemoveWeapons(player.m_iSlot, true)
     s2.GiveNamedItem(player.m_iSlot, "weapon_knife")
 
     // Set variables

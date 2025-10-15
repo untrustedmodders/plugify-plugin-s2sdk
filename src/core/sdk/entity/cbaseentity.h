@@ -181,12 +181,12 @@ public:
 	}
 
 	bool IsPawn() {
-		static int offset = g_pGameConfig->GetOffset("IsPlayerPawn");
+		static int offset = g_pGameConfig->GetOffset("CBaseEntity::IsPlayerPawn");
 		return CALL_VIRTUAL(bool, offset, this);
 	}
 
 	bool IsController() {
-		static int offset = g_pGameConfig->GetOffset("IsPlayerController");
+		static int offset = g_pGameConfig->GetOffset("CBaseEntity::IsPlayerController");
 		return CALL_VIRTUAL(bool, offset, this);
 	}
 
@@ -195,7 +195,7 @@ public:
 	}
 
 	void CollisionRulesChanged() {
-		static int offset = g_pGameConfig->GetOffset("CollisionRulesChanged");
+		static int offset = g_pGameConfig->GetOffset("CBaseEntity::CollisionRulesChanged");
 		CALL_VIRTUAL(void, offset, this);
 	}
 
@@ -213,7 +213,7 @@ public:
 	}*/
 
 	void Teleport(const Vector* newPosition, const QAngle* newAngles, const Vector* newVelocity) {
-		static int offset = g_pGameConfig->GetOffset("CBaseEntity_Teleport");
+		static int offset = g_pGameConfig->GetOffset("CBaseEntity::Teleport");
 		CALL_VIRTUAL(bool, offset, this, newPosition, newAngles, newVelocity);
 	}
 
