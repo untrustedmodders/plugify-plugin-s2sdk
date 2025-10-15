@@ -213,7 +213,7 @@ public:
 	}*/
 
 	void Teleport(const Vector* newPosition, const QAngle* newAngles, const Vector* newVelocity) {
-		static int offset = g_pGameConfig->GetOffset("Teleport");
+		static int offset = g_pGameConfig->GetOffset("CBaseEntity_Teleport");
 		CALL_VIRTUAL(bool, offset, this, newPosition, newAngles, newVelocity);
 	}
 
