@@ -348,7 +348,7 @@ extern "C" PLUGIN_API uint64_t FindConVar2(const plg::string& name, EConVarType 
 		case EConVarType_Qangle:
 			return g_ConVarManager.FindConVar<QAngle>(name);
 		default:
-			S2_LOGF(LS_WARNING, "Invalid convar type: {} - {}\n", name, static_cast<int>(type));
+			plg::print(LS_WARNING, "Invalid convar type: {} - {}\n", name, static_cast<int>(type));
 			return {};
 	}
 }
@@ -363,7 +363,7 @@ extern "C" PLUGIN_API uint64_t FindConVar2(const plg::string& name, EConVarType 
  */
 extern "C" PLUGIN_API void HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
 	if (callback == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid callback pointer: {}\n", name);
+		plg::print(LS_WARNING, "Invalid callback pointer: {}\n", name);
 		return;
 	}
 
@@ -380,7 +380,7 @@ extern "C" PLUGIN_API void HookConVarChange(const plg::string& name, ConVarChang
  */
 extern "C" PLUGIN_API void UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
 	if (callback == nullptr) {
-		S2_LOGF(LS_WARNING, "Invalid callback pointer: {}\n", name);
+		plg::print(LS_WARNING, "Invalid callback pointer: {}\n", name);
 		return;
 	}
 
@@ -398,7 +398,7 @@ extern "C" PLUGIN_API bool IsConVarFlagSet(uint64 conVarHandle, ConVarFlag flag)
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		return conVar->IsFlagSet(static_cast<int64>(flag));
 	} else {
-		S2_LOG(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error().c_str());
 		return false;
 	}
 }
@@ -413,7 +413,7 @@ extern "C" PLUGIN_API void AddConVarFlags(uint64 conVarHandle, ConVarFlag flags)
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		conVar->AddFlags(static_cast<int64>(flags));
 	} else {
-		S2_LOG(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error().c_str());
 	}
 }
 
@@ -427,7 +427,7 @@ extern "C" PLUGIN_API void RemoveConVarFlags(uint64 conVarHandle, ConVarFlag fla
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		conVar->RemoveFlags(static_cast<int64>(flags));
 	} else {
-		S2_LOG(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error().c_str());
 	}
 }
 
@@ -441,7 +441,7 @@ extern "C" PLUGIN_API ConVarFlag GetConVarFlags(uint64 conVarHandle) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		return static_cast<ConVarFlag>(conVar->GetFlags());
 	} else {
-		S2_LOG(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error().c_str());
 		return ConVarFlag::None;
 	}
 }
@@ -460,16 +460,16 @@ extern "C" PLUGIN_API plg::string GetConVarBounds(uint64 conVarHandle, bool max)
 			if (conVarData->HasMaxValue()) {
 				return std::format("{}", ConVal{conVarData->MaxValue(), conVarData->GetType()});
 			}
-			S2_LOGF(LS_WARNING, "No max value for ConVar {}\n", conVar->GetName());
+			plg::print(LS_WARNING, "No max value for ConVar {}\n", conVar->GetName());
 		} else {
 			if (conVarData->HasMinValue()) {
 				return std::format("{}", ConVal{conVarData->MinValue(), conVarData->GetType()});
 			}
-			S2_LOGF(LS_WARNING, "No min value for ConVar {}\n", conVar->GetName());
+			plg::print(LS_WARNING, "No min value for ConVar {}\n", conVar->GetName());
 		}
 		return {};
 	} else {
-		S2_LOG(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error().c_str());
 		return {};
 	}
 }
@@ -489,16 +489,16 @@ extern "C" PLUGIN_API void SetConVarBounds(uint64 conVarHandle, bool max, const 
 				conVarData->TypeTraits()->StringToValue(value.c_str(), conVarData->MaxValue());
 				return;
 			}
-			S2_LOGF(LS_WARNING, "No max value for ConVar {}\n", conVar->GetName());
+			plg::print(LS_WARNING, "No max value for ConVar {}\n", conVar->GetName());
 		} else {
 			if (conVarData->HasMinValue()) {
 				conVarData->TypeTraits()->StringToValue(value.c_str(), conVarData->MinValue());
 				return;
 			}
-			S2_LOGF(LS_WARNING, "No min value for ConVar {}\n", conVar->GetName());
+			plg::print(LS_WARNING, "No min value for ConVar {}\n", conVar->GetName());
 		}
 	} else {
-		S2_LOG(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error().c_str());
 	}
 }
 
@@ -514,10 +514,10 @@ extern "C" PLUGIN_API plg::string GetConVarDefault(uint64 conVarHandle) {
 		if (conVarData->HasDefaultValue()) {
 			return std::format("{}", ConVal{conVarData->DefaultValue(), conVarData->GetType()});
 		}
-		S2_LOGF(LS_WARNING, "No default value for ConVar {}\n", conVar->GetName());
+		plg::print(LS_WARNING, "No default value for ConVar {}\n", conVar->GetName());
 		return {};
 	} else {
-		S2_LOG(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error().c_str());
 		return {};
 	}
 }
@@ -533,7 +533,7 @@ extern "C" PLUGIN_API plg::string GetConVarValue(uint64 conVarHandle) {
 		auto* conVarData = conVar->GetConVarData();
 		return std::format("{}", ConVal{conVarData->DefaultValue(), conVarData->GetType()});
 	} else {
-		S2_LOG(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error().c_str());
 		return {};
 	}
 }
@@ -919,7 +919,7 @@ extern "C" PLUGIN_API void SendConVarValue(int playerSlot, uint64 conVarHandle, 
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		cvars::SendConVarValue(playerSlot, conVar->GetName(), value);
 	} else {
-		S2_LOG(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error().c_str());
 	}
 }
 
@@ -932,7 +932,7 @@ extern "C" PLUGIN_API void SendConVarValue(int playerSlot, uint64 conVarHandle, 
  */
 extern "C" PLUGIN_API plg::string GetClientConVarValue(int playerSlot, const plg::string& convarName) {
 	if (!utils::IsPlayerSlot(playerSlot)) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetClientConVarValue' on invalid player slot: {}\n", playerSlot);
+		plg::print(LS_WARNING, "Cannot execute 'GetClientConVarValue' on invalid player slot: {}\n", playerSlot);
 		return {};
 	}
 
@@ -948,7 +948,7 @@ extern "C" PLUGIN_API plg::string GetClientConVarValue(int playerSlot, const plg
  */
 extern "C" PLUGIN_API void SetFakeClientConVarValue(int playerSlot, const plg::string& convarName, const plg::string& convarValue) {
 	if (!utils::IsPlayerSlot(playerSlot)) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetFakeClientConVarValue' on invalid player slot: {}\n", playerSlot);
+		plg::print(LS_WARNING, "Cannot execute 'SetFakeClientConVarValue' on invalid player slot: {}\n", playerSlot);
 		return;
 	}
 

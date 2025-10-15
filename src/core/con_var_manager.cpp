@@ -39,7 +39,7 @@ ConVarRef ConVarManager::FindConVar(const plg::string& name) {
 	m_cnvCache.emplace(conVarInfo.conVar.get(), &conVarInfo);
 
 	if (!conVarInfo.conVar->IsValidRef()) {
-		S2_LOGF(LS_WARNING, "Failed to find \"{}\" convar\n", name);
+		plg::print(LS_WARNING, "Failed to find \"{}\" convar\n", name);
 		return {};
 	}
 
@@ -162,7 +162,7 @@ public:
 
 bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool autoCreate, std::string_view name, std::string_view folder) {
     if (name.empty()) {
-    	S2_LOGF(LS_WARNING, "No valid Config's name to process\n");
+    	plg::print(LS_WARNING, "No valid Config's name to process\n");
 	    return false;
     }
 
@@ -177,12 +177,12 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
 		if (auto conVar = cvars::CreateConVar(handle)) {
             conVarRefs.push_back(*conVar);
         } else {
-            S2_LOG(LS_WARNING, conVar.error().c_str());
+            plg::print(LS_WARNING, conVar.error().c_str());
         }
     }
 
     if (conVarRefs.empty()) {
-        S2_LOGF(LS_WARNING, "No valid ConVars to process\n");
+        plg::print(LS_WARNING, "No valid ConVars to process\n");
     	return false;
     }
 
@@ -197,13 +197,13 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
                 auto it = parsed.find(label);
                 if (it != parsed.end()) {
                     UpdateConVarValue(conVar, it->second);
-                    S2_LOGF(LS_DEBUG, "Loaded ConVar: {} = \"{}\"\n", label, it->second);
+                    plg::print(LS_DEBUG, "Loaded ConVar: {} = \"{}\"\n", label, it->second);
                 }
             }
-    		S2_LOGF(LS_DEBUG, "Parsed config file: {}\n", plg::as_string(fullPath));
+    		plg::print(LS_DEBUG, "Parsed config file: {}\n", plg::as_string(fullPath));
         	return true;
         } else {
-            S2_LOGF(LS_WARNING, "Failed to parse config file: {}\n", parseResult.error());
+            plg::print(LS_WARNING, "Failed to parse config file: {}\n", parseResult.error());
         	return false;
         }
     } else if (autoCreate) {
@@ -223,14 +223,14 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
     			ConVarConfigGenerator::FormatConVarData(file, conVar.GetConVarData());
     		}
     		file.close();
-    		S2_LOGF(LS_DEBUG, "Created config file: {}\n", plg::as_string(fullPath));
+    		plg::print(LS_DEBUG, "Created config file: {}\n", plg::as_string(fullPath));
 			return true;
     	} else {
-    		S2_LOGF(LS_WARNING, "Failed to create config file: {}\n", plg::as_string(fullPath));
+    		plg::print(LS_WARNING, "Failed to create config file: {}\n", plg::as_string(fullPath));
 			return false;
     	}
     } else {
-        S2_LOGF(LS_WARNING, "Config file does not exist and autoCreate is false: {}\n", plg::as_string(fullPath));
+        plg::print(LS_WARNING, "Config file does not exist and autoCreate is false: {}\n", plg::as_string(fullPath));
 		return false;
     }
 }
@@ -254,7 +254,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto number = plg::cast_to<int16>(value)) {
 				cvars::SetConVar(conVar, *number, replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Failed to parse Int16 value for ConVar '{}': '{}' is not a valid integer (range: {} to {})\n",
+				plg::print(LS_WARNING, "Failed to parse Int16 value for ConVar '{}': '{}' is not a valid integer (range: {} to {})\n",
 						conVar.GetName(), value, std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max());
 			}
 			break;
@@ -264,7 +264,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto number = plg::cast_to<uint16>(value)) {
 				cvars::SetConVar(conVar, *number, replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Failed to parse UInt16 value for ConVar '{}': '{}' is not a valid unsigned integer (range: 0 to {})\n",
+				plg::print(LS_WARNING, "Failed to parse UInt16 value for ConVar '{}': '{}' is not a valid unsigned integer (range: 0 to {})\n",
 						conVar.GetName(), value, std::numeric_limits<uint16_t>::max());
 			}
 			break;
@@ -274,7 +274,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto number = plg::cast_to<int32>(value)) {
 				cvars::SetConVar(conVar, *number, replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Failed to parse Int32 value for ConVar '{}': '{}' is not a valid integer (range: {} to {})\n",
+				plg::print(LS_WARNING, "Failed to parse Int32 value for ConVar '{}': '{}' is not a valid integer (range: {} to {})\n",
 					   conVar.GetName(), value, std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max());
 			}
 			break;
@@ -284,7 +284,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto number = plg::cast_to<uint32>(value)) {
 				cvars::SetConVar(conVar, *number, replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Failed to parse UInt32 value for ConVar '{}': '{}' is not a valid unsigned integer (range: 0 to {})\n",
+				plg::print(LS_WARNING, "Failed to parse UInt32 value for ConVar '{}': '{}' is not a valid unsigned integer (range: 0 to {})\n",
 						conVar.GetName(), value, std::numeric_limits<uint32_t>::max());
 			}
 			break;
@@ -294,7 +294,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto number = plg::cast_to<int64>(value)) {
 				cvars::SetConVar(conVar, *number, replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Failed to parse Int64 value for ConVar '{}': '{}' is not a valid integer (range: {} to {})\n",
+				plg::print(LS_WARNING, "Failed to parse Int64 value for ConVar '{}': '{}' is not a valid integer (range: {} to {})\n",
 						conVar.GetName(), value, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max());
 			}
 			break;
@@ -304,7 +304,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto number = plg::cast_to<uint64>(value)) {
 				cvars::SetConVar(conVar, *number, replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Failed to parse UInt64 value for ConVar '{}': '{}' is not a valid unsigned integer (range: 0 to {})\n",
+				plg::print(LS_WARNING, "Failed to parse UInt64 value for ConVar '{}': '{}' is not a valid unsigned integer (range: 0 to {})\n",
 						conVar.GetName(), value, std::numeric_limits<uint64_t>::max());
 			}
 			break;
@@ -314,7 +314,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto number = plg::cast_to<float>(value)) {
 				cvars::SetConVar(conVar, *number, replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Failed to parse Float32 value for ConVar '{}': '{}' is not a valid floating-point number\n",
+				plg::print(LS_WARNING, "Failed to parse Float32 value for ConVar '{}': '{}' is not a valid floating-point number\n",
 						conVar.GetName(), value);
 			}
 			break;
@@ -324,7 +324,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto number = plg::cast_to<double>(value)) {
 				cvars::SetConVar(conVar, *number, replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Failed to parse Float64 value for ConVar '{}': '{}' is not a valid floating-point number\n",
+				plg::print(LS_WARNING, "Failed to parse Float64 value for ConVar '{}': '{}' is not a valid floating-point number\n",
 						conVar.GetName(), value);
 			}
 			break;
@@ -339,7 +339,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto color = plg::parse<int>(value); color.size() == 4) {
 				cvars::SetConVar(conVar, Color(color[0], color[1], color[2], color[3]), replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Invalid Color value for ConVar '{}': expected 4 components, got {}. Value: '{}'\n",
+				plg::print(LS_WARNING, "Invalid Color value for ConVar '{}': expected 4 components, got {}. Value: '{}'\n",
 						conVar.GetName(), color.size(), value);
 			}
 			break;
@@ -349,7 +349,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto vector = plg::parse<float>(value); vector.size() == 2) {
 				cvars::SetConVar(conVar, Vector2D(vector[0], vector[1]), replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Invalid Vector2D value for ConVar '{}': expected 2 components, got {}. Value: '{}'\n",
+				plg::print(LS_WARNING, "Invalid Vector2D value for ConVar '{}': expected 2 components, got {}. Value: '{}'\n",
 						conVar.GetName(), vector.size(), value);
 			}
 			break;
@@ -359,7 +359,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto vector = plg::parse<float>(value); vector.size() == 3) {
 				cvars::SetConVar(conVar, Vector(vector[0], vector[1], vector[2]), replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Invalid Vector3 value for ConVar '{}': expected 3 components, got {}. Value: '{}'\n",
+				plg::print(LS_WARNING, "Invalid Vector3 value for ConVar '{}': expected 3 components, got {}. Value: '{}'\n",
 						conVar.GetName(), vector.size(), value);
 			}
 			break;
@@ -369,7 +369,7 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto vector = plg::parse<float>(value); vector.size() == 4) {
 				cvars::SetConVar(conVar, Vector4D(vector[0], vector[1], vector[2], vector[3]), replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Invalid Vector4D value for ConVar '{}': expected 4 components, got {}. Value: '{}'\n",
+				plg::print(LS_WARNING, "Invalid Vector4D value for ConVar '{}': expected 4 components, got {}. Value: '{}'\n",
 						conVar.GetName(), vector.size(), value);
 			}
 			break;
@@ -379,14 +379,14 @@ void ConVarManager::UpdateConVarValue(
 			if (const auto vector = plg::parse<float>(value); vector.size() == 3) {
 				cvars::SetConVar(conVar, QAngle(vector[0], vector[1], vector[2]), replicate, notify);
 			} else {
-				S2_LOGF(LS_WARNING, "Invalid QAngle value for ConVar '{}': expected 3 components (pitch, yaw, roll), got {}. Value: '{}'\n",
+				plg::print(LS_WARNING, "Invalid QAngle value for ConVar '{}': expected 3 components (pitch, yaw, roll), got {}. Value: '{}'\n",
 						conVar.GetName(), vector.size(), value);
 			}
 			break;
 		}
 
 		default:
-			S2_LOGF(LS_WARNING, "Invalid convar type: {}\n", static_cast<int>(type));
+			plg::print(LS_WARNING, "Invalid convar type: {}\n", static_cast<int>(type));
 			break;
 	}
 }

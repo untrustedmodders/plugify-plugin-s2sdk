@@ -83,7 +83,7 @@ extern "C" PLUGIN_API bool IsMapValid(const plg::string& mapname) {
  */
 extern "C" PLUGIN_API float GetGameTime() {
 	if (gpGlobals == nullptr) {
-		S2_LOG(LS_WARNING, "Global Variables not initialized yet.\n");
+		plg::print(LS_WARNING, "Global Variables not initialized yet.\n");
 		return 0.0f;
 	}
 
@@ -97,7 +97,7 @@ extern "C" PLUGIN_API float GetGameTime() {
  */
 extern "C" PLUGIN_API int GetGameTickCount() {
 	if (gpGlobals == nullptr) {
-		S2_LOG(LS_WARNING, "Global Variables not initialized yet.\n");
+		plg::print(LS_WARNING, "Global Variables not initialized yet.\n");
 		return 0;
 	}
 
@@ -111,7 +111,7 @@ extern "C" PLUGIN_API int GetGameTickCount() {
  */
 extern "C" PLUGIN_API float GetGameFrameTime() {
 	/*if (gpGlobals == nullptr) {
-		S2_LOG(LS_WARNING, "Global Variables not initialized yet.\n");
+		plg::print(LS_WARNING, "Global Variables not initialized yet.\n");
 		return 0.0f;
 	}
 
@@ -135,7 +135,7 @@ extern "C" PLUGIN_API double GetEngineTime() {
  */
 extern "C" PLUGIN_API int GetMaxClients() {
 	if (gpGlobals == nullptr) {
-		S2_LOG(LS_WARNING, "Global Variables not initialized yet.\n");
+		plg::print(LS_WARNING, "Global Variables not initialized yet.\n");
 		return -1;
 	}
 

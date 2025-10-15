@@ -263,7 +263,7 @@ void utils::CPrintChat(CPlayerSlot slot, std::string_view message) {
 	if (CFormat(coloredBuffer, sizeof(coloredBuffer), message.data())) {
 		ClientPrint(slot, HudDest::Chat, coloredBuffer);
 	} else {
-		S2_LOGF(LS_WARNING, "utils::CPrintChat did not have enough space to print: {}\n", message);
+		plg::print(LS_WARNING, "utils::CPrintChat did not have enough space to print: {}\n", message);
 	}
 }
 
@@ -272,6 +272,6 @@ void utils::CPrintChatAll(std::string_view message) {
 	if (CFormat(coloredBuffer, sizeof(coloredBuffer), message.data())) {
 		ClientPrint(std::nullopt, HudDest::Chat, coloredBuffer);
 	} else {
-		S2_LOGF(LS_WARNING, "utils::CPrintChatAll did not have enough space to print: {}\n", message);
+		plg::print(LS_WARNING, "utils::CPrintChatAll did not have enough space to print: {}\n", message);
 	}
 }

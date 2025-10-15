@@ -53,7 +53,7 @@ extern "C" PLUGIN_API void* GetGameRules() {
 extern "C" PLUGIN_API CTeam* GetGameTeamManager(int team) {
 	auto it = g_pTeamManagers.find(team);
 	if (it == g_pTeamManagers.end()) {
-		S2_LOGF(LS_WARNING, "Failed to find \"{}\" team\n", team);
+		plg::print(LS_WARNING, "Failed to find \"{}\" team\n", team);
 		return nullptr;
 	}
 
@@ -73,7 +73,7 @@ extern "C" PLUGIN_API CTeam* GetGameTeamManager(int team) {
 extern "C" PLUGIN_API int GetGameTeamScore(int team) {
 	auto it = g_pTeamManagers.find(team);
 	if (it == g_pTeamManagers.end()) {
-		S2_LOGF(LS_WARNING, "Failed to find \"{}\" team\n", team);
+		plg::print(LS_WARNING, "Failed to find \"{}\" team\n", team);
 		return -1;
 	}
 
@@ -92,7 +92,7 @@ extern "C" PLUGIN_API int GetGameTeamScore(int team) {
  */
 extern "C" PLUGIN_API int GetGamePlayerCount(int team) {
 	if (g_pGameRules == nullptr) {
-		S2_LOG(LS_WARNING, "cs_gamerules not instantiated yet.\n");
+		plg::print(LS_WARNING, "cs_gamerules not instantiated yet.\n");
 		return -1;
 	}
 
@@ -119,7 +119,7 @@ extern "C" PLUGIN_API int GetGamePlayerCount(int team) {
  */
 extern "C" PLUGIN_API int GetGameTotalRoundsPlayed() {
 	if (g_pGameRules == nullptr) {
-		S2_LOG(LS_WARNING, "cs_gamerules not instantiated yet.\n");
+		plg::print(LS_WARNING, "cs_gamerules not instantiated yet.\n");
 		return -1;
 	}
 
@@ -139,7 +139,7 @@ extern "C" PLUGIN_API int GetGameTotalRoundsPlayed() {
  */
 extern "C" PLUGIN_API void TerminateRound(float delay, CSRoundEndReason reason) {
 	if (g_pGameRules == nullptr) {
-		S2_LOG(LS_WARNING, "cs_gamerules not instantiated yet.\n");
+		plg::print(LS_WARNING, "cs_gamerules not instantiated yet.\n");
 		return;
 	}
 

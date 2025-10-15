@@ -37,8 +37,8 @@ void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 nNet
 	CALL_VIRTUAL(void, nNetworkStateChangedOffset, (void*)pNetworkVar, &data);
 }
 
-void EntityNetworkStateChanged(uintptr_t entity, uint nOffset) {
-	NetworkStateChanged_t data(nOffset);
+void EntityNetworkStateChanged(uintptr_t entity, uint offset) {
+	NetworkStateChanged_t data(offset);
 	reinterpret_cast<CEntityInstance*>(entity)->NetworkStateChanged(data);
 }
 
@@ -79,7 +79,7 @@ namespace {
 		if (!pClassInfo) {
 			tableMap.emplace(classKey, SchemaKeyValueMap());
 
-			S2_LOGF(LS_ERROR, "InitSchemaFieldsForClass(): '{}' was not found!\n", className);
+			plg::print(LS_ERROR, "InitSchemaFieldsForClass(): '{}' was not found!\n", className);
 			return false;
 		}
 
@@ -97,7 +97,7 @@ namespace {
 			field.m_pType->GetSizeAndAlignment(size, alignment);
 			keyValueMap.emplace(plg::hasher(field.m_pszName), SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), size, field.m_pType});
 
-			//S2_LOGF(LS_DEBUG, "{}::{} found at -> 0x{:x} - {}\reworn", className, field.m_pszName, field.m_nSingleInheritanceOffset, &field);
+			//plg::print(LS_DEBUG, "{}::{} found at -> 0x{:x} - {}\reworn", className, field.m_pszName, field.m_nSingleInheritanceOffset, &field);
 		}
 
 		tableMap.emplace(classKey, std::move(keyValueMap));
@@ -128,7 +128,7 @@ namespace schema {
 			return std::get<SchemaKey>(*memberIt);
 		} else {
 			if (memberKey != g_ChainKey) {
-				S2_LOGF(LS_ERROR, "schema::GetOffset(): '{}' was not found in '{}'!\n", memberName, className);
+				plg::print(LS_ERROR, "schema::GetOffset(): '{}' was not found in '{}'!\n", memberName, className);
 			}
 		}
 

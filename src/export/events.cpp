@@ -290,12 +290,12 @@ extern "C" PLUGIN_API void SetEventPlayerIndex(EventInfo* info, const plg::strin
  * @param value A handle to the entity to set.
  */
 extern "C" PLUGIN_API void SetEventEntity(EventInfo* info, const plg::string& key, int value) {
-	CEntityInstance* pEntity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) value));
-	if (!pEntity) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) value));
+	if (!entity) {
 		return;
 	}
 
-	info->event->SetEntity(utils::MakeEventKeySymbol(key), pEntity);
+	info->event->SetEntity(utils::MakeEventKeySymbol(key), entity);
 }
 
 /**

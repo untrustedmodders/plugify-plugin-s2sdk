@@ -54,7 +54,7 @@ extern "C" PLUGIN_API void* GetModuleFunctionByName(Module* module, const plg::s
 extern "C" PLUGIN_API plg::string GetModuleSectionNameByName(Module* module, const plg::string& sectionName) {
 	auto section = module->GetSectionByName(sectionName);
 	if (!section) {
-		S2_LOGF(LS_WARNING, "Failed to get the module section by '{}' name.\n", sectionName);
+		plg::print(LS_WARNING, "Failed to get the module section by '{}' name.\n", sectionName);
 		return {};
 	}
 
@@ -71,7 +71,7 @@ extern "C" PLUGIN_API plg::string GetModuleSectionNameByName(Module* module, con
 extern "C" PLUGIN_API void* GetModuleSectionBaseByName(Module* module, const plg::string& sectionName) {
 	auto section = module->GetSectionByName(sectionName);
 	if (!section) {
-		S2_LOGF(LS_WARNING, "Failed to get the module section base by '{}' name.\n", sectionName);
+		plg::print(LS_WARNING, "Failed to get the module section base by '{}' name.\n", sectionName);
 		return nullptr;
 	}
 
@@ -88,7 +88,7 @@ extern "C" PLUGIN_API void* GetModuleSectionBaseByName(Module* module, const plg
 extern "C" PLUGIN_API uint64_t GetModuleSectionSizeByName(Module* module, const plg::string& sectionName) {
 	auto section = module->GetSectionByName(sectionName);
 	if (!section) {
-		S2_LOGF(LS_WARNING, "Failed to get the module section size by '{}' name.\n", sectionName);
+		plg::print(LS_WARNING, "Failed to get the module section size by '{}' name.\n", sectionName);
 		return 0;
 	}
 

@@ -30,9 +30,9 @@ public:
 		ihook = poly::VTableHook2::Create(ptr, (void*&) func, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 #if PLUGIFY_IS_DEBUG
-			S2_LOGF(LS_WARNING, "Could not hook table function \"{}\".\n", ptr);
+			plg::print(LS_WARNING, "Could not hook table function \"{}\".\n", ptr);
 #else
-			S2_LOGF(LS_WARNING, "Could not hook table function \"{}\".\n", typeid(func).name());
+			plg::print(LS_WARNING, "Could not hook table function \"{}\".\n", typeid(func).name());
 #endif
 			return nullptr;
 		}
@@ -66,9 +66,9 @@ public:
 		ihook = poly::VFuncHook2::Create(ptr, (void*&) func, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 #if PLUGIFY_IS_DEBUG
-			S2_LOGF(LS_WARNING, "Could not hook virtual function \"{}\".\n", ptr);
+			plg::print(LS_WARNING, "Could not hook virtual function \"{}\".\n", ptr);
 #else
-			S2_LOGF(LS_WARNING, "Could not hook virtual function \"{}\".\n", typeid(func).name());
+			plg::print(LS_WARNING, "Could not hook virtual function \"{}\".\n", typeid(func).name());
 #endif
 			return nullptr;
 		}
@@ -89,7 +89,7 @@ public:
 
 		auto addr = g_pGameConfig->ResolveSignature(name);
 		if (!addr) {
-			S2_LOGF(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
+			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;
 		}
 
@@ -105,7 +105,7 @@ public:
 
 		ihook = poly::DetourHook::Create(addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
-			S2_LOGF(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
+			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;
 		}
 
@@ -137,7 +137,7 @@ public:
 
 		ihook = poly::DetourHook::Create((void*)addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
-			S2_LOGF(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
+			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;
 		}
 

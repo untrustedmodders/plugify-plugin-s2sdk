@@ -6,7 +6,7 @@ void ServerManager::OnGameFrame() {
 	if (m_nextTasks.empty())
 		return;
 
-	//S2_LOGF(LS_DEBUG, "Executing queued tasks of size: {} on tick number {}\n", m_nextTasks.size(), gpGlobals->tickcount);
+	//plg::print(LS_DEBUG, "Executing queued tasks of size: {} on tick number {}\n", m_nextTasks.size(), gpGlobals->tickcount);
 
 	m_nextTasks.for_each([](const Task& task) {
 		const auto& [nextTask, userData] = task;
@@ -20,7 +20,7 @@ void ServerManager::OnPreWorldUpdate() {
 	if (m_nextWorldUpdateTasks.empty())
 		return;
 
-	//S2_LOGF(LS_DEBUG, "Executing queued tasks of size: {} at time {}\n", m_nextWorldUpdateTasks.size(), gpGlobals->curtime);
+	//plg::print(LS_DEBUG, "Executing queued tasks of size: {} at time {}\n", m_nextWorldUpdateTasks.size(), gpGlobals->curtime);
 
 	m_nextWorldUpdateTasks.for_each([](const Task& task) {
 		const auto& [nextTask, userData] = task;

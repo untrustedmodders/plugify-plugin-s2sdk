@@ -113,11 +113,11 @@ namespace schema {
 
 }// namespace schema
 
-void EntityNetworkStateChanged(uintptr_t pEntity, uint32_t nOffset);
-void ChainNetworkStateChanged(uintptr_t pNetworkVarChainer, uint32_t nOffset);
-void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32_t nNetworkStateChangedOffset);
+void EntityNetworkStateChanged(uintptr_t entity, uint32_t offset);
+void ChainNetworkStateChanged(uintptr_t networkVarChainer, uint32_t offset);
+void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32_t networkStateChangedOffset);
 
-void SafeNetworkStateChanged(intptr_t pEntity, int offset, int chainOffset);
+void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset);
 
 class CBaseEntity;
 

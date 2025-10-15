@@ -225,7 +225,7 @@ extern "C" PLUGIN_API int FindEntityByClassname(int startEntity, const plg::stri
 
 	CBaseEntity* entity = static_cast<CBaseEntity*>(addresses::CGameEntitySystem_FindEntityByClassName(g_pGameEntitySystem, pStartStart, classname.c_str()));
 	if (!entity) {
-		//S2_LOGF(LS_WARNING, "Cannot execute 'FindEntityByClassname' with invalid entity classname: {}\n", classname);
+		//plg::print(LS_WARNING, "Cannot execute 'FindEntityByClassname' with invalid entity classname: {}\n", classname);
 		return INVALID_EHANDLE_INDEX;
 	}
 
@@ -251,7 +251,7 @@ extern "C" PLUGIN_API int FindEntityByName(int startEntity, const plg::string& n
 
 	CBaseEntity* entity = static_cast<CBaseEntity*>(addresses::CGameEntitySystem_FindEntityByName(g_pGameEntitySystem, start, name.c_str(), nullptr, nullptr, nullptr, nullptr));
 	if (!entity) {
-		//S2_LOGF(LS_WARNING, "Cannot execute 'FindEntityByName' with invalid entity name: {}\n", name);
+		//plg::print(LS_WARNING, "Cannot execute 'FindEntityByName' with invalid entity name: {}\n", name);
 		return INVALID_EHANDLE_INDEX;
 	}
 
@@ -272,7 +272,7 @@ extern "C" PLUGIN_API int FindEntityByName(int startEntity, const plg::string& n
 extern "C" PLUGIN_API int CreateEntityByName(const plg::string& className) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(addresses::CreateEntityByName(className.c_str(), -1));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'CreateEntityByName' with invalid entity classname: {}\n", className);
+		plg::print(LS_WARNING, "Cannot execute 'CreateEntityByName' with invalid entity classname: {}\n", className);
 		return INVALID_EHANDLE_INDEX;
 	}
 
@@ -290,7 +290,7 @@ extern "C" PLUGIN_API int CreateEntityByName(const plg::string& className) {
 extern "C" PLUGIN_API void DispatchSpawn(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'DispatchSpawn' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'DispatchSpawn' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -310,12 +310,12 @@ extern "C" PLUGIN_API void DispatchSpawn(int entityHandle) {
 extern "C" PLUGIN_API void DispatchSpawn2(int entityHandle, const plg::vector<plg::string>& keys, const plg::vector<plg::any>& values) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'DispatchSpawn2' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'DispatchSpawn2' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
 	if (keys.size() != values.size()) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'DispatchSpawn2': Mismatch between keys and values sizes. Keys size: {}, Values size: {}.", static_cast<int>(keys.size()), static_cast<int>(values.size()));
+		plg::print(LS_WARNING, "Cannot execute 'DispatchSpawn2': Mismatch between keys and values sizes. Keys size: {}, Values size: {}.", static_cast<int>(keys.size()), static_cast<int>(values.size()));
 		return;
 	}
 
@@ -333,7 +333,7 @@ extern "C" PLUGIN_API void DispatchSpawn2(int entityHandle, const plg::vector<pl
 extern "C" PLUGIN_API void RemoveEntity(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'RemoveEntity' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'RemoveEntity' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -354,7 +354,7 @@ extern "C" PLUGIN_API void RemoveEntity(int entityHandle) {
 extern "C" PLUGIN_API plg::string GetEntityClassname(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityClassname' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityClassname' on invalid entity handle: {}\n", entityHandle);
 		return {};
 	}
 
@@ -373,7 +373,7 @@ extern "C" PLUGIN_API plg::string GetEntityClassname(int entityHandle) {
 extern "C" PLUGIN_API plg::string GetEntityName(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityName' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityName' on invalid entity handle: {}\n", entityHandle);
 		return {};
 	}
 
@@ -392,7 +392,7 @@ extern "C" PLUGIN_API plg::string GetEntityName(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityName(int entityHandle, const plg::string& name) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityName' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityName' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -411,7 +411,7 @@ extern "C" PLUGIN_API void SetEntityName(int entityHandle, const plg::string& na
 extern "C" PLUGIN_API MoveType_t GetEntityMoveType(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityMoveType' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityMoveType' on invalid entity handle: {}\n", entityHandle);
 		return MOVETYPE_NONE;
 	}
 
@@ -430,7 +430,7 @@ extern "C" PLUGIN_API MoveType_t GetEntityMoveType(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityMoveType(int entityHandle, MoveType_t moveType) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityMoveType' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityMoveType' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -449,7 +449,7 @@ extern "C" PLUGIN_API void SetEntityMoveType(int entityHandle, MoveType_t moveTy
 extern "C" PLUGIN_API float GetEntityGravity(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityGravity' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityGravity' on invalid entity handle: {}\n", entityHandle);
 		return 0.0f;
 	}
 
@@ -468,7 +468,7 @@ extern "C" PLUGIN_API float GetEntityGravity(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityGravity(int entityHandle, float gravity) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityGravity' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityGravity' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -487,7 +487,7 @@ extern "C" PLUGIN_API void SetEntityGravity(int entityHandle, float gravity) {
 extern "C" PLUGIN_API int GetEntityFlags(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityFlags' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityFlags' on invalid entity handle: {}\n", entityHandle);
 		return 0;
 	}
 
@@ -506,7 +506,7 @@ extern "C" PLUGIN_API int GetEntityFlags(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityFlags(int entityHandle, int flags) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityFlags' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityFlags' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -525,7 +525,7 @@ extern "C" PLUGIN_API void SetEntityFlags(int entityHandle, int flags) {
 extern "C" PLUGIN_API int GetEntityRenderColor(int entityHandle) {
 	CBaseModelEntity* entity = static_cast<CBaseModelEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityRenderColor' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityRenderColor' on invalid entity handle: {}\n", entityHandle);
 		return 0;
 	}
 
@@ -544,7 +544,7 @@ extern "C" PLUGIN_API int GetEntityRenderColor(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityRenderColor(int entityHandle, int color) {
 	CBaseModelEntity* entity = static_cast<CBaseModelEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityRenderColor' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityRenderColor' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -563,7 +563,7 @@ extern "C" PLUGIN_API void SetEntityRenderColor(int entityHandle, int color) {
 extern "C" PLUGIN_API uint8_t GetEntityRenderMode(int entityHandle) {
 	CBaseModelEntity* entity = static_cast<CBaseModelEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityRenderMode' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityRenderMode' on invalid entity handle: {}\n", entityHandle);
 		return 0;
 	}
 
@@ -582,7 +582,7 @@ extern "C" PLUGIN_API uint8_t GetEntityRenderMode(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityRenderMode(int entityHandle, uint8_t renderMode) {
 	CBaseModelEntity* entity = static_cast<CBaseModelEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityRenderMode' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityRenderMode' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -601,7 +601,7 @@ extern "C" PLUGIN_API void SetEntityRenderMode(int entityHandle, uint8_t renderM
 extern "C" PLUGIN_API int GetEntityHealth(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityHealth' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityHealth' on invalid entity handle: {}\n", entityHandle);
 		return 0;
 	}
 
@@ -620,7 +620,7 @@ extern "C" PLUGIN_API int GetEntityHealth(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityHealth(int entityHandle, int health) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityHealth' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityHealth' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -639,7 +639,7 @@ extern "C" PLUGIN_API void SetEntityHealth(int entityHandle, int health) {
 extern "C" PLUGIN_API int GetEntityMaxHealth(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityMaxHealth' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityMaxHealth' on invalid entity handle: {}\n", entityHandle);
 		return 0;
 	}
 
@@ -658,7 +658,7 @@ extern "C" PLUGIN_API int GetEntityMaxHealth(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityMaxHealth(int entityHandle, int maxHealth) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityMaxHealth' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityMaxHealth' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -677,7 +677,7 @@ extern "C" PLUGIN_API void SetEntityMaxHealth(int entityHandle, int maxHealth) {
 extern "C" PLUGIN_API int GetEntityTeam(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetTeamEntity' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetTeamEntity' on invalid entity handle: {}\n", entityHandle);
 		return 0;
 	}
 
@@ -696,7 +696,7 @@ extern "C" PLUGIN_API int GetEntityTeam(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityTeam(int entityHandle, int team) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetTeamEntity' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetTeamEntity' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -715,7 +715,7 @@ extern "C" PLUGIN_API void SetEntityTeam(int entityHandle, int team) {
 extern "C" PLUGIN_API int GetEntityOwner(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityOwner' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityOwner' on invalid entity handle: {}\n", entityHandle);
 		return INVALID_EHANDLE_INDEX;
 	}
 
@@ -734,13 +734,13 @@ extern "C" PLUGIN_API int GetEntityOwner(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityOwner(int entityHandle, int ownerHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityOwner' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityOwner' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
 	CBaseEntity* pOwner = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) ownerHandle)));
 	if (!pOwner) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityOwner' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityOwner' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -759,7 +759,7 @@ extern "C" PLUGIN_API void SetEntityOwner(int entityHandle, int ownerHandle) {
 extern "C" PLUGIN_API int GetEntityParent(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityParent' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityParent' on invalid entity handle: {}\n", entityHandle);
 		return INVALID_EHANDLE_INDEX;
 	}
 
@@ -778,13 +778,13 @@ extern "C" PLUGIN_API int GetEntityParent(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityParent' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityParent' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
 	CBaseEntity* pNewParent = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) parentHandle)));
 	if (!pNewParent) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityParent' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityParent' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -803,7 +803,7 @@ extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityAbsOrigin(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityAbsOrigin' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityAbsOrigin' on invalid entity handle: {}\n", entityHandle);
 		return {};
 	}
 
@@ -823,7 +823,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAbsOrigin(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityAbsOrigin(int entityHandle, const Vector& origin) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityAbsOrigin' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityAbsOrigin' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -842,7 +842,7 @@ extern "C" PLUGIN_API void SetEntityAbsOrigin(int entityHandle, const Vector& or
 extern "C" PLUGIN_API plg::vec3 GetEntityAngRotation(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityAngRotation' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityAngRotation' on invalid entity handle: {}\n", entityHandle);
 		return {};
 	}
 
@@ -862,7 +862,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAngRotation(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityAngRotation(int entityHandle, const QAngle& angle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityAngRotation' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityAngRotation' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -881,7 +881,7 @@ extern "C" PLUGIN_API void SetEntityAngRotation(int entityHandle, const QAngle& 
 extern "C" PLUGIN_API plg::vec3 GetEntityAbsVelocity(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityAbsVelocity' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityAbsVelocity' on invalid entity handle: {}\n", entityHandle);
 		return {};
 	}
 
@@ -901,7 +901,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAbsVelocity(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityAbsVelocity(int entityHandle, const Vector& velocity) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityAbsVelocity' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityAbsVelocity' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -920,7 +920,7 @@ extern "C" PLUGIN_API void SetEntityAbsVelocity(int entityHandle, const Vector& 
 extern "C" PLUGIN_API plg::string GetEntityModel(int entityHandle) {
 	CBaseModelEntity* entity = static_cast<CBaseModelEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityModel' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityModel' on invalid entity handle: {}\n", entityHandle);
 		return {};
 	}
 
@@ -939,7 +939,7 @@ extern "C" PLUGIN_API plg::string GetEntityModel(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityModel(int entityHandle, const plg::string& model) {
 	CBaseModelEntity* entity = static_cast<CBaseModelEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'SetEntityModel' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'SetEntityModel' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -958,7 +958,7 @@ extern "C" PLUGIN_API void SetEntityModel(int entityHandle, const plg::string& m
 extern "C" PLUGIN_API float GetEntityWaterLevel(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityWaterLevel' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityWaterLevel' on invalid entity handle: {}\n", entityHandle);
 		return 0.0f;
 	}
 
@@ -977,7 +977,7 @@ extern "C" PLUGIN_API float GetEntityWaterLevel(int entityHandle) {
 extern "C" PLUGIN_API int GetEntityGroundEntity(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityGroundEntity' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityGroundEntity' on invalid entity handle: {}\n", entityHandle);
 		return INVALID_EHANDLE_INDEX;
 	}
 
@@ -996,7 +996,7 @@ extern "C" PLUGIN_API int GetEntityGroundEntity(int entityHandle) {
 extern "C" PLUGIN_API int GetEntityEffects(int entityHandle) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'GetEntityEffects' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'GetEntityEffects' on invalid entity handle: {}\n", entityHandle);
 		return 0;
 	}
 
@@ -1017,7 +1017,7 @@ extern "C" PLUGIN_API int GetEntityEffects(int entityHandle) {
 extern "C" PLUGIN_API void TeleportEntity(int entityHandle, const Vector* origin, const QAngle* angles, const Vector* velocity) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'TeleportEntity' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'TeleportEntity' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 
@@ -1042,7 +1042,7 @@ extern "C" PLUGIN_API void TeleportEntity(int entityHandle, const Vector* origin
 extern "C" PLUGIN_API void AcceptInput(int entityHandle, const plg::string& inputName, int activatorHandle, int callerHandle, const plg::any& value, FieldType type, int outputId) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
-		S2_LOGF(LS_WARNING, "Cannot execute 'AcceptInput' on invalid entity handle: {}\n", entityHandle);
+		plg::print(LS_WARNING, "Cannot execute 'AcceptInput' on invalid entity handle: {}\n", entityHandle);
 		return;
 	}
 

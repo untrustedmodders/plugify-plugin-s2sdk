@@ -121,7 +121,7 @@ bool PanoramaVoteHandler::SendYesNoVote(double duration, int caller,
 	if (result == nullptr)
 		return false;
 
-	S2_LOGF(LS_MESSAGE, "[Vote Start] Starting a new vote [id:{}]. Duration:{} Caller:{} NumClients:{}", m_voteCount, duration, caller, filter.GetRecipientCount());
+	plg::print(LS_MESSAGE, "[Vote Start] Starting a new vote [id:{}]. Duration:{} Caller:{} NumClients:{}", m_voteCount, duration, caller, filter.GetRecipientCount());
 
 	m_voteInProgress = true;
 	m_recipients = recipients;
@@ -218,15 +218,15 @@ void PanoramaVoteHandler::EndVote(VoteEndReason reason) {
 
 	switch (reason) {
 		case VoteEndReason::AllVotes: {
-			S2_LOGF(LS_MESSAGE, "[Vote Ending] [id:{}] All possible players voted.", m_voteCount);
+			plg::print(LS_MESSAGE, "[Vote Ending] [id:{}] All possible players voted.", m_voteCount);
 			break;
 		}
 		case VoteEndReason::TimeUp: {
-			S2_LOGF(LS_MESSAGE, "[Vote Ending] [id:{}] Time ran out.", m_voteCount);
+			plg::print(LS_MESSAGE, "[Vote Ending] [id:{}] Time ran out.", m_voteCount);
 			break;
 		}
 		case VoteEndReason::Cancelled: {
-			S2_LOGF(LS_MESSAGE, "[Vote Ending] [id:{}] The vote has been cancelled.", m_voteCount);
+			plg::print(LS_MESSAGE, "[Vote Ending] [id:{}] The vote has been cancelled.", m_voteCount);
 			break;
 		}
 	}

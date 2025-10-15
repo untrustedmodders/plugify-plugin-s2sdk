@@ -73,7 +73,7 @@ public:
 	template<typename T>
 	ConVarRef CreateConVar(const plg::string& name, const plg::string& description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
 		if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
-			S2_LOGF(LS_DEBUG, "[ConVarManager::CreateConVar]: ConVar '{}' is empty or already exists\n", name);
+			plg::print(LS_DEBUG, "[ConVarManager::CreateConVar]: ConVar '{}' is empty or already exists\n", name);
 			return {};
 		}
 
@@ -110,7 +110,7 @@ public:
 		m_cnvCache.emplace(conVarInfo.conVar.get(), &conVarInfo);
 
 		if (!conVarInfo.conVar->IsValidRef()) {
-			S2_LOGF(LS_WARNING, "Failed to find \"{}\" convar\n", name);
+			plg::print(LS_WARNING, "Failed to find \"{}\" convar\n", name);
 			return {};
 		}
 

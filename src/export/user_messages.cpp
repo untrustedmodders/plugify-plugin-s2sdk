@@ -83,9 +83,9 @@ extern "C" PLUGIN_API void UserMessageDestroy(UserMessage* userMessage) {
  * @param userMessage The UserMessage to send.
  */
 extern "C" PLUGIN_API void UserMessageSend(UserMessage* userMessage) {
-	S2_LOGF(LS_MESSAGE, "Count of players: {}\n", userMessage->GetRecipientFilter().GetRecipientCount());
-	S2_LOGF(LS_MESSAGE, "Serializable message: {}\n", (void *)userMessage->GetSerializableMessage());
-	S2_LOGF(LS_MESSAGE, "Net message: {}\n", (void *)userMessage->GetNetMessage());
+	plg::print(LS_MESSAGE, "Count of players: {}\n", userMessage->GetRecipientFilter().GetRecipientCount());
+	plg::print(LS_MESSAGE, "Serializable message: {}\n", (void *)userMessage->GetSerializableMessage());
+	plg::print(LS_MESSAGE, "Net message: {}\n", (void *)userMessage->GetNetMessage());
 
 	auto& slots = userMessage->GetRecipientFilter().GetRecipients();
 	userMessage->GetNetMessage()->Send(slots);
@@ -152,7 +152,7 @@ extern "C" PLUGIN_API int16_t UserMessageFindMessageIdByName(const plg::string& 
 	if (auto message = g_pNetworkMessages->FindNetworkMessagePartial(messageName.c_str())) {
 		return message->GetNetMessageInfo()->m_MessageId;
 	}
-	S2_LOGF(LS_WARNING, "Could not find user message: {}", messageName);
+	plg::print(LS_WARNING, "Could not find user message: {}", messageName);
 	return 0;
 }
 
@@ -277,12 +277,12 @@ extern "C" PLUGIN_API int PbReadEnum(UserMessage* userMessage, const plg::string
 	int32_t returnValue;
 	if (index < 0) {
 		if (!userMessage->GetEnum(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	} else {
 		if (!userMessage->GetRepeatedEnum(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	}
@@ -301,12 +301,12 @@ extern "C" PLUGIN_API int32_t PbReadInt32(UserMessage* userMessage, const plg::s
 	int32_t returnValue;
 	if (index < 0) {
 		if (!userMessage->GetInt32(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	} else {
 		if (!userMessage->GetRepeatedInt32(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	}
@@ -325,12 +325,12 @@ extern "C" PLUGIN_API int64_t PbReadInt64(UserMessage* userMessage, const plg::s
 	int64_t returnValue;
 	if (index < 0) {
 		if (!userMessage->GetInt64(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	} else {
 		if (!userMessage->GetRepeatedInt64(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	}
@@ -349,12 +349,12 @@ extern "C" PLUGIN_API uint32_t PbReadUInt32(UserMessage* userMessage, const plg:
 	uint32_t returnValue;
 	if (index < 0) {
 		if (!userMessage->GetUInt32(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	} else {
 		if (!userMessage->GetRepeatedUInt32(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	}
@@ -373,12 +373,12 @@ extern "C" PLUGIN_API uint64_t PbReadUInt64(UserMessage* userMessage, const plg:
 	uint64_t returnValue;
 	if (index < 0) {
 		if (!userMessage->GetUInt64(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	} else {
 		if (!userMessage->GetRepeatedUInt64(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	}
@@ -397,12 +397,12 @@ extern "C" PLUGIN_API float PbReadFloat(UserMessage* userMessage, const plg::str
 	float returnValue;
 	if (index < 0) {
 		if (!userMessage->GetFloat(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	} else {
 		if (!userMessage->GetRepeatedFloat(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	}
@@ -421,12 +421,12 @@ extern "C" PLUGIN_API double PbReadDouble(UserMessage* userMessage, const plg::s
 	double returnValue;
 	if (index < 0) {
 		if (!userMessage->GetDouble(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	} else {
 		if (!userMessage->GetRepeatedDouble(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return 0;
 		}
 	}
@@ -445,12 +445,12 @@ extern "C" PLUGIN_API bool PbReadBool(UserMessage* userMessage, const plg::strin
 	bool returnValue;
 	if (index < 0) {
 		if (!userMessage->GetBool(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return false;
 		}
 	} else {
 		if (!userMessage->GetRepeatedBool(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return false;
 		}
 	}
@@ -469,12 +469,12 @@ extern "C" PLUGIN_API plg::string PbReadString(UserMessage* userMessage, const p
 	plg::string returnValue;
 	if (index < 0) {
 		if (!userMessage->GetString(fieldName, returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	} else {
 		if (!userMessage->GetRepeatedString(fieldName, index, returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	}
@@ -493,12 +493,12 @@ extern "C" PLUGIN_API int PbReadColor(UserMessage* userMessage, const plg::strin
 	Color returnValue;
 	if (index < 0) {
 		if (!userMessage->GetColor(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	} else {
 		if (!userMessage->GetRepeatedColor(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	}
@@ -517,12 +517,12 @@ extern "C" PLUGIN_API plg::vec2 PbReadVector2(UserMessage* userMessage, const pl
 	Vector2D returnValue;
 	if (index < 0) {
 		if (!userMessage->GetVector2D(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	} else {
 		if (!userMessage->GetRepeatedVector2D(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	}
@@ -541,12 +541,12 @@ extern "C" PLUGIN_API plg::vec3 PbReadVector3(UserMessage* userMessage, const pl
 	Vector returnValue;
 	if (index < 0) {
 		if (!userMessage->GetVector(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	} else {
 		if (!userMessage->GetRepeatedVector(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	}
@@ -565,12 +565,12 @@ extern "C" PLUGIN_API plg::vec3 PbReadQAngle(UserMessage* userMessage, const plg
 	QAngle returnValue;
 	if (index < 0) {
 		if (!userMessage->GetQAngle(fieldName, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\" for message \"{}\"", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	} else {
 		if (!userMessage->GetRepeatedQAngle(fieldName, index, &returnValue)) {
-			S2_LOGF(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			plg::print(LS_WARNING, "Invalid field \"{}\"[{}] for message \"{}\"", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
 			return {};
 		}
 	}

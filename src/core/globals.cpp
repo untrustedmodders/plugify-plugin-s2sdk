@@ -15,7 +15,7 @@
 #define RESOLVE_SIG(gameConfig, name, variable) \
 	variable = (gameConfig)->ResolveSignature(name).RCast<decltype(variable)>(); \
 	if (!(variable)) { \
-		S2_LOGF(LS_ERROR, "Failed to resolve signature for {}\n", #name); \
+		plg::print(LS_ERROR, "Failed to resolve signature for {}\n", #name); \
 		return; \
 	} \
 
@@ -30,7 +30,7 @@ namespace globals {
 				paths["data"] + "/settings.jsonc"
 		});
 		if (!g_pCoreConfig->Initialize()) {
-			S2_LOG(LS_ERROR, "Failed to load settings configuration!\n");
+			plg::print(LS_ERROR, "Failed to load settings configuration!\n");
 			return;
 		}
 		uint32_t id = g_GameConfigManager.LoadGameConfigFile(plg::vector{
@@ -40,20 +40,20 @@ namespace globals {
 		});
 		g_pGameConfig = g_GameConfigManager.GetGameConfig(id);
 		if (!g_pGameConfig) {
-			S2_LOG(LS_ERROR, "Failed to load gamedata configuration!\n");
+			plg::print(LS_ERROR, "Failed to load gamedata configuration!\n");
 			return;
 		}
 
 		CAppSystemDict** p_ppCurrentAppSystem = g_pGameConfig->GetAddress("&s_pCurrentAppSystem").RCast<CAppSystemDict**>();
 		if (!p_ppCurrentAppSystem) {
-			S2_LOG(LS_ERROR, "s_pCurrentAppSystem not found!\n");
+			plg::print(LS_ERROR, "s_pCurrentAppSystem not found!\n");
 			return;
 		}
 		g_pCurrentAppSystem = *p_ppCurrentAppSystem;
 
 		IGameEventManager2** p_ppGameEventManager = g_pGameConfig->GetAddress("&s_GameEventManager").RCast<IGameEventManager2**>();
 		if (!p_ppGameEventManager) {
-			S2_LOG(LS_ERROR, "s_GameEventManager not found!\n");
+			plg::print(LS_ERROR, "s_GameEventManager not found!\n");
 			return;
 		}
 		g_pGameEventManager = *p_ppGameEventManager;
@@ -61,7 +61,7 @@ namespace globals {
 #if defined (CS2)
 		g_pScripts = g_pGameConfig->GetAddress("&s_pScripts").RCast<CUtlVector<void*>*>();
 		if (!g_pScripts) {
-			S2_LOG(LS_ERROR, "s_pScripts not found!\n");
+			plg::print(LS_ERROR, "s_pScripts not found!\n");
 			return;
 		}
 #endif
@@ -120,7 +120,7 @@ namespace globals {
 				return module.m_hModule;
 			}
 		}
-		S2_LOGF(LS_ERROR, "Could not find module at \"{}\"\n", name);
+		plg::print(LS_ERROR, "Could not find module at \"{}\"\n", name);
 		return {};
 	}
 	
@@ -130,7 +130,7 @@ namespace globals {
 				return system.m_pSystem;
 			}
 		}
-		S2_LOGF(LS_ERROR, "Could not find interface at \"{}\"\n", name);
+		plg::print(LS_ERROR, "Could not find interface at \"{}\"\n", name);
 		return {};
 	}
 
@@ -147,7 +147,7 @@ namespace globals {
 			}
 		}
 
-		S2_LOGF(LS_ERROR, "Could not query interface at \"{}\"\n", name);
+		plg::print(LS_ERROR, "Could not query interface at \"{}\"\n", name);
 		return {};
 	}
 }// namespace globals

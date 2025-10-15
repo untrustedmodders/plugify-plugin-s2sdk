@@ -39,9 +39,11 @@ public:
 	LoggingResponse_t LogFormat(LoggingSeverity_t severity, const LoggingRareOptions_t& code, const Color& color, const char* format, ...) const;
 
 private:
-	LoggingChannelID_t m_channelID;
 	mutable std::shared_mutex m_mutex;
+	LoggingChannelID_t m_channelID;
 };
+
+extern Logger g_Logger;
 
 #ifndef NDEBUG
 #define LS_DEBUG LS_MESSAGE
@@ -49,10 +51,24 @@ private:
 #define LS_DEBUG LS_MESSAGE
 #endif
 
-#define S2_CONCAT(a, b) S2_CONCAT_INNER(a, b)
-#define S2_CONCAT_INNER(a, b) a ## b
-#define S2_UNIQUE_NAME(base) S2_CONCAT(base, __COUNTER__)
-#define S2_LOG(...) [[maybe_unused]] auto S2_UNIQUE_NAME(_) = g_Logger.Log(__VA_ARGS__)
-#define S2_LOGF(v, ...) [[maybe_unused]] auto S2_UNIQUE_NAME(_) = g_Logger.Log(v, std::format(__VA_ARGS__).c_str())
+namespace plg {
+	class Severity {
+	public:
+		Severity(LoggingSeverity_t severity, std::source_location location = std::source_location::current()) :
+			m_severity(severity), m_location(location) {
+		}
 
-extern Logger g_Logger;
+		LoggingSeverity_t m_severity;
+		std::source_location m_location;
+	};
+
+	template <string_like First>
+	void print(Severity severity, First&& first) {
+		g_Logger.Log(std::forward<First>(first), severity.m_severity, severity.m_location);
+	}
+
+	template <typename... Args>
+	void print(Severity severity, std::format_string<Args...> fmt, Args&&... args) {
+		g_Logger.Log(std::format(fmt, std::forward<Args>(args)...), severity.m_severity, severity.m_location);
+	}
+}

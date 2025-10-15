@@ -35,7 +35,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 
 	int16_t messageID = message.GetMessageID();
 	
-	//S2_LOGF(LS_DEBUG, "[CUserMessageManager::ExecuteMessageCallbacks][{}] Pushing user message `{}` pointer: %p\n", mode == HookMode::Pre ? "Pre" : "Post",  messageID, pEvent);
+	//plg::print(LS_DEBUG, "[CUserMessageManager::ExecuteMessageCallbacks][{}] Pushing user message `{}` pointer: %p\n", mode == HookMode::Pre ? "Pre" : "Post",  messageID, pEvent);
 
 	ResultType result = ResultType::Continue;
 	

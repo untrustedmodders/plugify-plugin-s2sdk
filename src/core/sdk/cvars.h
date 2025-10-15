@@ -35,7 +35,7 @@ namespace cvars {
 		if (auto conVar = CreateConVar(conVarHandle)) {
 			SetConVarString(*conVar, value, replicate, notify);
 		} else {
-			S2_LOG(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error().c_str());
 		}
 	}
 
@@ -69,7 +69,7 @@ namespace cvars {
 	template<typename T>
 	void SetConVar(ConVarRefAbstract conVar, const T& value, bool replicate, bool notify) {
 		if (conVar.GetType() != TranslateConVarType<T>()) {
-			S2_LOGF(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
+			plg::print(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
 			return;
 		}
 
@@ -81,7 +81,7 @@ namespace cvars {
 		if (auto conVar = CreateConVar(conVarHandle)) {
 			SetConVar<T>(*conVar, value, replicate, notify);
 		} else {
-			S2_LOG(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error().c_str());
 		}
 	}
 	
@@ -196,11 +196,11 @@ namespace cvars {
 					}, value);
 					break;
 				default:
-					S2_LOGF(LS_WARNING, "Invalid convar type: {}\n", conVarHandle);
+					plg::print(LS_WARNING, "Invalid convar type: {}\n", conVarHandle);
 					return;
 			}
 		} else {
-			S2_LOG(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error().c_str());
 			return;
 		}
 	}
@@ -208,7 +208,7 @@ namespace cvars {
 	template<typename T>
 	void SetConVarValue(ConVarRefAbstract conVar, std::string_view value) {
 		if (conVar.GetType() != TranslateConVarType<T>()) {
-			S2_LOGF(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
+			plg::print(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
 			return;
 		}
 
@@ -218,7 +218,7 @@ namespace cvars {
 	template<typename T>
 	T GetConVarValue(ConVarRefAbstract conVar) {
 		if (conVar.GetType() != TranslateConVarType<T>()) {
-			S2_LOGF(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
+			plg::print(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
 			return {};
 		}
 
@@ -230,7 +230,7 @@ namespace cvars {
 		if (auto conVar = CreateConVar(conVarHandle)) {
 			return GetConVarValue<T>(*conVar);
 		} else {
-			S2_LOG(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error().c_str());
 			return {};
 		}
 	}
@@ -286,7 +286,7 @@ namespace cvars {
 					return "<invalid>";
 			}
 		} else {
-			S2_LOG(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error().c_str());
 			return {};
 		}
 	}
