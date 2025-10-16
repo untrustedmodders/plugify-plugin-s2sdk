@@ -20,7 +20,7 @@ ConVarInfo::ConVarInfo(plg::string name, plg::string description) : name(std::mo
 bool ConVarManager::RemoveConVar(const plg::string& name) {
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
-		m_cnvCache.erase(std::get<ConVarInfoPtr>(*it)->conVar.get());
+		m_cnvCache.erase(it->second->conVar.get());
 		m_cnvLookup.erase(it);
 		return true;
 	}
@@ -31,7 +31,7 @@ bool ConVarManager::RemoveConVar(const plg::string& name) {
 ConVarRef ConVarManager::FindConVar(const plg::string& name) {
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
-		return *std::get<ConVarInfoPtr>(*it)->conVar;
+		return *it->second->conVar;
 	}
 
 	auto& conVarInfo = *m_cnvLookup.emplace(name, std::make_unique<ConVarInfo>(name, "")).first->second;
@@ -57,7 +57,7 @@ void ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListen
 
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
-		auto& conVarInfo = *std::get<ConVarInfoPtr>(*it);
+		auto& conVarInfo = *it->second;
 		conVarInfo.hook.Register(callback);
 	}
 }
@@ -73,7 +73,7 @@ void ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeList
 
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
-		auto& conVarInfo = *std::get<ConVarInfoPtr>(*it);
+		auto& conVarInfo = *it->second;
 		conVarInfo.hook.Unregister(callback);
 	}
 }

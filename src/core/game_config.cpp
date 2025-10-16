@@ -108,28 +108,28 @@ std::string_view GameConfig::GetSignature(std::string_view name) const {
 	auto it = m_signatures.find(name);
 	if (it == m_signatures.end())
 		return {};
-	return std::get<plg::string>(*it);
+	return it->second;
 }
 
 std::string_view GameConfig::GetPatch(std::string_view name) const {
 	auto it = m_patches.find(name);
 	if (it == m_patches.end())
 		return {};
-	return std::get<plg::string>(*it);
+	return it->second;
 }
 
 int32_t GameConfig::GetOffset(std::string_view name) const {
 	auto it = m_offsets.find(name);
 	if (it == m_offsets.end())
 		return -1;
-	return std::get<int32_t>(*it);
+	return it->second;
 }
 
 std::string_view GameConfig::GetLibrary(std::string_view name) const {
 	auto it = m_libraries.find(name);
 	if (it == m_libraries.end())
 		return {};
-	return std::get<plg::string>(*it);
+	return it->second;
 }
 
 // memory addresses below 0x10000 are automatically considered invalid for dereferencing
@@ -140,7 +140,7 @@ Memory GameConfig::GetAddress(std::string_view name) const {
 	if (it == m_addresses.end())
 		return {};
 
-	const auto& addrConf = std::get<AddressConf>(*it);
+	const auto& addrConf = it->second;
 
 	auto addr = ResolveSignature(addrConf.signature);
 	if (!addr)
@@ -294,7 +294,7 @@ uint32_t GameConfigManager::LoadGameConfigFile(plg::vector<plg::string> paths) {
 void GameConfigManager::CloseGameConfigFile(uint32_t id) {
 	auto it = m_configs.find(id);
 	if (it != m_configs.end()) {
-		auto& config = std::get<GameConfig>(*it);
+		auto& config = it->second;
 		if (--config.m_refCount == 0) {
 			m_configs.erase(it);
 		}
@@ -304,7 +304,7 @@ void GameConfigManager::CloseGameConfigFile(uint32_t id) {
 GameConfig* GameConfigManager::GetGameConfig(uint32_t id) {
 	auto it = m_configs.find(id);
 	if (it != m_configs.end()) {
-		return &std::get<GameConfig>(*it);
+		return &it->second;
 	}
 	return nullptr;
 }
@@ -312,7 +312,7 @@ GameConfig* GameConfigManager::GetGameConfig(uint32_t id) {
 Module* GameConfigManager::GetModule(std::string_view name) {
 	auto it = m_modules.find(name);
 	if (it != m_modules.end()) {
-		return &std::get<Module>(*it);
+		return &it->second;
 	}
 
 	return &m_modules.try_emplace(name, Module{name}).first->second;

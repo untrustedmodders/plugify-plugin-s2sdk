@@ -8,7 +8,7 @@ bool EntityOutputManager::HookEntityOutput(plg::string classname, plg::string ou
 		auto& callbackPair = m_hookMap.emplace(std::move(outputKey), CallbackPair{}).first->second;
 		return callbackPair.callbacks[static_cast<size_t>(mode)].Register(callback);
 	} else {
-		auto& callbackPair = std::get<CallbackPair>(*it);
+		auto& callbackPair = it->second;
 		return callbackPair.callbacks[static_cast<size_t>(mode)].Register(callback);
 	}
 }
@@ -18,7 +18,7 @@ bool EntityOutputManager::UnhookEntityOutput(plg::string classname, plg::string 
 
 	auto it = m_hookMap.find(outputKey);
 	if (it != m_hookMap.end()) {
-		auto& callbackPair = std::get<CallbackPair>(*it);
+		auto& callbackPair = it->second;
 		auto status = callbackPair.callbacks[static_cast<size_t>(mode)].Unregister(callback);
 		if (callbackPair.callbacks[0].Empty() && callbackPair.callbacks[1].Empty()) {
 			m_hookMap.erase(it);
@@ -46,7 +46,7 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 		for (const auto& searchKey : searchKeys) {
 			auto it = m_hookMap.find(searchKey);
 			if (it != m_hookMap.end()) {
-				m_vecCallbackPairs.emplace_back(&std::get<CallbackPair>(*it));
+				m_vecCallbackPairs.emplace_back(&it->second);
 			}
 		}
 	} else {

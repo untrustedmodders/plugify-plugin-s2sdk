@@ -57,7 +57,7 @@ extern "C" PLUGIN_API CTeam* GetGameTeamManager(int team) {
 		return nullptr;
 	}
 
-	return std::get<CTeam*>(*it);
+	return it->second;
 }
 
 /**
@@ -77,7 +77,7 @@ extern "C" PLUGIN_API int GetGameTeamScore(int team) {
 		return -1;
 	}
 
-	return std::get<CTeam*>(*it)->m_iScore;
+	return it->second->m_iScore;
 }
 
 /**

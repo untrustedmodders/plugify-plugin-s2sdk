@@ -39,7 +39,7 @@ bool ConCommandManager::AddCommandListener(const plg::string& name, CommandListe
 		commandInfo.defaultCommand = true;
 		return commandInfo.callbacks[static_cast<size_t>(mode)].Register(callback);
 	} else {
-		auto& commandInfo = *std::get<CommandInfoPtr>(*it);
+		auto& commandInfo = *it->second;
 		return commandInfo.callbacks[static_cast<size_t>(mode)].Register(callback);
 	}
 }
@@ -54,7 +54,7 @@ bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandLi
 		return false;
 	}
 
-	auto& commandInfo = *std::get<CommandInfoPtr>(*it);
+	auto& commandInfo = *it->second;
 	return commandInfo.callbacks[static_cast<size_t>(mode)].Unregister(callback);
 }
 
@@ -166,7 +166,7 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(const plg::string& name, c
 
 	auto it = m_cmdLookup.find(name);
 	if (it != m_cmdLookup.end()) {
-		const auto& commandInfo = *std::get<CommandInfoPtr>(*it);
+		const auto& commandInfo = *it->second;
 
 		if (!CheckCommandAccess(caller, commandInfo.adminFlags)) {
 			return result;

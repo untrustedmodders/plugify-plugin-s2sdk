@@ -38,7 +38,7 @@ EventHookError EventManager::HookEvent(const plg::string& name, EventListenerCal
 		return EventHookError::Okay;
 	}
 
-	auto& eventHook = std::get<EventHook>(*it);
+	auto& eventHook = it->second;
 	if (mode == HookMode::Pre) {
 		if (eventHook.preHook == nullptr) {
 			eventHook.preHook = std::make_unique<HookCallback>();
@@ -69,7 +69,7 @@ EventHookError EventManager::UnhookEvent(const plg::string& name, EventListenerC
 	}
 
 	std::unique_ptr<HookCallback>* callbackHook;
-	auto& eventHook = std::get<EventHook>(*it);
+	auto& eventHook = it->second;
 	if (mode == HookMode::Pre) {
 		callbackHook = &eventHook.preHook;
 	} else {
@@ -138,7 +138,7 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 
 	auto it = m_eventHooks.find(name);
 	if (it != m_eventHooks.end()) {
-		auto& eventHook = std::get<EventHook>(*it);
+		auto& eventHook = it->second;
 		++eventHook.refCount;
 		m_eventStack.push(&eventHook);
 

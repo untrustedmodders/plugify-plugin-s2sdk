@@ -79,7 +79,7 @@ public:
 
 		auto it = m_cnvLookup.find(name);
 		if (it != m_cnvLookup.end()) {
-			return *std::get<ConVarInfoPtr>(*it)->conVar;
+			return *it->second->conVar;
 		}
 
 		auto flgs = static_cast<uint64>(flags);
@@ -102,7 +102,7 @@ public:
 	ConVarRef FindConVar(const plg::string& name) {
 		auto it = m_cnvLookup.find(name);
 		if (it != m_cnvLookup.end()) {
-			return *std::get<ConVarInfoPtr>(*it)->conVar;
+			return *it->second->conVar;
 		}
 
 		auto& conVarInfo = *m_cnvLookup.emplace(name, std::make_unique<ConVarInfo>(name, "")).first->second;

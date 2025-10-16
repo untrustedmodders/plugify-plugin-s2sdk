@@ -11,7 +11,7 @@ bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback 
 		auto& commandInfo = m_hooksMap.emplace(messageId, UserMessageHook{}).first->second;
 		return commandInfo.callbacks[static_cast<size_t>(mode)].Register(callback);
 	} else {
-		auto& commandInfo = std::get<UserMessageHook>(*it);
+		auto& commandInfo = it->second;
 		return commandInfo.callbacks[static_cast<size_t>(mode)].Register(callback);
 	}
 }
@@ -26,7 +26,7 @@ bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallbac
 		return false;
 	}
 
-	auto& commandInfo = std::get<UserMessageHook>(*it);
+	auto& commandInfo = it->second;
 	return commandInfo.callbacks[static_cast<size_t>(mode)].Unregister(callback);
 }
 
@@ -59,7 +59,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 	
 	auto it = m_hooksMap.find(messageID);
 	if (it != m_hooksMap.end()) {
-		const auto& messageHook = std::get<UserMessageHook>(*it);
+		const auto& messageHook = it->second;
 		const auto& callback = messageHook.callbacks[static_cast<size_t>(mode)];
 
 		for (size_t i = 0; i < callback.GetCount(); ++i) {
