@@ -32,6 +32,7 @@ public:
 	static inline const Color WHITE = Color(255, 255, 255, 255);
 	static inline const Color RED = Color(255, 0, 0, 255);
 	static inline const Color YELLOW = Color(255, 255, 0, 255);
+	static inline const Color GREEN = Color(0, 255, 0, 255);
 
 	void Log(std::string_view message, LoggingSeverity_t severity, std::source_location loc = std::source_location::current()) const {
 		LoggingRareOptions_t options {
@@ -49,6 +50,9 @@ public:
 				break;
 			case LS_MESSAGE:
 				LoggingSystem_Log(m_channelID, LS_MESSAGE, options, WHITE, message.data());
+				break;
+			case LS_DETAILED:
+				LoggingSystem_Log(m_channelID, LS_MESSAGE, options, GREEN, message.data());
 				break;
 			default:
 				break;
@@ -72,12 +76,6 @@ private:
 
 extern Logger g_Logger;
 
-#ifndef NDEBUG
-#define LS_DEBUG LS_MESSAGE
-#else
-#define LS_DEBUG LS_MESSAGE
-#endif
-
 namespace plg {
 	class Severity {
 	public:
@@ -91,11 +89,19 @@ namespace plg {
 
 	template <string_like First>
 	void print(Severity severity, First&& first) {
+#ifdef NDEBUG
+		if (severity <= LS_DETAILED)
+			return;
+#endif
 		g_Logger.Log(std::forward<First>(first), severity.m_severity, severity.m_location);
 	}
 
 	template <typename... Args>
 	void print(Severity severity, std::format_string<Args...> fmt, Args&&... args) {
+#ifdef NDEBUG
+		if (severity <= LS_DETAILED)
+			return;
+#endif
 		g_Logger.Log(std::format(fmt, std::forward<Args>(args)...), severity.m_severity, severity.m_location);
 	}
 }

@@ -125,7 +125,7 @@ public:
 			return it->second->GetAddress();
 		}
 
-		auto ihook = poly::DetourHook::Find((void*)addr);
+		auto ihook = poly::DetourHook::Find(reinterpret_cast<void*>(addr));
 		if (ihook != nullptr) {
 			callback(*ihook);
 			return ihook->GetAddress();
@@ -135,7 +135,7 @@ public:
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		ihook = poly::DetourHook::Create((void*)addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		ihook = poly::DetourHook::Create(reinterpret_cast<void*>(addr), ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;

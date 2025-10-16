@@ -73,7 +73,7 @@ public:
 	template<typename T>
 	ConVarRef CreateConVar(const plg::string& name, const plg::string& description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
 		if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
-			plg::print(LS_DEBUG, "[ConVarManager::CreateConVar]: ConVar '{}' is empty or already exists\n", name);
+			plg::print(LS_DETAILED, "[ConVarManager::CreateConVar]: ConVar '{}' is empty or already exists\n", name);
 			return {};
 		}
 
@@ -120,8 +120,8 @@ public:
 	ConVarRef FindConVar(const plg::string& name);
 	bool RemoveConVar(const plg::string& name);
 
-	void HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
-	void UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
+	bool HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
+	bool UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
 
 	template<typename T>
 	static void ChangeCallback(CConVar<T>* ref, const CSplitScreenSlot, const T* pNewValue, const T* pOldValue) {

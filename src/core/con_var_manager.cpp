@@ -46,36 +46,39 @@ ConVarRef ConVarManager::FindConVar(const plg::string& name) {
 	return *conVarInfo.conVar;
 }
 
-void ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
+bool ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
 	if (name.empty()) {
 		if (m_global.Empty()) {
 			g_pCVar->InstallGlobalChangeCallback(&ChangeGlobal);
 		}
-		m_global.Register(callback);
-		return;
+		return m_global.Register(callback);
 	}
 
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
 		auto& conVarInfo = *it->second;
-		conVarInfo.hook.Register(callback);
+		return conVarInfo.hook.Register(callback);
 	}
+
+	return false;
 }
 
-void ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
+bool ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
 	if (name.empty()) {
-		m_global.Unregister(callback);
+		bool status = m_global.Unregister(callback);
 		if (m_global.Empty()) {
 			g_pCVar->RemoveGlobalChangeCallback(&ChangeGlobal);
 		}
-		return;
+		return status;
 	}
 
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
 		auto& conVarInfo = *it->second;
-		conVarInfo.hook.Unregister(callback);
+		return conVarInfo.hook.Unregister(callback);
 	}
+
+	return false;
 }
 
 void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot slot, const char* newValue, const char* oldValue, void*) {
@@ -197,10 +200,10 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
                 auto it = parsed.find(label);
                 if (it != parsed.end()) {
                     UpdateConVarValue(conVar, it->second);
-                    plg::print(LS_DEBUG, "Loaded ConVar: {} = \"{}\"\n", label, it->second);
+                    plg::print(LS_DETAILED, "Loaded ConVar: {} = \"{}\"\n", label, it->second);
                 }
             }
-    		plg::print(LS_DEBUG, "Parsed config file: {}\n", plg::as_string(fullPath));
+    		plg::print(LS_DETAILED, "Parsed config file: {}\n", plg::as_string(fullPath));
         	return true;
         } else {
             plg::print(LS_WARNING, "Failed to parse config file: {}\n", parseResult.error());
@@ -223,7 +226,7 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
     			ConVarConfigGenerator::FormatConVarData(file, conVar.GetConVarData());
     		}
     		file.close();
-    		plg::print(LS_DEBUG, "Created config file: {}\n", plg::as_string(fullPath));
+    		plg::print(LS_DETAILED, "Created config file: {}\n", plg::as_string(fullPath));
 			return true;
     	} else {
     		plg::print(LS_WARNING, "Failed to create config file: {}\n", plg::as_string(fullPath));

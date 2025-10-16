@@ -60,18 +60,18 @@ bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandLi
 
 bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, uint64 adminFlags) {
 	if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
-		plg::print(LS_DEBUG, "[ConCommandManager::AddValveCommand]: Command '{}' is empty or already exists\n", name);
+		plg::print(LS_DETAILED, "[ConCommandManager::AddValveCommand]: Command '{}' is empty or already exists\n", name);
 		return false;
 	}
 
 	if (g_pCVar->FindConCommand(name.c_str()).IsValidRef()) {
-		plg::print(LS_DEBUG, "[ConCommandManager::AddValveCommand]: Command '{}' already exists\n", name);
+		plg::print(LS_DETAILED, "[ConCommandManager::AddValveCommand]: Command '{}' already exists\n", name);
 		return false;
 	}
 
 	auto it = m_cmdLookup.find(name);
 	if (it != m_cmdLookup.end()) {
-		plg::print(LS_DEBUG, "[ConCommandManager::AddValveCommand]: Command '{}' already exists\n", name);
+		plg::print(LS_DETAILED, "[ConCommandManager::AddValveCommand]: Command '{}' already exists\n", name);
 		return false;
 	}
 
@@ -132,7 +132,7 @@ static bool CheckCommandAccess(CPlayerSlot slot, uint64 flags) {
 }
 
 ResultType ConCommandManager::ExecuteCommandCallbacks(const plg::string& name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext) {
-	//plg::print(LS_DEBUG, "[ConCommandManager::ExecuteCommandCallbacks][{}]: {}\n", mode == HookMode::Pre ? "Pre" : "Post", name);
+	plg::print(LS_DETAILED, "[ConCommandManager::ExecuteCommandCallbacks][{}]: {}\n", mode == HookMode::Pre ? "Pre" : "Post", name);
 
 	int size = args.ArgC();
 
@@ -194,7 +194,7 @@ ResultType ConCommandManager::DispatchConCommand(const CCommandContext* ctx, con
 
 	const char* arg0 = args->Arg(0);
 
-	//plg::print(LS_DEBUG, "[ConCommandManager::Hook_DispatchConCommand]: {}\n", name);
+	plg::print(LS_DETAILED, "[ConCommandManager::Hook_DispatchConCommand]: {}\n", arg0);
 
 	static const char sayCommand[] = "say";
 	constexpr size_t sayNullTerminated = sizeof(sayCommand) - 1;
