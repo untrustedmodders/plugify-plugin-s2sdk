@@ -91,19 +91,3 @@ public:
 		static int offset = g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn");
 		CALL_VIRTUAL(void, offset, this);
 	}
-
-	void UpdateTeam(int iTeam) {
-		CCSPlayerPawn* pawn = GetPlayerPawn();
-		if (!pawn || pawn->IsAlive())
-			return;
-
-		const auto absOrigin = pawn->GetAbsOrigin();
-		const auto absRotation = pawn->GetAbsRotation();
-		const auto absAbsVelocity = pawn->GetAbsVelocity();
-		SwitchTeam(iTeam);
-		SetPawn(pawn);
-		static int offset = g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn");
-		CALL_VIRTUAL(void, offset, this);
-		pawn->Teleport(&absOrigin, &absRotation, &absAbsVelocity);
-	}
-};
