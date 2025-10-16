@@ -50,11 +50,11 @@ public:
 	SCHEMA_FIELD(CCSPlayer_ViewModelServices*, m_pViewModelServices)
 
 	CCSPlayerController* GetOriginalController() {
-		return m_hOriginalController();
+		return *m_hOriginalController;
 	}
 
 	bool IsBot() {
-		return m_fFlags() & FL_PAWN_FAKECLIENT;
+		return m_fFlags & FL_PAWN_FAKECLIENT;
 	}
 };
 

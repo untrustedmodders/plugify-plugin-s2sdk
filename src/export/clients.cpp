@@ -744,7 +744,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientAbsOrigin(int playerSlot) {
 		return {};
 	}
 	
-	auto pNode = controller->m_CBodyComponent->m_pSceneNode();
+	CGameSceneNode* pNode = controller->m_CBodyComponent->m_pSceneNode;
 	if (!pNode) {
 		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsOrigin' on invalid player node: {}\n", playerSlot);
 		return {};
@@ -767,7 +767,7 @@ extern "C" PLUGIN_API void SetClientAbsOrigin(int playerSlot, const plg::vec3& o
 		return;
 	}
 	
-	auto pNode = controller->m_CBodyComponent->m_pSceneNode();
+	CGameSceneNode* pNode = controller->m_CBodyComponent->m_pSceneNode;
 	if (!pNode) {
 		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player node: {}\n", playerSlot);
 		return;
@@ -789,7 +789,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientAbsAngles(int playerSlot) {
 		return {};
 	}
 	
-	auto pNode = controller->m_CBodyComponent->m_pSceneNode();
+	CGameSceneNode* pNode = controller->m_CBodyComponent->m_pSceneNode;
 	if (!pNode) {
 		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsAngles' on invalid player node: {}\n", playerSlot);
 		return {};
@@ -812,7 +812,7 @@ extern "C" PLUGIN_API void SetClientAbsAngles(int playerSlot, const plg::vec3& a
 		return;
 	}
 
-	auto pNode = controller->m_CBodyComponent->m_pSceneNode();
+	CGameSceneNode* pNode = controller->m_CBodyComponent->m_pSceneNode;
 	if (!pNode) {
 		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player node: {}\n", playerSlot);
 		return;
@@ -1123,7 +1123,7 @@ extern "C" PLUGIN_API int GetClientActiveWeapon(int playerSlot) {
 		return INVALID_EHANDLE_INDEX;
 	}
 
-	return weaponServices->m_hActiveWeapon().ToInt();
+	return weaponServices->m_hActiveWeapon->ToInt();
 }
 
 /**
@@ -1399,7 +1399,7 @@ extern "C" PLUGIN_API uint64_t GetClientButtons(int playerSlot, int buttonIndex)
 		return 0;
 	}
 
-	return movementServices->m_nButtons().m_pButtonStates[buttonIndex];
+	return movementServices->m_nButtons->m_pButtonStates[buttonIndex];
 }
 
 /**
@@ -1465,7 +1465,7 @@ extern "C" PLUGIN_API int GetClientKills(int playerSlot) {
 		return 0;
 	}
 
-	return actionTrackingServices->m_matchStats().m_iKills;
+	return actionTrackingServices->m_matchStats->m_iKills;
 }
 
 /**
@@ -1487,7 +1487,7 @@ extern "C" PLUGIN_API void SetClientKills(int playerSlot, int kills) {
 		return;
 	}
 
-	actionTrackingServices->m_matchStats().m_iKills = kills;
+	actionTrackingServices->m_matchStats->m_iKills = kills;
 }
 
 /**
@@ -1509,7 +1509,7 @@ extern "C" PLUGIN_API int GetClientDeaths(int playerSlot) {
 		return 0;
 	}
 
-	return actionTrackingServices->m_matchStats().m_iDeaths;
+	return actionTrackingServices->m_matchStats->m_iDeaths;
 }
 
 /**
@@ -1531,7 +1531,7 @@ extern "C" PLUGIN_API void SetClientDeaths(int playerSlot, int deaths) {
 		return;
 	}
 
-	actionTrackingServices->m_matchStats().m_iDeaths = deaths;
+	actionTrackingServices->m_matchStats->m_iDeaths = deaths;
 }
 
 /**
@@ -1553,7 +1553,7 @@ extern "C" PLUGIN_API int GetClientAssists(int playerSlot) {
 		return 0;
 	}
 
-	return actionTrackingServices->m_matchStats().m_iAssists;
+	return actionTrackingServices->m_matchStats->m_iAssists;
 }
 
 /**
@@ -1575,7 +1575,7 @@ extern "C" PLUGIN_API void SetClientAssists(int playerSlot, int assists) {
 		return;
 	}
 
-	actionTrackingServices->m_matchStats().m_iAssists = assists;
+	actionTrackingServices->m_matchStats->m_iAssists = assists;
 }
 
 /**
@@ -1597,7 +1597,7 @@ extern "C" PLUGIN_API int GetClientDamage(int playerSlot) {
 		return 0;
 	}
 
-	return actionTrackingServices->m_matchStats().m_iDamage;
+	return actionTrackingServices->m_matchStats->m_iDamage;
 }
 
 /**
@@ -1619,7 +1619,7 @@ extern "C" PLUGIN_API void SetClientDamage(int playerSlot, int damage) {
 		return;
 	}
 
-	actionTrackingServices->m_matchStats().m_iDamage = damage;
+	actionTrackingServices->m_matchStats->m_iDamage = damage;
 }
 
 /**

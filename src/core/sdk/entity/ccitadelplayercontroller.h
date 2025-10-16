@@ -20,7 +20,7 @@ public:
 
 	// Returns the actual player pawn
 	CCitadelPlayerPawn* GetPlayerPawn() {
-		return m_hHeroPawn();
+		return *m_hHeroPawn;
 	}
 
 	CCitadelPlayerPawn* GetObserverPawn() {
@@ -32,7 +32,7 @@ public:
 	}*/
 
 	bool IsBot() {
-		return m_fFlags() & FL_CONTROLLER_FAKECLIENT;
+		return m_fFlags & FL_CONTROLLER_FAKECLIENT;
 	}
 
 	void ChangeTeam(int iTeam) {

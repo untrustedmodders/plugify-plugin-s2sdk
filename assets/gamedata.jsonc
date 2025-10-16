@@ -113,7 +113,7 @@
         "linuxsteamrt64": "55 48 89 E5 41 54 53 48 83 EC ? 48 85 D2"
       },
       // String: "classname". Small function only with single string. Called after "nullptr Ent in GiveNamedItem: %s!\"
-      "DispatchSpawn": {
+      "CBaseEntity::DispatchSpawn": {
         "library": "server",
         "win64": "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 8B F9 48 85 C9 0F 84 ? ? ? ? 48 85 D2",
         "linuxsteamrt64": "48 85 FF 74 ? 55 48 89 E5 41 55 49 89 FD"
@@ -226,6 +226,25 @@
         "win64": 109,
         "linuxsteamrt64": 108
       },
+      "CBaseEntity::SetOwner": {
+        "win64": 50,
+        "linuxsteamrt64": 49
+      },
+      // StringL "item_pickup_failed"
+      "CBaseEntity::IsWeapon": {
+        "win64": 180,
+        "linuxsteamrt64": 179
+      },
+      // String "can't teleport object (%s) as it has a parent (%s)!" The vfunc call this
+      "CBaseEntity::Teleport": {
+        "win64": 168,
+        "linuxsteamrt64": 167
+      },
+      // Player controller respawn function offset
+      "CBasePlayerController::RoundRespawn": {
+        "win64": 277,
+        "linuxsteamrt64": 279
+      },
       // Look for the kill command, go through its callback and you should a find call like this, with v9 being a pawn pointer:
       // return (*(*v9 + 2976LL))(v9, v27, 0LL);
       // 2976 (372 * 8) is the offset
@@ -256,16 +275,6 @@
       "CCSPlayer_ItemServices::RemoveAllItems": {
         "win64": 22,
         "linuxsteamrt64": 23
-      },
-      // Player controller respawn function offset
-      "CBasePlayerController::RoundRespawn": {
-        "win64": 277,
-        "linuxsteamrt64": 279
-      },
-      // String "can't teleport object (%s) as it has a parent (%s)!" The vfunc call this
-      "CBaseEntity::Teleport": {
-        "win64": 168,
-        "linuxsteamrt64": 167
       },
       // "InitialActivate" and "OnActivate"
       "CCSScript_EntityScript": {

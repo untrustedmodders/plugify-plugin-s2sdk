@@ -72,7 +72,7 @@ PenaltyBreakTemplateDeclaration: 0
 PenaltyExcessCharacter: 10
 PenaltyIndentedWhitespace: 0
 AlwaysBreakAfterReturnType: None
-BreakAfterReturnType: ExceptShortType
+#BreakAfterReturnType: ExceptShortType
 PenaltyReturnTypeOnItsOwnLine: 0
 PointerAlignment: Left
 ReferenceAlignment: Left

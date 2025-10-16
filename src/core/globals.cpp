@@ -89,7 +89,7 @@ namespace globals {
 		RESOLVE_SIG(g_pGameConfig, "CGameEntitySystem::FindEntityByClassName", addresses::CGameEntitySystem_FindEntityByClassName);
 		RESOLVE_SIG(g_pGameConfig, "CGameEntitySystem::FindEntityByName", addresses::CGameEntitySystem_FindEntityByName);
 		RESOLVE_SIG(g_pGameConfig, "CreateEntityByName", addresses::CreateEntityByName);
-		RESOLVE_SIG(g_pGameConfig, "DispatchSpawn", addresses::DispatchSpawn);
+		RESOLVE_SIG(g_pGameConfig, "CBaseEntity::DispatchSpawn", addresses::DispatchSpawn);
 		RESOLVE_SIG(g_pGameConfig, "UTIL_Remove", addresses::UTIL_Remove);
 		RESOLVE_SIG(g_pGameConfig, "CEntityInstance::AcceptInput", addresses::CEntityInstance_AcceptInput);
 		RESOLVE_SIG(g_pGameConfig, "CEntityIdentity::SetEntityName", addresses::CEntityIdentity_SetEntityName);

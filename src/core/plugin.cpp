@@ -112,7 +112,7 @@ poly::ReturnAction Hook_ActivateServer(poly::PHook& hook, poly::Params& params, 
 			return;
 		}
 
-		g_pGameRules->m_bGameRestart = g_pGameRules->m_flRestartRoundTime() == 0.0f;
+		g_pGameRules->m_bGameRestart = g_pGameRules->m_flRestartRoundTime == 0.0f;
 
 	}, TimerFlag::Repeat | TimerFlag::NoMapChange, {});
 #endif

@@ -102,7 +102,7 @@ extern "C" PLUGIN_API uint16_t GetWeaponItemDefinition(int entityHandle) {
 		return 0;
 	}
 
-	return weapon->m_AttributeManager().m_Item().m_iItemDefinitionIndex;
+	return weapon->m_AttributeManager->m_Item->m_iItemDefinitionIndex;
 }
 
 PLUGIFY_WARN_POP()

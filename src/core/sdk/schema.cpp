@@ -32,9 +32,9 @@ using SchemaKeyValueMap = std::unordered_map<size_t, SchemaKey>;
 using SchemaTableMap = std::unordered_map<size_t, SchemaKeyValueMap>;
 static constexpr size_t g_ChainKey = plg::hasher("__m_pChainEntity");
 
-void NetworkVarStateChanged(uintptr_t pNetworkVar, uint32_t nOffset, uint32 nNetworkStateChangedOffset) {
-	NetworkStateChanged_t data(nOffset);
-	CALL_VIRTUAL(void, nNetworkStateChangedOffset, (void*)pNetworkVar, &data);
+void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32 networkStateChangedOffset) {
+	NetworkStateChanged_t data(offset);
+	CALL_VIRTUAL(void, networkStateChangedOffset, (void*)networkVar, &data);
 }
 
 void EntityNetworkStateChanged(uintptr_t entity, uint offset) {
@@ -42,9 +42,9 @@ void EntityNetworkStateChanged(uintptr_t entity, uint offset) {
 	reinterpret_cast<CEntityInstance*>(entity)->NetworkStateChanged(data);
 }
 
-void ChainNetworkStateChanged(uintptr_t pNetworkVarChainer, uint nLocalOffset) {
-	if (CEntityInstance* entity = reinterpret_cast<CNetworkVarChainer*>(pNetworkVarChainer)->GetObject()) {
-		entity->NetworkStateChanged(NetworkStateChanged_t(nLocalOffset, -1, reinterpret_cast<CNetworkVarChainer*>(pNetworkVarChainer)->m_PathIndex));
+void ChainNetworkStateChanged(uintptr_t networkVarChainer, uint localOffset) {
+	if (CEntityInstance* entity = reinterpret_cast<CNetworkVarChainer*>(networkVarChainer)->GetObject()) {
+		entity->NetworkStateChanged(NetworkStateChanged_t(localOffset, -1, reinterpret_cast<CNetworkVarChainer*>(networkVarChainer)->m_PathIndex));
 	}
 }
 

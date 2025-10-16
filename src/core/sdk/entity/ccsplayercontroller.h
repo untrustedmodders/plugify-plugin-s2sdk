@@ -48,11 +48,11 @@ public:
 
 	// Returns the actual player pawn
 	CCSPlayerPawn* GetPlayerPawn() {
-		return m_hPlayerPawn();
+		return *m_hPlayerPawn;
 	}
 
 	CCSPlayerPawnBase* GetObserverPawn() {
-		return m_hObserverPawn();
+		return *m_hObserverPawn;
 	}
 
 	/*CServerSideClient* GetServerSideClient() {
@@ -60,7 +60,7 @@ public:
 	}*/
 
 	bool IsBot() {
-		return m_fFlags() & FL_CONTROLLER_FAKECLIENT;
+		return m_fFlags & FL_CONTROLLER_FAKECLIENT;
 	}
 
 	void ChangeTeam(int iTeam) {
@@ -99,7 +99,7 @@ public:
 
 		const auto absOrigin = pawn->GetAbsOrigin();
 		const auto absRotation = pawn->GetAbsRotation();
-		const auto absAbsVelocity = pawn->m_vecAbsVelocity();
+		const auto absAbsVelocity = pawn->GetAbsVelocity();
 		SwitchTeam(iTeam);
 		SetPawn(pawn);
 		static int offset = g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn");

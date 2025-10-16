@@ -119,163 +119,225 @@ void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32_t netw
 
 void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset);
 
-class CBaseEntity;
+template<
+    typename T,
+    typename ThisClass,
+    char const* VarName,
+    size_t(*MemberOffset)(),
+    std::size_t ExtraOffset = 0
+>
+class SchemaField {
+	using ptr_t = std::conditional_t<
+			std::is_const_v<std::remove_reference_t<T>>,
+			const T*,
+			T*
+		>;
+	using ref_t = std::conditional_t<
+			std::is_const_v<std::remove_reference_t<T>>,
+			const T&,
+			T&
+	    >;
 
-#define SCHEMA_FIELD_OFFSET(type, varName, extra_offset)                                              \
-	PLUGIFY_NO_UNIQUE_ADDRESS class varName##_prop {                                                  \
-		using value_t = type;                                                                         \
-		using ref_t = std::add_lvalue_reference_t<type>;                                              \
-		using ptr_t = std::add_pointer_t<type>;                                                       \
-                                                                                                      \
-		const SchemaKey& GetKey() {                                                                   \
-			static const auto key = schema::GetOffset(                                                \
-			    m_className,                                                                          \
-			    m_classNameHash,                                                                      \
-			    #varName,                                                                             \
-			    m_varNameHash                                                                         \
-			);                                                                                        \
-			return key;                                                                               \
-		}                                                                                             \
-                                                                                                      \
-		int32_t GetChain() {                                                                          \
-			static const auto chain = schema::FindChainOffset(m_className, m_classNameHash);          \
-			return chain;                                                                             \
-		}                                                                                             \
-                                                                                                      \
-		int32 GetOffset() {                                                                           \
-			static const auto offset = GetKey().offset + extra_offset;                                \
-			return offset;                                                                            \
-		}                                                                                             \
-                                                                                                      \
-		uintptr_t GetThisPtr() const {                                                                \
-			return reinterpret_cast<uintptr_t>(this) - offsetof(ThisClass, varName);                  \
-		}                                                                                             \
-                                                                                                      \
-	public:                                                                                           \
-		[[nodiscard]] ref_t Get() {                                                                   \
-			return *reinterpret_cast<ptr_t>(GetThisPtr() + GetOffset());                              \
-		}                                                                                             \
-		void Set(ref_t val) {                                                                         \
-			NetworkStateChanged();                                                                    \
-			*reinterpret_cast<ptr_t>(GetThisPtr() + GetOffset()) = val;                               \
-		}                                                                                             \
-		void NetworkStateChanged() {                                                                  \
-			if (!GetKey().networked)                                                                  \
-				return;                                                                               \
-			if (GetChain() != 0) {                                                                    \
-				::ChainNetworkStateChanged(GetThisPtr() + GetChain(), GetOffset());                   \
-			} else {                                                                                  \
-				if constexpr (!m_networkStateChangedOffset)                                           \
-					::EntityNetworkStateChanged(GetThisPtr(), GetOffset());                           \
-				else                                                                                  \
-					::NetworkVarStateChanged(GetThisPtr(), GetOffset(), m_networkStateChangedOffset); \
-			}                                                                                         \
-		}                                                                                             \
-		[[nodiscard]] operator ref_t() {                                                              \
-			return Get();                                                                             \
-		}                                                                                             \
-		[[nodiscard]] ref_t operator()() {                                                            \
-			return Get();                                                                             \
-		}                                                                                             \
-		[[nodiscard]] ref_t operator->() {                                                            \
-			return Get();                                                                             \
-		}                                                                                             \
-		void operator()(value_t val) {                                                                \
-			Set(val);                                                                                 \
-		}                                                                                             \
-		ref_t operator=(value_t val) {                                                                \
-			Set(val);                                                                                 \
-			return Get();                                                                             \
-		}                                                                                             \
-		ref_t operator=(varName##_prop& val) {                                                        \
-			Set(val());                                                                               \
-			return Get();                                                                             \
-		}                                                                                             \
-                                                                                                      \
-	private:                                                                                          \
-		/*Prevent accidentally copying this wrapper class instead of the underlying field*/           \
-		varName##_prop(const varName##_prop&) = delete;                                               \
-		static constexpr auto m_varNameHash = plg::hasher(#varName);                                  \
-	} varName;
+	// Compact internal helpers
+	[[nodiscard]] auto Key(this auto&& self) {
+		static const auto key = schema::GetOffset(ThisClass::m_className, ThisClass::m_classNameHash, VarName, plg::hasher(VarName));
+		return key;
+	}
+	[[nodiscard]] auto Chain(this auto&& self) {
+		static const auto chain = schema::FindChainOffset(ThisClass::m_className, ThisClass::m_classNameHash);
+		return chain;
+	}
+	[[nodiscard]] auto Offset(this auto&& self) { return self.Key().offset + ExtraOffset; }
+	[[nodiscard]] auto ThisPtr(this auto&& self) { return reinterpret_cast<uintptr_t>(&self) - MemberOffset(); }
 
-#define SCHEMA_FIELD_POINTER_OFFSET(type, varName, extra_offset)                                      \
-	PLUGIFY_NO_UNIQUE_ADDRESS class varName##_prop {                                                  \
-		using value_t = type;                                                                         \
-		using ref_t = std::add_lvalue_reference_t<type>;                                              \
-		using ptr_t = std::add_pointer_t<type>;                                                       \
-                                                                                                      \
-		const SchemaKey& GetKey() {                                                                   \
-			static const auto key = schema::GetOffset(                                                \
-			    m_className,                                                                          \
-			    m_classNameHash,                                                                      \
-			    #varName,                                                                             \
-			    m_varNameHash                                                                         \
-			);                                                                                        \
-			return key;                                                                               \
-		}                                                                                             \
-                                                                                                      \
-		int32_t GetChain() {                                                                          \
-			static const auto chain = schema::FindChainOffset(m_className, m_classNameHash);          \
-			return chain;                                                                             \
-		}                                                                                             \
-                                                                                                      \
-		int32 GetOffset() {                                                                           \
-			static const auto offset = GetKey().offset + extra_offset;                                \
-			return offset;                                                                            \
-		}                                                                                             \
-		uintptr_t GetThisPtr() const {                                                                \
-			return reinterpret_cast<uintptr_t>(this) - offsetof(ThisClass, varName);                  \
-		}                                                                                             \
-                                                                                                      \
-	public:                                                                                           \
-		[[nodiscard]] ptr_t Get() {                                                                   \
-			return reinterpret_cast<ptr_t>(GetThisPtr() + GetOffset());                               \
-		}                                                                                             \
-		void NetworkStateChanged() /*Call this after editing the field*/                              \
-		{                                                                                             \
-			if (!GetKey().networked)                                                                  \
-				return;                                                                               \
-			if (GetChain() != 0) {                                                                    \
-				::ChainNetworkStateChanged(GetThisPtr() + GetChain(), GetOffset());                   \
-			} else {                                                                                  \
-				if constexpr (!m_networkStateChangedOffset)                                           \
-					::EntityNetworkStateChanged(GetThisPtr(), GetOffset());                           \
-				else                                                                                  \
-					::NetworkVarStateChanged(GetThisPtr(), GetOffset(), m_networkStateChangedOffset); \
-			}                                                                                         \
-		}                                                                                             \
-		[[nodiscard]] operator ptr_t() {                                                              \
-			return Get();                                                                             \
-		}                                                                                             \
-		[[nodiscard]] ptr_t operator()() {                                                            \
-			return Get();                                                                             \
-		}                                                                                             \
-		[[nodiscard]] ptr_t operator->() {                                                            \
-			return Get();                                                                             \
-		}                                                                                             \
-                                                                                                      \
-	private:                                                                                          \
-		/*Prevent accidentally copying this wrapper class instead of the underlying field*/           \
-		varName##_prop(const varName##_prop&) = delete;                                               \
-		static constexpr auto m_varNameHash = plg::hasher(#varName);                                  \
-	} varName;
+public:
+	[[nodiscard]] ref_t Get(this auto&& self) {
+		return *reinterpret_cast<ptr_t>(self.ThisPtr() + self.Offset());
+	}
 
-// Use this when you want the member's value itself
-#define SCHEMA_FIELD(type, varName) \
-	SCHEMA_FIELD_OFFSET(type, varName, 0)
+	void Set(this auto&& self, const T& val) {
+		self.NotifyNetworkChange();
+		*reinterpret_cast<ptr_t>(self.ThisPtr() + self.Offset()) = val;
+	}
 
-// Use this when you want a pointer to a member
-#define SCHEMA_FIELD_POINTER(type, varName) \
-	SCHEMA_FIELD_POINTER_OFFSET(type, varName, 0)
+	[[nodiscard]] operator ref_t(this auto&& self) { return self.Get(); }
+	[[nodiscard]] auto operator->(this auto&& self) requires (std::is_pointer_v<T>) { return self.Get(); }
+	[[nodiscard]] auto operator->(this auto&& self) requires (!std::is_pointer_v<T>) { return std::addressof(self.Get()); }
+    [[nodiscard]] auto operator*(this auto&& self) requires (std::is_pointer_v<T>) { return *self.Get(); }
+    [[nodiscard]] auto operator*(this auto&& self) requires (!std::is_pointer_v<T>) { return self.Get(); }
+    [[nodiscard]] auto operator[](this auto&& self, auto idx) { return self.Get()[idx]; }
+    [[nodiscard]] auto operator+(this auto&& self, auto v) { return self.Get() + v; }
+    [[nodiscard]] auto operator-(this auto&& self, auto v) { return self.Get() - v; }
+    [[nodiscard]] bool operator==(this auto&& self, const auto& v) { return self.Get() == v; }
+    [[nodiscard]] auto operator<=>(this auto&& self, const auto& v) { return self.Get() <=> v; }
+
+    auto& operator=(this auto&& self, const T& val) {
+	    self.Set(val); return self;
+    }
+	[[nodiscard]] bool operator==(this auto&& self, std::nullptr_t) requires (std::is_pointer_v<T>) {
+		return self.Get() == nullptr;
+	}
+
+	// Increment/decrement
+    auto& operator+=(this auto&& self, const auto& v) requires std::is_arithmetic_v<T> {
+        self.Set(self.Get() + v); return self;
+    }
+    auto& operator-=(this auto&& self, const auto& v) requires std::is_arithmetic_v<T> {
+        self.Set(self.Get() - v); return self;
+    }
+	auto& operator++(this auto&& self) requires std::is_arithmetic_v<T> {
+		self.Set(self.Get() + 1); return self;
+	}
+	auto& operator--(this auto&& self) requires std::is_arithmetic_v<T> {
+		self.Set(self.Get() - 1); return self;
+	}
+	[[nodiscard]] auto operator++(this auto&& self, int) requires std::is_arithmetic_v<T> {
+		auto old = self.Get(); self.Set(old + 1); return old;
+	}
+	[[nodiscard]] auto operator--(this auto&& self, int) requires std::is_arithmetic_v<T> {
+		auto old = self.Get(); self.Set(old - 1); return old;
+	}
+
+	// Arithmetic (for numeric fields)
+	auto& operator*=(this auto&& self, const auto& v) requires std::is_arithmetic_v<T> {
+		self.Set(self.Get() * v); return self;
+	}
+	auto& operator/=(this auto&& self, const auto& v) requires std::is_arithmetic_v<T> {
+		self.Set(self.Get() / v); return self;
+	}
+	[[nodiscard]] auto operator*(this auto&& self, const auto& v) requires std::is_arithmetic_v<T> {
+		return self.Get() * v;
+	}
+	[[nodiscard]] auto operator/(this auto&& self, const auto& v) requires std::is_arithmetic_v<T> {
+		return self.Get() / v;
+	}
+
+	// Bitwise (for integral fields)
+	auto& operator|=(this auto&& self, const auto& v) requires std::is_integral_v<T> {
+		self.Set(self.Get() | v); return self;
+	}
+	auto& operator&=(this auto&& self, const auto& v) requires std::is_integral_v<T> {
+		self.Set(self.Get() & v); return self;
+	}
+	auto& operator^=(this auto&& self, const auto& v) requires std::is_integral_v<T> {
+		self.Set(self.Get() ^ v); return self;
+	}
+	[[nodiscard]] auto operator|(this auto&& self, const auto& v) requires std::is_integral_v<T> {
+		return self.Get() | v;
+	}
+	[[nodiscard]] auto operator&(this auto&& self, const auto& v) requires std::is_integral_v<T> {
+		return self.Get() & v;
+	}
+	[[nodiscard]] auto operator^(this auto&& self, const auto& v) requires std::is_integral_v<T> {
+		return self.Get() ^ v;
+	}
+
+	void NotifyNetworkChange(this auto&& self) {
+		if (!self.Key().networked)
+			return;
+
+		const auto thisPtr = self.ThisPtr();
+		const auto offset = self.Offset();
+
+		if (const auto chain = self.Chain(); chain != 0) {
+			::ChainNetworkStateChanged(thisPtr + chain, offset);
+		} else if constexpr (ThisClass::m_networkStateChangedOffset) {
+			::NetworkVarStateChanged(thisPtr, offset, ThisClass::m_networkStateChangedOffset);
+		} else {
+			::EntityNetworkStateChanged(thisPtr, offset);
+		}
+	}
+};
+
+template<
+    typename T,
+    typename ThisClass,
+    char const* VarName,
+    size_t(*MemberOffset)(),
+    std::size_t ExtraOffset = 0
+>
+class SchemaPointerField {
+	using ptr_t = std::conditional_t<
+			std::is_const_v<std::remove_reference_t<T>>,
+			const T*,
+			T*
+		>;
+	/*using ref_t = std::conditional_t<
+			std::is_const_v<std::remove_reference_t<T>>,
+			const T&,
+			T&
+	    >;*/
+
+    // Compact internal helpers
+    [[nodiscard]] auto Key(this auto&& self) {
+        static const auto key = schema::GetOffset(ThisClass::m_className, ThisClass::m_classNameHash, VarName, plg::hasher(VarName));
+        return key;
+    }
+    [[nodiscard]] auto Chain(this auto&& self) {
+        static const auto chain = schema::FindChainOffset(ThisClass::m_className, ThisClass::m_classNameHash);
+        return chain;
+    }
+    [[nodiscard]] auto Offset(this auto&& self) { return self.Key().offset + ExtraOffset; }
+    [[nodiscard]] auto ThisPtr(this auto&& self) { return reinterpret_cast<uintptr_t>(&self) - MemberOffset(); }
+
+public:
+    // Single-line methods
+    [[nodiscard]] auto Get(this auto&& self) {
+        return reinterpret_cast<ptr_t>(self.ThisPtr() + self.Offset());
+    }
+
+	[[nodiscard]] operator ptr_t(this auto&& self) { return self.Get(); }
+	//[[nodiscard]] explicit operator bool(this auto&& self) { return self.Get() != nullptr; }
+    [[nodiscard]] auto operator->(this auto&& self) { return self.Get(); }
+    [[nodiscard]] auto operator*(this auto&& self) { return *self.Get(); }
+    [[nodiscard]] decltype(auto) operator[](this auto&& self, auto idx) { return self.Get()[idx]; }
+    //[[nodiscard]] auto operator+(this auto&& self, auto offset) { return self.Get() + offset; }
+    //[[nodiscard]] auto operator-(this auto&& self, auto offset) { return self.Get() - offset; }
+    [[nodiscard]] bool operator==(this auto&& self, auto ptr) { return self.Get() == ptr; }
+    //[[nodiscard]] auto operator<=>(this auto&& self, auto ptr) { return self.Get() <=> ptr; }
+
+    void NetworkStateChanged(this auto&& self) {
+        if (!self.Key().networked) return;
+        const auto thisPtr = self.ThisPtr();
+        const auto offset = self.Offset();
+        if (const auto chain = self.Chain(); chain != 0) {
+            ::ChainNetworkStateChanged(thisPtr + chain, offset);
+        } else if constexpr (ThisClass::m_networkStateChangedOffset) {
+            ::NetworkVarStateChanged(thisPtr, offset, ThisClass::m_networkStateChangedOffset);
+        } else {
+            ::EntityNetworkStateChanged(thisPtr, offset);
+        }
+    }
+};
+
+// macro helpers: trivial, localize offsetof usage to callsites only
+#define SCHEMA_FIELD(type, name) \
+	static constexpr const char name##_str[] = #name; \
+	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+    PLUGIFY_NO_UNIQUE_ADDRESS SchemaField<type, ThisClass, name##_str, name##_offset, 0> name;
+
+#define SCHEMA_FIELD_OFFSET(type, name, extra) \
+	static constexpr const char name##_str[] = #name; \
+	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+    PLUGIFY_NO_UNIQUE_ADDRESS SchemaField<type, ThisClass, name##_str, name##_offset, (extra)> name;
+
+#define SCHEMA_FIELD_POINTER(type, name) \
+	static constexpr const char name##_str[] = #name; \
+	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+	PLUGIFY_NO_UNIQUE_ADDRESS SchemaPointerField<type, ThisClass, name##_str, name##_offset, 0> name;
+
+#define SCHEMA_FIELD_POINTER_OFFSET(type, name, extra) \
+	static constexpr const char name##_str[] = #name; \
+	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+	PLUGIFY_NO_UNIQUE_ADDRESS SchemaPointerField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 
 // If the class needs a specific offset for its NetworkStateChanged (like CEconItemView), use this and provide the offset
 #define DECLARE_SCHEMA_CLASS_BASE(ClassName, offset)								\
-	private:																		\
-		typedef ClassName ThisClass;												\
-		static constexpr const char* m_className = #ClassName;						\
+	public:																		    \
+		using ThisClass = ClassName;												\
+		static constexpr const char m_className[] = #ClassName;						\
 		static constexpr size_t m_classNameHash = plg::hasher(#ClassName);          \
-		static constexpr int m_networkStateChangedOffset = offset;					\
-	public:
+		static constexpr int m_networkStateChangedOffset = offset;                  \
 
 #define DECLARE_SCHEMA_CLASS(className) DECLARE_SCHEMA_CLASS_BASE(className, 0)
 

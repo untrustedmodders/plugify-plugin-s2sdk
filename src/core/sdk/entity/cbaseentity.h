@@ -112,7 +112,7 @@ class CBaseEntity : public CEntityInstance {
 public:
 	DECLARE_SCHEMA_CLASS(CBaseEntity)
 
-	SCHEMA_FIELD_POINTER(CBodyComponent, m_CBodyComponent)
+	SCHEMA_FIELD(CBodyComponent*, m_CBodyComponent)
 	SCHEMA_FIELD(CBitVec<64>, m_isSteadyState)
 	SCHEMA_FIELD(float, m_lastNetworkChange)
 	SCHEMA_FIELD_POINTER(CNetworkTransmitComponent, m_NetworkTransmitComponent)
@@ -153,6 +153,8 @@ public:
 	// TODO: Validate
 	Vector GetAbsOrigin() { return m_CBodyComponent->m_pSceneNode->m_vecAbsOrigin; }
 	QAngle GetAbsRotation() { return m_CBodyComponent->m_pSceneNode->m_angAbsRotation; }
+	Vector GetAbsVelocity() { return m_vecAbsVelocity; }
+	Vector GetBaseVelocity() { return m_vecBaseVelocity; }
 	void SetAbsOrigin(const Vector& vecOrigin) { m_CBodyComponent->m_pSceneNode->m_vecAbsOrigin = vecOrigin; }
 	void SetAbsRotation(const QAngle& angAbsRotation) { m_CBodyComponent->m_pSceneNode->m_angAbsRotation = angAbsRotation; }
 
@@ -164,7 +166,7 @@ public:
 	}
 
 	const char* GetName() {
-		return m_iGlobalname().String();
+		return m_iGlobalname->String();
 	}
 
 	/*void TakeDamage(CTakeDamageInfo &info) {
@@ -172,10 +174,10 @@ public:
 	}*/
 
 	void SetCollisionGroup(StandardCollisionGroups_t nCollisionGroup) {
-		if (!m_pCollision)
+		if (m_pCollision == nullptr)
 			return;
 
-		m_pCollision->m_collisionAttribute().m_nCollisionGroup = COLLISION_GROUP_DEBRIS;
+		m_pCollision->m_collisionAttribute->m_nCollisionGroup = COLLISION_GROUP_DEBRIS;
 		m_pCollision->m_CollisionGroup = COLLISION_GROUP_DEBRIS;
 		CollisionRulesChanged();
 	}
@@ -312,6 +314,16 @@ public:
 	// This was needed so we can parent to nameless entities using pointers
 	void SetParent(CBaseEntity* pNewParent) {
 		addresses::CBaseEntity_SetParent(this, pNewParent, 0u, nullptr);
+	}
+
+	void SetOwner(CBaseEntity* pNewOwner) {
+		static int offset = g_pGameConfig->GetOffset("CBaseEntity::SetOwner");
+		CALL_VIRTUAL(void, offset, this, pNewOwner);
+	}
+
+	bool IsWeapon() {
+		static auto offset = g_pGameConfig->GetOffset("CBaseEntity::IsWeapon");
+		return CALL_VIRTUAL(bool, offset, this);
 	}
 
 	void Remove() {

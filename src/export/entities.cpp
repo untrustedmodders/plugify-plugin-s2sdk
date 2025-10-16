@@ -491,7 +491,7 @@ extern "C" PLUGIN_API int GetEntityFlags(int entityHandle) {
 		return 0;
 	}
 
-	return entity->m_fFlags;
+	return *entity->m_fFlags;
 }
 
 /**
@@ -529,7 +529,7 @@ extern "C" PLUGIN_API int GetEntityRenderColor(int entityHandle) {
 		return 0;
 	}
 
-	return entity->m_clrRender().GetRawColor();
+	return entity->m_clrRender->GetRawColor();
 }
 
 /**
@@ -744,7 +744,7 @@ extern "C" PLUGIN_API void SetEntityOwner(int entityHandle, int ownerHandle) {
 		return;
 	}
 
-	entity->m_CBodyComponent->m_pSceneNode->m_pOwner = pOwner;
+	entity->SetOwner(pOwner);
 }
 
 /**
@@ -981,7 +981,12 @@ extern "C" PLUGIN_API int GetEntityGroundEntity(int entityHandle) {
 		return INVALID_EHANDLE_INDEX;
 	}
 
-	return entity->m_hGroundEntity()->GetRefEHandle().ToInt();
+	CBaseEntity* ground = *entity->m_hGroundEntity;
+	if (!ground) {
+		return INVALID_EHANDLE_INDEX;
+	}
+
+	return ground->GetRefEHandle().ToInt();
 }
 
 /**

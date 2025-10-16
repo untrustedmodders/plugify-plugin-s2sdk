@@ -45,10 +45,10 @@ public:
 	}
 
 	CBasePlayerController* GetController() {
-		return m_hController();
+		return *m_hController;
 	}
 
 	bool IsBot() {
-		return m_fFlags() & FL_PAWN_FAKECLIENT;
+		return m_fFlags & FL_PAWN_FAKECLIENT;
 	}
 };
