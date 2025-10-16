@@ -35,17 +35,6 @@ struct SchemaKey {
 	CSchemaType* type{};
 };
 
-namespace plg {
-	constexpr std::size_t hasher(std::string_view sv) noexcept {
-		std::size_t hash = active_hash_traits::fnv_basis; // FNV-1a
-		for (const auto& c : sv) {
-			hash ^= static_cast<uint8_t>(c);
-			hash *= active_hash_traits::fnv_prime;
-		}
-		return hash;
-	}
-}
-
 namespace schema {
 	static std::unordered_set<plg::string> CS2BadList = {
 			"m_bIsValveDS",
@@ -94,16 +83,9 @@ namespace schema {
 		Class
 	};
 
-	int32_t FindChainOffset(const char* className, size_t classNameHash);
-	SchemaKey GetOffset(const char* className, size_t classKey, const char* memberName, size_t memberKey);
+	int32_t FindChainOffset(const plg::string& className);
+	SchemaKey GetOffset(const plg::string& className, const plg::string& memberName);
 	void NetworkStateChanged(intptr_t chainEntity, uint localOffset, int arrayIndex = 0xFFFFFFFF);
-
-	inline int32_t FindChainOffset(std::string_view className) {
-		return FindChainOffset(className.data(), plg::hasher(className));
-	}
-	inline SchemaKey GetOffset(std::string_view className, std::string_view memberName) {
-		return GetOffset(className.data(), plg::hasher(className), memberName.data(), plg::hasher(memberName));
-	}
 
 	ElementType GetElementType(CSchemaType* type);
 	std::pair<ElementType, int> IsIntType(CSchemaType* type);
@@ -122,7 +104,7 @@ void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset);
 template<
     typename T,
     typename ThisClass,
-    char const* VarName,
+    char const* MemberName,
     size_t(*MemberOffset)(),
     std::size_t ExtraOffset = 0
 >
@@ -140,11 +122,11 @@ class SchemaField {
 
 	// Compact internal helpers
 	[[nodiscard]] auto Key(this auto&& self) {
-		static const auto key = schema::GetOffset(ThisClass::m_className, ThisClass::m_classNameHash, VarName, plg::hasher(VarName));
+		static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
 		return key;
 	}
 	[[nodiscard]] auto Chain(this auto&& self) {
-		static const auto chain = schema::FindChainOffset(ThisClass::m_className, ThisClass::m_classNameHash);
+		static const auto chain = schema::FindChainOffset(ThisClass::m_className);
 		return chain;
 	}
 	[[nodiscard]] auto Offset(this auto&& self) { return self.Key().offset + ExtraOffset; }
@@ -252,7 +234,7 @@ public:
 template<
     typename T,
     typename ThisClass,
-    char const* VarName,
+    char const* MemberName,
     size_t(*MemberOffset)(),
     std::size_t ExtraOffset = 0
 >
@@ -270,11 +252,11 @@ class SchemaPointerField {
 
     // Compact internal helpers
     [[nodiscard]] auto Key(this auto&& self) {
-        static const auto key = schema::GetOffset(ThisClass::m_className, ThisClass::m_classNameHash, VarName, plg::hasher(VarName));
+        static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
         return key;
     }
     [[nodiscard]] auto Chain(this auto&& self) {
-        static const auto chain = schema::FindChainOffset(ThisClass::m_className, ThisClass::m_classNameHash);
+        static const auto chain = schema::FindChainOffset(ThisClass::m_className);
         return chain;
     }
     [[nodiscard]] auto Offset(this auto&& self) { return self.Key().offset + ExtraOffset; }
@@ -312,23 +294,31 @@ public:
 
 // macro helpers: trivial, localize offsetof usage to callsites only
 #define SCHEMA_FIELD(type, name) \
+private: \
 	static constexpr const char name##_str[] = #name; \
 	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+public: \
     PLUGIFY_NO_UNIQUE_ADDRESS SchemaField<type, ThisClass, name##_str, name##_offset, 0> name;
 
 #define SCHEMA_FIELD_OFFSET(type, name, extra) \
+private: \
 	static constexpr const char name##_str[] = #name; \
 	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+public: \
     PLUGIFY_NO_UNIQUE_ADDRESS SchemaField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 
 #define SCHEMA_FIELD_POINTER(type, name) \
+private: \
 	static constexpr const char name##_str[] = #name; \
 	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+public: \
 	PLUGIFY_NO_UNIQUE_ADDRESS SchemaPointerField<type, ThisClass, name##_str, name##_offset, 0> name;
 
 #define SCHEMA_FIELD_POINTER_OFFSET(type, name, extra) \
+private: \
 	static constexpr const char name##_str[] = #name; \
 	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+public: \
 	PLUGIFY_NO_UNIQUE_ADDRESS SchemaPointerField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 
 // If the class needs a specific offset for its NetworkStateChanged (like CEconItemView), use this and provide the offset
@@ -336,7 +326,6 @@ public:
 	public:																		    \
 		using ThisClass = ClassName;												\
 		static constexpr const char m_className[] = #ClassName;						\
-		static constexpr size_t m_classNameHash = plg::hasher(#ClassName);          \
 		static constexpr int m_networkStateChangedOffset = offset;                  \
 
 #define DECLARE_SCHEMA_CLASS(className) DECLARE_SCHEMA_CLASS_BASE(className, 0)

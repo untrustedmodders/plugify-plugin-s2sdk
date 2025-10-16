@@ -6,8 +6,23 @@
 #include <optional>
 #include <functional>
 #include <iterator>
+#include <version>
+
+#ifdef __cpp_lib_flat_map
+#include <flat_map>
+#else
+#include <map>
+#endif
 
 namespace plg {
+#ifdef __cpp_lib_flat_map
+	template<typename Key, typename T, typename Compare = std::less<Key>>
+	using flat_map = std::flat_map<Key, T, Compare>;
+#else
+	template<typename Key, typename T, typename Compare = std::less<Key>>
+	using flat_map = std::map<Key, T, Compare>; // Temporary fallback
+#endif
+
 	// Thread-safe wrapper for std::set
 	template<typename Key, typename Compare, typename Allocator, typename Container>
 	class safe_set {

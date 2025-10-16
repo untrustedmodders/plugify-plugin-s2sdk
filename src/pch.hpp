@@ -26,9 +26,10 @@
 #include <filesystem>
 #include <utility>
 #include <expected>
+#include <flat_map>
 
 namespace fs = std::filesystem;
 
-#include "safe.hpp"
+#include "stl.hpp"
 #include "core/globals.hpp"
 #include "core/logger.hpp"

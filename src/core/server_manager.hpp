@@ -3,8 +3,6 @@
 #include <mutex>
 #include <thread>
 
-#include "safe.hpp"
-
 using TaskCallback = void (*)(const plg::vector<plg::any>&);
 
 class ServerManager {
