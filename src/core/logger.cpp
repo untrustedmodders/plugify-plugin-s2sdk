@@ -63,6 +63,31 @@ void Logger::SetChannelFlags(LoggingChannelFlags_t flags) const {
 	LoggingSystem_SetChannelFlags(m_channelID, flags);
 }
 
+void Logger::Log(std::string_view message, LoggingSeverity_t severity, std::source_location loc) const  {
+	LoggingRareOptions_t options {
+		.m_File = loc.file_name(),
+		.m_Line = static_cast<int>(loc.line()),
+		.m_Function = loc.function_name(),
+	};
+	std::unique_lock lock(m_mutex);
+	switch (severity) {
+		case LS_ERROR:
+			LoggingSystem_Log(m_channelID, LS_ERROR, options, RED, message.data());
+		break;
+		case LS_WARNING:
+			LoggingSystem_Log(m_channelID, LS_WARNING,  options,YELLOW, message.data());
+		break;
+		case LS_MESSAGE:
+			LoggingSystem_Log(m_channelID, LS_MESSAGE, options, WHITE, message.data());
+		break;
+		case LS_DETAILED:
+			LoggingSystem_Log(m_channelID, LS_MESSAGE, options, GREEN, message.data());
+		break;
+		default:
+			break;
+	}
+}
+
 LoggingResponse_t Logger::Log(LoggingSeverity_t severity, const char* message) const {
 	LoggingResponse_t response = LR_ABORT;
 
