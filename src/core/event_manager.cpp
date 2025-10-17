@@ -20,46 +20,16 @@ EventHookError EventManager::HookEvent(const plg::string& name, EventListenerCal
 
 	auto it = m_eventHooks.find(name);
 	if (it == m_eventHooks.end()) {
-		EventHook eventHook{name};
-
-		if (mode == HookMode::Pre) {
-			eventHook.preHook = std::make_unique<HookCallback>();
-			eventHook.preHook->Register(callback);
-		} else {
-			eventHook.postHook = std::make_unique<HookCallback>();
-			eventHook.postHook->Register(callback);
-			eventHook.postCopy = (mode == HookMode::Post);
-		}
-
+		auto& eventHook = *m_eventHooks.emplace(name, std::make_unique<EventHook>(name)).first->second;
+		eventHook.postCopy = (mode == HookMode::Post);
 		++eventHook.refCount;
-
-		m_eventHooks.emplace(name, std::move(eventHook));
-
-		return EventHookError::Okay;
-	}
-
-	auto& eventHook = it->second;
-	if (mode == HookMode::Pre) {
-		if (eventHook.preHook == nullptr) {
-			eventHook.preHook = std::make_unique<HookCallback>();
-		}
-
-		eventHook.preHook->Register(callback);
+		return eventHook.callbacks[mode].Register(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
 	} else {
-		if (eventHook.postHook == nullptr) {
-			eventHook.postHook = std::make_unique<HookCallback>();
-		}
-
-		if (!eventHook.postCopy) {
-			eventHook.postCopy = (mode == HookMode::Post);
-		}
-
-		eventHook.postHook->Register(callback);
+		auto& eventHook = *it->second;
+		eventHook.postCopy = (mode == HookMode::Post);
+		++eventHook.refCount;
+		return eventHook.callbacks[mode].Register(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
 	}
-
-	++eventHook.refCount;
-
-	return EventHookError::Okay;
 }
 
 EventHookError EventManager::UnhookEvent(const plg::string& name, EventListenerCallback callback, HookMode mode) {
@@ -68,15 +38,9 @@ EventHookError EventManager::UnhookEvent(const plg::string& name, EventListenerC
 		return EventHookError::NotActive;
 	}
 
-	std::unique_ptr<HookCallback>* callbackHook;
-	auto& eventHook = it->second;
-	if (mode == HookMode::Pre) {
-		callbackHook = &eventHook.preHook;
-	} else {
-		callbackHook = &eventHook.postHook;
-	}
+	auto& eventHook = *it->second;
 
-	if (*callbackHook == nullptr || !(*callbackHook)->Unregister(callback)) {
+	if (!eventHook.callbacks[mode].Unregister(callback)) {
 		return EventHookError::InvalidCallback;
 	}
 
@@ -138,17 +102,19 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 
 	auto it = m_eventHooks.find(name);
 	if (it != m_eventHooks.end()) {
-		auto& eventHook = it->second;
+		auto& eventHook = *it->second;
 		++eventHook.refCount;
 		m_eventStack.push(&eventHook);
 
-		if (eventHook.preHook != nullptr) {
+		auto& preHook = eventHook.callbacks[HookMode::Pre];
+		if (!preHook.Empty()) {
 			plg::print(LS_DETAILED, "Pushing event `{}` pointer: {}, dont broadcast: {}, post: {}\n", event->GetName(), static_cast<const void*>(event), dontBroadcast, false);
 
 			EventInfo eventInfo{event, dontBroadcast};
 
-			for (size_t i = 0; i < eventHook.preHook->GetCount(); ++i) {
-				auto result = eventHook.preHook->Notify(i, name, &eventInfo, dontBroadcast);
+			auto funcs = preHook.AsView();
+			for (const auto& func : funcs) {
+				auto result = func(name, &eventInfo, dontBroadcast);
 				localDontBroadcast = eventInfo.dontBroadcast;
 
 				if (result >= ResultType::Handled) {
@@ -178,27 +144,25 @@ ResultType EventManager::OnFireEvent_Post(IGameEvent* event, bool dontBroadcast)
 		return ResultType::Continue;
 
 	EventHook* hook = m_eventStack.top();
-
 	if (hook != nullptr) {
-		if (hook->postHook != nullptr) {
+		auto& postHook = hook->callbacks[HookMode::Post];
+		if (!postHook.Empty()) {
 			if (hook->postCopy) {
 				auto eventCopy = m_eventCopies.top();
 				plg::print(LS_DETAILED, "Pushing event `{}` pointer: {}, dont broadcast: {}, post: {}\n", eventCopy->GetName(), static_cast<const void*>(eventCopy), dontBroadcast, true);
 				EventInfo eventInfo{eventCopy, dontBroadcast};
 
-				hook->postHook->Notify(hook->name, &eventInfo, dontBroadcast);
+				postHook(hook->name, &eventInfo, dontBroadcast);
 
 				g_pGameEventManager->FreeEvent(eventInfo.event);
 
 				m_eventCopies.pop();
 			} else {
-				hook->postHook->Notify(hook->name, nullptr, dontBroadcast);
+				postHook(hook->name, nullptr, dontBroadcast);
 			}
 		}
 
 		if (--hook->refCount == 0) {
-			AssertFatal(hook->postHook == nullptr);
-			AssertFatal(hook->preHook == nullptr);
 			m_eventHooks.erase(hook->name);
 			delete hook;
 		}

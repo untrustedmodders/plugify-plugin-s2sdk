@@ -17,14 +17,13 @@ private:
 	struct Task {
 		TaskCallback callback;
 		plg::vector<plg::any> userData;
-
-		bool operator<(const Task& other) const {
-			return callback < other.callback;
-		}
 	};
 
-	plg::multiset<Task> m_nextWorldUpdateTasks;
-	plg::multiset<Task> m_nextTasks;
+	std::vector<Task> m_nextWorldUpdateTasks;
+	std::vector<Task> m_nextTasks;
+
+	std::mutex m_worldUpdateMutex;
+	std::mutex m_frameTasksMutex;
 };
 
 extern ServerManager g_ServerManager;

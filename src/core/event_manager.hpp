@@ -10,17 +10,14 @@ struct EventInfo {
 
 using EventListenerCallback = ResultType (*)(const plg::string& name, EventInfo* event, bool dontBroadcast);
 
-using HookCallback = ListenerManager<EventListenerCallback>;
-
 struct EventHook {
 	plg::string name;
-	std::unique_ptr<HookCallback> preHook = nullptr;
-	std::unique_ptr<HookCallback> postHook = nullptr;
+	plg::enum_map<ListenerManager<EventListenerCallback>, HookMode> callbacks;
 	uint32_t refCount{};
 	bool postCopy{};
 };
 
-enum class EventHookError : int {
+enum class EventHookError {
 	Okay = 0,
 	InvalidEvent,
 	NotActive,
@@ -47,7 +44,7 @@ private:
 	void FireGameEvent(IGameEvent* event) override;
 
 private:
-	plg::map<plg::string, EventHook> m_eventHooks;
+	plg::parallel_flat_hash_map<plg::string, std::unique_ptr<EventHook>, plg::string_hash, std::equal_to<>> m_eventHooks;
 	std::stack<EventInfo*> m_freeEvents;
 	std::stack<EventHook*> m_eventStack;
 	std::stack<IGameEvent*> m_eventCopies;

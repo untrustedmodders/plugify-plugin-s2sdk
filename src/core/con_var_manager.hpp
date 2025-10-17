@@ -63,8 +63,6 @@ struct ConVarInfo {
 class ConVarManager;
 extern ConVarManager g_ConVarManager;
 
-using ConVarInfoPtr = std::unique_ptr<ConVarInfo>;
-
 class ConVarManager {
 public:
 	ConVarManager() = default;
@@ -96,7 +94,6 @@ public:
 		} else {
 			conVarInfo.conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(conVarInfo.name.c_str(), SanitiseConVarFlags(flgs), conVarInfo.description.c_str(), defaultVal, hasMin, min, hasMax, max));
 		}
-		m_cnvCache.emplace(conVarInfo.conVar.get(), &conVarInfo);
 		return *conVarInfo.conVar;
 	}
 
@@ -109,7 +106,6 @@ public:
 
 		auto& conVarInfo = *m_cnvLookup.emplace(name, std::make_unique<ConVarInfo>(name, "")).first->second;
 		conVarInfo.conVar = std::make_unique<CConVarRef<T>>(name.c_str());
-		m_cnvCache.emplace(conVarInfo.conVar.get(), &conVarInfo);
 
 		if (!conVarInfo.conVar->IsValidRef()) {
 			plg::print(LS_WARNING, "Failed to find \"{}\" convar\n", name);
@@ -152,8 +148,7 @@ private:
 	static void UpdateConVarValue(ConVarRefAbstract conVar, std::string_view value);
 
 private:
-	plg::map<plg::string, ConVarInfoPtr, plg::case_insensitive_equal> m_cnvLookup;
-	plg::map<const ConVarRef*, const ConVarInfo*> m_cnvCache;
+	plg::parallel_flat_hash_map<plg::string, std::unique_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
 	ListenerManager<ConVarChangeListenerCallback> m_globalCallbacks;
 };
 

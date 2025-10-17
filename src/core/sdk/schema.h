@@ -36,7 +36,7 @@ struct SchemaKey {
 };
 
 namespace schema {
-	static std::unordered_set<plg::string> CS2BadList = {
+	static plg::flat_hash_set<plg::string> CS2BadList = {
 			"m_bIsValveDS",
 			"m_bIsQuestEligible",
 			"m_iItemDefinitionIndex",// in unmanaged this cannot be set.

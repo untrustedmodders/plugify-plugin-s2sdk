@@ -24,7 +24,7 @@ ConCommandInfo::~ConCommandInfo() {
 
 bool ConCommandManager::AddCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
 	if (name.empty()) {
-		return m_globalCallbacks[static_cast<size_t>(mode)].Register(callback);
+		return m_globalCallbacks[mode].Register(callback);
 	}
 
 	auto it = m_cmdLookup.find(name);
@@ -37,16 +37,16 @@ bool ConCommandManager::AddCommandListener(const plg::string& name, CommandListe
 		auto& commandInfo = *m_cmdLookup.emplace(name, std::make_unique<ConCommandInfo>(name)).first->second;
 		commandInfo.command = g_pCVar->GetConCommandData(commandRef);
 		commandInfo.defaultCommand = true;
-		return commandInfo.callbacks[static_cast<size_t>(mode)].Register(callback);
+		return commandInfo.callbacks[mode].Register(callback);
 	} else {
 		auto& commandInfo = *it->second;
-		return commandInfo.callbacks[static_cast<size_t>(mode)].Register(callback);
+		return commandInfo.callbacks[mode].Register(callback);
 	}
 }
 
 bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
 	if (name.empty()) {
-		return m_globalCallbacks[static_cast<size_t>(mode)].Unregister(callback);
+		return m_globalCallbacks[mode].Unregister(callback);
 	}
 
 	auto it = m_cmdLookup.find(name);
@@ -55,7 +55,7 @@ bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandLi
 	}
 
 	auto& commandInfo = *it->second;
-	return commandInfo.callbacks[static_cast<size_t>(mode)].Unregister(callback);
+	return commandInfo.callbacks[mode].Unregister(callback);
 }
 
 bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, uint64 adminFlags) {
@@ -146,36 +146,36 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(const plg::string& name, c
 
 	ResultType result = ResultType::Continue;
 
-	const auto& globalCallback = m_globalCallbacks[static_cast<size_t>(mode)];
+	{
+		auto funcs = m_globalCallbacks[mode].AsView();
+		for (const auto& func : funcs) {
+			auto thisResult = func(caller, callingContext, arguments);
+			if (thisResult >= ResultType::Stop) {
+				if (mode == HookMode::Pre) {
+					return ResultType::Stop;
+				}
 
-	for (size_t i = 0; i < globalCallback.GetCount(); ++i) {
-		auto thisResult = globalCallback.Notify(i, caller, callingContext, arguments);
-		if (thisResult >= ResultType::Stop) {
-			if (mode == HookMode::Pre) {
-				return ResultType::Stop;
+				result = thisResult;
+				break;
 			}
 
-			result = thisResult;
-			break;
-		}
-
-		if (thisResult >= ResultType::Handled) {
-			result = thisResult;
+			if (thisResult >= ResultType::Handled) {
+				result = thisResult;
+			}
 		}
 	}
 
 	auto it = m_cmdLookup.find(name);
 	if (it != m_cmdLookup.end()) {
-		const auto& commandInfo = *it->second;
+		auto& commandInfo = *it->second;
 
 		if (!CheckCommandAccess(caller, commandInfo.adminFlags)) {
 			return result;
 		}
 
-		const auto& callback = commandInfo.callbacks[static_cast<size_t>(mode)];
-
-		for (size_t i = 0; i < callback.GetCount(); ++i) {
-			auto thisResult = callback.Notify(i, caller, callingContext, arguments);
+		auto funcs = commandInfo.callbacks[mode].AsView();
+		for (const auto& func : funcs) {
+			auto thisResult = func(caller, callingContext, arguments);
 			if (thisResult >= ResultType::Handled) {
 				return thisResult;
 			} else if (thisResult > result) {

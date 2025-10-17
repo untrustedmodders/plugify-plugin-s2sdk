@@ -7,7 +7,7 @@
 #include <steam/steam_api_common.h>
 #include <steam/steamclientpublic.h>
 
-enum class TargetType : int {
+enum class TargetType {
 	NONE,
 	PLAYER,
 	SELF,
@@ -103,7 +103,7 @@ private:
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
 	plg::string m_language;
 	plg::string m_operatingSystem;
-	plg::map<int, CvarQuery> m_queryCallback;
+	plg::flat_hash_map<int, CvarQuery> m_queryCallback;
 };
 
 class PlayerManager {
@@ -121,7 +121,7 @@ public:
 	Player* ToPlayer(CSteamID steamid, bool validate = false) const;
 
 	void OnSteamAPIActivated();
-	bool OnClientConnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID);
+	bool OnClientConnect(CPlayerSlot slot, char const* name, uint64 steamID64, char const* networkID);
 	bool OnClientConnect_Post(CPlayerSlot slot, bool origRet);
 	void OnClientConnected(CPlayerSlot slot, bool fakePlayer);
 	void OnClientPutInServer(CPlayerSlot slot, char const* name);
@@ -141,7 +141,7 @@ public:
 
 protected:
 	std::array<Player, MAXPLAYERS + 1> m_players{};
-	//std::mutex m_mutex;
+	std::mutex m_mutex;
 	bool m_callbackRegistered{};
 };
 

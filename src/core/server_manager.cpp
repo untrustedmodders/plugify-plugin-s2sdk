@@ -3,39 +3,51 @@
 #include <edict.h>
 
 void ServerManager::OnGameFrame() {
-	if (m_nextTasks.empty())
-		return;
+	std::vector<Task> tasksToExecute;
 
-	plg::print(LS_DETAILED, "Executing queued tasks of size: {} on tick number {}\n", m_nextTasks.size(), gpGlobals->tickcount);
+	{
+		std::scoped_lock lock(m_frameTasksMutex);
+		if (m_nextTasks.empty())
+			return;
 
-	m_nextTasks.for_each([](const Task& task) {
-		const auto& [nextTask, userData] = task;
-		nextTask(userData);
-	});
+		tasksToExecute.swap(m_nextTasks);
+	}
 
-	m_nextTasks.clear();
+	plg::print(LS_DETAILED, "Executing queued tasks of size: {} on tick number {}\n",
+			   tasksToExecute.size(), gpGlobals->tickcount);
+
+	for (auto& [callback, userData] : tasksToExecute) {
+		callback(userData);
+	}
 }
 
 void ServerManager::OnPreWorldUpdate() {
-	if (m_nextWorldUpdateTasks.empty())
-		return;
+	std::vector<Task> tasksToExecute;
 
-	plg::print(LS_DETAILED, "Executing queued tasks of size: {} at time {}\n", m_nextWorldUpdateTasks.size(), gpGlobals->curtime);
+	{
+		std::scoped_lock lock(m_worldUpdateMutex);
+		if (m_nextWorldUpdateTasks.empty())
+			return;
 
-	m_nextWorldUpdateTasks.for_each([](const Task& task) {
-		const auto& [nextTask, userData] = task;
-		nextTask(userData);
-	});
+		tasksToExecute.swap(m_nextWorldUpdateTasks);
+	}
 
-	m_nextWorldUpdateTasks.clear();
+	plg::print(LS_DETAILED, "Executing queued tasks of size: {} at time {}\n",
+			   tasksToExecute.size(), gpGlobals->curtime);
+
+	for (auto& [callback, userData] : tasksToExecute) {
+		callback(userData);
+	}
 }
 
 void ServerManager::AddTaskForNextFrame(TaskCallback task, const plg::vector<plg::any>& userData) {
-	m_nextTasks.emplace(task, userData);
+	std::scoped_lock lock(m_frameTasksMutex);
+	m_nextTasks.emplace_back(task, userData);
 }
 
 void ServerManager::AddTaskForNextWorldUpdate(TaskCallback task, const plg::vector<plg::any>& userData) {
-	m_nextWorldUpdateTasks.emplace(task, userData);
+	std::scoped_lock lock(m_worldUpdateMutex);
+	m_nextWorldUpdateTasks.emplace_back(task, userData);
 }
 
 ServerManager g_ServerManager;

@@ -28,10 +28,9 @@
 
 extern CGlobalVars* gpGlobals;
 
-using SchemaKeyValueMap = plg::flat_map<plg::string, SchemaKey>;
-using SchemaTableMap = plg::flat_map<plg::string, SchemaKeyValueMap>;
-static constexpr plg::string g_ChainKey = "__m_pChainEntity";
-
+using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey>;
+using SchemaTableMap = plg::node_hash_map<plg::string, SchemaValueMap>;
+ss
 void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32 networkStateChangedOffset) {
 	NetworkStateChanged_t data(offset);
 	CALL_VIRTUAL(void, networkStateChangedOffset, reinterpret_cast<void*>(networkVar), &data);
@@ -77,7 +76,7 @@ namespace {
 
 		SchemaMetaInfoHandle_t<CSchemaClassInfo> pClassInfo = pType->FindDeclaredClass(className.c_str());
 		if (!pClassInfo) {
-			tableMap.emplace(className, SchemaKeyValueMap());
+			tableMap.emplace(className, SchemaValueMap());
 
 			plg::print(LS_ERROR, "InitSchemaFieldsForClass(): '{}' was not found!\n", className);
 			return false;
@@ -86,7 +85,7 @@ namespace {
 		size_t fieldsSize = pClassInfo->m_nFieldCount;
 		SchemaClassFieldData_t* fields = pClassInfo->m_pFields;
 
-		SchemaKeyValueMap keyValueMap;
+		SchemaValueMap valueMap;
 
 		for (size_t i = 0; i < fieldsSize; ++i) {
 			const SchemaClassFieldData_t& field = fields[i];
@@ -94,12 +93,12 @@ namespace {
 			int size = 0;
 			uint8 alignment = 0;
 			field.m_pType->GetSizeAndAlignment(size, alignment);
-			keyValueMap.emplace(field.m_pszName, SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), size, field.m_pType});
+			valueMap.emplace(field.m_pszName, SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), size, field.m_pType});
 
 			plg::print(LS_DETAILED, "{}::{} found at -> 0x{:x} - {}\n", className, field.m_pszName, field.m_nSingleInheritanceOffset, static_cast<const void*>(&field));
 		}
 
-		tableMap.emplace(className, std::move(keyValueMap));
+		tableMap.emplace(className, std::move(valueMap));
 
 		return true;
 	}
@@ -107,12 +106,16 @@ namespace {
 }// namespace
 
 namespace schema {
+	static constexpr plg::string g_ChainKey = "__m_pChainEntity";
+
 	int32_t FindChainOffset(const plg::string& className) {
 		return GetOffset(className, g_ChainKey).offset;
 	}
 
 	SchemaKey GetOffset(const plg::string& className, const plg::string& memberName) {
 		static SchemaTableMap schemaTableMap;
+		static std::mutex mutex;
+		std::scoped_lock lock(mutex);
 
 		auto tableIt = schemaTableMap.find(className);
 		if (tableIt == schemaTableMap.end()) {

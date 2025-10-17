@@ -46,8 +46,9 @@ private:
 	bool m_hasMapTicked{};
 	bool m_hasMapSimulated{};
 	float m_lastTickedTime{};
-	plg::set<Timer> m_timers;
-	static inline std::atomic<uint32_t> s_nextId{static_cast<uint32_t>(-1)};
+	std::set<Timer> m_timers;
+	std::recursive_mutex m_mutex;
+	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
 };
 
 inline TimerFlag operator|(TimerFlag lhs, TimerFlag rhs) noexcept {

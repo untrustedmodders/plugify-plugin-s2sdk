@@ -1,484 +1,109 @@
 #pragma once
 
-#include <set>
-#include <map>
 #include <shared_mutex>
-#include <optional>
 #include <functional>
-#include <iterator>
-#include <version>
 
-#ifdef __cpp_lib_flat_map
-#include <flat_map>
-#else
-#include <map>
-#endif
+#include <shared_mutex>
+#include <parallel_hashmap/phmap.h>
 
 namespace plg {
-#ifdef __cpp_lib_flat_map
-	template<typename Key, typename T, typename Compare = std::less<Key>>
-	using flat_map = std::flat_map<Key, T, Compare>;
-#else
-	template<typename Key, typename T, typename Compare = std::less<Key>>
-	using flat_map = std::map<Key, T, Compare>; // Temporary fallback
-#endif
+	using namespace phmap;
 
-	// Thread-safe wrapper for std::set
-	template<typename Key, typename Compare, typename Allocator, typename Container>
-	class safe_set {
-	    mutable std::shared_mutex mutex_;
-	    Container set_;
+	template <typename K> using HashEqual = priv::hash_default_eq<K>;
+	template <typename V> using HashFn = priv::hash_default_hash<V>;
+	template <typename K> using Allocator = priv::Allocator<K>;
 
-	public:
-	    using key_type = Key;
-	    using value_type = Key;
-	    using size_type = typename Container::size_type;
-	    using difference_type = typename Container::difference_type;
-	    using key_compare = Compare;
-	    using value_compare = Compare;
-	    using allocator_type = Allocator;
-	    using reference = value_type&;
-	    using const_reference = const value_type&;
-	    using pointer = typename std::allocator_traits<Allocator>::pointer;
-	    using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
+	template <typename K, typename V, typename Hash = HashFn<K>, typename Eq = HashEqual<K>, size_t N = 4>
+	using parallel_flat_hash_map = parallel_flat_hash_map<K, V, Hash, Eq, Allocator<priv::Pair<K, V>>, N, std::shared_mutex>;
 
-	    // Constructors
-	    safe_set() = default;
+	template <class K, class Hash = HashFn<K>, class Eq = HashEqual<K>, size_t N = 4>
+	using parallel_flat_hash_set = parallel_flat_hash_set<K, Hash, Eq, Allocator<K>, N, std::shared_mutex>;
 
-	    explicit safe_set(const Compare& comp, const Allocator& alloc = Allocator())
-	        : set_(comp, alloc) {}
+	template<typename Enum>
+	constexpr size_t enum_size() {
+	    return static_cast<size_t>(Enum::Count);
+	}
 
-	    template<typename InputIt>
-	    safe_set(InputIt first, InputIt last,
-	                  const Compare& comp = Compare(), const Allocator& alloc = Allocator())
-	        : set_(first, last, comp, alloc) {}
-
-	    safe_set(std::initializer_list<Key> init,
-	                  const Compare& comp = Compare(), const Allocator& alloc = Allocator())
-	        : set_(init, comp, alloc) {}
-
-	    // Copy constructor
-	    safe_set(const safe_set& other) {
-	        std::shared_lock lock(other.mutex_);
-	        set_ = other.set_;
-	    }
-
-	    // Move constructor
-	    safe_set(safe_set&& other) noexcept {
-	        std::unique_lock lock(other.mutex_);
-	        set_ = std::move(other.set_);
-	    }
-
-	    // Assignment operators
-	    safe_set& operator=(const safe_set& other) {
-	        if (this != &other) {
-	            std::unique_lock lock1(mutex_, std::defer_lock);
-	            std::shared_lock lock2(other.mutex_, std::defer_lock);
-	            std::lock(lock1, lock2);
-	            set_ = other.set_;
-	        }
-	        return *this;
-	    }
-
-	    safe_set& operator=(safe_set&& other) noexcept {
-	        if (this != &other) {
-	            std::unique_lock lock1(mutex_, std::defer_lock);
-	            std::unique_lock lock2(other.mutex_, std::defer_lock);
-	            std::lock(lock1, lock2);
-	            set_ = std::move(other.set_);
-	        }
-	        return *this;
-	    }
-
-	    // Capacity
-	    bool empty() const {
-	        std::shared_lock lock(mutex_);
-	        return set_.empty();
-	    }
-
-	    size_type size() const {
-	        std::shared_lock lock(mutex_);
-	        return set_.size();
-	    }
-
-	    size_type max_size() const {
-	        std::shared_lock lock(mutex_);
-	        return set_.max_size();
-	    }
-
-	    // Modifiers
-	    void clear() {
-	        std::unique_lock lock(mutex_);
-	        set_.clear();
-	    }
-
-	    auto insert(const value_type& value) {
-	        std::unique_lock lock(mutex_);
-	        return set_.insert(value);
-	    }
-
-	    auto insert(value_type&& value) {
-	        std::unique_lock lock(mutex_);
-	        return set_.insert(std::move(value));
-	    }
-
-	    template<typename InputIt>
-	    void insert(InputIt first, InputIt last) {
-	        std::unique_lock lock(mutex_);
-	        set_.insert(first, last);
-	    }
-
-	    void insert(std::initializer_list<value_type> ilist) {
-	        std::unique_lock lock(mutex_);
-	        set_.insert(ilist);
-	    }
-
-	    void insert(Container::node_type&& node) {
-	        std::unique_lock lock(mutex_);
-	        set_.insert(std::move(node));
-	    }
-
-	    template<typename... Args>
-	    auto emplace(Args&&... args) {
-	        std::unique_lock lock(mutex_);
-	        return set_.emplace(std::forward<Args>(args)...);
-	    }
-
-	    auto erase(auto it) {
-	        std::unique_lock lock(mutex_);
-	        return set_.erase(it);
-	    }
-
-	    size_type erase(const key_type& key) {
-	        std::unique_lock lock(mutex_);
-	        return set_.erase(key);
-	    }
-
-	    void swap(safe_set& other) noexcept {
-	        if (this != &other) {
-	            std::unique_lock lock1(mutex_, std::defer_lock);
-	            std::unique_lock lock2(other.mutex_, std::defer_lock);
-	            std::lock(lock1, lock2);
-	            set_.swap(other.set_);
-	        }
-	    }
-
-	    // Lookup
-	    size_type count(const key_type& key) const {
-	        std::shared_lock lock(mutex_);
-	        return set_.count(key);
-	    }
-
-	    bool contains(const key_type& key) const {
-	        std::shared_lock lock(mutex_);
-	        return set_.contains(key);
-	    }
-
-	    auto find(const key_type& key) {
-	        std::shared_lock lock(mutex_);
-	        return set_.find(key);
-	    }
-
-	    auto find(const key_type& key) const {
-	        std::shared_lock lock(mutex_);
-	        return set_.find(key);
-	    }
-
-		auto begin() {
-	    	std::shared_lock lock(mutex_);
-	    	return set_.begin();
-	    }
-
-		auto begin() const {
-	    	std::shared_lock lock(mutex_);
-	    	return set_.begin();
-	    }
-
-		auto end() {
-	    	std::shared_lock lock(mutex_);
-	    	return set_.end();
-	    }
-
-		auto end() const {
-	    	std::shared_lock lock(mutex_);
-	    	return set_.end();
-	    }
-
-		auto extract(Container::const_iterator it) {
-		    std::unique_lock lock(mutex_);
-	    	return set_.extract(it);
-	    }
-
-	    // Apply function to all elements (read-only)
-	    template<typename Func>
-	    void for_each(Func func) const {
-	        std::shared_lock lock(mutex_);
-	        for (const auto& elem : set_) {
-	            func(elem);
-	        }
-	    }
-
-	    // Apply function to all elements (modifying)
-	    template<typename Func>
-	    void apply(Func func) {
-	        std::unique_lock lock(mutex_);
-	        func(set_);
-	    }
-
-	    // Get a snapshot of the set
-	    Container snapshot() const {
-	        std::shared_lock lock(mutex_);
-	        return set_;
-	    }
-	};
-
-	// Thread-safe wrapper for std::map
-	template<typename Key, typename T, typename Compare, typename Allocator, typename Container>
-	class safe_map {
+	// Enum-indexed array wrapper
+	template<typename T, typename Enum>
+	class enum_map {
 	private:
-	    mutable std::shared_mutex mutex_;
-	    Container map_;
+	    std::array<T, enum_size<Enum>()> data_;
+
+	    // Convert enum to index
+	    static constexpr size_t to_index(Enum e) {
+	        return static_cast<size_t>(e);
+	    }
 
 	public:
-	    using key_type = Key;
-	    using mapped_type = T;
-	    using value_type = std::pair<const Key, T>;
-	    using size_type = typename Container::size_type;
-	    using difference_type = typename Container::difference_type;
-	    using key_compare = Compare;
-	    using allocator_type = Allocator;
-	    using reference = value_type&;
-	    using const_reference = const value_type&;
-	    using pointer = typename std::allocator_traits<Allocator>::pointer;
-	    using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
+	    using value_type = T;
+	    using size_type = size_t;
+	    using reference = T&;
+	    using const_reference = const T&;
+	    using iterator = typename std::array<T, enum_size<Enum>()>::iterator;
+	    using const_iterator = typename std::array<T, enum_size<Enum>()>::const_iterator;
 
-	    // Constructors
-	    safe_map() = default;
+	    // Default constructor
+	    enum_map() = default;
 
-	    explicit safe_map(const Compare& comp, const Allocator& alloc = Allocator())
-	        : map_(comp, alloc) {}
-
-	    template<typename InputIt>
-	    safe_map(InputIt first, InputIt last,
-	                  const Compare& comp = Compare(), const Allocator& alloc = Allocator())
-	        : map_(first, last, comp, alloc) {}
-
-	    safe_map(std::initializer_list<value_type> init,
-	                  const Compare& comp = Compare(), const Allocator& alloc = Allocator())
-	        : map_(init, comp, alloc) {}
-
-	    // Copy constructor
-	    safe_map(const safe_map& other) {
-	        std::shared_lock lock(other.mutex_);
-	        map_ = other.map_;
+	    // Initialize with default value
+	    explicit enum_map(const T& default_value) {
+	        data_.fill(default_value);
 	    }
 
-	    // Move constructor
-	    safe_map(safe_map&& other) noexcept {
-	        std::unique_lock lock(other.mutex_);
-	        map_ = std::move(other.map_);
-	    }
-
-	    // Assignment operators
-	    safe_map& operator=(const safe_map& other) {
-	        if (this != &other) {
-	            std::unique_lock lock1(mutex_, std::defer_lock);
-	            std::shared_lock lock2(other.mutex_, std::defer_lock);
-	            std::lock(lock1, lock2);
-	            map_ = other.map_;
+	    // Initialize with initializer list
+	    enum_map(std::initializer_list<T> init) {
+	        if (init.size() != size()) {
+	            throw std::invalid_argument("Initializer list size must match enum count");
 	        }
-	        return *this;
+	        std::copy(init.begin(), init.end(), data_.begin());
 	    }
 
-	    safe_map& operator=(safe_map&& other) noexcept {
-	        if (this != &other) {
-	            std::unique_lock lock1(mutex_, std::defer_lock);
-	            std::unique_lock lock2(other.mutex_, std::defer_lock);
-	            std::lock(lock1, lock2);
-	            map_ = std::move(other.map_);
+	    // Access with enum key (non-const)
+	    reference operator[](Enum e) {
+	        return data_[to_index(e)];
+	    }
+
+	    // Access with enum key (const)
+	    const_reference operator[](Enum e) const {
+	        return data_[to_index(e)];
+	    }
+
+	    // Bounds-checked access
+	    reference at(Enum e) {
+	        size_t idx = to_index(e);
+	        if (idx >= size()) {
+	            throw std::out_of_range("Enum value out of range");
 	        }
-	        return *this;
+	        return data_[idx];
 	    }
 
-	    // Element access
-	    T& operator[](const key_type& key) {
-	        std::unique_lock lock(mutex_);
-	        return map_[key];
-	    }
-
-	    T& operator[](key_type&& key) {
-	        std::unique_lock lock(mutex_);
-	        return map_[std::move(key)];
-	    }
-
-	    // Capacity
-	    bool empty() const {
-	        std::shared_lock lock(mutex_);
-	        return map_.empty();
-	    }
-
-	    size_type size() const {
-	        std::shared_lock lock(mutex_);
-	        return map_.size();
-	    }
-
-	    size_type max_size() const {
-	        std::shared_lock lock(mutex_);
-	        return map_.max_size();
-	    }
-
-	    // Modifiers
-	    void clear() {
-	        std::unique_lock lock(mutex_);
-	        map_.clear();
-	    }
-
-	    auto insert(const value_type& value) {
-	        std::unique_lock lock(mutex_);
-	        return map_.insert(value);
-	    }
-
-	    auto insert(value_type&& value) {
-	        std::unique_lock lock(mutex_);
-	        return map_.insert(std::move(value));
-	    }
-
-	    template<typename InputIt>
-	    void insert(InputIt first, InputIt last) {
-	        std::unique_lock lock(mutex_);
-	        map_.insert(first, last);
-	    }
-
-	    void insert(std::initializer_list<value_type> ilist) {
-	        std::unique_lock lock(mutex_);
-	        map_.insert(ilist);
-	    }
-
-	    template<typename M>
-	    auto insert_or_assign(const key_type& key, M&& obj) {
-	        std::unique_lock lock(mutex_);
-	        return map_.insert_or_assign(key, std::forward<M>(obj));
-	    }
-
-	    template<typename M>
-	    auto insert_or_assign(key_type&& key, M&& obj) {
-	        std::unique_lock lock(mutex_);
-	        return map_.insert_or_assign(std::move(key), std::forward<M>(obj));
-	    }
-
-	    template<typename... Args>
-	    auto emplace(Args&&... args) {
-	        std::unique_lock lock(mutex_);
-	        return map_.emplace(std::forward<Args>(args)...);
-	    }
-
-	    template<typename... Args>
-	    auto try_emplace(const key_type& key, Args&&... args) {
-	        std::unique_lock lock(mutex_);
-	        return map_.try_emplace(key, std::forward<Args>(args)...);
-	    }
-
-	    template<typename... Args>
-	    auto try_emplace(key_type&& key, Args&&... args) {
-	        std::unique_lock lock(mutex_);
-	        return map_.try_emplace(std::move(key), std::forward<Args>(args)...);
-	    }
-
-	    auto erase(auto it) {
-	        std::unique_lock lock(mutex_);
-	        return map_.erase(it);
-	    }
-
-	    size_type erase(const key_type& key) {
-	        std::unique_lock lock(mutex_);
-	        return map_.erase(key);
-	    }
-
-	    void swap(safe_map& other) noexcept {
-	        if (this != &other) {
-	            std::unique_lock lock1(mutex_, std::defer_lock);
-	            std::unique_lock lock2(other.mutex_, std::defer_lock);
-	            std::lock(lock1, lock2);
-	            map_.swap(other.map_);
+	    const_reference at(Enum e) const {
+	        size_t idx = to_index(e);
+	        if (idx >= size()) {
+	            throw std::out_of_range("Enum value out of range");
 	        }
+	        return data_[idx];
 	    }
 
-	    // Lookup
-	    size_type count(const key_type& key) const {
-	        std::shared_lock lock(mutex_);
-	        return map_.count(key);
+	    // Size
+	    constexpr size_type size() const noexcept {
+	        return data_.size();
 	    }
 
-	    bool contains(const key_type& key) const {
-	        std::shared_lock lock(mutex_);
-	        return map_.contains(key);
-	    }
+	    // Iterators
+	    iterator begin() noexcept { return data_.begin(); }
+	    const_iterator begin() const noexcept { return data_.begin(); }
+	    iterator end() noexcept { return data_.end(); }
+	    const_iterator end() const noexcept { return data_.end(); }
 
-	    auto find(const key_type& key) {
-	        std::shared_lock lock(mutex_);
-	        return map_.find(key);
-	    }
+	    // Direct access to underlying array
+	    std::array<T, enum_size<Enum>()>& array() { return data_; }
+	    const std::array<T, enum_size<Enum>()>& array() const { return data_; }
 
-	    auto find(const key_type& key) const {
-	        std::shared_lock lock(mutex_);
-	        return map_.find(key);
-	    }
-
-		auto begin() {
-	        std::shared_lock lock(mutex_);
-		    return map_.begin();
-	    }
-
-		auto begin() const {
-	        std::shared_lock lock(mutex_);
-		    return map_.begin();
-	    }
-
-		auto end() {
-	        std::shared_lock lock(mutex_);
-		    return map_.end();
-	    }
-
-		auto end() const {
-	        std::shared_lock lock(mutex_);
-		    return map_.end();
-	    }
-
-	    // Apply function to all elements (read-only)
-	    template<typename Func>
-	    void for_each(Func func) const {
-	        std::shared_lock lock(mutex_);
-	        for (const auto& [key, value] : map_) {
-	            func(key, value);
-	        }
-	    }
-
-	    // Apply function to all elements (modifying)
-	    template<typename Func>
-	    void apply(Func func) {
-	        std::unique_lock lock(mutex_);
-	        func(map_);
-	    }
-
-	    // Get a snapshot of the map
-	    Container snapshot() const {
-	        std::shared_lock lock(mutex_);
-	        return map_;
+	    // Fill with value
+	    void fill(const T& value) {
+	        data_.fill(value);
 	    }
 	};
-
-	// Convenience aliases for specific container types
-	template<typename Key, typename Compare = std::less<Key>, typename Allocator = std::allocator<Key>>
-	using set = safe_set<Key, Compare, Allocator, std::set<Key, Compare, Allocator>>;
-
-	template<typename Key, typename Compare = std::less<Key>, typename Allocator = std::allocator<Key>>
-	using multiset = safe_set<Key, Compare, Allocator, std::multiset<Key, Compare, Allocator>>;
-
-	template<typename Key, typename T, typename Compare = std::less<Key>,
-			 typename Allocator = std::allocator<std::pair<const Key, T>>>
-	using map = safe_map<Key, T, Compare, Allocator, std::map<Key, T, Compare, Allocator>>;
-
-	template<typename Key, typename T, typename Compare = std::less<Key>,
-			 typename Allocator = std::allocator<std::pair<const Key, T>>>
-	using multimap = safe_map<Key, T, Compare, Allocator, std::multimap<Key, T, Compare, Allocator>>;
 } // namespace plg

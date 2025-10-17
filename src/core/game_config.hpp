@@ -37,11 +37,11 @@ private:
 private:
 	plg::string m_gameDir;
 	plg::vector<plg::string> m_paths;
-	std::unordered_map<plg::string, int32_t, plg::string_hash, std::equal_to<>> m_offsets;
-	std::unordered_map<plg::string, plg::string, plg::string_hash, std::equal_to<>> m_signatures;
-	std::unordered_map<plg::string, AddressConf, plg::string_hash, std::equal_to<>> m_addresses;
-	std::unordered_map<plg::string, plg::string, plg::string_hash, std::equal_to<>> m_libraries;
-	std::unordered_map<plg::string, plg::string, plg::string_hash, std::equal_to<>> m_patches;
+	plg::flat_hash_map<plg::string, int32_t, plg::string_hash, std::equal_to<>> m_offsets;
+	plg::flat_hash_map<plg::string, plg::string, plg::string_hash, std::equal_to<>> m_signatures;
+	plg::flat_hash_map<plg::string, AddressConf, plg::string_hash, std::equal_to<>> m_addresses;
+	plg::flat_hash_map<plg::string, plg::string, plg::string_hash, std::equal_to<>> m_libraries;
+	plg::flat_hash_map<plg::string, plg::string, plg::string_hash, std::equal_to<>> m_patches;
 	size_t m_refCount{1};
 };
 
@@ -56,9 +56,10 @@ public:
 	Module* GetModule(std::string_view name);
 
 private:
-	plg::map<uint32_t, GameConfig> m_configs;
-	plg::map<plg::string, Module> m_modules;
-	static inline std::atomic<uint32_t> s_nextId{static_cast<uint32_t>(-1)};
+	plg::flat_hash_map<uint32_t, std::unique_ptr<GameConfig>> m_configs;
+	plg::flat_hash_map<plg::string, std::unique_ptr<Module>, plg::string_hash, std::equal_to<>> m_modules;
+	std::mutex m_mutex;
+	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
 };
 
 extern GameConfigManager g_GameConfigManager;

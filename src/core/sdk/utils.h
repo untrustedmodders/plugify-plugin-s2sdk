@@ -62,7 +62,7 @@ namespace utils {
 
 }// namespace utils
 
-enum class FieldType : int {
+enum class FieldType {
 	Auto,
 	Float32,
 	Float64,

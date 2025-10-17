@@ -31,7 +31,7 @@ struct ClientAddonInfo {
 	PublishedFileId_t currentPendingAddon;
 };
 
-std::unordered_map<uint64, ClientAddonInfo> g_ClientAddons;
+plg::parallel_flat_hash_map<uint64, ClientAddonInfo> g_ClientAddons;
 
 CConVar<CUtlString> s2_extra_addons("s2_extra_addons", FCVAR_NONE, "The workshop IDs of extra addons separated by commas, addons will be downloaded (if not present) and mounted", CUtlString(""),
 	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
@@ -378,11 +378,12 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 				// Client is already loading, telling them to reload now will actually just disconnect them. ("Received signon %i when at %i\n" in client console)
 				if (client->GetSignonState() == SIGNONSTATE_CHANGELEVEL)
 					break;
-				// Client still has addons to load anyway, they don't need to be told to reload
-				if (g_ClientAddons[steamID64].currentPendingAddon != 0)
-					break;
 
 				ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
+
+				// Client still has addons to load anyway, they don't need to be told to reload
+				if (clientInfo.currentPendingAddon != 0)
+					break;
 
 				plg::vector<PublishedFileId_t> addons = GetClientAddons(steamID64);
 
@@ -727,7 +728,8 @@ void MultiAddonManager::OnClientConnect(CPlayerSlot slot, const char* name, uint
 		// Reset the current pending addon anyway, SendNetMessage tells us which addon to download next.
 		clientInfo.currentPendingAddon = 0;
 	}
-	g_ClientAddons[steamID64].lastActiveTime = Plat_FloatTime();
+
+	clientInfo.lastActiveTime = Plat_FloatTime();
 }
 
 void MultiAddonManager::OnClientDisconnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID) {

@@ -5,11 +5,11 @@ bool EntityOutputManager::HookEntityOutput(plg::string classname, plg::string ou
 
 	auto it = m_hookMap.find(outputKey);
 	if (it == m_hookMap.end()) {
-		auto& callbackPair = m_hookMap.emplace(std::move(outputKey), CallbackPair{}).first->second;
-		return callbackPair.callbacks[static_cast<size_t>(mode)].Register(callback);
+		auto& callbackPair = *m_hookMap.emplace(std::move(outputKey), std::make_unique<CallbackPair>()).first->second;
+		return callbackPair.callbacks[mode].Register(callback);
 	} else {
-		auto& callbackPair = it->second;
-		return callbackPair.callbacks[static_cast<size_t>(mode)].Register(callback);
+		auto& callbackPair = *it->second;
+		return callbackPair.callbacks[mode].Register(callback);
 	}
 }
 
@@ -18,9 +18,9 @@ bool EntityOutputManager::UnhookEntityOutput(plg::string classname, plg::string 
 
 	auto it = m_hookMap.find(outputKey);
 	if (it != m_hookMap.end()) {
-		auto& callbackPair = it->second;
-		auto status = callbackPair.callbacks[static_cast<size_t>(mode)].Unregister(callback);
-		if (callbackPair.callbacks[0].Empty() && callbackPair.callbacks[1].Empty()) {
+		auto& callbackPair = *it->second;
+		auto status = callbackPair.callbacks[mode].Unregister(callback);
+		if (callbackPair.callbacks[HookMode::Pre].Empty() && callbackPair.callbacks[HookMode::Post].Empty()) {
 			m_hookMap.erase(it);
 		}
 		return status;
@@ -46,7 +46,7 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 		for (const auto& searchKey : searchKeys) {
 			auto it = m_hookMap.find(searchKey);
 			if (it != m_hookMap.end()) {
-				m_vecCallbackPairs.emplace_back(&it->second);
+				m_vecCallbackPairs.emplace_back(it->second.get());
 			}
 		}
 	} else {
@@ -59,9 +59,9 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 	int callerHandle = caller != nullptr ? caller->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
 
 	for (const auto& pCallbackPair : m_vecCallbackPairs) {
-		auto& cb = pCallbackPair->callbacks[0];
-		for (size_t i = 0; i < cb.GetCount(); ++i) {
-			auto thisResult = cb.Notify(i, activatorHandle, callerHandle, delay);
+		auto funcs = pCallbackPair->callbacks[HookMode::Pre].AsView();
+		for (const auto& func : funcs) {
+			auto thisResult = func(activatorHandle, callerHandle, delay);
 			if (thisResult >= ResultType::Stop) {
 				break;
 			}
@@ -80,8 +80,8 @@ ResultType EntityOutputManager::FireOutputInternal_Post(CEntityIOOutput* self, C
 	int callerHandle = caller != nullptr ? caller->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 
 	for (const auto& pCallbackPair : m_vecCallbackPairs) {
-		auto& cb = pCallbackPair->callbacks[1];
-		cb.Notify(activatorHandle, callerHandle, delay);
+		auto& callback = pCallbackPair->callbacks[HookMode::Post];
+		callback(activatorHandle, callerHandle, delay);
 	}
 
 	return ResultType::Continue;

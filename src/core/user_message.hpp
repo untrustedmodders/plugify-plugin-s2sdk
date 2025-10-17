@@ -7,26 +7,27 @@
 
 namespace pb = google::protobuf;
 
-#define GETCHECK_FIELD()                                                                           \
-	const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(std::string(fieldName)); \
-	if (!field) {                                                                                  \
-		plg::print(                                                                                   \
-		    LS_WARNING,                                                                            \
-		    "Field '{}' not found in message '{}'\n",                                              \
-		    fieldName,                                                                             \
-		    m_msg->GetDescriptor()->name()                                                         \
-		);                                                                                         \
-		return false;                                                                              \
+#define GETCHECK_FIELD()                                                                             \
+	const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(std::string(fieldName \
+	));                                                                                              \
+	if (!field) {                                                                                    \
+		plg::print(                                                                                  \
+			LS_WARNING,                                                                              \
+			"Field '{}' not found in message '{}'\n",                                                \
+			fieldName,                                                                               \
+			m_msg->GetDescriptor()->name()                                                           \
+		);                                                                                           \
+		return false;                                                                                \
 	}
 
 #define CHECK_FIELD_TYPE(type)                                                                     \
-	if (field->cpp_type() != pb::FieldDescriptor::CPPTYPE_## type) {                                \
-		plg::print(                                                                                   \
-		    LS_WARNING,                                                                            \
-		    "Field '{}' has wrong type: expected {}, got {}\n",                                    \
-		    field->name(),                                                                         \
-		    #type,                                                                                 \
-		    field->cpp_type_name()                                                                 \
+	if (field->cpp_type() != pb::FieldDescriptor::CPPTYPE_##type) {                                \
+		plg::print(                                                                                \
+			LS_WARNING,                                                                            \
+			"Field '{}' has wrong type: expected {}, got {}\n",                                    \
+			field->name(),                                                                         \
+			#type,                                                                                 \
+			field->cpp_type_name()                                                                 \
 		);                                                                                         \
 		return false;                                                                              \
 	}
@@ -34,15 +35,15 @@ namespace pb = google::protobuf;
 #define CHECK_FIELD_TYPE2(type1, type2)                                                            \
 	{                                                                                              \
 		pb::FieldDescriptor::CppType fieldType = field->cpp_type();                                \
-		if (fieldType != pb::FieldDescriptor::CPPTYPE_## type1                                      \
-		    && fieldType != pb::FieldDescriptor::CPPTYPE_## type2) {                                \
-			plg::print(                                                                               \
-			    LS_WARNING,                                                                        \
-			    "Field '{}' has wrong type: expected {} or {}, got {}\n",                          \
-			    field->name(),                                                                     \
-			    #type1,                                                                            \
-			    #type2,                                                                            \
-			    fieldType                                                                          \
+		if (fieldType != pb::FieldDescriptor::CPPTYPE_##type1                                      \
+			&& fieldType != pb::FieldDescriptor::CPPTYPE_##type2) {                                \
+			plg::print(                                                                            \
+				LS_WARNING,                                                                        \
+				"Field '{}' has wrong type: expected {} or {}, got {}\n",                          \
+				field->name(),                                                                     \
+				#type1,                                                                            \
+				#type2,                                                                            \
+				fieldType                                                                          \
 			);                                                                                     \
 			return false;                                                                          \
 		}                                                                                          \
@@ -51,17 +52,17 @@ namespace pb = google::protobuf;
 #define CHECK_FIELD_TYPE3(type1, type2, type3)                                                     \
 	{                                                                                              \
 		pb::FieldDescriptor::CppType fieldType = field->cpp_type();                                \
-		if (fieldType != pb::FieldDescriptor::CPPTYPE_## type1                                      \
-		    && fieldType != pb::FieldDescriptor::CPPTYPE_## type2                                   \
-		    && fieldType != pb::FieldDescriptor::CPPTYPE_## type3) {                                \
-			plg::print(                                                                               \
-			    LS_WARNING,                                                                        \
-			    "Field '{}' has wrong type: expected {}, {}, or {}, got {}\n",                     \
-			    field->name(),                                                                     \
-			    #type1,                                                                            \
-			    #type2,                                                                            \
-			    #type3,                                                                            \
-			    fieldType                                                                          \
+		if (fieldType != pb::FieldDescriptor::CPPTYPE_##type1                                      \
+			&& fieldType != pb::FieldDescriptor::CPPTYPE_##type2                                   \
+			&& fieldType != pb::FieldDescriptor::CPPTYPE_##type3) {                                \
+			plg::print(                                                                            \
+				LS_WARNING,                                                                        \
+				"Field '{}' has wrong type: expected {}, {}, or {}, got {}\n",                     \
+				field->name(),                                                                     \
+				#type1,                                                                            \
+				#type2,                                                                            \
+				#type3,                                                                            \
+				fieldType                                                                          \
 			);                                                                                     \
 			return false;                                                                          \
 		}                                                                                          \
@@ -69,21 +70,21 @@ namespace pb = google::protobuf;
 
 #define CHECK_FIELD_REPEATED()                                                                     \
 	if (field->label() != pb::FieldDescriptor::LABEL_REPEATED) {                                   \
-		plg::print(LS_WARNING, "Field '{}' is not repeated as expected\n", field->name());            \
+		plg::print(LS_WARNING, "Field '{}' is not repeated as expected\n", field->name());         \
 		return false;                                                                              \
 	}
 
 #define CHECK_FIELD_NOT_REPEATED()                                                                 \
 	if (field->label() == pb::FieldDescriptor::LABEL_REPEATED) {                                   \
-		plg::print(LS_WARNING, "Field '{}' should not be repeated\n", field->name());                 \
+		plg::print(LS_WARNING, "Field '{}' should not be repeated\n", field->name());              \
 		return false;                                                                              \
 	}
 
-#define CHECK_REPEATED_ELEMENT(idx)                                                                      \
-	int elemCount = m_msg->GetReflection()->FieldSize(*m_msg, field);                                    \
-	if (elemCount == 0 || idx >= elemCount || idx < 0) {                                                 \
+#define CHECK_REPEATED_ELEMENT(idx)                                                                         \
+	int elemCount = m_msg->GetReflection()->FieldSize(*m_msg, field);                                       \
+	if (elemCount == 0 || idx >= elemCount || idx < 0) {                                                    \
 		plg::print(LS_WARNING, "Field '{}' invalid index {} (size = {})\n", field->name(), idx, elemCount); \
-		return false;                                                                                    \
+		return false;                                                                                       \
 	}
 
 class INetworkMessageInternal;

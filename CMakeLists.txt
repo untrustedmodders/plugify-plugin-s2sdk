@@ -71,6 +71,12 @@ add_subdirectory(external/configs)
 add_subdirectory(external/dynlibutils)
 
 #
+# Maps
+#
+add_subdirectory(external/parallel-hashmap)
+include_directories(external/parallel-hashmap)
+
+#
 # V8
 #
 set(V8_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/v8/include/")

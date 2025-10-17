@@ -11,8 +11,8 @@ ConVarManager::~ConVarManager() {
 	g_pCVar->RemoveGlobalChangeCallback(&ChangeDefault);
 	g_pCVar->RemoveGlobalChangeCallback(&ChangeGlobal);
 
-	for (const auto& [cv, _]: m_cnvCache) {
-		g_pCVar->UnregisterConVarCallbacks(*cv);
+	for (const auto& [_, cv]: m_cnvLookup) {
+		g_pCVar->UnregisterConVarCallbacks(*cv->conVar);
 	}
 
 	//ConVar_Unregister();
@@ -35,7 +35,6 @@ ConVarInfo::ConVarInfo(plg::string name, plg::string description) : name(std::mo
 bool ConVarManager::RemoveConVar(const plg::string& name) {
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
-		m_cnvCache.erase(it->second->conVar.get());
 		m_cnvLookup.erase(it);
 		return true;
 	}
@@ -51,7 +50,6 @@ ConVarRef ConVarManager::FindConVar(const plg::string& name) {
 
 	auto& conVarInfo = *m_cnvLookup.emplace(name, std::make_unique<ConVarInfo>(name, "")).first->second;
 	conVarInfo.conVar = std::make_unique<ConVarRefAbstract>(name.c_str(), true);
-	m_cnvCache.emplace(conVarInfo.conVar.get(), &conVarInfo);
 
 	if (!conVarInfo.conVar->IsValidRef()) {
 		plg::print(LS_WARNING, "Failed to find \"{}\" convar\n", name);
@@ -90,18 +88,16 @@ bool ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeList
 }
 
 void ConVarManager::ChangeDefault(ConVarRefAbstract* ref, CSplitScreenSlot , const char* newValue, const char* oldValue, void*) {
-	auto it = g_ConVarManager.m_cnvCache.find(ref);
-	if (it != g_ConVarManager.m_cnvCache.end()) {
+	std::string_view name = ref->GetName();
+	auto it = g_ConVarManager.m_cnvLookup.find(name);
+	if (it != g_ConVarManager.m_cnvLookup.end()) {
 		auto& conVarInfo = *it->second;
-		conVarInfo.hook.Notify(*ref, newValue, oldValue);
+		conVarInfo.hook(*ref, newValue, oldValue);
 	}
 }
 
 void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot, const char* newValue, const char* oldValue, void*) {
-	auto& cb = g_ConVarManager.m_globalCallbacks;
-	if (!cb.Empty()) {
-		cb.Notify(*ref, newValue, oldValue);
-	}
+	g_ConVarManager.m_globalCallbacks(*ref, newValue, oldValue);
 }
 
 struct ConVal {

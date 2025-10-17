@@ -8,7 +8,7 @@ class UserMessage;
 using UserMessageCallback = ResultType (*)(UserMessage* message);
 
 struct UserMessageHook {
-	std::array<ListenerManager<UserMessageCallback>, 2> callbacks;
+	plg::enum_map<ListenerManager<UserMessageCallback>, HookMode> callbacks;
 };
 
 class UserMessageManager {
@@ -22,7 +22,7 @@ public:
 	ResultType ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode);
 
 private:
-	plg::map<int16_t, UserMessageHook> m_hooksMap;
+	plg::parallel_flat_hash_map<int16_t, std::unique_ptr<UserMessageHook>> m_hooksMap;
 	UserMessageHook m_global;
 };
 

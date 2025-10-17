@@ -23,11 +23,9 @@ struct ConCommandInfo {
 	uint64 adminFlags{};
 	ConCommandData* command{};
 	ConCommandRef commandRef{};
-	std::array<ListenerManager<CommandListenerCallback>, 2> callbacks;
+	plg::enum_map<ListenerManager<CommandListenerCallback>, HookMode> callbacks;
 	bool defaultCommand{};
 };
-
-using CommandInfoPtr = std::unique_ptr<ConCommandInfo>;
 
 class ConCommandManager {
 public:
@@ -44,9 +42,8 @@ public:
 	ResultType ExecuteCommandCallbacks(const plg::string& name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext);
 
 private:
-	//std::vector<ConCommandInfo*> m_cmdList;
-	plg::map<plg::string, CommandInfoPtr, plg::case_insensitive_equal> m_cmdLookup;
-	std::array<ListenerManager<CommandListenerCallback>, 2> m_globalCallbacks;
+	plg::parallel_flat_hash_map<plg::string, std::unique_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
+	plg::enum_map<ListenerManager<CommandListenerCallback>, HookMode> m_globalCallbacks;
 };
 
 extern ConCommandManager g_CommandManager;

@@ -252,25 +252,34 @@ GameConfigManager::GameConfigManager() {
 #else
 		int flags = RTLD_LAZY | RTLD_NOLOAD;
 #endif
-		Module engine2;
-		engine2.LoadFromPath(plg::as_string(utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2"), flags);
-		if (engine2) {
+		auto engine2 = std::make_unique<Module>();
+		engine2->LoadFromPath(plg::as_string(utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2"), flags);
+		if (engine2->IsValid()) {
 			m_modules.emplace("engine2", std::move(engine2));
 		}
-		Module server;
-		server.LoadFromPath(plg::as_string(utils::GameDirectory() / S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server"), flags);
-		if (server) {
+		auto server = std::make_unique<Module>();
+		server->LoadFromPath(plg::as_string(utils::GameDirectory() / S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server"), flags);
+		if (server->IsValid()) {
 			m_modules.emplace("server", std::move(server));
 		}
 	} else {
-		m_modules.try_emplace("engine2", "engine2");
-		m_modules.try_emplace("server", "server");
+		auto engine2 = std::make_unique<Module>("engine2");
+		if (engine2->IsValid()) {
+			m_modules.emplace("engine2", std::move(engine2));
+		}
+		auto server = std::make_unique<Module>("server");
+		if (server->IsValid()) {
+			m_modules.emplace("server", std::move(server));
+		}
 	}
 	// add more for preload
 }
 
 uint32_t GameConfigManager::LoadGameConfigFile(plg::vector<plg::string> paths) {
-	for (auto& [id, config] : m_configs) {
+	std::scoped_lock lock(m_mutex);
+
+	for (auto& [id, cfg] : m_configs) {
+		auto& config = *cfg;
 		for (const auto& fullPath : config.GetPaths()) {
 			for (const auto& path : paths) {
 				if (fullPath.ends_with(path)) {
@@ -281,8 +290,8 @@ uint32_t GameConfigManager::LoadGameConfigFile(plg::vector<plg::string> paths) {
 		}
 	}
 
-	GameConfig gameConfig(S2SDK_GAME_NAME, std::move(paths));
-	if (!gameConfig.Initialize()) {
+	auto gameConfig = std::make_unique<GameConfig>(S2SDK_GAME_NAME, std::move(paths));
+	if (!gameConfig->Initialize()) {
 		return static_cast<uint32_t>(-1);
 	}
 
@@ -292,9 +301,11 @@ uint32_t GameConfigManager::LoadGameConfigFile(plg::vector<plg::string> paths) {
 }
 
 void GameConfigManager::CloseGameConfigFile(uint32_t id) {
+	std::scoped_lock lock(m_mutex);
+
 	auto it = m_configs.find(id);
 	if (it != m_configs.end()) {
-		auto& config = it->second;
+		auto& config = *it->second;
 		if (--config.m_refCount == 0) {
 			m_configs.erase(it);
 		}
@@ -302,20 +313,25 @@ void GameConfigManager::CloseGameConfigFile(uint32_t id) {
 }
 
 GameConfig* GameConfigManager::GetGameConfig(uint32_t id) {
+	std::scoped_lock lock(m_mutex);
+
 	auto it = m_configs.find(id);
 	if (it != m_configs.end()) {
-		return &it->second;
+		return it->second.get();
 	}
+
 	return nullptr;
 }
 
 Module* GameConfigManager::GetModule(std::string_view name) {
+	std::scoped_lock lock(m_mutex);
+
 	auto it = m_modules.find(name);
 	if (it != m_modules.end()) {
-		return &it->second;
+		return it->second.get();
 	}
 
-	return &m_modules.try_emplace(name, Module{name}).first->second;
+	return m_modules.emplace(name, std::make_unique<Module>(name)).first->second.get();
 }
 
 GameConfigManager g_GameConfigManager;

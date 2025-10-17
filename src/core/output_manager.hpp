@@ -10,7 +10,7 @@ using OutputKey = std::pair<plg::string, plg::string>;
 using EntityListenerCallback = ResultType (*)(int activatorHandle, int callerHandle, float delay);
 
 struct CallbackPair {
-	std::array<ListenerManager<EntityListenerCallback>, 2> callbacks;
+	plg::enum_map<ListenerManager<EntityListenerCallback>, HookMode> callbacks;
 };
 
 class EntityOutputManager {
@@ -25,7 +25,7 @@ public:
 	ResultType FireOutputInternal_Post(CEntityIOOutput* self, CEntityInstance* activator, CEntityInstance* caller, float delay);
 
 private:
-	plg::map<OutputKey, CallbackPair> m_hookMap;
+	plg::parallel_flat_hash_map<OutputKey, std::unique_ptr<CallbackPair>, plg::pair_hash<plg::string, plg::string>> m_hookMap;
 	plg::inplace_vector<CallbackPair*, 4> m_vecCallbackPairs;
 };
 

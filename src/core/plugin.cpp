@@ -57,7 +57,7 @@ poly::ReturnAction Hook_StartupServer(poly::PHook& hook, poly::Params& params, i
 		return poly::ReturnAction::Ignored;
 	}
 
-	GetOnServerStartupListenerManager().Notify();
+	GetOnServerStartupListenerManager()();
 
 	return poly::ReturnAction::Ignored;
 }
@@ -75,12 +75,12 @@ poly::ReturnAction Hook_DisconnectGameNow(poly::PHook& hook, poly::Params& param
 
 		g_TimerSystem.OnMapEnd();
 
-		GetOnMapEndListenerManager().Notify();
+		GetOnMapEndListenerManager()();
 	}
 
 	if (reason == NETWORK_DISCONNECT_REQUEST_HOSTSTATE_IDLE) {
 		ExecuteOnce( {
-			GetOnServerStartedListenerManager().Notify();
+			GetOnServerStartedListenerManager()();
 		});
 	}
 
@@ -119,7 +119,7 @@ poly::ReturnAction Hook_ActivateServer(poly::PHook& hook, poly::Params& params, 
 
 	g_Precached.clear();
 
-	GetOnServerActivateListenerManager().Notify();
+	GetOnServerActivateListenerManager()();
 
 	return poly::ReturnAction::Ignored;
 }
@@ -127,7 +127,7 @@ poly::ReturnAction Hook_ActivateServer(poly::PHook& hook, poly::Params& params, 
 poly::ReturnAction Hook_SpawnServer(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	plg::print(LS_DETAILED, "[SpawnServer]\n");
 
-	GetOnServerSpawnListenerManager().Notify();
+	GetOnServerSpawnListenerManager()();
 
 	return poly::ReturnAction::Ignored;
 }
@@ -184,7 +184,7 @@ poly::ReturnAction Hook_GameFrame(poly::PHook& hook, poly::Params& params, int c
 	g_ServerManager.OnGameFrame();
 	g_TimerSystem.OnGameFrame(simulating);
 
-	GetOnGameFrameListenerManager().Notify(simulating, bFirstTick, bLastTick);
+	GetOnGameFrameListenerManager()(simulating, bFirstTick, bLastTick);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -200,7 +200,7 @@ poly::ReturnAction Hook_ClientActive(poly::PHook& hook, poly::Params& params, in
 	g_MultiAddonManager.OnClientActive(slot, bLoadGame, name, steamID64);
 	g_PlayerManager.OnClientActive(slot, bLoadGame);
 
-	GetOnClientActiveListenerManager().Notify(slot, bLoadGame);
+	GetOnClientActiveListenerManager()(slot, bLoadGame);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -244,7 +244,7 @@ poly::ReturnAction Hook_ClientSettingsChanged(poly::PHook& hook, poly::Params& p
 
 	plg::print(LS_DETAILED, "[ClientSettingsChanged] = {}\n", slot);
 
-	GetOnClientSettingsChangedListenerManager().Notify(slot);
+	GetOnClientSettingsChangedListenerManager()(slot);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -269,7 +269,7 @@ poly::ReturnAction Hook_ClientFullyConnect(poly::PHook& hook, poly::Params& para
 
 	plg::print(LS_DETAILED, "[ClientFullyConnect] = {}\n", slot);
 
-	GetOnClientFullyConnectListenerManager().Notify(slot);
+	GetOnClientFullyConnectListenerManager()(slot);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -328,7 +328,7 @@ poly::ReturnAction Hook_GameServerSteamAPIActivated(poly::PHook& hook, poly::Par
 	g_PlayerManager.OnSteamAPIActivated();
 	g_MultiAddonManager.OnSteamAPIActivated();
 
-	//GetOnGameServerSteamAPIActivatedListenerManager().Notify();
+	//GetOnGameServerSteamAPIActivatedListenerManager()();
 	return poly::ReturnAction::Ignored;
 }
 
@@ -337,7 +337,7 @@ poly::ReturnAction Hook_GameServerSteamAPIDeactivated(poly::PHook& hook, poly::P
 
 	//g_http = nullptr;
 
-	//GetOnGameServerSteamAPIDeactivatedListenerManager().Notify();
+	//GetOnGameServerSteamAPIDeactivatedListenerManager()();
 	return poly::ReturnAction::Ignored;
 }
 
@@ -345,7 +345,7 @@ poly::ReturnAction Hook_UpdateWhenNotInGame(poly::PHook& hook, poly::Params& par
 	// float flFrameTime
 	auto frameTime = poly::GetArgument<float>(params, 1);
 	//plg::print(LS_DETAILED, "UpdateWhenNotInGame = {}\n", frameTime);
-	GetOnUpdateWhenNotInGameListenerManager().Notify(frameTime);
+	GetOnUpdateWhenNotInGameListenerManager()(frameTime);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -356,7 +356,7 @@ poly::ReturnAction Hook_PreWorldUpdate(poly::PHook& hook, poly::Params& params, 
 
 	g_ServerManager.OnPreWorldUpdate();
 
-	GetOnPreWorldUpdateListenerManager().Notify(simulating);
+	GetOnPreWorldUpdateListenerManager()(simulating);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -385,7 +385,7 @@ poly::ReturnAction Hook_TerminateRound(poly::PHook& hook, poly::Params& params, 
 
 	g_pGameRules->m_bGameRestart = false;
 
-	GetOnRoundTerminatedListenerManager().Notify(delay, reason);
+	GetOnRoundTerminatedListenerManager()(delay, reason);
 
 	return poly::ReturnAction::Ignored;
 }
@@ -461,7 +461,7 @@ poly::ReturnAction Hook_OnAddEntity(poly::PHook& hook, poly::Params& params, int
 	}
 #endif
 
-	GetOnEntityCreatedListenerManager().Notify(handle.ToInt());
+	GetOnEntityCreatedListenerManager()(handle.ToInt());
 	return poly::ReturnAction::Ignored;
 }
 
@@ -478,7 +478,7 @@ poly::ReturnAction Hook_OnRemoveEntity(poly::PHook& hook, poly::Params& params, 
 	}
 #endif
 
-	GetOnEntityDeletedListenerManager().Notify(handle.ToInt());
+	GetOnEntityDeletedListenerManager()(handle.ToInt());
 	return poly::ReturnAction::Ignored;
 }
 
@@ -486,7 +486,7 @@ poly::ReturnAction Hook_OnEntityParentChanged(poly::PHook& hook, poly::Params& p
 	auto entity = poly::GetArgument<CBaseEntity*>(params, 1);
 	auto newParent = poly::GetArgument<CBaseEntity*>(params, 2);
 
-	GetOnEntityParentChangedListenerManager().Notify(entity->GetRefEHandle().ToInt(), newParent ? newParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
+	GetOnEntityParentChangedListenerManager()(entity->GetRefEHandle().ToInt(), newParent ? newParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
 	return poly::ReturnAction::Ignored;
 }
 

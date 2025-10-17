@@ -2,12 +2,13 @@
 
 #include <concepts>
 
-enum class HookMode : bool {
+enum class HookMode : uint8 {
 	Pre,
 	Post,
+	Count,
 };
 
-enum class ResultType : int {
+enum class ResultType {
 	Continue = 0,
 	Changed = 1,
 	Handled = 2,
@@ -20,77 +21,78 @@ class ListenerManager;
 template<class Ret, class... Args>
 class ListenerManager<Ret (*)(Args...)> {
 public:
-	using Func = Ret (*)(Args...);
+    template<typename Callable>
+        requires std::invocable<Callable, Args...> &&
+                 std::convertible_to<std::invoke_result_t<Callable, Args...>, Ret>
+    bool Register(Callable callable)
+    {
+        std::scoped_lock lock(m_mutex);
+        for (auto& f : m_callables) {
+            if (f == callable) {
+                return false;
+            }
+        }
 
-	template<typename Callable>
-	bool Register(Callable&& callable)
-		requires std::invocable<Callable, Args...>
-	{
-		// Is the callable already in the vector?
-		if (IsRegistered(callable)) {
-			//plg::print(LS_WARNING, "Callback already registered.\n");
-			return false;
-		} else {
-			m_callables.emplace_back(callable);
-			return true;
-		}
-	}
+        m_callables.push_back(callable);
+        return true;
+    }
 
-	template<typename Callable>
-	bool Unregister(Callable&& callable)
-		requires std::invocable<Callable, Args...>
-	{
-		auto index = Find(callable);
-		if (index == -1) {
-			//plg::print(LS_WARNING, "Callback not registered.\n");
-			return false;
-		} else {
-			m_callables.erase(m_callables.begin() + index);
-			return true;
-		}
-	}
+    template<typename Callable>
+        requires std::invocable<Callable, Args...> &&
+                 std::convertible_to<std::invoke_result_t<Callable, Args...>, Ret>
+    bool Unregister(Callable callable)
+    {
+        std::scoped_lock lock(m_mutex);
 
-	template<typename Callable>
-	ptrdiff_t Find(Callable&& callable) const {
-		for (size_t i = 0; i < m_callables.size(); ++i) {
-			if (callable == m_callables[i]) {
-				return static_cast<ptrdiff_t>(i);
-			}
-		}
-		return -1;
-	}
+        for (auto it = m_callables.begin(); it != m_callables.end(); ++it) {
+            if (*it == callable) {
+                m_callables.erase(it);  // no need for prev
+                return true;
+            }
+        }
+        return false;
+    }
 
-	template<typename Callable>
-	bool IsRegistered(Callable&& callable) const {
-		return Find(callable) != -1;
-	}
+    template <typename... Params>
+    void operator()(Params&&... params) const {
+        std::scoped_lock lock(m_mutex);
+        for (const auto& f : m_callables) {
+            f(std::forward<Params>(params)...);
+        }
+    }
 
-	void Notify(Args... args) const {
-		for (size_t i = 0; i < m_callables.size(); ++i) {
-			m_callables[i](std::forward<Args>(args)...);
-		}
-	}
+    class SafeView {
+    public:
+        SafeView(ListenerManager* self) : m_self(*self) {
+            m_self.m_mutex.lock();
+        }
 
-	Ret Notify(size_t index, Args... args) const {
-		return m_callables[index](std::forward<Args>(args)...);
-	}
+        ~SafeView() {
+            m_self.m_mutex.unlock();
+        }
 
-	Ret operator()(size_t index, Args... args) const {
-		return m_callables[index](std::forward<Args>(args)...);
-	}
+        auto begin() const { return m_self.m_callables.begin(); }
+        auto end() const { return m_self.m_callables.end(); }
 
-	void Clear() {
-		m_callables.clear();
-	}
+    private:
+        ListenerManager& m_self;
+    };
 
-	size_t GetCount() const {
-		return m_callables.size();
-	}
+    SafeView AsView() {
+        return { this };
+    }
 
-	bool Empty() const {
-		return m_callables.empty();
-	}
+    void Clear() {
+        std::scoped_lock lock(m_mutex);
+        m_callables.clear();
+    }
+
+    bool Empty() const {
+        std::scoped_lock lock(m_mutex);
+        return m_callables.empty();
+    }
 
 private:
-	std::vector<Func> m_callables;
+    mutable std::recursive_mutex m_mutex;
+    std::list<Ret (*)(Args...)> m_callables;
 };
