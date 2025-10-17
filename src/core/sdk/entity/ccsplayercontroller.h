@@ -91,3 +91,4 @@ public:
 		static int offset = g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn");
 		CALL_VIRTUAL(void, offset, this);
 	}
+};

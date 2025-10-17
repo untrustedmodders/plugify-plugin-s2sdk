@@ -35,12 +35,17 @@ namespace cvars {
 		if (auto conVar = CreateConVar(conVarHandle)) {
 			SetConVarString(*conVar, value, replicate, notify);
 		} else {
-			plg::print(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error());
 		}
 	}
 
 	template<typename T>
-	void SetConVarInternal(ConVarRefAbstract conVar, const T& value, bool replicate, bool notify) {
+	void SetConVar(ConVarRefAbstract conVar, const T& value, bool replicate, bool notify) {
+		if (conVar.GetType() != TranslateConVarType<T>()) {
+			plg::print(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
+			return;
+		}
+
 		conVar.SetAs<T>(value);
 
 		if (notify || replicate) {
@@ -67,21 +72,11 @@ namespace cvars {
 	}
 
 	template<typename T>
-	void SetConVar(ConVarRefAbstract conVar, const T& value, bool replicate, bool notify) {
-		if (conVar.GetType() != TranslateConVarType<T>()) {
-			plg::print(LS_WARNING, "Invalid cvar type for variable '{}'. Expected: '{}', but got: '{}'. Please ensure the type matches the expected type.\n", conVar.GetName(), conVar.TypeTraits()->m_TypeName, GetCvarTypeTraits(TranslateConVarType<T>())->m_TypeName);
-			return;
-		}
-
-		SetConVarInternal<T>(conVar, value, replicate, notify);
-	}
-
-	template<typename T>
 	void SetConVarByHandle(uint64 conVarHandle, const T& value, bool replicate, bool notify) {
 		if (auto conVar = CreateConVar(conVarHandle)) {
 			SetConVar<T>(*conVar, value, replicate, notify);
 		} else {
-			plg::print(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error());
 		}
 	}
 	
@@ -200,7 +195,7 @@ namespace cvars {
 					return;
 			}
 		} else {
-			plg::print(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error());
 			return;
 		}
 	}
@@ -230,7 +225,7 @@ namespace cvars {
 		if (auto conVar = CreateConVar(conVarHandle)) {
 			return GetConVarValue<T>(*conVar);
 		} else {
-			plg::print(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error());
 			return {};
 		}
 	}
@@ -286,69 +281,10 @@ namespace cvars {
 					return "<invalid>";
 			}
 		} else {
-			plg::print(LS_WARNING, conVar.error().c_str());
+			plg::print(LS_WARNING, conVar.error());
 			return {};
 		}
 	}
 
 	int SendConVarValueQueryToClient(CPlayerSlot slot, std::string_view cvarName, int queryCvarCookieOverride = -1);
 }
-
-struct ConVal {
-	CVValue_t* cv;
-	EConVarType type;
-};
-
-// format support
-#ifdef FMT_HEADER_ONLY
-namespace fmt {
-#else
-namespace std {
-#endif
-template<>
-struct formatter<ConVal> {
-	constexpr auto parse(std::format_parse_context& ctx) {
-		return ctx.begin();
-	}
-
-	template<class FormatContext>
-	auto format(const ConVal& cv, FormatContext& ctx) const {
-		switch (const auto& [value, type] = cv ;type) {
-			case EConVarType_Bool:
-				return std::format_to(ctx.out(), "{}", value->m_bValue);
-			case EConVarType_Int16:
-				return std::format_to(ctx.out(), "{}", value->m_i16Value);
-			case EConVarType_UInt16:
-				return std::format_to(ctx.out(), "{}", value->m_u16Value);
-			case EConVarType_Int32:
-				return std::format_to(ctx.out(), "{}", value->m_i32Value);
-			case EConVarType_UInt32:
-				return std::format_to(ctx.out(), "{}", value->m_u32Value);
-			case EConVarType_Int64:
-				return std::format_to(ctx.out(), "{}", value->m_i64Value);
-			case EConVarType_UInt64:
-				return std::format_to(ctx.out(), "{}", value->m_u64Value);
-			case EConVarType_Float32:
-				return std::format_to(ctx.out(), "{}", value->m_fl32Value);
-			case EConVarType_Float64:
-				return std::format_to(ctx.out(), "{}", value->m_fl64Value);
-			case EConVarType_String:
-				return std::format_to(ctx.out(), "{}", std::string_view(value->m_StringValue.Get(), static_cast<size_t>(value->m_StringValue.Length())));
-			case EConVarType_Color:
-				return std::format_to(ctx.out(), "{} {} {} {}", value->m_clrValue.r(), value->m_clrValue.g(), value->m_clrValue.b(), value->m_clrValue.a());
-			case EConVarType_Vector2:
-				return std::format_to(ctx.out(), "{} {}", value->m_vec2Value.x, value->m_vec2Value.y);
-			case EConVarType_Vector3:
-				return std::format_to(ctx.out(), "{} {} {}", value->m_vec3Value.x, value->m_vec3Value.y, value->m_vec3Value.z);
-			case EConVarType_Vector4:
-				return std::format_to(ctx.out(), "{} {} {} {}", value->m_vec4Value.x, value->m_vec4Value.y, value->m_vec4Value.z, value->m_vec4Value.w);
-			case EConVarType_Qangle:
-				return std::format_to(ctx.out(), "{} {} {}", value->m_angValue.x, value->m_angValue.y, value->m_angValue.z);
-			case EConVarType_Invalid:
-			case EConVarType_MAX:
-			default:
-				return std::format_to(ctx.out(), "<invalid>");
-		}
-	}
-};
-}// namespace std

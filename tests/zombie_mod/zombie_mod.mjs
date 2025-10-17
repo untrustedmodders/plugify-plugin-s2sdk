@@ -79,7 +79,25 @@ export class ZombieMod extends Plugin {
         zm_human_speed = s2.CreateConVarFloat("zm_human_speed", 1.0, "Speed amount for human", 0, true, 0.0, false, 0.0)
         zm_human_gravity = s2.CreateConVarFloat("zm_human_gravity", 1.0, "Gravity amount for human", 0, true, 0.0, false, 0.0)
 
-        s2.ServerCommand("mp_give_player_c4 0")
+        const mp_autoteambalance   = s2.FindConVar("mp_autoteambalance");
+        const mp_limitteams    = s2.FindConVar("mp_limitteams");
+        const mp_warmuptime    = s2.FindConVar("mp_warmuptime");
+        const mp_do_warmup_period  = s2.FindConVar("mp_do_warmup_period");
+        const mp_roundtime   = s2.FindConVar("mp_roundtime");
+        const mp_roundtime_hostage   = s2.FindConVar("mp_roundtime_hostage");
+        const mp_roundtime_defuse   = s2.FindConVar("mp_roundtime_defuse");
+        const mp_restartgame  = s2.FindConVar("mp_restartgame");
+        const mp_round_restart_delay  = s2.FindConVar("mp_round_restart_delay");
+
+        s2.SetConVar(mp_autoteambalance, 0, true, true);
+        s2.SetConVar(mp_limitteams, 0, true, true);
+        s2.SetConVar(mp_warmuptime, 0, true, true);
+        s2.SetConVar(mp_do_warmup_period, 0, true, true);
+
+        s2.HookConVarChange(mp_autoteambalance,  OnCvarHook);
+        s2.HookConVarChange(mp_limitteams, OnCvarHook);
+        s2.HookConVarChange(mp_warmuptime, OnCvarHook);
+        s2.HookConVarChange(mp_do_warmup_period, OnCvarHook);
 
         const cvars = [zm_delay_time, zm_infect_ratio, zm_human_health, zm_human_armor, zm_human_speed, zm_human_gravity]
         s2.AutoExecConfig(cvars, true, "zombiemod", "")
@@ -100,6 +118,17 @@ export class ZombieMod extends Plugin {
 
         pl.AddCallback(canAcquireFunc, preHook, OnCanAcquire)
     }
+}
+
+/**
+ * Prevent cvars from change
+ * @param conVarHandle
+ * @param newValue
+ * @param oldValue
+ * @constructor
+ */
+function OnCvarHook(conVarHandle, newValue, oldValue) {
+    s2.SetConVar(conVarHandle, 1, true, true);
 }
 
 /**

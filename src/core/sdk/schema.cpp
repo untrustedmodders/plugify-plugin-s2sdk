@@ -34,7 +34,7 @@ static constexpr plg::string g_ChainKey = "__m_pChainEntity";
 
 void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32 networkStateChangedOffset) {
 	NetworkStateChanged_t data(offset);
-	CALL_VIRTUAL(void, networkStateChangedOffset, (void*)networkVar, &data);
+	CALL_VIRTUAL(void, networkStateChangedOffset, reinterpret_cast<void*>(networkVar), &data);
 }
 
 void EntityNetworkStateChanged(uintptr_t entity, uint offset) {
@@ -96,7 +96,7 @@ namespace {
 			field.m_pType->GetSizeAndAlignment(size, alignment);
 			keyValueMap.emplace(field.m_pszName, SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), size, field.m_pType});
 
-			plg::print(LS_DETAILED, "{}::{} found at -> 0x{:x} - {}", className, field.m_pszName, field.m_nSingleInheritanceOffset, &field);
+			plg::print(LS_DETAILED, "{}::{} found at -> 0x{:x} - {}\n", className, field.m_pszName, field.m_nSingleInheritanceOffset, static_cast<const void*>(&field));
 		}
 
 		tableMap.emplace(className, std::move(keyValueMap));

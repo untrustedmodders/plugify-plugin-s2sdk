@@ -963,7 +963,7 @@ extern "C" PLUGIN_API void SwitchClientTeam(int playerSlot, int team) {
 		return;
 	}
 
-	controller->UpdateTeam(team);
+	controller->SwitchTeam(team);
 }
 
 /**
@@ -1093,9 +1093,7 @@ extern "C" PLUGIN_API void SetClientModel(int playerSlot, const plg::string& mod
 		return;
 	}
 
-	plg::print(LS_WARNING, "Try Set {}\n", model);
 	pawn->SetModel(model.c_str());
-	plg::print(LS_WARNING, "Set {}\n", model);
 }
 
 /**

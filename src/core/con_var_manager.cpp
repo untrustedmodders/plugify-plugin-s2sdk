@@ -8,10 +8,25 @@ ConVarManager::~ConVarManager() {
 		return;
 	}
 
+	g_pCVar->RemoveGlobalChangeCallback(&ChangeDefault);
 	g_pCVar->RemoveGlobalChangeCallback(&ChangeGlobal);
+
 	for (const auto& [cv, _]: m_cnvCache) {
 		g_pCVar->UnregisterConVarCallbacks(*cv);
 	}
+
+	//ConVar_Unregister();
+}
+
+void ConVarManager::Init() {
+	if (!g_pCVar) {
+		return;
+	}
+
+	ConVar_Register(FCVAR_RELEASE | FCVAR_SERVER_CAN_EXECUTE | FCVAR_GAMEDLL);
+
+	g_pCVar->InstallGlobalChangeCallback(&ChangeGlobal);
+	g_pCVar->InstallGlobalChangeCallback(&ChangeDefault);
 }
 
 ConVarInfo::ConVarInfo(plg::string name, plg::string description) : name(std::move(name)), description(std::move(description)) {
@@ -48,10 +63,7 @@ ConVarRef ConVarManager::FindConVar(const plg::string& name) {
 
 bool ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
 	if (name.empty()) {
-		if (m_global.Empty()) {
-			g_pCVar->InstallGlobalChangeCallback(&ChangeGlobal);
-		}
-		return m_global.Register(callback);
+		return m_globalCallbacks.Register(callback);
 	}
 
 	auto it = m_cnvLookup.find(name);
@@ -65,11 +77,7 @@ bool ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListen
 
 bool ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
 	if (name.empty()) {
-		bool status = m_global.Unregister(callback);
-		if (m_global.Empty()) {
-			g_pCVar->RemoveGlobalChangeCallback(&ChangeGlobal);
-		}
-		return status;
+		return m_globalCallbacks.Unregister(callback);
 	}
 
 	auto it = m_cnvLookup.find(name);
@@ -81,9 +89,79 @@ bool ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeList
 	return false;
 }
 
-void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot slot, const char* newValue, const char* oldValue, void*) {
-	g_ConVarManager.m_global.Notify(*ref, newValue, oldValue);
+void ConVarManager::ChangeDefault(ConVarRefAbstract* ref, CSplitScreenSlot , const char* newValue, const char* oldValue, void*) {
+	auto it = g_ConVarManager.m_cnvCache.find(ref);
+	if (it != g_ConVarManager.m_cnvCache.end()) {
+		auto& conVarInfo = *it->second;
+		conVarInfo.hook.Notify(*ref, newValue, oldValue);
+	}
 }
+
+void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot, const char* newValue, const char* oldValue, void*) {
+	auto& cb = g_ConVarManager.m_globalCallbacks;
+	if (!cb.Empty()) {
+		cb.Notify(*ref, newValue, oldValue);
+	}
+}
+
+struct ConVal {
+	CVValue_t* cv;
+	EConVarType type;
+};
+
+// format support
+#ifdef FMT_HEADER_ONLY
+namespace fmt {
+#else
+namespace std {
+#endif
+template<>
+struct formatter<ConVal> {
+	constexpr auto parse(std::format_parse_context& ctx) {
+		return ctx.begin();
+	}
+
+	template<class FormatContext>
+	auto format(const ConVal& cv, FormatContext& ctx) const {
+		switch (const auto& [value, type] = cv ;type) {
+			case EConVarType_Bool:
+				return std::format_to(ctx.out(), "{}", value->m_bValue);
+			case EConVarType_Int16:
+				return std::format_to(ctx.out(), "{}", value->m_i16Value);
+			case EConVarType_UInt16:
+				return std::format_to(ctx.out(), "{}", value->m_u16Value);
+			case EConVarType_Int32:
+				return std::format_to(ctx.out(), "{}", value->m_i32Value);
+			case EConVarType_UInt32:
+				return std::format_to(ctx.out(), "{}", value->m_u32Value);
+			case EConVarType_Int64:
+				return std::format_to(ctx.out(), "{}", value->m_i64Value);
+			case EConVarType_UInt64:
+				return std::format_to(ctx.out(), "{}", value->m_u64Value);
+			case EConVarType_Float32:
+				return std::format_to(ctx.out(), "{}", value->m_fl32Value);
+			case EConVarType_Float64:
+				return std::format_to(ctx.out(), "{}", value->m_fl64Value);
+			case EConVarType_String:
+				return std::format_to(ctx.out(), "{}", std::string_view(value->m_StringValue.Get(), static_cast<size_t>(value->m_StringValue.Length())));
+			case EConVarType_Color:
+				return std::format_to(ctx.out(), "{} {} {} {}", value->m_clrValue.r(), value->m_clrValue.g(), value->m_clrValue.b(), value->m_clrValue.a());
+			case EConVarType_Vector2:
+				return std::format_to(ctx.out(), "{} {}", value->m_vec2Value.x, value->m_vec2Value.y);
+			case EConVarType_Vector3:
+				return std::format_to(ctx.out(), "{} {} {}", value->m_vec3Value.x, value->m_vec3Value.y, value->m_vec3Value.z);
+			case EConVarType_Vector4:
+				return std::format_to(ctx.out(), "{} {} {} {}", value->m_vec4Value.x, value->m_vec4Value.y, value->m_vec4Value.z, value->m_vec4Value.w);
+			case EConVarType_Qangle:
+				return std::format_to(ctx.out(), "{} {} {}", value->m_angValue.x, value->m_angValue.y, value->m_angValue.z);
+			case EConVarType_Invalid:
+			case EConVarType_MAX:
+			default:
+				return std::format_to(ctx.out(), "<invalid>");
+		}
+	}
+};
+}// namespace std
 
 class ConVarConfigGenerator {
 public:
@@ -180,7 +258,7 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
 		if (auto conVar = cvars::CreateConVar(handle)) {
             conVarRefs.push_back(*conVar);
         } else {
-            plg::print(LS_WARNING, conVar.error().c_str());
+            plg::print(LS_WARNING, conVar.error());
         }
     }
 

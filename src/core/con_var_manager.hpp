@@ -70,6 +70,8 @@ public:
 	ConVarManager() = default;
 	~ConVarManager();
 
+	static void Init();
+
 	template<typename T>
 	ConVarRef CreateConVar(const plg::string& name, const plg::string& description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
 		if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
@@ -92,7 +94,7 @@ public:
 		if (conVar->IsValidRef()) {
 			conVarInfo.conVar = std::move(conVar);
 		} else {
-			conVarInfo.conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(conVarInfo.name.c_str(), SanitiseConVarFlags(flgs), conVarInfo.description.c_str(), defaultVal, hasMin, min, hasMax, max, &ChangeCallback));
+			conVarInfo.conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(conVarInfo.name.c_str(), SanitiseConVarFlags(flgs), conVarInfo.description.c_str(), defaultVal, hasMin, min, hasMax, max));
 		}
 		m_cnvCache.emplace(conVarInfo.conVar.get(), &conVarInfo);
 		return *conVarInfo.conVar;
@@ -123,40 +125,13 @@ public:
 	bool HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
 	bool UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
 
-	template<typename T>
-	static void ChangeCallback(CConVar<T>* ref, const CSplitScreenSlot, const T* pNewValue, const T* pOldValue) {
-		auto it = g_ConVarManager.m_cnvCache.find(ref);
-		if (it == g_ConVarManager.m_cnvCache.end())
-			return;
-
-		auto& conVarInfo = *it->second;
-
-		if constexpr (std::is_same_v<T, CUtlString>) {
-			plg::string newValue(pNewValue->Get(), static_cast<size_t>(pNewValue->Length()));
-			plg::string oldValue(pOldValue->Get(), static_cast<size_t>(pOldValue->Length()));
-			conVarInfo.hook.Notify(*ref, newValue, oldValue);
-		} else if constexpr (std::is_same_v<T, Color>) {
-			plg::string newValue = std::format("{} {} {} {}", pNewValue->r(), pNewValue->g(), pNewValue->b(), pNewValue->a());
-			plg::string oldValue = std::format("{} {} {} {}", pOldValue->r(), pOldValue->g(), pOldValue->b(), pOldValue->a());
-			conVarInfo.hook.Notify(*ref, newValue, oldValue);
-		} else if constexpr (std::is_same_v<T, Vector2D>) {
-			plg::string newValue = std::format("{} {}", pNewValue->x, pNewValue->y);
-			plg::string oldValue = std::format("{} {}", pOldValue->x, pOldValue->y);
-			conVarInfo.hook.Notify(*ref, newValue, oldValue);
-		} else if constexpr (std::is_same_v<T, Vector> || std::is_same_v<T, QAngle>) {
-			plg::string newValue = std::format("{} {} {}", pNewValue->x, pNewValue->y, pNewValue->z);
-			plg::string oldValue = std::format("{} {} {}", pOldValue->x, pOldValue->y, pOldValue->z);
-			conVarInfo.hook.Notify(*ref, newValue, oldValue);
-		} else if constexpr (std::is_same_v<T, Vector4D>) {
-			plg::string newValue = std::format("{} {} {} {}", pNewValue->x, pNewValue->y, pNewValue->z, pNewValue->w);
-			plg::string oldValue = std::format("{} {} {} {}", pOldValue->x, pOldValue->y, pOldValue->z, pOldValue->w);
-			conVarInfo.hook.Notify(*ref, newValue, oldValue);
-		} else {
-			plg::string newValue = std::format("{}", *pNewValue);
-			plg::string oldValue = std::format("{}", *pOldValue);
-			conVarInfo.hook.Notify(*ref, newValue, oldValue);
-		}
-	}
+	static void ChangeDefault(
+		ConVarRefAbstract* ref,
+		CSplitScreenSlot slot,
+		const char* newValue,
+		const char* oldValue,
+		void*
+	);
 
 	static void ChangeGlobal(
 		ConVarRefAbstract* ref,
@@ -179,7 +154,7 @@ private:
 private:
 	plg::map<plg::string, ConVarInfoPtr, plg::case_insensitive_equal> m_cnvLookup;
 	plg::map<const ConVarRef*, const ConVarInfo*> m_cnvCache;
-	ListenerManager<ConVarChangeListenerCallback> m_global;
+	ListenerManager<ConVarChangeListenerCallback> m_globalCallbacks;
 };
 
 inline ConVarFlag operator|(ConVarFlag lhs, ConVarFlag rhs) noexcept {

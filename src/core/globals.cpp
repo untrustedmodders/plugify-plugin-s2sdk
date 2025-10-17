@@ -1,16 +1,17 @@
 
+#include <core/sdk/utils.h>
+#include <core/sdk/virtual.h>
+#include <engine/igameeventsystem.h>
+#include <IEngineSound.h>
+#include <igameevents.h>
+#include <igamesystemfactory.h>
+
 #include "globals.hpp"
+
+#include "con_var_manager.hpp"
 #include "core_config.hpp"
 #include "game_config.hpp"
 #include "hook_holder.hpp"
-
-#include <core/sdk/utils.h>
-#include <core/sdk/virtual.h>
-
-#include <IEngineSound.h>
-#include <engine/igameeventsystem.h>
-#include <igameevents.h>
-#include <igamesystemfactory.h>
 
 #define RESOLVE_SIG(gameConfig, name, variable) \
 	variable = (gameConfig)->ResolveSignature(name).RCast<decltype(variable)>(); \
@@ -80,7 +81,7 @@ namespace globals {
 		g_pNetworkServerService = static_cast<INetworkServerService*>(QueryInterface("engine", NETWORKSERVERSERVICE_INTERFACE_VERSION));
 		g_pNetworkMessages = static_cast<INetworkMessages*>(QueryInterface("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
 
-		ConVar_Register(FCVAR_RELEASE | FCVAR_SERVER_CAN_EXECUTE | FCVAR_GAMEDLL);
+		ConVarManager::Init();
 
 		// load more if needed
 		RESOLVE_SIG(g_pGameConfig, "LegacyGameEventListener", addresses::GetLegacyGameEventListener);

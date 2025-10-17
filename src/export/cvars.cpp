@@ -27,8 +27,31 @@ PLUGIFY_WARN_IGNORE(4190)
  * @param flags Additional flags for the console variable.
  * @return A handle to the created console variable.
  */
-extern "C" PLUGIN_API uint64_t CreateConVar(const plg::string& name, const plg::string& defaultValue, const plg::string& description, ConVarFlag flags) {
-	return g_ConVarManager.CreateConVar<CUtlString>(name, description, defaultValue.data(), flags);
+extern "C" PLUGIN_API uint64_t CreateConVar(const plg::string& name, const plg::any& defaultValue, const plg::string& description, ConVarFlag flags) {
+	ConVarRef result{};
+	plg::visit([&](const auto& v) {
+		using T = std::decay_t<decltype(v)>;
+		if constexpr (std::is_pointer_v<T> || std::is_same_v<T, int8_t> || std::is_same_v<T, uint8_t> || std::is_same_v<T, char16_t> || std::is_same_v<T, char> || std::is_same_v<T, plg::mat4x4>) {
+			plg::print(LS_WARNING, "Type not supported: {}\n", typeid(T).name());
+		} else if constexpr (std::is_same_v<T, plg::string>) {
+			result = g_ConVarManager.CreateConVar<CUtlString>(name, description, CUtlString(v.c_str(), static_cast<int>(v.size())), flags);
+		} else if constexpr (std::is_same_v<T, plg::vec2>) {
+			result = g_ConVarManager.CreateConVar<Vector2D>(name, description, *reinterpret_cast<const Vector2D*>(&v), flags);
+		} else if constexpr (std::is_same_v<T, plg::vec3>) {
+			result = g_ConVarManager.CreateConVar<Vector>(name, description, *reinterpret_cast<const Vector*>(&v), flags);
+		} else if constexpr (std::is_same_v<T, plg::vec4>) {
+			result = g_ConVarManager.CreateConVar<Vector4D>(name, description, *reinterpret_cast<const Vector4D*>(&v), flags);
+		} else if constexpr (std::is_same_v<T, int64_t>) {
+			result = g_ConVarManager.CreateConVar<int64>(name, description, v, flags);
+		} else if constexpr (std::is_same_v<T, uint64_t>) {
+			result = g_ConVarManager.CreateConVar<uint64>(name, description, v, flags);
+		} else if constexpr (std::is_arithmetic_v<T>) {
+			result = g_ConVarManager.CreateConVar<T>(name, description, v, flags);
+		} else {
+			plg::print(LS_WARNING, "Type not supported: {}\n", typeid(T).name());
+		}
+	}, defaultValue);
+	return result;
 }
 
 /**
@@ -301,6 +324,21 @@ extern "C" PLUGIN_API uint64_t CreateConVarQAngle(const plg::string& name, const
 }
 
 /**
+ * @brief Creates a new string console variable.
+ *
+ * This function registers a new console variable of type QAngle with the specified parameters.
+ *
+ * @param name The name of the console variable.
+ * @param defaultValue The default value of the console variable.
+ * @param description A description of the console variable's purpose.
+ * @param flags Additional flags for the console variable.
+ * @return A handle to the created console variable.
+ */
+extern "C" PLUGIN_API uint64_t CreateConVarString(const plg::string& name, const plg::string& defaultValue, const plg::string& description, ConVarFlag flags) {
+	return g_ConVarManager.CreateConVar<CUtlString>(name, description, CUtlString(defaultValue.c_str(), static_cast<int>(defaultValue.size())), flags);
+}
+
+/**
  * @brief Searches for a console variable. *
  * @param name The name of the console variable to search for.
  * @return Pointer to the console variable data if found; otherwise, nullptr.
@@ -358,16 +396,17 @@ extern "C" PLUGIN_API uint64_t FindConVar2(const plg::string& name, EConVarType 
 *
  * This function allows a callback to be executed whenever the specified console variable is modified.
  *
- * @param name The name of the console variable to hook.
+ * @param conVarHandle The handle to the console variable data.
  * @param callback The callback function to be executed when the variable's value changes.
+ * @return A boolean indicating whether the command was successfully added.
  */
-extern "C" PLUGIN_API void HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
-	if (callback == nullptr) {
-		plg::print(LS_WARNING, "Invalid callback pointer: {}\n", name);
-		return;
+extern "C" PLUGIN_API bool HookConVarChange(uint64 conVarHandle, ConVarChangeListenerCallback callback) {
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		return g_ConVarManager.HookConVarChange(conVar->GetName(), callback);
+	} else {
+		plg::print(LS_WARNING, conVar.error());
+		return false;
 	}
-
-	g_ConVarManager.HookConVarChange(name, callback);
 }
 
 /**
@@ -375,16 +414,17 @@ extern "C" PLUGIN_API void HookConVarChange(const plg::string& name, ConVarChang
 *
  * This function unhooks a previously set callback for a console variable.
  *
- * @param name The name of the console variable to unhook.
+ * @param conVarHandle The handle to the console variable data.
  * @param callback The callback function to be removed.
+ * @return A boolean indicating whether the command was successfully added.
  */
-extern "C" PLUGIN_API void UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
-	if (callback == nullptr) {
-		plg::print(LS_WARNING, "Invalid callback pointer: {}\n", name);
-		return;
+extern "C" PLUGIN_API bool UnhookConVarChange(uint64 conVarHandle, ConVarChangeListenerCallback callback) {
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		return g_ConVarManager.UnhookConVarChange(conVar->GetName(), callback);
+	} else {
+		plg::print(LS_WARNING, conVar.error());
+		return false;
 	}
-
-	g_ConVarManager.UnhookConVarChange(name, callback);
 }
 
 /**
@@ -398,7 +438,7 @@ extern "C" PLUGIN_API bool IsConVarFlagSet(uint64 conVarHandle, ConVarFlag flag)
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		return conVar->IsFlagSet(static_cast<int64>(flag));
 	} else {
-		plg::print(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error());
 		return false;
 	}
 }
@@ -413,7 +453,7 @@ extern "C" PLUGIN_API void AddConVarFlags(uint64 conVarHandle, ConVarFlag flags)
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		conVar->AddFlags(static_cast<int64>(flags));
 	} else {
-		plg::print(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error());
 	}
 }
 
@@ -427,7 +467,7 @@ extern "C" PLUGIN_API void RemoveConVarFlags(uint64 conVarHandle, ConVarFlag fla
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		conVar->RemoveFlags(static_cast<int64>(flags));
 	} else {
-		plg::print(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error());
 	}
 }
 
@@ -441,7 +481,7 @@ extern "C" PLUGIN_API ConVarFlag GetConVarFlags(uint64 conVarHandle) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		return static_cast<ConVarFlag>(conVar->GetFlags());
 	} else {
-		plg::print(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error());
 		return ConVarFlag::None;
 	}
 }
@@ -455,21 +495,15 @@ extern "C" PLUGIN_API ConVarFlag GetConVarFlags(uint64 conVarHandle) {
  */
 extern "C" PLUGIN_API plg::string GetConVarBounds(uint64 conVarHandle, bool max) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
-		auto* conVarData = conVar->GetConVarData();
+		CBufferStringN<2048> buffer;
 		if (max) {
-			if (conVarData->HasMaxValue()) {
-				return std::format("{}", ConVal{conVarData->MaxValue(), conVarData->GetType()});
-			}
-			plg::print(LS_WARNING, "No max value for ConVar {}\n", conVar->GetName());
+			conVar->GetConVarData()->MaxValueToString(buffer);
 		} else {
-			if (conVarData->HasMinValue()) {
-				return std::format("{}", ConVal{conVarData->MinValue(), conVarData->GetType()});
-			}
-			plg::print(LS_WARNING, "No min value for ConVar {}\n", conVar->GetName());
+			conVar->GetConVarData()->MinValueToString(buffer);
 		}
-		return {};
+		return { buffer.Get(), static_cast<size_t>(buffer.Length()) };
 	} else {
-		plg::print(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error());
 		return {};
 	}
 }
@@ -483,22 +517,13 @@ extern "C" PLUGIN_API plg::string GetConVarBounds(uint64 conVarHandle, bool max)
  */
 extern "C" PLUGIN_API void SetConVarBounds(uint64 conVarHandle, bool max, const plg::string& value) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
-		auto* conVarData = conVar->GetConVarData();
 		if (max) {
-			if (conVarData->HasMaxValue()) {
-				conVarData->TypeTraits()->StringToValue(value.c_str(), conVarData->MaxValue());
-				return;
-			}
-			plg::print(LS_WARNING, "No max value for ConVar {}\n", conVar->GetName());
+			conVar->GetConVarData()->UpdateMaxValueString(value.c_str());
 		} else {
-			if (conVarData->HasMinValue()) {
-				conVarData->TypeTraits()->StringToValue(value.c_str(), conVarData->MinValue());
-				return;
-			}
-			plg::print(LS_WARNING, "No min value for ConVar {}\n", conVar->GetName());
+			conVar->GetConVarData()->UpdateMinValueString(value.c_str());
 		}
 	} else {
-		plg::print(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error());
 	}
 }
 
@@ -510,15 +535,26 @@ extern "C" PLUGIN_API void SetConVarBounds(uint64 conVarHandle, bool max, const 
  */
 extern "C" PLUGIN_API plg::string GetConVarDefault(uint64 conVarHandle) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
-		auto* conVarData = conVar->GetConVarData();
-		if (conVarData->HasDefaultValue()) {
-			return std::format("{}", ConVal{conVarData->DefaultValue(), conVarData->GetType()});
-		}
-		plg::print(LS_WARNING, "No default value for ConVar {}\n", conVar->GetName());
-		return {};
+		CBufferStringN<2048> buffer;
+		conVar->GetConVarData()->DefaultValueToString(buffer);
+		return { buffer.Get(), static_cast<size_t>(buffer.Length()) };
 	} else {
-		plg::print(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error());
 		return {};
+	}
+}
+
+/**
+ * @brief Sets the specified default value for a console variable.
+ *
+ * @param conVarHandle The handle to the console variable data.
+ * @param value The value to set as the default.
+ */
+extern "C" PLUGIN_API void SetConVarDefault(uint64 conVarHandle, const plg::string& value) {
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		conVar->GetConVarData()->UpdateDefaultValueString(value.c_str());
+	} else {
+		plg::print(LS_WARNING, conVar.error());
 	}
 }
 
@@ -530,10 +566,11 @@ extern "C" PLUGIN_API plg::string GetConVarDefault(uint64 conVarHandle) {
  */
 extern "C" PLUGIN_API plg::string GetConVarValue(uint64 conVarHandle) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
-		auto* conVarData = conVar->GetConVarData();
-		return std::format("{}", ConVal{conVarData->DefaultValue(), conVarData->GetType()});
+		CBufferStringN<2048> buffer;
+		conVar->GetConVarData()->ValueToString(-1, buffer);
+		return { buffer.Get(), static_cast<size_t>(buffer.Length()) };
 	} else {
-		plg::print(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error());
 		return {};
 	}
 }
@@ -919,7 +956,7 @@ extern "C" PLUGIN_API void SendConVarValue(int playerSlot, uint64 conVarHandle, 
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
 		cvars::SendConVarValue(playerSlot, conVar->GetName(), value);
 	} else {
-		plg::print(LS_WARNING, conVar.error().c_str());
+		plg::print(LS_WARNING, conVar.error());
 	}
 }
 

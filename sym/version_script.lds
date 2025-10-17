@@ -121,6 +121,7 @@
         CreateConVarVector3;
         CreateConVarVector4;
         CreateConVarQAngle;
+        CreateConVarString;
         FindConVar;
         FindConVar2;
         HookConVarChange;
