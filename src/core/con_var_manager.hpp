@@ -155,7 +155,7 @@ private:
 	static void UpdateConVarValue(ConVarRefAbstract conVar, std::string_view value);
 
 private:
-	plg::parallel_flat_hash_map_m<plg::string, std::shared_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
+	plg::parallel_flat_hash_map<plg::string, std::shared_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
 	ListenerManager<ConVarChangeListenerCallback> m_globalCallbacks;
 };
 

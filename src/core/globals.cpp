@@ -24,7 +24,7 @@ CoreConfig* g_pCoreConfig = nullptr;
 GameConfig* g_pGameConfig = nullptr;
 
 namespace globals {
-	void Initialize(std::map<plg::string, plg::string> paths) {
+	void Initialize(plg::flat_hash_map<plg::string, plg::string> paths) {
 		g_pCoreConfig = new CoreConfig(plg::vector{
 				paths["base"] + "/settings.jsonc",
 				paths["configs"] + "/settings.jsonc",

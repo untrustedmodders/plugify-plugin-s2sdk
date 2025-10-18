@@ -23,17 +23,20 @@ class ListenerManager<Ret(*)(Args...)> {
 public:
     using Func = Ret(*)(Args...);
 
-    bool Register(const Func& f) {
+    bool Register(const Func& f, ptrdiff_t priority = 0) {
         std::scoped_lock lock(m_mutex);
-        if (std::any_of(m_listeners.begin(), m_listeners.end(), [&](auto& x){ return x == f; }))
+        if (std::any_of(m_listeners.begin(), m_listeners.end(), [&](auto& x){ return x.first == f; }))
             return false;
-        m_listeners.push_back(f);
+        m_listeners.emplace_back(f, priority);
+        std::sort(m_listeners.begin(), m_listeners.end(),
+                  [](const auto& a, const auto& b){ return a.second > b.second; });
         return true;
     }
 
     bool Unregister(const Func& f) {
         std::scoped_lock lock(m_mutex);
-        auto it = std::find_if(m_listeners.begin(), m_listeners.end(), [&](auto& x){ return x == f; });
+        auto it = std::find_if(m_listeners.begin(), m_listeners.end(),
+                               [&](auto& x){ return x.first == f; });
         if (it == m_listeners.end()) return false;
         m_listeners.erase(it);
         return true;
@@ -43,7 +46,8 @@ public:
         std::vector<Func> copy;
         {
             std::scoped_lock lock(m_mutex);
-            copy = m_listeners;
+            copy.reserve(m_listeners.size());
+            for (auto& p : m_listeners) copy.push_back(p.first);
         }
         for (auto& f : copy) f(std::forward<Args>(args)...);
     }
@@ -55,7 +59,10 @@ public:
 
     std::vector<Func> Get() {
         std::scoped_lock lock(m_mutex);
-        return m_listeners;
+        std::vector<Func> result;
+        result.reserve(m_listeners.size());
+        for (auto& p : m_listeners) result.push_back(p.first);
+        return result;
     }
 
     bool Empty() const {
@@ -65,5 +72,5 @@ public:
 
 private:
     mutable std::mutex m_mutex;
-    std::vector<Func> m_listeners;
+    std::vector<std::pair<Func, ptrdiff_t>> m_listeners;
 };

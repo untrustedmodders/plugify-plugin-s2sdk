@@ -44,7 +44,7 @@ private:
 	void FireGameEvent(IGameEvent* event) override;
 
 private:
-	plg::parallel_flat_hash_map_m<plg::string, std::shared_ptr<EventHook>, plg::string_hash, std::equal_to<>> m_eventHooks;
+	plg::parallel_flat_hash_map<plg::string, std::shared_ptr<EventHook>, plg::string_hash, std::equal_to<>> m_eventHooks;
 	std::stack<EventInfo*> m_freeEvents;
 	std::stack<std::shared_ptr<EventHook>> m_eventStack;
 	std::stack<IGameEvent*> m_eventCopies;

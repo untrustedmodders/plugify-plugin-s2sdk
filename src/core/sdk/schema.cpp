@@ -53,8 +53,8 @@ void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset) {
 	}
 }
 
-using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey>;
-using SchemaTableMap = plg::flat_hash_map<plg::string, SchemaValueMap>;
+using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey, plg::string_hash, std::equal_to<>>;
+using SchemaTableMap = plg::parallel_node_hash_map<plg::string, std::shared_ptr<SchemaValueMap>, plg::string_hash, std::equal_to<>>;
 
 namespace {
 	bool IsFieldNetworked(const SchemaClassFieldData_t& field) {
@@ -67,12 +67,12 @@ namespace {
 		return false;
 	}
 
-	SchemaValueMap InitSchemaFieldsForClass(const plg::string& className) {
+	std::shared_ptr<SchemaValueMap> InitSchemaFieldsForClass(std::string_view className) {
 		CSchemaSystemTypeScope* pType = g_pSchemaSystem->FindTypeScopeForModule(S2SDK_LIBRARY_PREFIX "server" S2SDK_LIBRARY_SUFFIX);
 		if (!pType)
 			return {};
 
-		SchemaMetaInfoHandle_t<CSchemaClassInfo> pClassInfo = pType->FindDeclaredClass(className.c_str());
+		SchemaMetaInfoHandle_t<CSchemaClassInfo> pClassInfo = pType->FindDeclaredClass(className.data());
 		if (!pClassInfo) {
 			plg::print(LS_ERROR, "InitSchemaFieldsForClass(): '{}' was not found!\n", className);
 			return {};
@@ -81,8 +81,8 @@ namespace {
 		size_t fieldsSize = pClassInfo->m_nFieldCount;
 		SchemaClassFieldData_t* fields = pClassInfo->m_pFields;
 
-		SchemaValueMap valueMap;
-		valueMap.reserve(fieldsSize);
+		auto valueMap = std::make_shared<SchemaValueMap>();
+		valueMap->reserve(fieldsSize);
 
 		for (size_t i = 0; i < fieldsSize; ++i) {
 			const SchemaClassFieldData_t& field = fields[i];
@@ -90,7 +90,7 @@ namespace {
 			int size = 0;
 			uint8 alignment = 0;
 			field.m_pType->GetSizeAndAlignment(size, alignment);
-			valueMap.emplace(field.m_pszName, SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), size, field.m_pType});
+			valueMap->emplace(field.m_pszName, SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), size, field.m_pType});
 
 			plg::print(LS_DETAILED, "{}::{} found at -> 0x{:x} - {}\n", className, field.m_pszName, field.m_nSingleInheritanceOffset, static_cast<const void*>(&field));
 		}
@@ -101,38 +101,37 @@ namespace {
 }// namespace
 
 SchemaTableMap schemaTableMap;
-std::shared_mutex mutex;
 
 namespace schema {
 	static constexpr plg::string g_ChainKey = "__m_pChainEntity";
 
-	int32_t FindChainOffset(const plg::string& className) {
+	int32_t FindChainOffset(std::string_view className) {
 		return GetOffset(className, g_ChainKey).offset;
 	}
 
-	SchemaKey GetOffset(const plg::string& className, const plg::string& memberName) {
-		{
-			std::shared_lock lock(mutex);
-			auto tableIt = schemaTableMap.find(className);
-			if (tableIt != schemaTableMap.end()) {
-				const auto& fieldTableMap = tableIt->second;
-				auto memberIt = fieldTableMap.find(memberName);
-				if (memberIt != fieldTableMap.end()) {
-					return memberIt->second;
-				}
-				if (memberName != g_ChainKey) {
-					plg::print(LS_ERROR, "schema::GetOffset(): '{}' was not found in '{}'!\n", memberName, className);
-				}
-				return {};
+	SchemaKey GetOffset(std::string_view className, std::string_view memberName) {
+		if (auto table = plg::find(schemaTableMap, className)) {
+			auto it = table->find(memberName);
+			if (it != table->end()) {
+				return it->second;
 			}
+			if (g_ChainKey != memberName) {
+				plg::print(LS_ERROR, "schema::GetOffset(): '{}' was not found in '{}'!\n", memberName, className);
+			}
+			return {};
 		}
 
-		{
-			std::unique_lock lock(mutex);
-			schemaTableMap.emplace(className, InitSchemaFieldsForClass(className));
-		}
+		schemaTableMap.emplace(className, InitSchemaFieldsForClass(className));
 
 		return GetOffset(className, memberName);
+	}
+
+	int32_t FindChainOffset(const char* className) {
+		return GetOffset(className, g_ChainKey).offset;
+	}
+
+	SchemaKey GetOffset(const char* className, const char* memberName) {
+		return GetOffset(std::string_view(className), std::string_view(memberName));
 	}
 
 	void NetworkStateChanged(intptr_t chainEntity, int32_t localOffset, int32_t arrayIndex) {
@@ -304,9 +303,9 @@ namespace schema {
 				return {Invalid, -1};
 			}
 			case SCHEMA_TYPE_DECLARED_CLASS: {
-				int nSize = static_cast<CSchemaType_DeclaredClass*>(type)->m_pClassInfo->m_nSize;
-				if (nSize <= sizeof(double)) {
-					return {Single, nSize};
+				int size = static_cast<CSchemaType_DeclaredClass*>(type)->m_pClassInfo->m_nSize;
+				if (size <= sizeof(double)) {
+					return {Single, size};
 				}
 				return {Invalid, -1};
 			}

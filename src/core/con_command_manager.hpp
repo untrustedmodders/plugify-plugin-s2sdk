@@ -37,7 +37,7 @@ public:
 	ResultType ExecuteCommandCallbacks(const plg::string& name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext);
 
 private:
- 	plg::parallel_flat_hash_map_m<plg::string, std::shared_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
+ 	plg::parallel_flat_hash_map<plg::string, std::shared_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
 	plg::enum_map<ListenerManager<CommandListenerCallback>, HookMode> m_globalCallbacks;
 };
 

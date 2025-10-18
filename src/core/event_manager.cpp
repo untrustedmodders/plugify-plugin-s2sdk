@@ -91,9 +91,7 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 	plg::string name(event->GetName());
 	bool localDontBroadcast = dontBroadcast;
 
-	auto it = m_eventHooks.find(name);
-	if (it != m_eventHooks.end()) {
-		auto& eventHook = it->second;
+	if (auto eventHook = plg::find(m_eventHooks, name)) {
 		++eventHook->refCount;
 		m_eventStack.push(eventHook);
 

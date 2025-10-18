@@ -1,7 +1,7 @@
 /**
  * =============================================================================
- * CS2Fixes
- * Copyright (C) 2023-2024 Source2ZE
+ * s2sdk
+ * Copyright (C) 2023-2025 untrustedmodders
  * =============================================================================
  *
  * This program is free software; you can redistribute it and/or modify it under
