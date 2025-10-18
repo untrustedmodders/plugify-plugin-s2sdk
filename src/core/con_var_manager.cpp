@@ -11,7 +11,7 @@ ConVarManager::~ConVarManager() {
 	g_pCVar->RemoveGlobalChangeCallback(&ChangeDefault);
 	g_pCVar->RemoveGlobalChangeCallback(&ChangeGlobal);
 
-	for (const auto& [_, cv]: m_cnvLookup) {
+	for (const auto& [_, cv] : m_cnvLookup) {
 		g_pCVar->UnregisterConVarCallbacks(*cv->conVar);
 	}
 
@@ -29,34 +29,24 @@ void ConVarManager::Init() {
 	g_pCVar->InstallGlobalChangeCallback(&ChangeDefault);
 }
 
-ConVarInfo::ConVarInfo(plg::string name, plg::string description) : name(std::move(name)), description(std::move(description)) {
-}
-
 bool ConVarManager::RemoveConVar(const plg::string& name) {
-	auto it = m_cnvLookup.find(name);
-	if (it != m_cnvLookup.end()) {
-		m_cnvLookup.erase(it);
-		return true;
-	}
-
-	return false;
+	return m_cnvLookup.erase(name) != 0;
 }
 
 ConVarRef ConVarManager::FindConVar(const plg::string& name) {
-	auto it = m_cnvLookup.find(name);
-	if (it != m_cnvLookup.end()) {
-		return *it->second->conVar;
+	if (auto conVarInfo = plg::find(m_cnvLookup, name)) {
+		return *conVarInfo->conVar;
+	} else {
+		conVarInfo = m_cnvLookup.emplace(name, std::make_shared<ConVarInfo>()).first->second;
+		conVarInfo->conVar = std::make_unique<ConVarRefAbstract>(name.c_str(), true);
+
+		if (!conVarInfo->conVar->IsValidRef()) {
+			plg::print(LS_WARNING, "Failed to find '{}' convar\n", name);
+			return {};
+		}
+
+		return *conVarInfo->conVar;
 	}
-
-	auto& conVarInfo = *m_cnvLookup.emplace(name, std::make_unique<ConVarInfo>(name, "")).first->second;
-	conVarInfo.conVar = std::make_unique<ConVarRefAbstract>(name.c_str(), true);
-
-	if (!conVarInfo.conVar->IsValidRef()) {
-		plg::print(LS_WARNING, "Failed to find \"{}\" convar\n", name);
-		return {};
-	}
-
-	return *conVarInfo.conVar;
 }
 
 bool ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
@@ -64,10 +54,8 @@ bool ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListen
 		return m_globalCallbacks.Register(callback);
 	}
 
-	auto it = m_cnvLookup.find(name);
-	if (it != m_cnvLookup.end()) {
-		auto& conVarInfo = *it->second;
-		return conVarInfo.hook.Register(callback);
+	if (auto conVarInfo = plg::find(m_cnvLookup, name)) {
+		return conVarInfo->hook.Register(callback);
 	}
 
 	return false;
@@ -78,21 +66,16 @@ bool ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeList
 		return m_globalCallbacks.Unregister(callback);
 	}
 
-	auto it = m_cnvLookup.find(name);
-	if (it != m_cnvLookup.end()) {
-		auto& conVarInfo = *it->second;
-		return conVarInfo.hook.Unregister(callback);
+	if (auto conVarInfo = plg::find(m_cnvLookup, name)) {
+		return conVarInfo->hook.Unregister(callback);
 	}
 
 	return false;
 }
 
 void ConVarManager::ChangeDefault(ConVarRefAbstract* ref, CSplitScreenSlot , const char* newValue, const char* oldValue, void*) {
-	std::string_view name = ref->GetName();
-	auto it = g_ConVarManager.m_cnvLookup.find(name);
-	if (it != g_ConVarManager.m_cnvLookup.end()) {
-		auto& conVarInfo = *it->second;
-		conVarInfo.hook(*ref, newValue, oldValue);
+	if (auto conVarInfo = plg::find(g_ConVarManager.m_cnvLookup, ref->GetName())) {
+		conVarInfo->hook(*ref, newValue, oldValue);
 	}
 }
 
@@ -169,19 +152,19 @@ public:
             }
         }
 
-		std::print(os, "// -\n// Type: \"{}\"\n", conVarData->TypeTraits()->m_TypeName);
+		std::print(os, "// -\n// Type: {}\n", conVarData->TypeTraits()->m_TypeName);
 
     	if (conVarData->HasDefaultValue()) {
-			std::print(os, "// Default: \"{}\"\n", ConVal{conVarData->DefaultValue(), conVarData->GetType()});
+			std::print(os, "// Default: {}\n", ConVal{conVarData->DefaultValue(), conVarData->GetType()});
     	}
         if (conVarData->HasMinValue()) {
-			std::print(os, "// Minimum: \"{}\"\n", ConVal{conVarData->MinValue(), conVarData->GetType()});
+			std::print(os, "// Minimum: {}\n", ConVal{conVarData->MinValue(), conVarData->GetType()});
         }
         if (conVarData->HasMaxValue()) {
-			std::print(os, "// Maximum: \"{}\"\n", ConVal{conVarData->MaxValue(), conVarData->GetType()});
+			std::print(os, "// Maximum: {}\n", ConVal{conVarData->MaxValue(), conVarData->GetType()});
         }
 
-        std::print(os, "{} \"{}\"\n\n", conVarData->GetName(), ConVal{conVarData->ValueOrDefault(-1), conVarData->GetType()});
+        std::print(os, "{} {}\n\n", conVarData->GetName(), ConVal{conVarData->ValueOrDefault(-1), conVarData->GetType()});
     }
 };
 
@@ -274,7 +257,7 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
                 auto it = parsed.find(label);
                 if (it != parsed.end()) {
                     UpdateConVarValue(conVar, it->second);
-                    plg::print(LS_DETAILED, "Loaded ConVar: {} = \"{}\"\n", label, it->second);
+                    plg::print(LS_DETAILED, "Loaded ConVar: {} = {}\n", label, it->second);
                 }
             }
     		plg::print(LS_DETAILED, "Parsed config file: {}\n", plg::as_string(fullPath));
@@ -293,7 +276,7 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
     		auto now = std::chrono::system_clock::now();
     		std::print(file,
     			"// This file was auto-generated by Plugify (v" S2SDK_VERSION ")\n"
-				"// ConVars for plugin \"{}\"\n"
+				"// ConVars for plugin {}\n"
 				"// Generated: {:%Y-%m-%d %H:%M:%S}\n\n",
 				name, now);
     		for (const auto& conVar : conVarRefs) {

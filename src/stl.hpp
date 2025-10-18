@@ -1,23 +1,18 @@
 #pragma once
 
-#include <shared_mutex>
-#include <functional>
-
-#include <shared_mutex>
 #include <parallel_hashmap/phmap.h>
 
 namespace plg {
 	using namespace phmap;
 
-	template <typename K> using HashEqual = priv::hash_default_eq<K>;
-	template <typename V> using HashFn = priv::hash_default_hash<V>;
-	template <typename K> using Allocator = priv::Allocator<K>;
-
-	template <typename K, typename V, typename Hash = HashFn<K>, typename Eq = HashEqual<K>, size_t N = 4>
-	using parallel_flat_hash_map = parallel_flat_hash_map<K, V, Hash, Eq, Allocator<priv::Pair<K, V>>, N, std::shared_mutex>;
-
-	template <class K, class Hash = HashFn<K>, class Eq = HashEqual<K>, size_t N = 4>
-	using parallel_flat_hash_set = parallel_flat_hash_set<K, Hash, Eq, Allocator<K>, N, std::shared_mutex>;
+	template<typename Map>
+	constexpr auto find(const Map& map, const typename Map::key_type& key) {
+		typename Map::mapped_type result;
+		map.if_contains(key, [&](const auto& v) {
+			result = v.second;
+		});
+		return result;
+	}
 
 	template<typename Enum>
 	constexpr size_t enum_size() {

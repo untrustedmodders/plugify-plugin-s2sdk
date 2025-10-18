@@ -197,7 +197,7 @@ bool PlayerManager::OnClientConnect(CPlayerSlot slot, char const* name, uint64 s
 		s_refuseConnection = false;
 
 		plg::string playerName(name);
-		auto funcs = GetOnClientConnectListenerManager().AsView();
+		auto funcs = GetOnClientConnectListenerManager().Get();
 		for (const auto& func : funcs) {
 			auto res = func(slot, playerName, networkID);
 			s_refuseConnection |= !res;

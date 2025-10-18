@@ -85,7 +85,7 @@ namespace schema {
 
 	int32_t FindChainOffset(const plg::string& className);
 	SchemaKey GetOffset(const plg::string& className, const plg::string& memberName);
-	void NetworkStateChanged(intptr_t chainEntity, uint localOffset, int arrayIndex = 0xFFFFFFFF);
+	void NetworkStateChanged(intptr_t chainEntity, uint32_t localOffset, int32_t arrayIndex = 0xFFFFFFFF);
 
 	ElementType GetElementType(CSchemaType* type);
 	std::pair<ElementType, int> IsIntType(CSchemaType* type);
@@ -298,28 +298,28 @@ private: \
 	static constexpr const char name##_str[] = #name; \
 	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
-    PLUGIFY_NO_UNIQUE_ADDRESS SchemaField<type, ThisClass, name##_str, name##_offset, 0> name;
+    SchemaField<type, ThisClass, name##_str, name##_offset, 0> name;
 
 #define SCHEMA_FIELD_OFFSET(type, name, extra) \
 private: \
 	static constexpr const char name##_str[] = #name; \
 	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
-    PLUGIFY_NO_UNIQUE_ADDRESS SchemaField<type, ThisClass, name##_str, name##_offset, (extra)> name;
+    SchemaField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 
 #define SCHEMA_FIELD_POINTER(type, name) \
 private: \
 	static constexpr const char name##_str[] = #name; \
 	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
-	PLUGIFY_NO_UNIQUE_ADDRESS SchemaPointerField<type, ThisClass, name##_str, name##_offset, 0> name;
+	SchemaPointerField<type, ThisClass, name##_str, name##_offset, 0> name;
 
 #define SCHEMA_FIELD_POINTER_OFFSET(type, name, extra) \
 private: \
 	static constexpr const char name##_str[] = #name; \
 	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
-	PLUGIFY_NO_UNIQUE_ADDRESS SchemaPointerField<type, ThisClass, name##_str, name##_offset, (extra)> name;
+	SchemaPointerField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 
 // If the class needs a specific offset for its NetworkStateChanged (like CEconItemView), use this and provide the offset
 #define DECLARE_SCHEMA_CLASS_BASE(ClassName, offset)								\

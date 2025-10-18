@@ -14,13 +14,8 @@ enum class CommandCallingContext  {
 using CommandListenerCallback = ResultType (*)(int caller, CommandCallingContext context, const plg::vector<plg::string>& arguments);
 
 struct ConCommandInfo {
-	ConCommandInfo() = delete;
-	explicit ConCommandInfo(plg::string name, plg::string description = {});
 	~ConCommandInfo();
 
-	plg::string name;
-	plg::string description;
-	uint64 adminFlags{};
 	ConCommandData* command{};
 	ConCommandRef commandRef{};
 	plg::enum_map<ListenerManager<CommandListenerCallback>, HookMode> callbacks;
@@ -42,7 +37,7 @@ public:
 	ResultType ExecuteCommandCallbacks(const plg::string& name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext);
 
 private:
-	plg::parallel_flat_hash_map<plg::string, std::unique_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
+ 	plg::parallel_flat_hash_map_m<plg::string, std::shared_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
 	plg::enum_map<ListenerManager<CommandListenerCallback>, HookMode> m_globalCallbacks;
 };
 

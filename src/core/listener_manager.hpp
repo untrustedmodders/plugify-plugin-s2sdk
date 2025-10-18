@@ -15,84 +15,55 @@ enum class ResultType {
 	Stop = 3,
 };
 
-template<class = void>
+template<class Sig>
 class ListenerManager;
 
 template<class Ret, class... Args>
-class ListenerManager<Ret (*)(Args...)> {
+class ListenerManager<Ret(*)(Args...)> {
 public:
-    template<typename Callable>
-        requires std::invocable<Callable, Args...> &&
-                 std::convertible_to<std::invoke_result_t<Callable, Args...>, Ret>
-    bool Register(Callable callable)
-    {
-        std::scoped_lock lock(m_mutex);
-        for (auto& f : m_callables) {
-            if (f == callable) {
-                return false;
-            }
-        }
+    using Func = Ret(*)(Args...);
 
-        m_callables.push_back(callable);
+    bool Register(const Func& f) {
+        std::scoped_lock lock(m_mutex);
+        if (std::any_of(m_listeners.begin(), m_listeners.end(), [&](auto& x){ return x == f; }))
+            return false;
+        m_listeners.push_back(f);
         return true;
     }
 
-    template<typename Callable>
-        requires std::invocable<Callable, Args...> &&
-                 std::convertible_to<std::invoke_result_t<Callable, Args...>, Ret>
-    bool Unregister(Callable callable)
-    {
+    bool Unregister(const Func& f) {
         std::scoped_lock lock(m_mutex);
-
-        for (auto it = m_callables.begin(); it != m_callables.end(); ++it) {
-            if (*it == callable) {
-                m_callables.erase(it);  // no need for prev
-                return true;
-            }
-        }
-        return false;
+        auto it = std::find_if(m_listeners.begin(), m_listeners.end(), [&](auto& x){ return x == f; });
+        if (it == m_listeners.end()) return false;
+        m_listeners.erase(it);
+        return true;
     }
 
-    template <typename... Params>
-    void operator()(Params&&... params) const {
-        std::scoped_lock lock(m_mutex);
-        for (const auto& f : m_callables) {
-            f(std::forward<Params>(params)...);
+    void operator()(Args... args) {
+        std::vector<Func> copy;
+        {
+            std::scoped_lock lock(m_mutex);
+            copy = m_listeners;
         }
-    }
-
-    class SafeView {
-    public:
-        SafeView(ListenerManager* self) : m_self(*self) {
-            m_self.m_mutex.lock();
-        }
-
-        ~SafeView() {
-            m_self.m_mutex.unlock();
-        }
-
-        auto begin() const { return m_self.m_callables.begin(); }
-        auto end() const { return m_self.m_callables.end(); }
-
-    private:
-        ListenerManager& m_self;
-    };
-
-    SafeView AsView() {
-        return { this };
+        for (auto& f : copy) f(std::forward<Args>(args)...);
     }
 
     void Clear() {
         std::scoped_lock lock(m_mutex);
-        m_callables.clear();
+        m_listeners.clear();
+    }
+
+    std::vector<Func> Get() {
+        std::scoped_lock lock(m_mutex);
+        return m_listeners;
     }
 
     bool Empty() const {
         std::scoped_lock lock(m_mutex);
-        return m_callables.empty();
+        return m_listeners.empty();
     }
 
 private:
-    mutable std::recursive_mutex m_mutex;
-    std::list<Ret (*)(Args...)> m_callables;
+    mutable std::mutex m_mutex;
+    std::vector<Func> m_listeners;
 };

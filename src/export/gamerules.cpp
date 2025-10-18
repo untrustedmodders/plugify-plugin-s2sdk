@@ -53,7 +53,7 @@ extern "C" PLUGIN_API void* GetGameRules() {
 extern "C" PLUGIN_API CTeam* GetGameTeamManager(int team) {
 	auto it = g_pTeamManagers.find(team);
 	if (it == g_pTeamManagers.end()) {
-		plg::print(LS_WARNING, "Failed to find \"{}\" team\n", team);
+		plg::print(LS_WARNING, "Failed to find {} team\n", team);
 		return nullptr;
 	}
 
@@ -73,7 +73,7 @@ extern "C" PLUGIN_API CTeam* GetGameTeamManager(int team) {
 extern "C" PLUGIN_API int GetGameTeamScore(int team) {
 	auto it = g_pTeamManagers.find(team);
 	if (it == g_pTeamManagers.end()) {
-		plg::print(LS_WARNING, "Failed to find \"{}\" team\n", team);
+		plg::print(LS_WARNING, "Failed to find {} team\n", team);
 		return -1;
 	}
 

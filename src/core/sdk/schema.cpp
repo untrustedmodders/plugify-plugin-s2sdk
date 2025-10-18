@@ -18,30 +18,25 @@
  */
 
 #include "schema.h"
+#include "utils.h"
 
 #include <schemasystem/schemasystem.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#include "utils.h"
 
-extern CGlobalVars* gpGlobals;
-
-using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey>;
-using SchemaTableMap = plg::node_hash_map<plg::string, SchemaValueMap>;
-ss
-void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32 networkStateChangedOffset) {
+void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32_t networkStateChangedOffset) {
 	NetworkStateChanged_t data(offset);
 	CALL_VIRTUAL(void, networkStateChangedOffset, reinterpret_cast<void*>(networkVar), &data);
 }
 
-void EntityNetworkStateChanged(uintptr_t entity, uint offset) {
+void EntityNetworkStateChanged(uintptr_t entity, uint32_t offset) {
 	NetworkStateChanged_t data(offset);
 	reinterpret_cast<CEntityInstance*>(entity)->NetworkStateChanged(data);
 }
 
-void ChainNetworkStateChanged(uintptr_t networkVarChainer, uint localOffset) {
+void ChainNetworkStateChanged(uintptr_t networkVarChainer, uint32_t localOffset) {
 	if (CEntityInstance* entity = reinterpret_cast<CNetworkVarChainer*>(networkVarChainer)->GetObject()) {
 		entity->NetworkStateChanged(NetworkStateChanged_t(localOffset, -1, reinterpret_cast<CNetworkVarChainer*>(networkVarChainer)->m_PathIndex));
 	}
@@ -58,6 +53,9 @@ void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset) {
 	}
 }
 
+using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey>;
+using SchemaTableMap = plg::flat_hash_map<plg::string, SchemaValueMap>;
+
 namespace {
 	bool IsFieldNetworked(const SchemaClassFieldData_t& field) {
 		for (int i = 0; i < field.m_nStaticMetadataCount; ++i) {
@@ -69,23 +67,22 @@ namespace {
 		return false;
 	}
 
-	bool InitSchemaFieldsForClass(SchemaTableMap& tableMap, const plg::string& className) {
+	SchemaValueMap InitSchemaFieldsForClass(const plg::string& className) {
 		CSchemaSystemTypeScope* pType = g_pSchemaSystem->FindTypeScopeForModule(S2SDK_LIBRARY_PREFIX "server" S2SDK_LIBRARY_SUFFIX);
 		if (!pType)
-			return false;
+			return {};
 
 		SchemaMetaInfoHandle_t<CSchemaClassInfo> pClassInfo = pType->FindDeclaredClass(className.c_str());
 		if (!pClassInfo) {
-			tableMap.emplace(className, SchemaValueMap());
-
 			plg::print(LS_ERROR, "InitSchemaFieldsForClass(): '{}' was not found!\n", className);
-			return false;
+			return {};
 		}
 
 		size_t fieldsSize = pClassInfo->m_nFieldCount;
 		SchemaClassFieldData_t* fields = pClassInfo->m_pFields;
 
 		SchemaValueMap valueMap;
+		valueMap.reserve(fieldsSize);
 
 		for (size_t i = 0; i < fieldsSize; ++i) {
 			const SchemaClassFieldData_t& field = fields[i];
@@ -98,12 +95,13 @@ namespace {
 			plg::print(LS_DETAILED, "{}::{} found at -> 0x{:x} - {}\n", className, field.m_pszName, field.m_nSingleInheritanceOffset, static_cast<const void*>(&field));
 		}
 
-		tableMap.emplace(className, std::move(valueMap));
-
-		return true;
+		return valueMap;
 	}
 
 }// namespace
+
+SchemaTableMap schemaTableMap;
+std::shared_mutex mutex;
 
 namespace schema {
 	static constexpr plg::string g_ChainKey = "__m_pChainEntity";
@@ -113,32 +111,31 @@ namespace schema {
 	}
 
 	SchemaKey GetOffset(const plg::string& className, const plg::string& memberName) {
-		static SchemaTableMap schemaTableMap;
-		static std::mutex mutex;
-		std::scoped_lock lock(mutex);
-
-		auto tableIt = schemaTableMap.find(className);
-		if (tableIt == schemaTableMap.end()) {
-			if (InitSchemaFieldsForClass(schemaTableMap, className))
-				return GetOffset(className, memberName);
-			return {};
+		{
+			std::shared_lock lock(mutex);
+			auto tableIt = schemaTableMap.find(className);
+			if (tableIt != schemaTableMap.end()) {
+				const auto& fieldTableMap = tableIt->second;
+				auto memberIt = fieldTableMap.find(memberName);
+				if (memberIt != fieldTableMap.end()) {
+					return memberIt->second;
+				}
+				if (memberName != g_ChainKey) {
+					plg::print(LS_ERROR, "schema::GetOffset(): '{}' was not found in '{}'!\n", memberName, className);
+				}
+				return {};
+			}
 		}
 
-		const auto& fieldTableMap = tableIt->second;
-
-		auto memberIt = fieldTableMap.find(memberName);
-		if (memberIt != fieldTableMap.end()) {
-			return memberIt->second;
+		{
+			std::unique_lock lock(mutex);
+			schemaTableMap.emplace(className, InitSchemaFieldsForClass(className));
 		}
 
-		if (memberName != g_ChainKey) {
-			plg::print(LS_ERROR, "schema::GetOffset(): '{}' was not found in '{}'!\n", memberName, className);
-		}
-
-		return {};
+		return GetOffset(className, memberName);
 	}
 
-	void NetworkStateChanged(intptr_t chainEntity, uint localOffset, int arrayIndex) {
+	void NetworkStateChanged(intptr_t chainEntity, int32_t localOffset, int32_t arrayIndex) {
 		CNetworkVarChainer* chainEnt = reinterpret_cast<CNetworkVarChainer*>(chainEntity);
 		CEntityInstance* entity = chainEnt->GetObject();
 		if (entity && !(entity->m_pEntity->m_flags & EF_IS_CONSTRUCTION_IN_PROGRESS)) {

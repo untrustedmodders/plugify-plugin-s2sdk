@@ -6,13 +6,11 @@ bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback 
 		return m_global.callbacks[mode].Register(callback);
 	}
 
-	auto it = m_hooksMap.find(messageId);
-	if (it == m_hooksMap.end()) {
-		auto& commandInfo = *m_hooksMap.emplace(messageId, std::make_unique<UserMessageHook>()).first->second;
-		return commandInfo.callbacks[mode].Register(callback);
+	if (auto hook = plg::find(m_hookMap, messageId)) {
+		return hook->callbacks[mode].Register(callback);
 	} else {
-		auto& commandInfo = *it->second;
-		return commandInfo.callbacks[mode].Register(callback);
+		hook = m_hookMap.emplace(messageId, std::make_shared<UserMessageHook>()).first->second;
+		return hook->callbacks[mode].Register(callback);
 	}
 }
 
@@ -21,13 +19,15 @@ bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallbac
 		return m_global.callbacks[mode].Unregister(callback);
 	}
 
-	auto it = m_hooksMap.find(messageId);
-	if (it == m_hooksMap.end()) {
-		return false;
+	if (auto hook = plg::find(m_hookMap, messageId)) {
+		auto status = hook->callbacks[mode].Unregister(callback);
+		if (hook->callbacks[HookMode::Pre].Empty() && hook->callbacks[HookMode::Post].Empty()) {
+			m_hookMap.erase(messageId);
+		}
+		return status;
 	}
 
-	auto& commandInfo = *it->second;
-	return commandInfo.callbacks[mode].Unregister(callback);
+	return false;
 }
 
 ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode) {
@@ -40,7 +40,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 	ResultType result = ResultType::Continue;
 	
 	{
-		auto funcs = m_global.callbacks[mode].AsView();
+		auto funcs = m_global.callbacks[mode].Get();
 		for (const auto& func : funcs) {
 			auto thisResult = func(&message);
 			if (thisResult >= ResultType::Stop) {
@@ -58,11 +58,8 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 		}
 	}
 
-	auto it = m_hooksMap.find(messageID);
-	if (it != m_hooksMap.end()) {
-		auto& messageHook = *it->second;
-
-		auto funcs = messageHook.callbacks[mode].AsView();
+	if (auto hook = plg::find(m_hookMap, messageID)) {
+		auto funcs = hook->callbacks[mode].Get();
 		for (const auto& func : funcs) {
 			auto thisResult = func(&message);
 			if (thisResult >= ResultType::Handled) {

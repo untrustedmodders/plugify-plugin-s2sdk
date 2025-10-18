@@ -11,9 +11,6 @@
 static void CommandCallback(const CCommandContext&, const CCommand&) {
 }
 
-ConCommandInfo::ConCommandInfo(plg::string name, plg::string description) : name(std::move(name)), description(std::move(description)) {
-}
-
 ConCommandInfo::~ConCommandInfo() {
 	if (!g_pCVar || defaultCommand) {
 		return;
@@ -27,20 +24,19 @@ bool ConCommandManager::AddCommandListener(const plg::string& name, CommandListe
 		return m_globalCallbacks[mode].Register(callback);
 	}
 
-	auto it = m_cmdLookup.find(name);
-	if (it == m_cmdLookup.end()) {
+	if (auto commandInfo = plg::find(m_cmdLookup, name)) {
+		return commandInfo->callbacks[mode].Register(callback);
+	} else {
 		ConCommandRef commandRef = g_pCVar->FindConCommand(name.c_str());
 		if (!commandRef.IsValidRef()) {
+			plg::print(LS_WARNING, "Command {} is not exists\n", name);
 			return false;
 		}
 
-		auto& commandInfo = *m_cmdLookup.emplace(name, std::make_unique<ConCommandInfo>(name)).first->second;
-		commandInfo.command = g_pCVar->GetConCommandData(commandRef);
-		commandInfo.defaultCommand = true;
-		return commandInfo.callbacks[mode].Register(callback);
-	} else {
-		auto& commandInfo = *it->second;
-		return commandInfo.callbacks[mode].Register(callback);
+		commandInfo = m_cmdLookup.emplace(name, std::make_shared<ConCommandInfo>()).first->second;
+		commandInfo->command = g_pCVar->GetConCommandData(commandRef);
+		commandInfo->defaultCommand = true;
+		return commandInfo->callbacks[mode].Register(callback);
 	}
 }
 
@@ -49,44 +45,37 @@ bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandLi
 		return m_globalCallbacks[mode].Unregister(callback);
 	}
 
-	auto it = m_cmdLookup.find(name);
-	if (it == m_cmdLookup.end()) {
-		return false;
+	if (auto commandInfo = plg::find(m_cmdLookup, name)) {
+		return commandInfo->callbacks[mode].Unregister(callback);
 	}
 
-	auto& commandInfo = *it->second;
-	return commandInfo.callbacks[mode].Unregister(callback);
+	return false;
 }
 
 bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, uint64 adminFlags) {
-	if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
-		plg::print(LS_DETAILED, "[ConCommandManager::AddValveCommand]: Command '{}' is empty or already exists\n", name);
+	if (name.empty()) {
+		plg::print(LS_WARNING, "Command name empty\n", name);
 		return false;
 	}
 
-	if (g_pCVar->FindConCommand(name.c_str()).IsValidRef()) {
-		plg::print(LS_DETAILED, "[ConCommandManager::AddValveCommand]: Command '{}' already exists\n", name);
+	auto commandInfo = plg::find(m_cmdLookup, name);
+	if (commandInfo || g_pCVar->FindConVar(name.c_str()).IsValidRef() || g_pCVar->FindConCommand(name.c_str()).IsValidRef()) {
+		plg::print(LS_WARNING, "Command '{}' is already exists\n", name);
 		return false;
 	}
 
-	auto it = m_cmdLookup.find(name);
-	if (it != m_cmdLookup.end()) {
-		plg::print(LS_DETAILED, "[ConCommandManager::AddValveCommand]: Command '{}' already exists\n", name);
-		return false;
-	}
-
-	auto& commandInfo = *m_cmdLookup.emplace(name, std::make_unique<ConCommandInfo>(name, description)).first->second;
+	commandInfo = m_cmdLookup.emplace(name, std::make_shared<ConCommandInfo>()).first->second;
 
 	ConCommandCreation_t setup;
-	setup.m_pszName = commandInfo.name.c_str();
-	setup.m_pszHelpString = commandInfo.description.c_str();
+	setup.m_pszName = name.c_str();
+	setup.m_pszHelpString = description.c_str();
 	setup.m_nFlags = SanitiseConVarFlags(static_cast<uint64>(flags));
 	setup.m_CBInfo = { &CommandCallback };
 	setup.m_CompletionCBInfo = {};
 
-	commandInfo.commandRef = g_pCVar->RegisterConCommand(setup, ConVar_GetDefaultFlags());
-	commandInfo.command = commandInfo.commandRef.GetRawData();
-	commandInfo.adminFlags = adminFlags;
+	commandInfo->commandRef = g_pCVar->RegisterConCommand(setup, ConVar_GetDefaultFlags());
+	commandInfo->command = commandInfo->commandRef.GetRawData();
+	//commandInfo->adminFlags = adminFlags;
 
 	return true;
 }
@@ -97,14 +86,11 @@ bool ConCommandManager::RemoveValveCommand(const plg::string& name) {
 		return false;
 	}
 
-	auto it = m_cmdLookup.find(name);
-	if (it != m_cmdLookup.end()) {
-		m_cmdLookup.erase(it);
+	if (m_cmdLookup.erase(name) != 0) {
 		return true;
-	} else {
-		g_pCVar->UnregisterConCommandCallbacks(commandRef);
 	}
 
+	g_pCVar->UnregisterConCommandCallbacks(commandRef);
 	return true;
 }
 
@@ -147,7 +133,7 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(const plg::string& name, c
 	ResultType result = ResultType::Continue;
 
 	{
-		auto funcs = m_globalCallbacks[mode].AsView();
+		auto funcs = m_globalCallbacks[mode].Get();
 		for (const auto& func : funcs) {
 			auto thisResult = func(caller, callingContext, arguments);
 			if (thisResult >= ResultType::Stop) {
@@ -165,15 +151,12 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(const plg::string& name, c
 		}
 	}
 
-	auto it = m_cmdLookup.find(name);
-	if (it != m_cmdLookup.end()) {
-		auto& commandInfo = *it->second;
-
-		if (!CheckCommandAccess(caller, commandInfo.adminFlags)) {
+	if (auto commandInfo = plg::find(m_cmdLookup, name)) {
+		/*if (!CheckCommandAccess(caller, commandInfo->adminFlags)) {
 			return result;
-		}
+		}*/
 
-		auto funcs = commandInfo.callbacks[mode].AsView();
+		auto funcs = commandInfo->callbacks[mode].Get();
 		for (const auto& func : funcs) {
 			auto thisResult = func(caller, callingContext, arguments);
 			if (thisResult >= ResultType::Handled) {

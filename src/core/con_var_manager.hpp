@@ -51,11 +51,6 @@ enum class ConVarFlag : uint64_t {
 };
 
 struct ConVarInfo {
-	explicit ConVarInfo(plg::string name, plg::string description = {});
-	~ConVarInfo() = default;
-
-	plg::string name;
-	plg::string description;
 	std::unique_ptr<ConVarRef> conVar;
 	ListenerManager<ConVarChangeListenerCallback> hook;
 };
@@ -70,49 +65,61 @@ public:
 
 	static void Init();
 
+	uint64 GetFlags(ConVarFlag flags) {
+		auto f = static_cast<uint64>(flags);
+		if (f == FCVAR_NONE) {
+			f |= ConVar_GetDefaultFlags();
+		}
+		return SanitiseConVarFlags(f);
+	}
+
 	template<typename T>
 	ConVarRef CreateConVar(const plg::string& name, const plg::string& description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
-		if (name.empty() || g_pCVar->FindConVar(name.c_str()).IsValidRef()) {
-			plg::print(LS_DETAILED, "[ConVarManager::CreateConVar]: ConVar '{}' is empty or already exists\n", name);
+		if (name.empty()) {
+			plg::print(LS_WARNING, "ConVar name empty\n", name);
 			return {};
 		}
 
-		auto it = m_cnvLookup.find(name);
-		if (it != m_cnvLookup.end()) {
-			return *it->second->conVar;
+		auto conVarRef = g_pCVar->FindConVar(name.c_str());
+		if (conVarRef.IsValidRef()) {
+			plg::print(LS_WARNING, "ConVar '{}' is already exists\n", name);
+			return conVarRef;
 		}
 
-		auto flgs = static_cast<uint64>(flags);
-		if (flgs == FCVAR_NONE) {
-			flgs |= ConVar_GetDefaultFlags();
+		auto conVarInfo = plg::find(m_cnvLookup, name);
+		if (conVarInfo) {
+			plg::print(LS_WARNING, "ConVar '{}' is already exists\n", name);
+			return *conVarInfo->conVar;
 		}
 
-		auto& conVarInfo = *m_cnvLookup.emplace(name, std::make_unique<ConVarInfo>(name, description)).first->second;
+		conVarInfo = m_cnvLookup.emplace(name, std::make_shared<ConVarInfo>()).first->second;
 		auto conVar = std::make_unique<ConVarRef>(name.c_str());
+
 		if (conVar->IsValidRef()) {
-			conVarInfo.conVar = std::move(conVar);
+			conVarInfo->conVar = std::move(conVar);
 		} else {
-			conVarInfo.conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(conVarInfo.name.c_str(), SanitiseConVarFlags(flgs), conVarInfo.description.c_str(), defaultVal, hasMin, min, hasMax, max));
+			conVarInfo->conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(name.c_str(), GetFlags(flags), description.c_str(), defaultVal, hasMin, min, hasMax, max));
 		}
-		return *conVarInfo.conVar;
+
+		return *conVarInfo->conVar;
 	}
 
 	template<typename T>
 	ConVarRef FindConVar(const plg::string& name) {
-		auto it = m_cnvLookup.find(name);
-		if (it != m_cnvLookup.end()) {
-			return *it->second->conVar;
+		auto conVarInfo = plg::find(m_cnvLookup, name);
+		if (conVarInfo) {
+			return *conVarInfo->conVar;
 		}
 
-		auto& conVarInfo = *m_cnvLookup.emplace(name, std::make_unique<ConVarInfo>(name, "")).first->second;
-		conVarInfo.conVar = std::make_unique<CConVarRef<T>>(name.c_str());
+		conVarInfo = m_cnvLookup.emplace(name, std::make_shared<ConVarInfo>()).first->second;
+		conVarInfo->conVar = std::make_unique<CConVarRef<T>>(name.c_str());
 
-		if (!conVarInfo.conVar->IsValidRef()) {
-			plg::print(LS_WARNING, "Failed to find \"{}\" convar\n", name);
+		if (!conVarInfo->conVar->IsValidRef()) {
+			plg::print(LS_WARNING, "Failed to find '{}' convar\n", name);
 			return {};
 		}
 
-		return *conVarInfo.conVar;
+		return *conVarInfo->conVar;
 	}
 
 	ConVarRef FindConVar(const plg::string& name);
@@ -148,7 +155,7 @@ private:
 	static void UpdateConVarValue(ConVarRefAbstract conVar, std::string_view value);
 
 private:
-	plg::parallel_flat_hash_map<plg::string, std::unique_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
+	plg::parallel_flat_hash_map_m<plg::string, std::shared_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
 	ListenerManager<ConVarChangeListenerCallback> m_globalCallbacks;
 };
 

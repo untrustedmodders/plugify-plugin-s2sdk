@@ -137,7 +137,7 @@ poly::ReturnAction Hook_FireEvent(poly::PHook& hook, poly::Params& params, int c
 	auto event = poly::GetArgument<IGameEvent*>(params, 1);
 	auto dontBroadcast = poly::GetArgument<bool>(params, 2);
 
-	plg::print(LS_DETAILED, "FireEvent = {}\n", event->GetName() );
+	plg::print(LS_DETAILED, "[FireEvent] = {}\n", event->GetName() );
 
 	auto result = type == poly::CallbackType::Post ? g_EventManager.OnFireEvent_Post(event, dontBroadcast) : g_EventManager.OnFireEvent(event, dontBroadcast);
 	if (result >= ResultType::Handled) {
@@ -195,7 +195,7 @@ poly::ReturnAction Hook_ClientActive(poly::PHook& hook, poly::Params& params, in
 	auto name = poly::GetArgument<const char*>(params, 3);
 	auto steamID64 = (uint64) poly::GetArgument<uint64_t>(params, 4);
 
-	plg::print(LS_DETAILED, "[OnClientActive] = {}, \"{}\", {}\n", slot, name, steamID64);
+	plg::print(LS_DETAILED, "[OnClientActive] = {}, {}, {}\n", slot, name, steamID64);
 
 	g_MultiAddonManager.OnClientActive(slot, bLoadGame, name, steamID64);
 	g_PlayerManager.OnClientActive(slot, bLoadGame);
@@ -212,7 +212,7 @@ poly::ReturnAction Hook_ClientDisconnect(poly::PHook& hook, poly::Params& params
 	auto steamID64 = poly::GetArgument<uint64_t>(params, 4);
 	auto networkID = poly::GetArgument<const char*>(params, 5);
 
-	plg::print(LS_DETAILED, "[ClientDisconnect] = {}, {}, \"{}\", {}, \"{}\"\n", slot,  static_cast<int>(reason), name, steamID64, networkID);
+	plg::print(LS_DETAILED, "[ClientDisconnect] = {}, {}, {}, {}, {}\n", slot,  static_cast<int>(reason), name, steamID64, networkID);
 
 	if (type == poly::CallbackType::Pre) {
 		g_MultiAddonManager.OnClientDisconnect(slot, name, steamID64, networkID);
@@ -232,7 +232,7 @@ poly::ReturnAction Hook_ClientPutInServer(poly::PHook& hook, poly::Params& param
 	auto conType = poly::GetArgument<int>(params, 3);
 	auto steamID64 = poly::GetArgument<uint64_t>(params, 4);
 
-	plg::print(LS_DETAILED, "[ClientPutInServer] = {}, \"{}\", {}, {}\n", slot, name, conType, steamID64);
+	plg::print(LS_DETAILED, "[ClientPutInServer] = {}, {}, {}, {}\n", slot, name, conType, steamID64);
 
 	g_PlayerManager.OnClientPutInServer(slot, name);
 	return poly::ReturnAction::Ignored;
@@ -257,7 +257,7 @@ poly::ReturnAction Hook_OnClientConnected(poly::PHook& hook, poly::Params& param
 	auto pszAddress = poly::GetArgument<const char*>(params, 5);
 	auto fakePlayer = poly::GetArgument<bool>(params, 6);
 
-	plg::print(LS_DETAILED, "[OnClientConnected] = {}, \"{}\", {}, \"{}\", \"{}\", {}\n", slot, name, steamID64, networkID, pszAddress, fakePlayer);
+	plg::print(LS_DETAILED, "[OnClientConnected] = {}, {}, {}, {}, {}, {}\n", slot, name, steamID64, networkID, pszAddress, fakePlayer);
 
 	g_PlayerManager.OnClientConnected(slot, fakePlayer);
 	return poly::ReturnAction::Ignored;
@@ -282,7 +282,7 @@ poly::ReturnAction Hook_ClientConnect(poly::PHook& hook, poly::Params& params, i
 	bool unk1 = poly::GetArgument<bool>(params, 5);
 	auto pRejectReason = poly::GetArgument<CBufferString*>(params, 6);
 
-	plg::print(LS_DETAILED, "[ClientConnect] = {}, \"{}\", {}, \"{}\", {}, \"{}\" \n", slot, name, steamID64, networkID, unk1, pRejectReason->Get());
+	plg::print(LS_DETAILED, "[ClientConnect] = {}, {}, {}, {}, {}, {} \n", slot, name, steamID64, networkID, unk1, pRejectReason->Get());
 
 	if (type == poly::CallbackType::Pre) {
 		g_MultiAddonManager.OnClientConnect(slot, name, steamID64, networkID);
@@ -307,7 +307,7 @@ poly::ReturnAction Hook_ClientCommand(poly::PHook& hook, poly::Params& params, i
 		return poly::ReturnAction::Ignored;
 	}
 
-	plg::print(LS_DETAILED, "[ClientCommand] = {}, \"{}\"\n", slot, args->GetCommandString());
+	plg::print(LS_DETAILED, "[ClientCommand] = {}, {}\n", slot, args->GetCommandString());
 
 	const char* cmd = args->Arg(0);
 
