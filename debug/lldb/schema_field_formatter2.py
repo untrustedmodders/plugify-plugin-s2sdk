@@ -34,8 +34,7 @@ class SchemaFieldSynthProvider:
             options.SetSuppressPersistentResult(False)
 
             # Call Get() on our SchemaField
-            #get_expr = f"(({self.valobj.GetTypeName()}*)0x{schema_field_addr:x})->Get()"
-            get_expr = f"{self.valobj.GetName()}.Get()"
+            get_expr = f"(({self.valobj.GetTypeName()}*)0x{schema_field_addr:x})->Get()"
 
             result = self.valobj.target.EvaluateExpression(get_expr, options)
 
