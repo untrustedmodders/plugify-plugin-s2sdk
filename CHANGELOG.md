@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.1.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.1.2...v2.1.3) (2025-10-18)
+
+
+### Bug Fixes
+
+* add lldb debug script for schemas ([04e0799](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/04e07994ad3152cb2c5897591c5ef423049bea5a))
+* add lldb init file ([e86b9bf](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e86b9bf7e31b61b1e7804b884ca7d3d273236725))
+* cvar improvements ([1b943f9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1b943f94cc93d3b25571ee3d3f27421ffef7d96b))
+* enable debug logger ([02ef163](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/02ef16336a0f0b99bd51befaf56d5dfa1fe562b7))
+* lldb 2nd script revert ([db69965](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/db699655408ee25a7c33ce824088068a8ec098b7))
+* move schema to flat_maps and remove hashes ([0cf3854](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0cf385457779a0315e051fbcc891518885cd749d))
+* rework schemas ([ec2599a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ec2599aca9e7b8c9854dd5569ef43b6eda016547))
+* some manager rework with containers ([61e7c2c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/61e7c2ca93aa5af5884075d036613e17d0b7068f))
+* some manager rework with containers ([f221f94](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f221f94bd90624b3a84fa6fc752e64bb9fbe9813))
+* some manager rework with containers ([ab39ddd](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ab39dddbdbe7a90ce8558d8d50b5339c87f17779))
+* update string ([a94da28](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a94da28a90763298bb1adb620bc6483b444f491d))
+* update SwitchTeam sig ([746658f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/746658faea74606a9d4dda707c27d3a1e465447c))
+
 ## [2.1.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.1.1...v2.1.2) (2025-10-15)
 
 
