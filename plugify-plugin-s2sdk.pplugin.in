@@ -21040,7 +21040,9 @@
             { "value": 10, "name": "ReservedSlot11" },
             { "value": 11, "name": "Boosts" },
             { "value": 12, "name": "Utility" },
-            { "value": 13, "name": "Count" }
+            { "value": 13, "name": "Count" },
+            { "value": 0, "name": "First" },
+            { "value": 12, "name": "Last" }
           ]
         }
       }
