@@ -6,8 +6,6 @@
 #include <core/sdk/utils.h>
 #include <core/sdk/cvars.h>
 #include <core/sdk/virtual.h>
-#include <plg/plugin.hpp>
-#include <plugin_export.h>
 
 #include "core/player_manager.hpp"
 

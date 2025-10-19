@@ -153,14 +153,14 @@ poly::ReturnAction Hook_FireEvent(poly::PHook& hook, poly::Params& params, int c
 }
 
 poly::ReturnAction Hook_PostEvent(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//auto slot = poly::GetArgument<int>(params, 1);
-	//auto localOnly = poly::GetArgument<bool>(params, 2);
-	//auto clientCount = poly::GetArgument<int>(params, 3);
+	auto slot = poly::GetArgument<int>(params, 1);
+	auto localOnly = poly::GetArgument<bool>(params, 2);
+	auto clientCount = poly::GetArgument<int>(params, 3);
 	auto clients = poly::GetArgument<uint64_t*>(params, 4);
 	auto message = poly::GetArgument<INetworkMessageInternal*>(params, 5);
 	auto pData = poly::GetArgument<CNetMessage*>(params, 6);
 
-	//plg::print(LS_DETAILED, "[PostEvent] = {}, {}, {}, {}\n", slot, localOnly, clientCount, static_cast<void*>(clients) );
+	plg::print(LS_DETAILED, "[PostEvent] = {}, {}, {}, {}\n", slot, localOnly, clientCount, static_cast<void*>(clients) );
 
 	if (type == poly::CallbackType::Pre) {
 		g_MultiAddonManager.OnPostEvent(message, pData, clients);
@@ -366,7 +366,7 @@ poly::ReturnAction Hook_FireOutputInternal(poly::PHook& hook, poly::Params& para
 	auto activator = poly::GetArgument<CEntityInstance*>(params, 1);
 	auto caller = poly::GetArgument<CEntityInstance*>(params, 2);
 	//auto value = poly::GetArgument<const CVariant* const>(params, 3);
-	auto delay = poly::GetArgument<float>(params, 4);
+	auto delay = poly::GetArgument<float>(params, 6);
 
 	ResultType result = type == poly::CallbackType::Post ? g_OutputManager.FireOutputInternal_Post(self, activator, caller, delay) : g_OutputManager.FireOutputInternal(self, activator, caller, delay);
 
@@ -619,7 +619,7 @@ void Source2SDK::OnPluginStart() {
 	g_PH.AddHookDetourFunc<HostStateRequestFn>("CHostStateMgr::StartNewRequest", Hook_HostStateRequest, Pre);
 	using ReplyConnectionFn = void (*)(CNetworkGameServerBase *server, CServerSideClient* client);
 	g_PH.AddHookDetourFunc<ReplyConnectionFn>("CNetworkGameServer::ReplyConnection", Hook_ReplyConnection, Pre, Post);
-	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float);
+	using FireOutputInternalFn = uint64_t(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, int32_t*, int16_t*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
 	auto engine2 = g_GameConfigManager.GetModule("engine2");
@@ -716,7 +716,7 @@ void Source2SDK::OnServerStartup() {
 
 	RegisterEventListeners();
 
-	/*ConVarFlag flags = ConVarFlag::LinkedConcommand | ConVarFlag::Release | ConVarFlag::ClientCanExecute;
+	ConVarFlag flags = ConVarFlag::LinkedConcommand | ConVarFlag::Release | ConVarFlag::ClientCanExecute;
 	auto result = g_CommandManager.AddValveCommand("test_vote", "", flags);
 	g_CommandManager.AddCommandListener("test_vote", [](int caller, CommandCallingContext context, const plg::vector<plg::string>& arguments) {
 		g_PanoramaVoteHandler.SendYesNoVote(30, caller, "#SFUI_vote_swap_teams", "", "#SFUI_vote_swap_teams", "", 0, static_cast<uint64>(-1), [](int numVotes, int yesVotes, int noVotes, int numClients, const plg::vector<int>& clientInfoSlot, const plg::vector<int>& clientInfoItem) {
@@ -729,6 +729,6 @@ void Source2SDK::OnServerStartup() {
 
 		});
 		return ResultType::Continue;
-	}, HookMode::Post);*/
+	}, HookMode::Post);
 }
 

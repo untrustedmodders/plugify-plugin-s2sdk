@@ -1,7 +1,5 @@
 #pragma once
 
-#include <concepts>
-
 enum class HookMode : uint8 {
 	Pre,
 	Post,
@@ -21,56 +19,55 @@ class ListenerManager;
 template<class Ret, class... Args>
 class ListenerManager<Ret(*)(Args...)> {
 public:
+    static constexpr size_t kStackSize = 62; // for 512 byte object
     using Func = Ret(*)(Args...);
 
-    bool Register(const Func& f, ptrdiff_t priority = 0) {
-        std::scoped_lock lock(m_mutex);
-        if (std::any_of(m_listeners.begin(), m_listeners.end(), [&](auto& x){ return x.first == f; }))
-            return false;
-        m_listeners.emplace_back(f, priority);
-        std::sort(m_listeners.begin(), m_listeners.end(),
-                  [](const auto& a, const auto& b){ return a.second > b.second; });
+    bool Register(const Func& handler, ptrdiff_t priority = 0) {
+        std::unique_lock lock(m_mutex);
+        auto it = std::upper_bound(m_priorities.begin(), m_priorities.end(), priority,
+                                   [](int p, int cur){ return p > cur; });
+        auto index = std::distance(m_priorities.begin(), it);
+        m_handlers.insert(m_handlers.begin() + index, handler);
+        m_priorities.insert(m_priorities.begin() + index, priority);
         return true;
     }
 
-    bool Unregister(const Func& f) {
-        std::scoped_lock lock(m_mutex);
-        auto it = std::find_if(m_listeners.begin(), m_listeners.end(),
-                               [&](auto& x){ return x.first == f; });
-        if (it == m_listeners.end()) return false;
-        m_listeners.erase(it);
+    bool Unregister(const Func& handler) {
+        std::unique_lock lock(m_mutex);
+        auto it = std::find(m_handlers.begin(), m_handlers.end(), handler);
+        if (it == m_handlers.end()) return false;
+        auto index = std::distance(m_handlers.begin(), it);
+        m_handlers.erase(m_handlers.begin() + index);
+        m_priorities.erase(m_priorities.begin() + index);
         return true;
     }
 
     void operator()(Args... args) {
-        std::vector<Func> copy;
+        plg::hybrid_vector<Func, kStackSize> copy;
         {
-            std::scoped_lock lock(m_mutex);
-            copy.reserve(m_listeners.size());
-            for (auto& p : m_listeners) copy.push_back(p.first);
+            std::shared_lock lock(m_mutex);
+            copy = m_handlers;
         }
         for (auto& f : copy) f(std::forward<Args>(args)...);
     }
 
     void Clear() {
-        std::scoped_lock lock(m_mutex);
-        m_listeners.clear();
+        std::unique_lock lock(m_mutex);
+        m_handlers.clear();
     }
 
-    std::vector<Func> Get() {
-        std::scoped_lock lock(m_mutex);
-        std::vector<Func> result;
-        result.reserve(m_listeners.size());
-        for (auto& p : m_listeners) result.push_back(p.first);
-        return result;
+    plg::hybrid_vector<Func, kStackSize> Get() const {
+        std::shared_lock lock(m_mutex);
+        return m_handlers;
     }
 
     bool Empty() const {
-        std::scoped_lock lock(m_mutex);
-        return m_listeners.empty();
+        std::shared_lock lock(m_mutex);
+        return m_handlers.empty();
     }
 
 private:
-    mutable std::mutex m_mutex;
-    std::vector<std::pair<Func, ptrdiff_t>> m_listeners;
+    plg::hybrid_vector<Func, kStackSize> m_handlers;
+    plg::hybrid_vector<int, kStackSize> m_priorities;
+    mutable std::shared_mutex m_mutex;
 };

@@ -78,6 +78,10 @@ namespace plg {
 		if (severity <= LS_DETAILED)
 			return;
 #endif
-		g_Logger.Log(std::format(fmt, std::forward<Args>(args)...), severity.m_severity, severity.m_location);
+		try {
+			g_Logger.Log(std::format(fmt, std::forward<Args>(args)...), severity.m_severity, severity.m_location);
+		}
+		catch (...) {
+		}
 	}
 }

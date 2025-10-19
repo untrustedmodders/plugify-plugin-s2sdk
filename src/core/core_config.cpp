@@ -47,7 +47,7 @@ bool CoreConfig::Initialize() {
 		config->JumpBack();
 	}
 
-	FilterConsoleCleaner.clear();
+	/*FilterConsoleCleaner.clear();
 	if (config->JumpKey("FilterConsoleCleaner")) {
 		if (config->IsArray() && config->JumpFirst()) {
 			do {
@@ -57,7 +57,7 @@ bool CoreConfig::Initialize() {
 			config->JumpBack();
 		}
 		config->JumpBack();
-	}
+	}*/
 
 	ServerLanguage = config->GetString("ServerLanguage", "en");
 	FollowCS2ServerGuidelines = config->GetBool("FollowCS2ServerGuidelines", true);
@@ -88,9 +88,9 @@ bool CoreConfig::IsPublicChatTrigger(std::string_view message) const {
 }
 
 bool CoreConfig::IsRegexMatch(std::string_view message) const {
-	for (const auto& regex : FilterConsoleCleaner) {
+	/*for (const auto& regex : FilterConsoleCleaner) {
 		if (std::regex_match(message.begin(), message.end(), regex))
 			return true;
-	}
+	}*/
 	return false;
 }

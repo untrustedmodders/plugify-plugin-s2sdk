@@ -6,7 +6,7 @@ typedef void (*FnEventListenerCallback)(IGameEvent* event);
 
 class CGameEventListener;
 
-extern std::vector<CGameEventListener*> g_vecEventListeners;
+extern plg::hybrid_vector<CGameEventListener*, 64> g_vecEventListeners;
 
 class CGameEventListener : public IGameEventListener2
 {

@@ -2,7 +2,6 @@
 #include <core/user_message.hpp>
 #include <core/user_message_manager.hpp>
 #include <engine/igameeventsystem.h>
-#include <plugin_export.h>
 
 PLUGIFY_WARN_PUSH()
 

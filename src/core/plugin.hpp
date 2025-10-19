@@ -1,8 +1,6 @@
 #pragma once
 
-#include <plg/plugin.hpp>
 #include <polyhook/polyhook.hpp>
-#include <plugin_export.h>
 
 #include <igamesystem.h>
 #include <igamesystemfactory.h>

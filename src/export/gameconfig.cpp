@@ -1,5 +1,4 @@
 #include <core/game_config.hpp>
-#include <plugin_export.h>
 
 PLUGIFY_WARN_PUSH()
 

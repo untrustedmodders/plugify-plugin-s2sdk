@@ -25,7 +25,7 @@ public:
 	ResultType FireOutputInternal_Post(CEntityIOOutput* self, CEntityInstance* activator, CEntityInstance* caller, float delay);
 
 private:
-	plg::parallel_flat_hash_map<OutputKey, std::shared_ptr<EntityOutputHook>, plg::pair_hash<plg::string, plg::string>> m_hookMap;
+	plg::parallel_flat_hash_map_s<OutputKey, std::shared_ptr<EntityOutputHook>, plg::pair_hash<plg::string, plg::string>> m_hookMap;
 	plg::inplace_vector<std::shared_ptr<EntityOutputHook>, 4> m_callbackHooks;
 };
 

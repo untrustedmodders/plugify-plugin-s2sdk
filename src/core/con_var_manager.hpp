@@ -74,13 +74,13 @@ public:
 	}
 
 	template<typename T>
-	ConVarRef CreateConVar(const plg::string& name, const plg::string& description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
+	ConVarRef CreateConVar(std::string_view name, std::string_view description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
 		if (name.empty()) {
 			plg::print(LS_WARNING, "ConVar name empty\n", name);
 			return {};
 		}
 
-		auto conVarRef = g_pCVar->FindConVar(name.c_str());
+		auto conVarRef = g_pCVar->FindConVar(name.data());
 		if (conVarRef.IsValidRef()) {
 			plg::print(LS_WARNING, "ConVar '{}' is already exists\n", name);
 			return conVarRef;
@@ -92,41 +92,43 @@ public:
 			return *conVarInfo->conVar;
 		}
 
-		conVarInfo = m_cnvLookup.emplace(name, std::make_shared<ConVarInfo>()).first->second;
-		auto conVar = std::make_unique<ConVarRef>(name.c_str());
+		conVarInfo = std::make_shared<ConVarInfo>();
+		auto conVar = std::make_unique<ConVarRef>(name.data());
 
 		if (conVar->IsValidRef()) {
 			conVarInfo->conVar = std::move(conVar);
 		} else {
-			conVarInfo->conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(name.c_str(), GetFlags(flags), description.c_str(), defaultVal, hasMin, min, hasMax, max));
+			conVarInfo->conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(name.data(), GetFlags(flags), description.data(), defaultVal, hasMin, min, hasMax, max));
 		}
 
+		m_cnvLookup.emplace(name, conVarInfo);
 		return *conVarInfo->conVar;
 	}
 
 	template<typename T>
-	ConVarRef FindConVar(const plg::string& name) {
+	ConVarRef FindConVar(std::string_view name) {
 		auto conVarInfo = plg::find(m_cnvLookup, name);
 		if (conVarInfo) {
 			return *conVarInfo->conVar;
 		}
 
-		conVarInfo = m_cnvLookup.emplace(name, std::make_shared<ConVarInfo>()).first->second;
-		conVarInfo->conVar = std::make_unique<CConVarRef<T>>(name.c_str());
+		conVarInfo = std::make_shared<ConVarInfo>();
+		conVarInfo->conVar = std::make_unique<CConVarRef<T>>(name.data());
 
 		if (!conVarInfo->conVar->IsValidRef()) {
 			plg::print(LS_WARNING, "Failed to find '{}' convar\n", name);
 			return {};
 		}
 
+		m_cnvLookup.emplace(name, conVarInfo);
 		return *conVarInfo->conVar;
 	}
 
-	ConVarRef FindConVar(const plg::string& name);
-	bool RemoveConVar(const plg::string& name);
+	ConVarRef FindConVar(std::string_view name);
+	bool RemoveConVar(std::string_view name);
 
-	bool HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
-	bool UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback);
+	bool HookConVarChange(std::string_view name, ConVarChangeListenerCallback callback);
+	bool UnhookConVarChange(std::string_view name, ConVarChangeListenerCallback callback);
 
 	static void ChangeDefault(
 		ConVarRefAbstract* ref,
@@ -155,7 +157,7 @@ private:
 	static void UpdateConVarValue(ConVarRefAbstract conVar, std::string_view value);
 
 private:
-	plg::parallel_flat_hash_map<plg::string, std::shared_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
+	plg::parallel_flat_hash_map_s<plg::string, std::shared_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
 	ListenerManager<ConVarChangeListenerCallback> m_globalCallbacks;
 };
 

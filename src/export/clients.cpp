@@ -3,8 +3,6 @@
 #include <core/sdk/entity/cbaseplayercontroller.h>
 #include <core/sdk/entity/cplayercontroller.h>
 #include <core/sdk/utils.h>
-#include <plg/plugin.hpp>
-#include <plugin_export.h>
 
 #include <core/sdk/entity/cplayerpawn.h>
 

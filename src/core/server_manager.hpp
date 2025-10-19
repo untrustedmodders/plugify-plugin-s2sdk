@@ -1,8 +1,5 @@
 #pragma once
 
-#include <mutex>
-#include <thread>
-
 using TaskCallback = void (*)(const plg::vector<plg::any>&);
 
 class ServerManager {
@@ -19,8 +16,8 @@ private:
 		plg::vector<plg::any> userData;
 	};
 
-	std::vector<Task> m_nextWorldUpdateTasks;
-	std::vector<Task> m_nextTasks;
+	plg::hybrid_vector<Task, 16> m_nextWorldUpdateTasks;
+	plg::hybrid_vector<Task, 16> m_nextTasks;
 
 	std::mutex m_worldUpdateMutex;
 	std::mutex m_frameTasksMutex;

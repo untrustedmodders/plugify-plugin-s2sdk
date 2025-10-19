@@ -1,5 +1,3 @@
-#include <plugin_export.h>
-
 #include <core/sdk/entity/cgamerules.h>
 #include <core/sdk/entity/cteam.h>
 

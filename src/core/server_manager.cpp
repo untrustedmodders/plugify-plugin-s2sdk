@@ -3,7 +3,7 @@
 #include <edict.h>
 
 void ServerManager::OnGameFrame() {
-	std::vector<Task> tasksToExecute;
+	plg::hybrid_vector<Task, 16> tasksToExecute;
 
 	{
 		std::scoped_lock lock(m_frameTasksMutex);
@@ -13,8 +13,7 @@ void ServerManager::OnGameFrame() {
 		tasksToExecute.swap(m_nextTasks);
 	}
 
-	plg::print(LS_DETAILED, "Executing queued tasks of size: {} on tick number {}\n",
-			   tasksToExecute.size(), gpGlobals->tickcount);
+	plg::print(LS_DETAILED, "Executing queued tasks of size: {} on tick number {}\n", tasksToExecute.size(), gpGlobals->tickcount);
 
 	for (auto& [callback, userData] : tasksToExecute) {
 		callback(userData);
@@ -22,7 +21,7 @@ void ServerManager::OnGameFrame() {
 }
 
 void ServerManager::OnPreWorldUpdate() {
-	std::vector<Task> tasksToExecute;
+	plg::hybrid_vector<Task, 16> tasksToExecute;
 
 	{
 		std::scoped_lock lock(m_worldUpdateMutex);
@@ -32,8 +31,7 @@ void ServerManager::OnPreWorldUpdate() {
 		tasksToExecute.swap(m_nextWorldUpdateTasks);
 	}
 
-	plg::print(LS_DETAILED, "Executing queued tasks of size: {} at time {}\n",
-			   tasksToExecute.size(), gpGlobals->curtime);
+	plg::print(LS_DETAILED, "Executing queued tasks of size: {} at time {}\n", tasksToExecute.size(), gpGlobals->curtime);
 
 	for (auto& [callback, userData] : tasksToExecute) {
 		callback(userData);

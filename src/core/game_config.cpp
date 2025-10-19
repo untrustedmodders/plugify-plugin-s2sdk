@@ -1,8 +1,8 @@
-#include "game_config.hpp"
-
 #include <core/sdk/utils.h>
 #include <platform.h>
 #include <plugify-configs/plugify-configs.hpp>
+
+#include "game_config.hpp"
 
 GameConfig::GameConfig(plg::string game, plg::vector<plg::string> paths) : m_gameDir(std::move(game)), m_paths(std::move(paths)) {
 }
@@ -10,7 +10,7 @@ GameConfig::GameConfig(plg::string game, plg::vector<plg::string> paths) : m_gam
 GameConfig::~GameConfig() = default;
 
 bool GameConfig::Initialize() {
-	std::vector<std::string_view> paths;
+	plg::hybrid_vector<std::string_view, 16> paths;
 	paths.reserve(m_paths.size());
 	for (const auto& path : m_paths) {
 		paths.emplace_back(path);
@@ -276,7 +276,7 @@ GameConfigManager::GameConfigManager() {
 }
 
 uint32_t GameConfigManager::LoadGameConfigFile(plg::vector<plg::string> paths) {
-	std::scoped_lock lock(m_mutex);
+	std::unique_lock lock(m_mutex);
 
 	for (auto& [id, cfg] : m_configs) {
 		auto& config = *cfg;
@@ -301,7 +301,7 @@ uint32_t GameConfigManager::LoadGameConfigFile(plg::vector<plg::string> paths) {
 }
 
 void GameConfigManager::CloseGameConfigFile(uint32_t id) {
-	std::scoped_lock lock(m_mutex);
+	std::unique_lock lock(m_mutex);
 
 	auto it = m_configs.find(id);
 	if (it != m_configs.end()) {
@@ -313,7 +313,7 @@ void GameConfigManager::CloseGameConfigFile(uint32_t id) {
 }
 
 GameConfig* GameConfigManager::GetGameConfig(uint32_t id) {
-	std::scoped_lock lock(m_mutex);
+	std::shared_lock lock(m_mutex);
 
 	auto it = m_configs.find(id);
 	if (it != m_configs.end()) {
@@ -324,13 +324,15 @@ GameConfig* GameConfigManager::GetGameConfig(uint32_t id) {
 }
 
 Module* GameConfigManager::GetModule(std::string_view name) {
-	std::scoped_lock lock(m_mutex);
-
-	auto it = m_modules.find(name);
-	if (it != m_modules.end()) {
-		return it->second.get();
+	{
+		std::shared_lock lock(m_mutex);
+		auto it = m_modules.find(name);
+		if (it != m_modules.end()) {
+			return it->second.get();
+		}
 	}
 
+	std::unique_lock lock(m_mutex);
 	return m_modules.emplace(name, std::make_unique<Module>(name)).first->second.get();
 }
 

@@ -19,7 +19,7 @@ ConCommandInfo::~ConCommandInfo() {
 	g_pCVar->UnregisterConCommandCallbacks(commandRef);
 }
 
-bool ConCommandManager::AddCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
+bool ConCommandManager::AddCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode) {
 	if (name.empty()) {
 		return m_globalCallbacks[mode].Register(callback);
 	}
@@ -27,20 +27,21 @@ bool ConCommandManager::AddCommandListener(const plg::string& name, CommandListe
 	if (auto commandInfo = plg::find(m_cmdLookup, name)) {
 		return commandInfo->callbacks[mode].Register(callback);
 	} else {
-		ConCommandRef commandRef = g_pCVar->FindConCommand(name.c_str());
+		ConCommandRef commandRef = g_pCVar->FindConCommand(name.data());
 		if (!commandRef.IsValidRef()) {
 			plg::print(LS_WARNING, "Command {} is not exists\n", name);
 			return false;
 		}
 
-		commandInfo = m_cmdLookup.emplace(name, std::make_shared<ConCommandInfo>()).first->second;
+		commandInfo = std::make_shared<ConCommandInfo>();
 		commandInfo->command = g_pCVar->GetConCommandData(commandRef);
 		commandInfo->defaultCommand = true;
-		return commandInfo->callbacks[mode].Register(callback);
+		m_cmdLookup.emplace(name, commandInfo);
+		return commandInfo->callbacks[mode].Register(callback);;
 	}
 }
 
-bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
+bool ConCommandManager::RemoveCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode) {
 	if (name.empty()) {
 		return m_globalCallbacks[mode].Unregister(callback);
 	}
@@ -52,23 +53,23 @@ bool ConCommandManager::RemoveCommandListener(const plg::string& name, CommandLi
 	return false;
 }
 
-bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, uint64 adminFlags) {
+bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view description, ConVarFlag flags, uint64 adminFlags) {
 	if (name.empty()) {
 		plg::print(LS_WARNING, "Command name empty\n", name);
 		return false;
 	}
 
 	auto commandInfo = plg::find(m_cmdLookup, name);
-	if (commandInfo || g_pCVar->FindConVar(name.c_str()).IsValidRef() || g_pCVar->FindConCommand(name.c_str()).IsValidRef()) {
+	if (commandInfo || g_pCVar->FindConVar(name.data()).IsValidRef() || g_pCVar->FindConCommand(name.data()).IsValidRef()) {
 		plg::print(LS_WARNING, "Command '{}' is already exists\n", name);
 		return false;
 	}
 
-	commandInfo = m_cmdLookup.emplace(name, std::make_shared<ConCommandInfo>()).first->second;
+	commandInfo = std::make_shared<ConCommandInfo>();
 
 	ConCommandCreation_t setup;
-	setup.m_pszName = name.c_str();
-	setup.m_pszHelpString = description.c_str();
+	setup.m_pszName = name.data();
+	setup.m_pszHelpString = description.data();
 	setup.m_nFlags = SanitiseConVarFlags(static_cast<uint64>(flags));
 	setup.m_CBInfo = { &CommandCallback };
 	setup.m_CompletionCBInfo = {};
@@ -77,11 +78,12 @@ bool ConCommandManager::AddValveCommand(const plg::string& name, const plg::stri
 	commandInfo->command = commandInfo->commandRef.GetRawData();
 	//commandInfo->adminFlags = adminFlags;
 
+	m_cmdLookup.emplace(name, commandInfo);
 	return true;
 }
 
-bool ConCommandManager::RemoveValveCommand(const plg::string& name) {
-	auto commandRef = g_pCVar->FindConCommand(name.c_str());
+bool ConCommandManager::RemoveValveCommand(std::string_view name) {
+	auto commandRef = g_pCVar->FindConCommand(name.data());
 	if (!commandRef.IsValidRef()) {
 		return false;
 	}
@@ -94,8 +96,8 @@ bool ConCommandManager::RemoveValveCommand(const plg::string& name) {
 	return true;
 }
 
-bool ConCommandManager::IsValidValveCommand(const plg::string& name) const {
-	ConCommandRef commandRef = g_pCVar->FindConCommand(name.c_str());
+bool ConCommandManager::IsValidValveCommand(std::string_view name) const {
+	ConCommandRef commandRef = g_pCVar->FindConCommand(name.data());
 	return commandRef.IsValidRef();
 }
 
@@ -117,7 +119,7 @@ static bool CheckCommandAccess(CPlayerSlot slot, uint64 flags) {
 	return true;
 }
 
-ResultType ConCommandManager::ExecuteCommandCallbacks(const plg::string& name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext) {
+ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext) {
 	plg::print(LS_DETAILED, "[ConCommandManager::ExecuteCommandCallbacks][{}]: {}\n", mode == HookMode::Pre ? "Pre" : "Post", name);
 
 	int size = args.ArgC();

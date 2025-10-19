@@ -1,5 +1,4 @@
 #include <core/timer_system.hpp>
-#include <plugin_export.h>
 
 PLUGIFY_WARN_PUSH()
 

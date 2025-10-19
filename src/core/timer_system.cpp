@@ -80,7 +80,7 @@ uint32_t TimerSystem::CreateTimer(double delay, TimerCallback callback, TimerFla
 	std::scoped_lock lock(m_mutex);
 	// Enforce minimum delay to prevent immediate execution and iterator invalidation
 	uint32_t id = ++s_nextId;
-	m_timers.emplace(id, flags & TimerFlag::Repeat, flags & TimerFlag::NoMapChange, false, false, universalTime + std::max(delay, engineFixedTickInterval), delay, callback, userData);
+	m_timers.emplace(id, flags & TimerFlag::Repeat, flags & TimerFlag::NoMapChange, false, false, universalTime, universalTime + std::max(delay, engineFixedTickInterval), delay, callback, userData);
 	return id;
 }
 

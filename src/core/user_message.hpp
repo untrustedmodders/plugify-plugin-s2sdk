@@ -132,17 +132,6 @@ public:
 	INetworkMessageInternal* GetSerializableMessage() const { return m_msgSerializable; }
 	CRecipientFilter& GetRecipientFilter() { return m_recipients; }
 
-	bool HasField(const std::string& fieldName) {
-		const pb::Descriptor* descriptor = m_msg->GetDescriptor();
-		const pb::FieldDescriptor* field = descriptor->FindFieldByName(fieldName);
-
-		if (field == nullptr || (field->label() == pb::FieldDescriptor::LABEL_REPEATED)) {
-			return false;
-		}
-
-		return m_msg->GetReflection()->HasField(*m_msg, field);
-	}
-
 private:
 	INetworkMessageInternal* m_msgSerializable{};
 	CNetMessage* m_netMessage{};

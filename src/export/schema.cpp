@@ -3,8 +3,6 @@
 #include <core/sdk/schema.h>
 #include <core/sdk/utils.h>
 #include <schemasystem/schemasystem.h>
-#include <plg/plugin.hpp>
-#include <plugin_export.h>
 #include <tier0/utlstring.h>
 
 PLUGIFY_WARN_PUSH()

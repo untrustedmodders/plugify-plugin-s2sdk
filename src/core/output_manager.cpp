@@ -6,7 +6,8 @@ bool EntityOutputManager::HookEntityOutput(plg::string classname, plg::string ou
 	if (auto hook = plg::find(m_hookMap, outputKey)) {
 		return hook->callbacks[mode].Register(callback);
 	} else {
-		hook = m_hookMap.emplace(std::move(outputKey), std::make_shared<EntityOutputHook>()).first->second;
+		hook = std::make_shared<EntityOutputHook>();
+		m_hookMap.emplace(std::move(outputKey), hook);
 		return hook->callbacks[mode].Register(callback);
 	}
 }

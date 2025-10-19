@@ -1,5 +1,4 @@
 #include <core/panorama_vote.hpp>
-#include <plugin_export.h>
 #include <recipientfilter.h>
 
 /**

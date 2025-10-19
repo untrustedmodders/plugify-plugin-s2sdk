@@ -2,7 +2,6 @@
 #include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/entity/cbasemodelentity.h>
 #include <core/sdk/utils.h>
-#include <plugin_export.h>
 
 PLUGIFY_WARN_PUSH()
 

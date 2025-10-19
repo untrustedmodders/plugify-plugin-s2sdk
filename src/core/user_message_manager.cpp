@@ -9,7 +9,8 @@ bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback 
 	if (auto hook = plg::find(m_hookMap, messageId)) {
 		return hook->callbacks[mode].Register(callback);
 	} else {
-		hook = m_hookMap.emplace(messageId, std::make_shared<UserMessageHook>()).first->second;
+		hook = std::make_shared<UserMessageHook>();
+		m_hookMap.emplace(messageId, hook);
 		return hook->callbacks[mode].Register(callback);
 	}
 }
@@ -35,7 +36,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 
 	int16_t messageID = message.GetMessageID();
 	
-	//plg::print(LS_DETAILED, "[CUserMessageManager::ExecuteMessageCallbacks][{}] Pushing user message `{}` pointer: %p\n", mode == HookMode::Pre ? "Pre" : "Post",  messageID, static_cast<const void*>(msgSerializable));
+	plg::print(LS_DETAILED, "[CUserMessageManager::ExecuteMessageCallbacks][{}] Pushing user message `{}` pointer: %p\n", mode == HookMode::Pre ? "Pre" : "Post",  messageID, static_cast<const void*>(msgSerializable));
 
 	ResultType result = ResultType::Continue;
 	

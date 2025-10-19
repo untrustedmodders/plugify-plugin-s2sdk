@@ -105,5 +105,5 @@ def __lldb_init_module(debugger, internal_dict):
         'type summary add -x "^SchemaField<.+>$" '
         '--summary-string "${svar.value}"'
     )
-    print("✅ SchemaField formatter loaded!")
+    print("✅ SchemaField formatter LOADED!")
 

@@ -11,9 +11,9 @@ EventManager::~EventManager() {
 	}
 }
 
-EventHookError EventManager::HookEvent(const plg::string& name, EventListenerCallback callback, HookMode mode) {
-	if (!g_pGameEventManager->FindListener(this, name.c_str())) {
-		if (!g_pGameEventManager->AddListener(this, name.c_str(), true)) {
+EventHookError EventManager::HookEvent(std::string_view name, EventListenerCallback callback, HookMode mode) {
+	if (!g_pGameEventManager->FindListener(this, name.data())) {
+		if (!g_pGameEventManager->AddListener(this, name.data(), true)) {
 			return EventHookError::InvalidEvent;
 		}
 	}
@@ -23,14 +23,15 @@ EventHookError EventManager::HookEvent(const plg::string& name, EventListenerCal
 		++eventHook->refCount;
 		return eventHook->callbacks[mode].Register(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
 	} else {
-		eventHook = m_eventHooks.emplace(name, std::make_shared<EventHook>(name)).first->second;
+		eventHook = std::make_shared<EventHook>(name);
 		eventHook->postCopy = (mode == HookMode::Post);
 		++eventHook->refCount;
+		m_eventHooks.emplace(name, eventHook);
 		return eventHook->callbacks[mode].Register(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
 	}
 }
 
-EventHookError EventManager::UnhookEvent(const plg::string& name, EventListenerCallback callback, HookMode mode) {
+EventHookError EventManager::UnhookEvent(std::string_view name, EventListenerCallback callback, HookMode mode) {
 	if (auto eventHook = plg::find(m_eventHooks, name)) {
 		auto status = eventHook->callbacks[mode].Unregister(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
 		if (eventHook->callbacks[HookMode::Pre].Empty() && eventHook->callbacks[HookMode::Post].Empty() || --eventHook->refCount == 0) {
@@ -51,8 +52,8 @@ void EventManager::FireEvent(EventInfo* info, bool dontBroadcast) {
 	m_freeEvents.push(info);
 }
 
-EventInfo* EventManager::CreateEvent(const plg::string& name, bool force) {
-	IGameEvent* event = g_pGameEventManager->CreateEvent(name.c_str(), force);
+EventInfo* EventManager::CreateEvent(std::string_view name, bool force) {
+	IGameEvent* event = g_pGameEventManager->CreateEvent(name.data(), force);
 
 	if (event) {
 		EventInfo* info;
@@ -129,12 +130,10 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 }
 
 ResultType EventManager::OnFireEvent_Post(IGameEvent* event, bool dontBroadcast) {
-	if (!event)
+	if (!event || m_eventStack.empty())
 		return ResultType::Continue;
 
-	auto hook = m_eventStack.top();
-
-	if (hook != nullptr) {
+	if (auto hook = m_eventStack.top()) {
 		auto& postHook = hook->callbacks[HookMode::Post];
 		if (!postHook.Empty()) {
 			if (hook->postCopy) {

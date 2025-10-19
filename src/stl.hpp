@@ -1,5 +1,11 @@
 #pragma once
 
+#include <plg/plugin.hpp>
+#include <plg/enum.hpp>
+#include <plg/path.hpp>
+#include <plg/hybrid_vector.hpp>
+#include <plugin_export.h>
+
 #include <parallel_hashmap/phmap.h>
 
 namespace plg {
@@ -10,10 +16,10 @@ namespace plg {
 	template <typename K> using Allocator = priv::Allocator<K>;
 
 	template <typename K, typename V, typename Hash = HashFn<K>, typename Eq = HashEqual<K>, size_t N = 4>
-	using parallel_flat_hash_map = parallel_flat_hash_map<K, V, Hash, Eq, Allocator<priv::Pair<K, V>>, N, std::shared_mutex>;
+	using parallel_flat_hash_map_s = parallel_flat_hash_map<K, V, Hash, Eq, Allocator<priv::Pair<K, V>>, N, std::shared_mutex>;
 
 	template <class K, class Hash = HashFn<K>, class Eq = HashEqual<K>, size_t N = 4>
-	using parallel_flat_hash_set = parallel_flat_hash_set<K, Hash, Eq, Allocator<K>, N, std::shared_mutex>;
+	using parallel_flat_hash_set_s = parallel_flat_hash_set<K, Hash, Eq, Allocator<K>, N, std::shared_mutex>;
 
 	template<typename Map>
 	constexpr auto find(const Map& map, const typename Map::key_type& key) {

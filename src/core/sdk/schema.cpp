@@ -1,7 +1,7 @@
 /**
  * =============================================================================
- * CS2Fixes
- * Copyright (C) 2023-2024 Source2ZE
+ * s2sdk
+ * Copyright (C) 2023-2025 untrustedmodders
  * =============================================================================
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -25,7 +25,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-
 void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32_t networkStateChangedOffset) {
 	NetworkStateChanged_t data(offset);
 	CALL_VIRTUAL(void, networkStateChangedOffset, reinterpret_cast<void*>(networkVar), &data);
@@ -44,17 +43,17 @@ void ChainNetworkStateChanged(uintptr_t networkVarChainer, uint32_t localOffset)
 
 void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset) {
 	if (chainOffset > 0) {
-		::ChainNetworkStateChanged(entity + chainOffset, offset);
+		ChainNetworkStateChanged(entity + chainOffset, offset);
 	} else {
 		if (chainOffset == 0)
-			::EntityNetworkStateChanged(entity, offset);
+			EntityNetworkStateChanged(entity, offset);
 		else
-			::NetworkVarStateChanged(entity, offset, -chainOffset);
+			NetworkVarStateChanged(entity, offset, -chainOffset);
 	}
 }
 
 using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey, plg::string_hash, std::equal_to<>>;
-using SchemaTableMap = plg::parallel_node_hash_map<plg::string, std::shared_ptr<SchemaValueMap>, plg::string_hash, std::equal_to<>>;
+using SchemaTableMap = plg::parallel_flat_hash_map_s<plg::string, std::shared_ptr<SchemaValueMap>, plg::string_hash, std::equal_to<>>;
 
 namespace {
 	bool IsFieldNetworked(const SchemaClassFieldData_t& field) {

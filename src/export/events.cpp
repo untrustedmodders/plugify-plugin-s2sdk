@@ -1,7 +1,6 @@
 #include <core/event_manager.hpp>
 #include <entity2/entitysystem.h>
 #include <core/sdk/utils.h>
-#include <plugin_export.h>
 
 PLUGIFY_WARN_PUSH()
 

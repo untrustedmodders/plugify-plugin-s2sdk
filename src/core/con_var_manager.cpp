@@ -19,37 +19,38 @@ ConVarManager::~ConVarManager() {
 }
 
 void ConVarManager::Init() {
+	ConVar_Register(FCVAR_RELEASE | FCVAR_SERVER_CAN_EXECUTE | FCVAR_GAMEDLL);
+
 	if (!g_pCVar) {
 		return;
 	}
-
-	ConVar_Register(FCVAR_RELEASE | FCVAR_SERVER_CAN_EXECUTE | FCVAR_GAMEDLL);
 
 	g_pCVar->InstallGlobalChangeCallback(&ChangeGlobal);
 	g_pCVar->InstallGlobalChangeCallback(&ChangeDefault);
 }
 
-bool ConVarManager::RemoveConVar(const plg::string& name) {
+bool ConVarManager::RemoveConVar(std::string_view name) {
 	return m_cnvLookup.erase(name) != 0;
 }
 
-ConVarRef ConVarManager::FindConVar(const plg::string& name) {
+ConVarRef ConVarManager::FindConVar(std::string_view name) {
 	if (auto conVarInfo = plg::find(m_cnvLookup, name)) {
 		return *conVarInfo->conVar;
 	} else {
-		conVarInfo = m_cnvLookup.emplace(name, std::make_shared<ConVarInfo>()).first->second;
-		conVarInfo->conVar = std::make_unique<ConVarRefAbstract>(name.c_str(), true);
+		conVarInfo = std::make_shared<ConVarInfo>();
+		conVarInfo->conVar = std::make_unique<ConVarRefAbstract>(name.data(), true);
 
 		if (!conVarInfo->conVar->IsValidRef()) {
 			plg::print(LS_WARNING, "Failed to find '{}' convar\n", name);
 			return {};
 		}
 
+		m_cnvLookup.emplace(name, conVarInfo);
 		return *conVarInfo->conVar;
 	}
 }
 
-bool ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
+bool ConVarManager::HookConVarChange(std::string_view name, ConVarChangeListenerCallback callback) {
 	if (name.empty()) {
 		return m_globalCallbacks.Register(callback);
 	}
@@ -61,7 +62,7 @@ bool ConVarManager::HookConVarChange(const plg::string& name, ConVarChangeListen
 	return false;
 }
 
-bool ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeListenerCallback callback) {
+bool ConVarManager::UnhookConVarChange(std::string_view name, ConVarChangeListenerCallback callback) {
 	if (name.empty()) {
 		return m_globalCallbacks.Unregister(callback);
 	}
@@ -74,7 +75,8 @@ bool ConVarManager::UnhookConVarChange(const plg::string& name, ConVarChangeList
 }
 
 void ConVarManager::ChangeDefault(ConVarRefAbstract* ref, CSplitScreenSlot , const char* newValue, const char* oldValue, void*) {
-	if (auto conVarInfo = plg::find(g_ConVarManager.m_cnvLookup, ref->GetName())) {
+	std::string_view key = ref->GetName();
+	if (auto conVarInfo = plg::find(g_ConVarManager.m_cnvLookup, key)) {
 		conVarInfo->hook(*ref, newValue, oldValue);
 	}
 }

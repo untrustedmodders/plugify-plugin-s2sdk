@@ -29,10 +29,10 @@ public:
 	EventManager() = default;
 	~EventManager() override;
 
-	EventHookError HookEvent(const plg::string& name, EventListenerCallback callback, HookMode mode = HookMode::Post);
-	EventHookError UnhookEvent(const plg::string& name, EventListenerCallback callback, HookMode mode = HookMode::Post);
+	EventHookError HookEvent(std::string_view name, EventListenerCallback callback, HookMode mode = HookMode::Post);
+	EventHookError UnhookEvent(std::string_view name, EventListenerCallback callback, HookMode mode = HookMode::Post);
 
-	EventInfo* CreateEvent(const plg::string& name, bool force = false);
+	EventInfo* CreateEvent(std::string_view name, bool force = false);
 	void FireEvent(EventInfo* info, bool dontBroadcast);
 	void FireEventToClient(EventInfo* info, CPlayerSlot slot);
 	void CancelCreatedEvent(EventInfo* info);
@@ -44,7 +44,7 @@ private:
 	void FireGameEvent(IGameEvent* event) override;
 
 private:
-	plg::parallel_flat_hash_map<plg::string, std::shared_ptr<EventHook>, plg::string_hash, std::equal_to<>> m_eventHooks;
+	plg::parallel_flat_hash_map_s<plg::string, std::shared_ptr<EventHook>, plg::string_hash, std::equal_to<>> m_eventHooks;
 	std::stack<EventInfo*> m_freeEvents;
 	std::stack<std::shared_ptr<EventHook>> m_eventStack;
 	std::stack<IGameEvent*> m_eventCopies;

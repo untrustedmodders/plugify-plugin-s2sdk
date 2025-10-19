@@ -1,5 +1,3 @@
-#include <plugin_export.h>
-
 PLUGIFY_WARN_PUSH()
 
 #if defined(__clang)

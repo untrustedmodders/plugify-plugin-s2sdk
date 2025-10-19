@@ -1,6 +1,5 @@
 #include <core/sdk/utils.h>
 #include <core/con_command_manager.hpp>
-#include <plugin_export.h>
 
 PLUGIFY_WARN_PUSH()
 

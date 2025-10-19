@@ -1,6 +1,5 @@
 #include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/entity/ccsweaponbase.h>
-#include <plugin_export.h>
 
 PLUGIFY_WARN_PUSH()
 

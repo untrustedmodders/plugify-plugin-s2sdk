@@ -15,7 +15,7 @@ struct Timer {
 	bool noMapChange;
 	mutable bool exec;
 	mutable bool kill;
-	//double createTime;
+	double createTime;
 	double executeTime;
 	double delay;
 	TimerCallback callback;
