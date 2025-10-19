@@ -61,6 +61,8 @@ namespace plg {
 
 		LoggingSeverity_t m_severity;
 		std::source_location m_location;
+
+		auto operator<=>(const LoggingSeverity_t& severity) const { return m_severity <=> severity; }
 	};
 
 	template <string_like First>
