@@ -103,7 +103,7 @@ private:
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
 	plg::string m_language;
 	plg::string m_operatingSystem;
-	plg::flat_hash_map<int, CvarQuery> m_queryCallback;
+	plg::flat_map<int, CvarQuery> m_queryCallback;
 };
 
 class PlayerManager {

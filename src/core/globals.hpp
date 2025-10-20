@@ -61,7 +61,7 @@ inline CGameEntitySystem* g_pGameEntitySystem = nullptr;
 inline CBaseGameRules* g_pGameRules = nullptr;
 inline CBaseGameRulesProxy* g_pGameRulesProxy = nullptr;
 inline CBaseEntity* g_pPointScript = nullptr;
-inline plg::flat_hash_map<int, CTeam*> g_pTeamManagers;
+inline plg::flat_map<int, CTeam*> g_pTeamManagers;
 //inline ISteamHTTP* g_http = nullptr;
 inline CSteamGameServerAPIContext g_SteamAPI = {};
 inline plg::flat_hash_set<plg::string> g_Precached;
@@ -73,7 +73,7 @@ extern CoreConfig* g_pCoreConfig;
 extern GameConfig* g_pGameConfig;
 
 namespace globals {
-	void Initialize(plg::flat_hash_map<plg::string, plg::string> paths);
+	void Initialize(plg::flat_map<plg::string, plg::string> paths);
 	void Terminate();
 
 	PlatModule_t FindModule(std::string_view name);

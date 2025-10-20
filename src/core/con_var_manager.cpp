@@ -172,7 +172,7 @@ public:
 
 class ConVarConfigParser {
 public:
-	using ConVarMap = std::map<plg::string, plg::string, plg::case_insensitive_equal>;
+	using ConVarMap = plg::flat_map<plg::string, plg::string, plg::case_insensitive_compare>;
 
 	static std::expected<ConVarMap, std::string> ParseConfigFile(const fs::path& filePath) {
 		std::error_code ec;
@@ -185,9 +185,6 @@ public:
 			return std::unexpected(std::format("Failed to open config file: {}", plg::as_string(filePath)));
 		}
 
-		ConVarMap conVars;
-		std::string line;
-
 		auto trim = [](std::string_view str) -> std::string_view {
 			const auto start = str.find_first_not_of(" \t\n\r\f\v");
 			if (start == std::string_view::npos)
@@ -195,6 +192,9 @@ public:
 			const auto end = str.find_last_not_of(" \t\n\r\f\v");
 			return str.substr(start, end - start + 1);
 		};
+
+		ConVarMap conVars;
+		std::string line;
 
 		while (std::getline(file, line)) {
 			std::string_view buffer = trim(line);
@@ -255,7 +255,7 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
         if (auto parseResult = ConVarConfigParser::ParseConfigFile(fullPath)) {
 			const auto& parsed = *parseResult;
         	for (const auto& conVar : conVarRefs) {
-        		plg::string label = conVar.GetName();
+        		std::string_view label = conVar.GetName();
                 auto it = parsed.find(label);
                 if (it != parsed.end()) {
                     UpdateConVarValue(conVar, it->second);

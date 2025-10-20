@@ -6,9 +6,22 @@
 #include <plg/hybrid_vector.hpp>
 #include <plugin_export.h>
 
+#ifdef __cpp_lib_flat_map
+#include <flat_map>
+#else
+#include <map>
+#endif
+
 #include <parallel_hashmap/phmap.h>
 
 namespace plg {
+#ifdef __cpp_lib_flat_map
+	template<typename Key, typename T, typename Compare = std::less<Key>>
+	using flat_map = std::flat_map<Key, T, Compare>;
+#else
+	template<typename Key, typename T, typename Compare = std::less<Key>>
+	using flat_map = std::map<Key, T, Compare>; // Temporary fallback
+#endif
 	using namespace phmap;
 
 	template <typename K> using HashEqual = priv::hash_default_eq<K>;
