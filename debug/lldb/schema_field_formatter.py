@@ -73,12 +73,14 @@ class SchemaFieldSynthProvider:
 
         offset = self._get_schema_offset(parent_name, field_name)
         member_offset = self._get_member_offset(parent_type, field_name)
+
         if member_offset is None:
             self.cached_value = None
             return
 
         parent_addr = self.valobj.GetLoadAddress() - member_offset
         final_addr = parent_addr + offset
+
         self.cached_value = self.valobj.CreateValueFromAddress("value", final_addr, value_type)
 
     def num_children(self):
@@ -98,12 +100,11 @@ class SchemaFieldSynthProvider:
 
 def __lldb_init_module(debugger, internal_dict):
     debugger.HandleCommand(
-        'type synthetic add -x "^SchemaField<.+>$" '
+        'type synthetic add -x "SchemaField<[^>]+>" '
         '--python-class schema_field_formatter.SchemaFieldSynthProvider'
     )
     debugger.HandleCommand(
-        'type summary add -x "^SchemaField<.+>$" '
+        'type summary add -x "SchemaField<[^>]+>" '
         '--summary-string "${svar.value}"'
     )
-    print("✅ SchemaField formatter LOADED!")
-
+    print("✅ SchemaField formatter loaded!")
