@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.2.0...v2.2.1) (2025-10-21)
+
+
+### Bug Fixes
+
+* windows build ([18a5209](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/18a520905c01116f2aaea6b7b7c499201ab9bb25))
+
 ## [2.2.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.1.2...v2.2.0) (2025-10-21)
 
 
