@@ -133,11 +133,12 @@ poly::ReturnAction Hook_SpawnServer(poly::PHook& hook, poly::Params& params, int
 }
 
 poly::ReturnAction Hook_FireEvent(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-
 	auto event = poly::GetArgument<IGameEvent*>(params, 1);
 	auto dontBroadcast = poly::GetArgument<bool>(params, 2);
 
-	plg::print(LS_DETAILED, "[FireEvent] = {}\n", event->GetName() );
+	if (event) {
+		plg::print(LS_DETAILED, "[FireEvent] = {}\n", event->GetName());
+	}
 
 	auto result = type == poly::CallbackType::Post ? g_EventManager.OnFireEvent_Post(event, dontBroadcast) : g_EventManager.OnFireEvent(event, dontBroadcast);
 	if (result >= ResultType::Handled) {

@@ -55,10 +55,12 @@ public:
 	}
 
 	void operator()(Args... args) {
-		auto funcs = Get();
-		for (const auto& func : funcs) {
-			func(std::forward<Args>(args)...);
+		plg::hybrid_vector<Func, N> funcs;
+		{
+			SharedLock lock(m_mutex);
+			funcs = m_handlers;
 		}
+		for (auto& func : funcs) func(std::forward<Args>(args)...);
 	}
 
 	void Clear() {
@@ -78,6 +80,7 @@ public:
 	}
 
 private:
+	alignas(std::hardware_destructive_interference_size)
 	plg::hybrid_vector<Func, N> m_handlers;
 	plg::hybrid_vector<int, N> m_priorities;
 	PLUGIFY_NO_UNIQUE_ADDRESS mutable Mutex m_mutex;

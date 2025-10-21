@@ -95,7 +95,8 @@ bool ConVarManager::UnhookConVarChange(std::string_view name, ConVarChangeListen
 void ConVarManager::ChangeDefault(ConVarRefAbstract* ref, CSplitScreenSlot , const char* newValue, const char* oldValue, void*) {
 	std::scoped_lock lock(g_ConVarManager.m_mutex);
 
-	auto it = g_ConVarManager.m_cnvLookup.find(ref->GetName());
+	std::string_view key = ref->GetName();
+	auto it = g_ConVarManager.m_cnvLookup.find(key);
 	if (it != g_ConVarManager.m_cnvLookup.end()) {
 		auto conVarInfo = it->second;
 		conVarInfo->callbacks(*ref, newValue, oldValue);
@@ -103,7 +104,7 @@ void ConVarManager::ChangeDefault(ConVarRefAbstract* ref, CSplitScreenSlot , con
 }
 
 void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot, const char* newValue, const char* oldValue, void*) {
-	std::scoped_lock lock(m_mutex);
+	std::scoped_lock lock(g_ConVarManager.m_mutex);
 
 	g_ConVarManager.m_globalCallbacks(*ref, newValue, oldValue);
 }

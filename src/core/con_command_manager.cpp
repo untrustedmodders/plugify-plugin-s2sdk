@@ -113,7 +113,7 @@ bool ConCommandManager::RemoveValveCommand(std::string_view name) {
 	return true;
 }
 
-bool ConCommandManager::IsValidValveCommand(std::string_view name) const {
+bool ConCommandManager::IsValidValveCommand(std::string_view name) {
 	std::scoped_lock lock(m_mutex);
 
 	ConCommandRef commandRef = g_pCVar->FindConCommand(name.data());

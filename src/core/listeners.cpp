@@ -2,7 +2,7 @@
 
 #define DEFINE_MANAGER_ACCESSOR(name, ret, ...)                                                    \
 	using Fn##name = ret (*)(__VA_ARGS__);                                                         \
-	ListenerManager<Fn##name>& Get##name##ListenerManager() {                                      \
+	ListenerManager<Fn##name, std::shared_mutex>& Get##name##ListenerManager() {                   \
 		static ListenerManager<Fn##name, std::shared_mutex> s_##name;                              \
 		return s_##name;                                                                           \
 	}                                                                                              \
