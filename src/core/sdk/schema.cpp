@@ -54,7 +54,7 @@ void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset) {
 
 namespace {
 	using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey, plg::string_hash, std::equal_to<>>;
-	using SchemaTableMap = plg::flat_hash_map<plg::string, std::shared_ptr<SchemaValueMap>, plg::string_hash, std::equal_to<>>;
+	using SchemaTableMap = plg::flat_hash_map<plg::string, SchemaValueMap, plg::string_hash, std::equal_to<>>;
 
 	bool IsFieldNetworked(const SchemaClassFieldData_t& field) {
 		for (int i = 0; i < field.m_nStaticMetadataCount; ++i) {
@@ -66,7 +66,7 @@ namespace {
 		return false;
 	}
 
-	std::shared_ptr<SchemaValueMap> InitSchemaFieldsForClass(std::string_view className) {
+	SchemaValueMap InitSchemaFieldsForClass(std::string_view className) {
 		CSchemaSystemTypeScope* pType = g_pSchemaSystem->FindTypeScopeForModule(S2SDK_LIBRARY_PREFIX "server" S2SDK_LIBRARY_SUFFIX);
 		if (!pType)
 			return {};
@@ -80,8 +80,8 @@ namespace {
 		size_t fieldsSize = pClassInfo->m_nFieldCount;
 		SchemaClassFieldData_t* fields = pClassInfo->m_pFields;
 
-		auto valueMap = std::make_shared<SchemaValueMap>();
-		valueMap->reserve(fieldsSize);
+		SchemaValueMap valueMap;
+		valueMap.reserve(fieldsSize);
 
 		for (size_t i = 0; i < fieldsSize; ++i) {
 			const SchemaClassFieldData_t& field = fields[i];
@@ -89,7 +89,7 @@ namespace {
 			int size = 0;
 			uint8 alignment = 0;
 			field.m_pType->GetSizeAndAlignment(size, alignment);
-			valueMap->emplace(field.m_pszName, SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), size, field.m_pType});
+			valueMap.emplace(field.m_pszName, SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), static_cast<size_t>(size), field.m_pType});
 
 			plg::print(LS_DETAILED, "{}::{} found at -> 0x{:x} - {}\n", className, field.m_pszName, field.m_nSingleInheritanceOffset, static_cast<const void*>(&field));
 		}
@@ -102,7 +102,7 @@ namespace {
 }// namespace
 
 namespace schema {
-	static constexpr plg::string g_ChainKey = "__m_pChainEntity";
+	static constexpr std::string_view g_ChainKey = "__m_pChainEntity";
 
 	int32_t FindChainOffset(std::string_view className) {
 		return GetOffset(className, g_ChainKey).offset;
@@ -114,8 +114,8 @@ namespace schema {
 			auto it = schemaTableMap.find(className);
 			if (it != schemaTableMap.end()) {
 				auto& table = it->second;
-				auto it2 = table->find(memberName);
-				if (it2 != table->end()) {
+				auto it2 = table.find(memberName);
+				if (it2 != table.end()) {
 					return it2->second;
 				}
 				if (g_ChainKey != memberName) {

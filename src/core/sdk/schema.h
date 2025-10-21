@@ -29,10 +29,10 @@
 #undef schema
 
 struct SchemaKey {
-    int32 offset;
-    int32 networked : 1;
-    int32 size : 31;
-    CSchemaType* type;
+	ptrdiff_t offset;
+	size_t networked;
+	size_t size;
+	CSchemaType* type;
 };
 
 namespace schema {

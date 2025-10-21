@@ -717,7 +717,7 @@ void Source2SDK::OnServerStartup() {
 
 	RegisterEventListeners();
 
-	ConVarFlag flags = ConVarFlag::LinkedConcommand | ConVarFlag::Release | ConVarFlag::ClientCanExecute;
+	/*ConVarFlag flags = ConVarFlag::LinkedConcommand | ConVarFlag::Release | ConVarFlag::ClientCanExecute;
 	auto result = g_CommandManager.AddValveCommand("test_vote", "", flags);
 	g_CommandManager.AddCommandListener("test_vote", [](int caller, CommandCallingContext context, const plg::vector<plg::string>& arguments) {
 		g_PanoramaVoteHandler.SendYesNoVote(30, caller, "#SFUI_vote_swap_teams", "", "#SFUI_vote_swap_teams", "", 0, static_cast<uint64>(-1), [](int numVotes, int yesVotes, int noVotes, int numClients, const plg::vector<int>& clientInfoSlot, const plg::vector<int>& clientInfoItem) {
@@ -730,6 +730,6 @@ void Source2SDK::OnServerStartup() {
 
 		});
 		return ResultType::Continue;
-	}, HookMode::Post);
+	}, HookMode::Post);*/
 }
 
