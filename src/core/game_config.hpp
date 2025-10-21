@@ -58,7 +58,7 @@ public:
 private:
 	plg::flat_hash_map<uint32_t, std::unique_ptr<GameConfig>> m_configs;
 	plg::flat_hash_map<plg::string, std::unique_ptr<Module>, plg::string_hash, std::equal_to<>> m_modules;
-	std::shared_mutex m_mutex;
+	mutable std::shared_mutex m_mutex;
 	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
 };
 

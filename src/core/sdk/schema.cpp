@@ -52,10 +52,10 @@ void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset) {
 	}
 }
 
-using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey, plg::string_hash, std::equal_to<>>;
-using SchemaTableMap = plg::parallel_flat_hash_map_s<plg::string, std::shared_ptr<SchemaValueMap>, plg::string_hash, std::equal_to<>>;
-
 namespace {
+	using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey, plg::string_hash, std::equal_to<>>;
+	using SchemaTableMap = plg::flat_hash_map<plg::string, std::shared_ptr<SchemaValueMap>, plg::string_hash, std::equal_to<>>;
+
 	bool IsFieldNetworked(const SchemaClassFieldData_t& field) {
 		for (int i = 0; i < field.m_nStaticMetadataCount; ++i) {
 			std::string_view fieldName(field.m_pStaticMetadata[i].m_pszName);
@@ -97,9 +97,9 @@ namespace {
 		return valueMap;
 	}
 
+	SchemaTableMap schemaTableMap;
+	std::shared_mutex schemaMutex;
 }// namespace
-
-SchemaTableMap schemaTableMap;
 
 namespace schema {
 	static constexpr plg::string g_ChainKey = "__m_pChainEntity";
@@ -109,18 +109,31 @@ namespace schema {
 	}
 
 	SchemaKey GetOffset(std::string_view className, std::string_view memberName) {
-		if (auto table = plg::find(schemaTableMap, className)) {
-			auto it = table->find(memberName);
-			if (it != table->end()) {
-				return it->second;
+		{
+			std::shared_lock lock(schemaMutex);
+			auto it = schemaTableMap.find(className);
+			if (it != schemaTableMap.end()) {
+				auto& table = it->second;
+				auto it2 = table->find(memberName);
+				if (it2 != table->end()) {
+					return it2->second;
+				}
+				if (g_ChainKey != memberName) {
+					plg::print(
+						LS_ERROR,
+						"schema::GetOffset(): '{}' was not found in '{}'!\n",
+						memberName,
+						className
+					);
+				}
+				return {};
 			}
-			if (g_ChainKey != memberName) {
-				plg::print(LS_ERROR, "schema::GetOffset(): '{}' was not found in '{}'!\n", memberName, className);
-			}
-			return {};
 		}
 
-		schemaTableMap.emplace(className, InitSchemaFieldsForClass(className));
+		{
+			std::unique_lock lock(schemaMutex);
+			schemaTableMap.emplace(className, InitSchemaFieldsForClass(className));
+		}
 
 		return GetOffset(className, memberName);
 	}

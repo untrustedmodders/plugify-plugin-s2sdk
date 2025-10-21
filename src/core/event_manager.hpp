@@ -12,8 +12,8 @@ using EventListenerCallback = ResultType (*)(const plg::string& name, EventInfo*
 
 struct EventHook {
 	plg::string name;
-	std::atomic<uint32_t> refCount{};
-	std::atomic<bool> postCopy{};
+	bool postCopy{};
+	uint32_t refCount{1};
 	plg::enum_map<ListenerManager<EventListenerCallback>, HookMode> callbacks;
 };
 
@@ -44,7 +44,8 @@ private:
 	void FireGameEvent(IGameEvent* event) override;
 
 private:
-	plg::parallel_flat_hash_map_s<plg::string, std::shared_ptr<EventHook>, plg::string_hash, std::equal_to<>> m_eventHooks;
+	plg::flat_hash_map<plg::string, std::shared_ptr<EventHook>, plg::string_hash, std::equal_to<>> m_hookMap;
+	std::recursive_mutex m_mutex;
 	std::stack<EventInfo*> m_freeEvents;
 	std::stack<std::shared_ptr<EventHook>> m_eventStack;
 	std::stack<IGameEvent*> m_eventCopies;

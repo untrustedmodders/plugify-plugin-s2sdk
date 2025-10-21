@@ -30,14 +30,20 @@ void ConVarManager::Init() {
 }
 
 bool ConVarManager::RemoveConVar(std::string_view name) {
+	std::scoped_lock lock(m_mutex);
+
 	return m_cnvLookup.erase(name) != 0;
 }
 
 ConVarRef ConVarManager::FindConVar(std::string_view name) {
-	if (auto conVarInfo = plg::find(m_cnvLookup, name)) {
+	std::scoped_lock lock(m_mutex);
+
+	auto it = m_cnvLookup.find(name);
+	if (it != m_cnvLookup.end()) {
+		auto conVarInfo = it->second;
 		return *conVarInfo->conVar;
 	} else {
-		conVarInfo = std::make_shared<ConVarInfo>();
+		auto conVarInfo = std::make_shared<ConVarInfo>();
 		conVarInfo->conVar = std::make_unique<ConVarRefAbstract>(name.data(), true);
 
 		if (!conVarInfo->conVar->IsValidRef()) {
@@ -51,37 +57,54 @@ ConVarRef ConVarManager::FindConVar(std::string_view name) {
 }
 
 bool ConVarManager::HookConVarChange(std::string_view name, ConVarChangeListenerCallback callback) {
+	std::scoped_lock lock(m_mutex);
+
 	if (name.empty()) {
 		return m_globalCallbacks.Register(callback);
 	}
 
-	if (auto conVarInfo = plg::find(m_cnvLookup, name)) {
-		return conVarInfo->hook.Register(callback);
+	auto it = m_cnvLookup.find(name);
+	if (it != m_cnvLookup.end()) {
+		auto conVarInfo = it->second;
+		auto status = conVarInfo->callbacks.Unregister(callback);
+		/*if (conVarInfo->hook.Empty()) {
+			m_cnvLookup.erase(it);
+		}*/
+		return status;
 	}
 
 	return false;
 }
 
 bool ConVarManager::UnhookConVarChange(std::string_view name, ConVarChangeListenerCallback callback) {
+	std::scoped_lock lock(m_mutex);
+
 	if (name.empty()) {
 		return m_globalCallbacks.Unregister(callback);
 	}
 
-	if (auto conVarInfo = plg::find(m_cnvLookup, name)) {
-		return conVarInfo->hook.Unregister(callback);
+	auto it = m_cnvLookup.find(name);
+	if (it != m_cnvLookup.end()) {
+		auto conVarInfo = it->second;
+		return conVarInfo->callbacks.Unregister(callback);
 	}
 
 	return false;
 }
 
 void ConVarManager::ChangeDefault(ConVarRefAbstract* ref, CSplitScreenSlot , const char* newValue, const char* oldValue, void*) {
-	std::string_view key = ref->GetName();
-	if (auto conVarInfo = plg::find(g_ConVarManager.m_cnvLookup, key)) {
-		conVarInfo->hook(*ref, newValue, oldValue);
+	std::scoped_lock lock(g_ConVarManager.m_mutex);
+
+	auto it = g_ConVarManager.m_cnvLookup.find(ref->GetName());
+	if (it != g_ConVarManager.m_cnvLookup.end()) {
+		auto conVarInfo = it->second;
+		conVarInfo->callbacks(*ref, newValue, oldValue);
 	}
 }
 
 void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot, const char* newValue, const char* oldValue, void*) {
+	std::scoped_lock lock(m_mutex);
+
 	g_ConVarManager.m_globalCallbacks(*ref, newValue, oldValue);
 }
 

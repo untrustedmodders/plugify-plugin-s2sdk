@@ -22,7 +22,8 @@ public:
 	ResultType ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode);
 
 private:
-	plg::parallel_flat_hash_map_s<int16_t, std::shared_ptr<UserMessageHook>> m_hookMap;
+	plg::flat_hash_map<int16_t, std::shared_ptr<UserMessageHook>> m_hookMap;
+	std::recursive_mutex m_mutex;
 	UserMessageHook m_global;
 };
 

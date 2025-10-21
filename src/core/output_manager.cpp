@@ -1,24 +1,34 @@
 #include "output_manager.hpp"
 
 bool EntityOutputManager::HookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode) {
+	std::scoped_lock lock(m_mutex);
+
 	OutputKey outputKey{std::move(classname), std::move(output)};
 
-	if (auto hook = plg::find(m_hookMap, outputKey)) {
-		return hook->callbacks[mode].Register(callback);
-	} else {
-		hook = std::make_shared<EntityOutputHook>();
-		m_hookMap.emplace(std::move(outputKey), hook);
-		return hook->callbacks[mode].Register(callback);
+	std::shared_ptr<EntityOutputHook> hook;
+	{
+		auto it = m_hookMap.find(outputKey);
+		if (it != m_hookMap.end()) {
+			hook = it->second;
+		} else {
+			hook = std::make_shared<EntityOutputHook>();
+			m_hookMap.emplace(std::move(outputKey), hook);
+		}
 	}
+	return hook->callbacks[mode].Register(callback);
 }
 
 bool EntityOutputManager::UnhookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode) {
+	std::scoped_lock lock(m_mutex);
+
 	OutputKey outputKey{std::move(classname), std::move(output)};
 
-	if (auto hook = plg::find(m_hookMap, outputKey)) {
+	auto it = m_hookMap.find(outputKey);
+	if (it != m_hookMap.end()) {
+		auto hook = it->second;
 		auto status = hook->callbacks[mode].Unregister(callback);
 		if (hook->callbacks[HookMode::Pre].Empty() && hook->callbacks[HookMode::Post].Empty()) {
-			return m_hookMap.erase(outputKey);
+			m_hookMap.erase(it);
 		}
 		return status;
 	}
@@ -27,6 +37,7 @@ bool EntityOutputManager::UnhookEntityOutput(plg::string classname, plg::string 
 }
 
 ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntityInstance* activator, CEntityInstance* caller, float delay) {
+	std::scoped_lock lock(m_mutex);
 
 	if (caller) {
 		plg::print(LS_DETAILED, "[EntityOutputManager][FireOutputHook] - {}, {}\n", self->m_pDesc->m_pName, caller->GetClassname());
@@ -41,8 +52,9 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 		m_callbackHooks.clear();
 
 		for (const auto& searchKey : searchKeys) {
-			if (auto hook = plg::find(m_hookMap, searchKey)) {
-				m_callbackHooks.push_back(std::move(hook));
+			auto it = m_hookMap.find(searchKey);
+			if (it != m_hookMap.end()) {
+				m_callbackHooks.push_back(it->second);
 			}
 		}
 	} else {
@@ -75,6 +87,7 @@ ResultType EntityOutputManager::FireOutputInternal_Post(CEntityIOOutput* self, C
 	int activatorHandle = activator != nullptr ? activator->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 	int callerHandle = caller != nullptr ? caller->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 
+	std::scoped_lock lock(m_mutex);
 	for (const auto& hook : m_callbackHooks) {
 		auto& callback = hook->callbacks[HookMode::Post];
 		callback(activatorHandle, callerHandle, delay);

@@ -20,52 +20,67 @@ ConCommandInfo::~ConCommandInfo() {
 }
 
 bool ConCommandManager::AddCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode) {
+	std::scoped_lock lock(m_mutex);
+
 	if (name.empty()) {
 		return m_globalCallbacks[mode].Register(callback);
 	}
 
-	if (auto commandInfo = plg::find(m_cmdLookup, name)) {
-		return commandInfo->callbacks[mode].Register(callback);
-	} else {
-		ConCommandRef commandRef = g_pCVar->FindConCommand(name.data());
-		if (!commandRef.IsValidRef()) {
-			plg::print(LS_WARNING, "Command {} is not exists\n", name);
-			return false;
+	std::shared_ptr<ConCommandInfo> commandInfo;
+	{
+		auto it = m_cmdLookup.find(name);
+		if (it != m_cmdLookup.end()) {
+			commandInfo = it->second;
+		} else {
+			ConCommandRef commandRef = g_pCVar->FindConCommand(name.data());
+			if (!commandRef.IsValidRef()) {
+				plg::print(LS_WARNING, "Command {} is not exists\n", name);
+				return false;
+			}
+			commandInfo = std::make_shared<ConCommandInfo>();
+			commandInfo->command = g_pCVar->GetConCommandData(commandRef);
+			commandInfo->defaultCommand = true;
+			m_cmdLookup.emplace(name, commandInfo);
 		}
-
-		commandInfo = std::make_shared<ConCommandInfo>();
-		commandInfo->command = g_pCVar->GetConCommandData(commandRef);
-		commandInfo->defaultCommand = true;
-		m_cmdLookup.emplace(name, commandInfo);
-		return commandInfo->callbacks[mode].Register(callback);;
 	}
+	return commandInfo->callbacks[mode].Register(callback);
 }
 
 bool ConCommandManager::RemoveCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode) {
+	std::scoped_lock lock(m_mutex);
+
 	if (name.empty()) {
 		return m_globalCallbacks[mode].Unregister(callback);
 	}
 
-	if (auto commandInfo = plg::find(m_cmdLookup, name)) {
-		return commandInfo->callbacks[mode].Unregister(callback);
+	auto it = m_cmdLookup.find(name);
+	if (it != m_cmdLookup.end()) {
+		auto commandInfo = it->second;
+		auto status = commandInfo->callbacks[mode].Unregister(callback);
+		if (commandInfo->callbacks[HookMode::Pre].Empty() && commandInfo->callbacks[HookMode::Post].Empty()) {
+			m_cmdLookup.erase(it);
+		}
+		return status;
 	}
 
 	return false;
 }
 
 bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view description, ConVarFlag flags, uint64 adminFlags) {
+	std::scoped_lock lock(m_mutex);
+
 	if (name.empty()) {
 		plg::print(LS_WARNING, "Command name empty\n", name);
 		return false;
 	}
 
-	auto commandInfo = plg::find(m_cmdLookup, name);
-	if (commandInfo || g_pCVar->FindConVar(name.data()).IsValidRef() || g_pCVar->FindConCommand(name.data()).IsValidRef()) {
+	auto it = m_cmdLookup.find(name);
+	if (it != m_cmdLookup.end() || g_pCVar->FindConVar(name.data()).IsValidRef() || g_pCVar->FindConCommand(name.data()).IsValidRef()) {
 		plg::print(LS_WARNING, "Command '{}' is already exists\n", name);
 		return false;
 	}
 
-	commandInfo = std::make_shared<ConCommandInfo>();
+	auto commandInfo = std::make_shared<ConCommandInfo>();
 
 	ConCommandCreation_t setup;
 	setup.m_pszName = name.data();
@@ -83,6 +98,8 @@ bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view 
 }
 
 bool ConCommandManager::RemoveValveCommand(std::string_view name) {
+	std::scoped_lock lock(m_mutex);
+
 	auto commandRef = g_pCVar->FindConCommand(name.data());
 	if (!commandRef.IsValidRef()) {
 		return false;
@@ -97,6 +114,8 @@ bool ConCommandManager::RemoveValveCommand(std::string_view name) {
 }
 
 bool ConCommandManager::IsValidValveCommand(std::string_view name) const {
+	std::scoped_lock lock(m_mutex);
+
 	ConCommandRef commandRef = g_pCVar->FindConCommand(name.data());
 	return commandRef.IsValidRef();
 }
@@ -134,6 +153,8 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, con
 
 	ResultType result = ResultType::Continue;
 
+	std::scoped_lock lock(m_mutex);
+
 	{
 		auto funcs = m_globalCallbacks[mode].Get();
 		for (const auto& func : funcs) {
@@ -153,7 +174,9 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, con
 		}
 	}
 
-	if (auto commandInfo = plg::find(m_cmdLookup, name)) {
+	auto it = m_cmdLookup.find(name);
+	if (it != m_cmdLookup.end()) {
+		auto commandInfo = it->second;
 		/*if (!CheckCommandAccess(caller, commandInfo->adminFlags)) {
 			return result;
 		}*/

@@ -10,7 +10,7 @@ GameConfig::GameConfig(plg::string game, plg::vector<plg::string> paths) : m_gam
 GameConfig::~GameConfig() = default;
 
 bool GameConfig::Initialize() {
-	plg::hybrid_vector<std::string_view, 16> paths;
+	std::inplace_vector<std::string_view, 16> paths;
 	paths.reserve(m_paths.size());
 	for (const auto& path : m_paths) {
 		paths.emplace_back(path);

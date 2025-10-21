@@ -2,28 +2,38 @@
 #include "user_message.hpp"
 
 bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode) {
+	std::scoped_lock lock(m_mutex);
+
 	if (messageId == 0) {
 		return m_global.callbacks[mode].Register(callback);
 	}
 
-	if (auto hook = plg::find(m_hookMap, messageId)) {
-		return hook->callbacks[mode].Register(callback);
-	} else {
-		hook = std::make_shared<UserMessageHook>();
-		m_hookMap.emplace(messageId, hook);
-		return hook->callbacks[mode].Register(callback);
+	std::shared_ptr<UserMessageHook> hook;
+	{
+		auto it = m_hookMap.find(messageId);
+		if (it != m_hookMap.end()) {
+			hook = it->second;
+		} else {
+			hook = std::make_shared<UserMessageHook>();
+			m_hookMap.emplace(messageId, hook);
+		}
 	}
+	return hook->callbacks[mode].Register(callback);
 }
 
 bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode) {
+	std::scoped_lock lock(m_mutex);
+
 	if (messageId == 0) {
 		return m_global.callbacks[mode].Unregister(callback);
 	}
 
-	if (auto hook = plg::find(m_hookMap, messageId)) {
+	auto it = m_hookMap.find(messageId);
+	if (it != m_hookMap.end()) {
+		auto hook = it->second;
 		auto status = hook->callbacks[mode].Unregister(callback);
 		if (hook->callbacks[HookMode::Pre].Empty() && hook->callbacks[HookMode::Post].Empty()) {
-			m_hookMap.erase(messageId);
+			m_hookMap.erase(it);
 		}
 		return status;
 	}
@@ -32,14 +42,17 @@ bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallbac
 }
 
 ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode) {
+	std::scoped_lock lock(m_mutex);
+
 	UserMessage message(msgSerializable, msgData, *clients);
 
-	int16_t messageID = message.GetMessageID();
+	int16_t messageId = message.GetMessageID();
 	
-	plg::print(LS_DETAILED, "[CUserMessageManager::ExecuteMessageCallbacks][{}] Pushing user message `{}` pointer: %p\n", mode == HookMode::Pre ? "Pre" : "Post",  messageID, static_cast<const void*>(msgSerializable));
+	plg::print(LS_DETAILED, "[CUserMessageManager::ExecuteMessageCallbacks][{}] Pushing user message `{}` pointer: %p\n", mode == HookMode::Pre ? "Pre" : "Post",
+		messageId, static_cast<const void*>(msgSerializable));
 
 	ResultType result = ResultType::Continue;
-	
+
 	{
 		auto funcs = m_global.callbacks[mode].Get();
 		for (const auto& func : funcs) {
@@ -59,7 +72,9 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 		}
 	}
 
-	if (auto hook = plg::find(m_hookMap, messageID)) {
+	auto it = m_hookMap.find(messageId);
+	if (it != m_hookMap.end()) {
+		auto hook = it->second;
 		auto funcs = hook->callbacks[mode].Get();
 		for (const auto& func : funcs) {
 			auto thisResult = func(&message);
@@ -77,6 +92,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 	if (mode == HookMode::Pre) {
 		*clients = *reinterpret_cast<const uint64_t *>(message.GetRecipientFilter().GetRecipients().Base());
 	}
+
 	return result;
 }
 

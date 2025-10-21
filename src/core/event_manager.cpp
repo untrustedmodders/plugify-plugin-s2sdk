@@ -6,36 +6,42 @@ EventManager::~EventManager() {
 		m_freeEvents.pop();
 	}
 
-	if (!m_eventHooks.empty()) {
+	if (!m_hookMap.empty()) {
 		g_pGameEventManager->RemoveListener(this);
 	}
 }
 
 EventHookError EventManager::HookEvent(std::string_view name, EventListenerCallback callback, HookMode mode) {
+	std::scoped_lock lock(m_mutex);
+
 	if (!g_pGameEventManager->FindListener(this, name.data())) {
 		if (!g_pGameEventManager->AddListener(this, name.data(), true)) {
 			return EventHookError::InvalidEvent;
 		}
 	}
 
-	if (auto eventHook = plg::find(m_eventHooks, name)) {
-		eventHook->postCopy = (mode == HookMode::Post);
-		++eventHook->refCount;
-		return eventHook->callbacks[mode].Register(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
-	} else {
-		eventHook = std::make_shared<EventHook>(name);
-		eventHook->postCopy = (mode == HookMode::Post);
-		++eventHook->refCount;
-		m_eventHooks.emplace(name, eventHook);
-		return eventHook->callbacks[mode].Register(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
+	std::shared_ptr<EventHook> hook;
+	{
+		auto it = m_hookMap.find(name);
+		if (it != m_hookMap.end()) {
+			hook = it->second;
+		} else {
+			hook = std::make_shared<EventHook>(name, mode == HookMode::Post);
+			m_hookMap.emplace(name, hook);
+		}
 	}
+	return hook->callbacks[mode].Register(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
 }
 
 EventHookError EventManager::UnhookEvent(std::string_view name, EventListenerCallback callback, HookMode mode) {
-	if (auto eventHook = plg::find(m_eventHooks, name)) {
-		auto status = eventHook->callbacks[mode].Unregister(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
-		if (eventHook->callbacks[HookMode::Pre].Empty() && eventHook->callbacks[HookMode::Post].Empty() || --eventHook->refCount == 0) {
-			m_eventHooks.erase(name);
+	std::scoped_lock lock(m_mutex);
+
+	auto it = m_hookMap.find(name);
+	if (it != m_hookMap.end()) {
+		auto hook = it->second;
+		auto status = hook->callbacks[mode].Unregister(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
+		if (hook->callbacks[HookMode::Pre].Empty() && hook->callbacks[HookMode::Post].Empty() || --hook->refCount == 0) {
+			m_hookMap.erase(it);
 		}
 		return status;
 	}
@@ -92,11 +98,14 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 	plg::string name(event->GetName());
 	bool localDontBroadcast = dontBroadcast;
 
-	if (auto eventHook = plg::find(m_eventHooks, name)) {
-		++eventHook->refCount;
-		m_eventStack.push(eventHook);
+	std::scoped_lock lock(m_mutex);
+	auto it = m_hookMap.find(name);
+	if (it != m_hookMap.end()) {
+		auto hook = it->second;
+		++hook->refCount;
+		m_eventStack.push(hook);
 
-		auto& preHook = eventHook->callbacks[HookMode::Pre];
+		auto& preHook = hook->callbacks[HookMode::Pre];
 		if (!preHook.Empty()) {
 			plg::print(LS_DETAILED, "Pushing event `{}` pointer: {}, dont broadcast: {}, post: {}\n", event->GetName(), static_cast<const void*>(event), dontBroadcast, false);
 
@@ -115,7 +124,7 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 			}
 		}
 
-		if (eventHook->postCopy) {
+		if (hook->postCopy) {
 			m_eventCopies.push(g_pGameEventManager->DuplicateEvent(event));
 		}
 	} else {
@@ -152,7 +161,7 @@ ResultType EventManager::OnFireEvent_Post(IGameEvent* event, bool dontBroadcast)
 		}
 
 		if (--hook->refCount == 0) {
-			m_eventHooks.erase(hook->name);
+			m_hookMap.erase(hook->name);
 		}
 	}
 

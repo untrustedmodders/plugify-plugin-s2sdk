@@ -52,7 +52,7 @@ enum class ConVarFlag : uint64_t {
 
 struct ConVarInfo {
 	std::unique_ptr<ConVarRef> conVar;
-	ListenerManager<ConVarChangeListenerCallback> hook;
+	ListenerManager<ConVarChangeListenerCallback> callbacks;
 };
 
 class ConVarManager;
@@ -75,6 +75,8 @@ public:
 
 	template<typename T>
 	ConVarRef CreateConVar(std::string_view name, std::string_view description, const T& defaultVal, ConVarFlag flags, bool hasMin = false, T min = {}, bool hasMax = {}, T max = {}) {
+		std::scoped_lock lock(m_mutex);
+
 		if (name.empty()) {
 			plg::print(LS_WARNING, "ConVar name empty\n", name);
 			return {};
@@ -86,13 +88,14 @@ public:
 			return conVarRef;
 		}
 
-		auto conVarInfo = plg::find(m_cnvLookup, name);
-		if (conVarInfo) {
+		auto it = m_cnvLookup.find(name);
+		if (it != m_cnvLookup.end()) {
 			plg::print(LS_WARNING, "ConVar '{}' is already exists\n", name);
+			auto conVarInfo = it->second;
 			return *conVarInfo->conVar;
 		}
 
-		conVarInfo = std::make_shared<ConVarInfo>();
+		auto conVarInfo = std::make_shared<ConVarInfo>();
 		auto conVar = std::make_unique<ConVarRef>(name.data());
 
 		if (conVar->IsValidRef()) {
@@ -107,12 +110,15 @@ public:
 
 	template<typename T>
 	ConVarRef FindConVar(std::string_view name) {
-		auto conVarInfo = plg::find(m_cnvLookup, name);
-		if (conVarInfo) {
+		std::scoped_lock lock(m_mutex);
+
+		auto it = m_cnvLookup.find(name);
+		if (it != m_cnvLookup.end()) {
+			auto conVarInfo = it->second;
 			return *conVarInfo->conVar;
 		}
 
-		conVarInfo = std::make_shared<ConVarInfo>();
+		auto conVarInfo = std::make_shared<ConVarInfo>();
 		conVarInfo->conVar = std::make_unique<CConVarRef<T>>(name.data());
 
 		if (!conVarInfo->conVar->IsValidRef()) {
@@ -157,7 +163,8 @@ private:
 	static void UpdateConVarValue(ConVarRefAbstract conVar, std::string_view value);
 
 private:
-	plg::parallel_flat_hash_map_s<plg::string, std::shared_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
+	plg::flat_hash_map<plg::string, std::shared_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
+	std::recursive_mutex m_mutex;
 	ListenerManager<ConVarChangeListenerCallback> m_globalCallbacks;
 };
 

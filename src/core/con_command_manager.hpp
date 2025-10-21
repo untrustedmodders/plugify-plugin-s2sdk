@@ -37,7 +37,8 @@ public:
 	ResultType ExecuteCommandCallbacks(std::string_view name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext);
 
 private:
- 	plg::parallel_flat_hash_map_s<plg::string, std::shared_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
+ 	plg::flat_hash_map<plg::string, std::shared_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
+	std::recursive_mutex m_mutex;
 	plg::enum_map<ListenerManager<CommandListenerCallback>, HookMode> m_globalCallbacks;
 };
 
