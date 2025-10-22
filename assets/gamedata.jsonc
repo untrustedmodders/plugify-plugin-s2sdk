@@ -352,7 +352,11 @@
           }
         ]
       }
-    }
+    },
+	"Patches": {
+	}
+	"VTables": {
+	}
   },
   "citadel": {
     "Signatures": {
@@ -575,6 +579,10 @@
           }
         ]
       }
-    }
+    },
+	"Patches": {
+	}
+	"VTables": {
+	}
   }
 }

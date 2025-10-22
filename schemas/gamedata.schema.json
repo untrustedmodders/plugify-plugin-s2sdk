@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/untrustedmodders/plugify-source-2/refs/heads/main/schemas/gamedata.schema.json",
   "description": "GameData contains information that allows you to target client/server memory directly. This can be useful for exposing functionality",
   "title": "GameConfig",
   "type": "object",
@@ -8,6 +7,10 @@
     "addressActionsSection": {
       "type": "object",
       "properties": {
+        "signature": {
+          "description": "An address name from \"Addressess\" and \"Signatures\" sections",
+          "type": "string"
+        },
         "offset": {
           "description": "A offset number in bytes",
           "type": "number"
@@ -19,6 +22,18 @@
         "read_offs32": {
           "description": "A offset number to 32-bit relative cell to read",
           "type": "number"
+        },
+        "win64": {
+          "description": "Address actions on Windows side",
+          "$ref": "#/$defs/addressActionsSection"
+        },
+        "linuxsteamrt64": {
+          "description": "Address actions on Linux side",
+          "$ref": "#/$defs/addressActionsSection"
+        },
+        "osx64": {
+          "description": "Address actions on macOS side",
+          "$ref": "#/$defs/addressActionsSection"
         }
       }
     }
@@ -35,36 +50,7 @@
             "^.+$": {
               "description": "A address name",
               "type": "object",
-              "properties": {
-                "signature": {
-                  "description": "A signarute name from \"Signatures\" section",
-                  "type": "string"
-                },
-                "win64": {
-                  "description": "Address actions on Windows side",
-                  "type": "array",
-                  "items": {
-                      "$ref": "#/$defs/addressActionsSection"
-                  }
-                },
-                "linuxsteamrt64": {
-                  "description": "Address actions on Linux side",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/$defs/addressActionsSection"
-                  }
-                },
-                "osx64": {
-                  "description": "Address actions on macOS side",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/$defs/addressActionsSection"
-                  }
-                }
-              },
-              "required": [
-                "signature"
-              ]
+              "$ref": "#/$defs/addressActionsSection"
             }
           }
         },
@@ -77,13 +63,37 @@
               "type": "object",
               "properties": {
                 "win64": {
-                  "type": "string"
+                  "description": "A key value on Windows side",
+                  "type": [
+                    "null",
+                    "boolean",
+                    "number",
+                    "string",
+                    "array",
+                    "object"
+                  ]
                 },
                 "linuxsteamrt64": {
-                  "type": "string"
+                  "description": "A key value on Linux side",
+                  "type": [
+                    "null",
+                    "boolean",
+                    "number",
+                    "string",
+                    "array",
+                    "object"
+                  ]
                 },
                 "osx64": {
-                  "type": "string"
+                  "description": "A key value on macOS side",
+                  "type": [
+                    "null",
+                    "boolean",
+                    "number",
+                    "string",
+                    "array",
+                    "object"
+                  ]
                 }
               }
             }
@@ -122,7 +132,7 @@
               "type": "object",
               "properties": {
                 "library": {
-                  "description": "Library shared name",
+                  "description": "The shared library name",
                   "type": "string"
                 },
                 "win64": {
@@ -135,6 +145,60 @@
                 },
                 "osx64": {
                   "description": "A signature bytes string on macOS side. Passes ? to skip a byte",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "library"
+              ]
+            }
+          }
+        },
+        "Patches": {
+          "description": "Patches section",
+          "type": "object",
+          "patternProperties": {
+            "^.+$": {
+              "description": "A patch name",
+              "type": "object",
+              "properties": {
+                "signature": {
+				  "description": "An address name from \"Addressess\" and \"Signatures\" sections",
+				  "type": "string"
+				},
+                "win64": {
+                  "description": "A patch bytes string on Windows side. Passes ? to skip a byte",
+                  "type": "string"
+                },
+                "linuxsteamrt64": {
+                  "description": "A patch bytes string on Linux side. Passes ? to skip a byte",
+                  "type": "string"
+                },
+                "osx64": {
+                  "description": "A patch bytes string on macOS side. Passes ? to skip a byte",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "signature"
+              ]
+            }
+          }
+        },
+        "VTables": {
+          "description": "Virtual tables section",
+          "type": "object",
+          "patternProperties": {
+            "^.+$": {
+              "description": "A virtual table key",
+              "type": "object",
+              "properties": {
+                "library": {
+                  "description": "The shared library name",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "A virtual table name",
                   "type": "string"
                 }
               },
