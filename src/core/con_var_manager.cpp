@@ -44,6 +44,8 @@ ConVarRef ConVarManager::FindConVar(std::string_view name) {
 		return *conVarInfo->conVar;
 	} else {
 		auto conVarInfo = std::make_shared<ConVarInfo>();
+		m_cnvLookup.emplace(name, conVarInfo);
+
 		conVarInfo->conVar = std::make_unique<ConVarRefAbstract>(name.data(), true);
 
 		if (!conVarInfo->conVar->IsValidRef()) {
@@ -51,7 +53,6 @@ ConVarRef ConVarManager::FindConVar(std::string_view name) {
 			return {};
 		}
 
-		m_cnvLookup.emplace(name, conVarInfo);
 		return *conVarInfo->conVar;
 	}
 }
