@@ -10337,21 +10337,21 @@
         },
         {
           "name": "origin",
-          "type": "ptr64",
+          "type": "vec3",
           "ref": false,
-          "description": "A pointer to a Vector representing the new absolute position. Can be nullptr."
+          "description": "Vector representing the new absolute position."
         },
         {
           "name": "angles",
-          "type": "ptr64",
+          "type": "vec3",
           "ref": false,
-          "description": "A pointer to a QAngle representing the new orientation. Can be nullptr."
+          "description": "QAngle representing the new orientation."
         },
         {
           "name": "velocity",
-          "type": "ptr64",
+          "type": "vec3",
           "ref": false,
-          "description": "A pointer to a Vector representing the new velocity. Can be nullptr."
+          "description": "Vector representing the new velocity."
         }
       ],
       "retType": {
