@@ -2929,6 +2929,51 @@
       }
     },
     {
+      "name": "ReplyToCommand",
+      "group": "Console",
+      "description": "Sends a reply message to a player or to the server console depending on the command context.",
+      "funcName": "ReplyToCommand",
+      "paramTypes": [
+        {
+          "name": "ctx",
+          "type": "int32",
+          "ref": false,
+          "description": "The context from which the command was called (e.g., Console or Chat).",
+          "enum": {
+            "name": "CommandCallingContext",
+            "description": "The command execution context.",
+            "values": [
+              {
+                "value": 0,
+                "name": "Console",
+                "description": "The command execute from the client's console."
+              },
+              {
+                "value": 1,
+                "name": "Chat",
+                "description": "The command execute from the client's chat."
+              }
+            ]
+          }
+        },
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot/index of the player receiving the message."
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "ref": false,
+          "description": "The message string to be sent as a reply."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "CreateConVar",
       "group": "Cvars",
       "description": "Creates a new console variable.",
