@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.3.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.2.1...v2.3.0) (2025-10-25)
+
+
+### Features
+
+* massive game config rework ([926c6e2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/926c6e2ec2e21fda9a61bb5b4bc1af7e1ccc66e6))
+
+
+### Bug Fixes
+
+* `TeleportClient` param types and desc ([d1a6964](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d1a69642f130f519324366f5a221d320938c9f1b))
+* `TeleportEntity` type and desc ([57959a6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/57959a664b210b5e6ec67be2f3d8ff59bfcb8b82))
+* add `ReplyToCommand` in manifest ([31e1b95](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/31e1b95292a6b0bc57b8951b84383b99e179c37c))
+* cvar callbacks ([1d9a7bb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1d9a7bb4c9eaa95183233416086c261b86b716c7))
+* signature `CCSPlayer_WeaponServices::RemoveItem` ([2fe7e9e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2fe7e9ecbe446bae2161be13a942c4593c6e26c2))
+* update gamedata ([bb80121](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bb80121cd33d8ae400c8417695df7b05930ed875))
+
 ## [2.2.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.2.0...v2.2.1) (2025-10-21)
 
 
