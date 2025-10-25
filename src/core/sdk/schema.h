@@ -26,7 +26,6 @@
 #include <smartptr.h>
 #include <tier0/dbg.h>
 #include <utldelegate.h>
-#undef schema
 
 struct SchemaKey {
 	ptrdiff_t offset;

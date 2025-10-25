@@ -14,8 +14,6 @@
 #include "entity/globaltypes.h"
 #include "core/player_manager.hpp"
 
-#include <tier0/memdbgon.h>
-
 /*bool utils::TraceLine(const Vector& vecStart, const Vector& vecEnd, CEntityInstance* ignore1, CGameTrace* tr, uint64 traceLayer, uint64 excludeLayer) {
 	Ray_t ray;
 	CTraceFilter filter;

@@ -11678,7 +11678,7 @@
       "name": "GetGameConfigVTable",
       "group": "Gameconfig",
       "description": "Retrieves a vtable associated with the game configuration.",
-      "funcName": "GetGameConfigLibrary",
+      "funcName": "GetGameConfigVTable",
       "paramTypes": [
         {
           "name": "id",

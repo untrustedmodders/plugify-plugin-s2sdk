@@ -290,7 +290,7 @@
         GetGameConfigOffset;
         GetGameConfigVTable;
         GetGameConfigAddress;
-        GetGameConfigMemSig;
+        GetGameConfigSignature;
 
         GetGameRulesProxy;
         GetGameRules;

@@ -80,7 +80,8 @@ Result<void> PatchManager::WriteBytes(Memory address, const PatchBytes& bytes, b
 		// Temporarily make memory writable
 		MemoryProtection guard(
 			address,
-			bytes.Size()
+			bytes.Size(),
+			DynLibUtils::RWX
 		);
 
 		// Temporarily make memory writable
@@ -88,11 +89,11 @@ Result<void> PatchManager::WriteBytes(Memory address, const PatchBytes& bytes, b
 			address,
 			bytes.Size(),
 			MemoryProtection::Protection::ReadWriteExecute
-		);
+		);*/
 
-		if (!guardResult) {
-			return std::unexpected(guardResult.error());
-		}*/
+		if (!guard.IsValid()) {
+			return MakeError("Could not unprotect memory");
+		}
 
 		std::memcpy(address.RCast<void*>(), bytes.Data(), bytes.Size());
 		// Guard destructor restores protection

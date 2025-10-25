@@ -8,8 +8,6 @@
 #include <usermessages.pb.h>
 #include <usermessages.h>
 
-#include <tier0/memdbgon.h>
-
 int8_t ConvertColorStringToByte(const char* str, size_t length) {
 	switch (length) {
 		case 3:

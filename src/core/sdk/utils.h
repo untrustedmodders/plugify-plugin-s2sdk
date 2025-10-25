@@ -7,6 +7,7 @@
 
 #if S2SDK_PLATFORM_LINUX || S2SDK_PLATFORM_APPLE
 #include <cxxabi.h>
+#include <dlfcn.h>
 #endif
 
 class CBaseEntity;

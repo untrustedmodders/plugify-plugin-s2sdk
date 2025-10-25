@@ -49,7 +49,6 @@ struct AddressData {
 	plg::string name;
 	plg::string baseSignature;  // Reference to a signature
 	plg::vector<IndirectionStep> indirections;
-	bool lastIsOffset = false;  // If true, last step doesn't dereference
 };
 
 struct OffsetData {
@@ -79,7 +78,7 @@ struct LoadOptions {
 	plg::vector<plg::string> configPaths;
 	plg::string gameDirectory = S2SDK_GAME_NAME;
 	CacheStrategy cacheStrategy = CacheStrategy::Eager;
-	mutable std::execution::parallel_policy processStrategy = std::execution::par;
+	std::execution::parallel_policy processStrategy = std::execution::par;
 	bool strictMode = false;
 	bool validateOnLoad = true;
 	bool allowPartialApply = false;
@@ -166,7 +165,7 @@ struct ResolvedAddress {
 
 	ResolvedAddress() : address(nullptr) {}
 	ResolvedAddress(Memory addr, plg::string n, plg::string base)
-		: address(addr), baseSignature(std::move(base)), name(std::move(n)) {}
+		: address(addr), name(std::move(n)), baseSignature(std::move(base)) {}
 
 	static ResolvedAddress Failed(plg::string name, plg::string error) {
 		ResolvedAddress result;
@@ -254,8 +253,7 @@ public:
 private:
 	Result<Memory> ApplyIndirections(
 		Memory baseAddress,
-		const plg::vector<IndirectionStep>& steps,
-		bool lastIsOffset
+		const plg::vector<IndirectionStep>& steps
 	) const;
 
 	Result<Memory> ApplyStep(Memory current, const IndirectionStep& step) const;
@@ -411,17 +409,6 @@ public:
 	DiagnosticsInfo GetDiagnostics() const;
 	void PrintDiagnostics() const;
 
-private:
-	// Internal resolution methods
-	Result<ResolvedSignature> ResolveSignatureInternal(std::string_view name);
-	Result<ResolvedAddress> ResolveAddressInternal(std::string_view name);
-	Result<ResolvedVTable> ResolveVTableInternal(std::string_view name);
-
-	// Eager loading
-	Result<void> PreloadSignatures();
-	Result<void> PreloadAddresses();
-	Result<void> PreloadVTables();
-
 	// Apply patch
 	Result<void> ApplyPatch(std::string_view name, std::string_view address, const PatchOptions& options = {});
 	Result<void> ApplyAllPatches(const PatchOptions& options = {});
@@ -435,12 +422,24 @@ private:
 	PatchManager::Stats GetPatchStats() const;
 
 private:
+	// Internal resolution methods
+	Result<ResolvedSignature> ResolveSignatureInternal(std::string_view name);
+	Result<ResolvedAddress> ResolveAddressInternal(std::string_view name);
+	Result<ResolvedVTable> ResolveVTableInternal(std::string_view name);
+
+	// Eager loading
+	Result<void> PreloadSignatures();
+	Result<void> PreloadAddresses();
+	Result<void> PreloadVTables();
+
+private:
 	LoadOptions m_options;
 	bool m_initialized;
 
 	// Components
 	ConfigLoader m_loader;
 	ConfigCache m_cache;
+
 	PLUGIFY_NO_UNIQUE_ADDRESS SignatureResolver m_signatureResolver;
 	PLUGIFY_NO_UNIQUE_ADDRESS AddressResolver m_addressResolver;
 	PLUGIFY_NO_UNIQUE_ADDRESS VTableResolver m_vtableResolver;

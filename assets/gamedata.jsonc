@@ -198,6 +198,12 @@
       "CEconItemSchema::GetItemDefinitionByName": {
         "library": "server",
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 53 48 83 EC ? 80 BF ? ? ? ? 00 75"
+      },
+      // String: "Script_Warning"
+      "VScriptInitialization": {
+        "library": "vscript",
+        "win64": "BE 01 2A 2A 2A 2B D6 74 2A 3B D6",
+        "linuxsteamrt64": "83 FE 01 0F 84 67"
       }
     },
     "Offsets": {
@@ -366,8 +372,25 @@
       }
     },
 	"Patches": {
+      "VScript": {
+        "address": "VScriptInitialization",
+        "win64": "BE 02",
+        "linuxsteamrt64": "83 FE 02"
+      }
 	},
 	"VTables": {
+      "CServerSideClient": {
+        "library": "engine2",
+        "table": "CServerSideClient"
+      },
+      "CGameRulesGameSystem": {
+        "library": "server",
+        "table": "CGameRulesGameSystem"
+      },
+      "CLuaVM": {
+        "library": "vscript",
+        "table": "CLuaVM"
+      }
 	}
   },
   "citadel": {

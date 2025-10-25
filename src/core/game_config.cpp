@@ -1,5 +1,4 @@
 #include <core/sdk/utils.h>
-#include <platform.h>
 
 #include "game_config.hpp"
 
@@ -9,42 +8,33 @@ ModuleProvider::ModuleProvider() {
 
 void ModuleProvider::PreloadModules() {
 	// Metamod workaround - check if metamod is loaded
-	if (Module("metamod.2.cs2").GetHandle() != nullptr) {
+	const bool hasMetamod = Module("metamod.2.cs2").GetHandle() != nullptr;
+
 #if S2SDK_PLATFORM_WINDOWS
-		int flags = DONT_RESOLVE_DLL_REFERENCES;
+	const int flags = hasMetamod ? DONT_RESOLVE_DLL_REFERENCES : 0;
 #else
-		int flags = RTLD_LAZY | RTLD_NOLOAD;
+	const int flags = hasMetamod ? (RTLD_LAZY | RTLD_NOLOAD) : 0;
 #endif
-		auto engine2 = std::make_unique<Module>();
-		engine2->LoadFromPath(
-			plg::as_string(utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2"), flags
-		);
-		if (engine2->IsValid()) {
-			std::unique_lock lock(m_mutex);
-			m_modules.emplace("engine2", std::move(engine2));
+
+	// Helper lambda to load a module
+	auto loadModule = [&](std::string_view name, const auto& path) {
+		auto module = std::make_shared<Module>();
+
+		if (hasMetamod) {
+			module->LoadFromPath(plg::as_string(path), flags);
+		} else {
+			module = std::make_shared<Module>(name);
 		}
 
-		auto server = std::make_unique<Module>();
-		server->LoadFromPath(
-			plg::as_string(utils::GameDirectory() / S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server"), flags
-		);
-		if (server->IsValid()) {
+		if (module->IsValid()) {
 			std::unique_lock lock(m_mutex);
-			m_modules.emplace("server", std::move(server));
+			m_modules[name] = std::move(module);
 		}
-	} else {
-		auto engine2 = std::make_unique<Module>("engine2");
-		if (engine2->IsValid()) {
-			std::unique_lock lock(m_mutex);
-			m_modules.emplace("engine2", std::move(engine2));
-		}
+	};
 
-		auto server = std::make_unique<Module>("server");
-		if (server->IsValid()) {
-			std::unique_lock lock(m_mutex);
-			m_modules.emplace("server", std::move(server));
-		}
-	}
+	// Load common modules
+	loadModule("engine2", utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2");
+	loadModule("server", utils::GameDirectory() / S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server");
 }
 
 std::shared_ptr<Module> ModuleProvider::GetModule(std::string_view name) {
@@ -115,31 +105,28 @@ Result<void> ConfigLoader::ParseConfigFile(std::string_view gameName) {
 		return MakeError("Game section not found: {}", gameName);
 	}
 
-	// Load each section (continue on individual errors if not in strict mode)
+	// Load each section
+	struct SectionLoader {
+		const char* name;
+		Result<void> (ConfigLoader::*loader)(pcf::Config*);
+	};
+
+	constexpr SectionLoader loaders[] = {
+		{"Signatures", &ConfigLoader::LoadSignatures},
+		{"Offsets", &ConfigLoader::LoadOffsets},
+		{"Patches", &ConfigLoader::LoadPatches},
+		{"Addresses", &ConfigLoader::LoadAddresses},
+	};
+
 	bool hasErrors = false;
-
-	if (auto result = LoadSignatures(config.get()); !result) {
-		if (m_options.strictMode) return result;
-		plg::print(LS_WARNING, "Signature loading errors: {}\n", result.error());
-		hasErrors = true;
-	}
-
-	if (auto result = LoadOffsets(config.get()); !result) {
-		if (m_options.strictMode) return result;
-		plg::print(LS_WARNING, "Offset loading errors: {}\n", result.error());
-		hasErrors = true;
-	}
-
-	if (auto result = LoadPatches(config.get()); !result) {
-		if (m_options.strictMode) return result;
-		plg::print(LS_WARNING, "Patch loading errors: {}\n", result.error());
-		hasErrors = true;
-	}
-
-	if (auto result = LoadAddresses(config.get()); !result) {
-		if (m_options.strictMode) return result;
-		plg::print(LS_WARNING, "Address loading errors: {}\n", result.error());
-		hasErrors = true;
+	for (const auto& section : loaders) {
+		if (auto result = (this->*section.loader)(config.get()); !result) {
+			if (m_options.strictMode) {
+				return result;
+			}
+			plg::print(LS_WARNING, "{} loading failed: {}\n", section.name, result.error());
+			hasErrors = true;
+		}
 	}
 
 	if (hasErrors && m_options.strictMode) {
@@ -281,7 +268,6 @@ Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::s
 	AddressData addr;
 	addr.name = name;
 	addr.baseSignature = config->GetString("signature");
-	addr.lastIsOffset = false;
 
 	if (addr.baseSignature.empty()) {
 		return MakeError("Missing base signature");
@@ -295,16 +281,9 @@ Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::s
 					auto stepName = config->GetName();
 					auto value = config->GetAsInt32();
 
-					if (addr.lastIsOffset) {
-						plg::print(LS_WARNING, "Address '{}': 'offset' must be last entry\n", name);
-						config->JumpBack();
-						continue;
-					}
-
 					if (stepName == "offset") {
 						addr.indirections.push_back(IndirectionStep::MakeOffset(value));
-						addr.lastIsOffset = true;
-					} else if (stepName == "read" || stepName == "dereference") {
+					} else if (stepName == "read") {
 						addr.indirections.push_back(IndirectionStep::MakeDereference(value));
 					} else if (stepName == "read_offs32") {
 						addr.indirections.push_back(IndirectionStep::MakeRelative(value));
@@ -355,21 +334,21 @@ std::optional<PatchData> ConfigLoader::GetPatch(std::string_view name) const {
 
 template <typename Fn>
 void ConfigLoader::ForEachSignature(Fn&& fn) const {
-	std::for_each(m_options.processStrategy, m_signatures.begin(), m_signatures.end(), [&](const auto& kv) {
+	std::for_each(m_signatures.begin(), m_signatures.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachAddress(Fn&& fn) const  {
-	std::for_each(m_options.processStrategy, m_addresses.begin(), m_addresses.end(), [&](const auto& kv) {
+	std::for_each(m_addresses.begin(), m_addresses.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachVTable(Fn&& fn) const  {
-	std::for_each(m_options.processStrategy, m_vtables.begin(), m_vtables.end(), [&](const auto& kv) {
+	std::for_each(m_vtables.begin(), m_vtables.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
@@ -389,66 +368,72 @@ void ConfigLoader::ForEachPatch(Fn&& fn) const  {
 }
 
 void ConfigCache::CacheSignature(const ResolvedSignature& signature) {
-	std::unique_lock lock(m_mutex);
-	m_signatures[signature.name] = signature;
+	{
+		std::unique_lock lock(m_mutex);
+		m_signatures[signature.name] = signature;
+	}
 	if (signature.address) {
-		++m_stats.cachedSignatures;
+		m_stats.cachedSignatures.fetch_add(1, std::memory_order_relaxed);
 	} else {
-		++m_stats.failedSignatures;
+		m_stats.failedSignatures.fetch_add(1, std::memory_order_relaxed);
 	}
 }
 
 void ConfigCache::CacheAddress(const ResolvedAddress& address) {
-	std::unique_lock lock(m_mutex);
-	m_addresses[address.name] = address;
+	{
+		std::unique_lock lock(m_mutex);
+		m_addresses[address.name] = address;
+	}
 	if (address.address) {
-		++m_stats.cachedAddresses;
+		m_stats.cachedAddresses.fetch_add(1, std::memory_order_relaxed);
 	} else {
-		++m_stats.failedAddresses;
+		m_stats.failedAddresses.fetch_add(1, std::memory_order_relaxed);
 	}
 }
 
 void ConfigCache::CacheVTable(const ResolvedVTable& vtable) {
-	std::unique_lock lock(m_mutex);
-	m_vtables[vtable.name] = vtable;
+	{
+		std::unique_lock lock(m_mutex);
+		m_vtables[vtable.name] = vtable;
+	}
 	if (vtable.address) {
-		++m_stats.cachedVTables;
+		m_stats.cachedVTables.fetch_add(1, std::memory_order_relaxed);
 	} else {
-		++m_stats.failedVTables;
+		m_stats.failedVTables.fetch_add(1, std::memory_order_relaxed);
 	}
 }
 
 std::optional<ResolvedSignature> ConfigCache::GetSignature(std::string_view name) const {
-	std::shared_lock lock(m_mutex);
-	++m_stats.totalLookups;
+	m_stats.totalLookups.fetch_add(1, std::memory_order_relaxed);
 
+	std::shared_lock lock(m_mutex);
 	auto it = m_signatures.find(name);
 	if (it != m_signatures.end()) {
-		++m_stats.cacheHits;
+		m_stats.cacheHits.fetch_add(1, std::memory_order_relaxed);
 		return it->second;
 	}
 	return std::nullopt;
 }
 
 std::optional<ResolvedAddress> ConfigCache::GetAddress(std::string_view name) const {
-	std::shared_lock lock(m_mutex);
-	++m_stats.totalLookups;
+	m_stats.totalLookups.fetch_add(1, std::memory_order_relaxed);
 
+	std::shared_lock lock(m_mutex);
 	auto it = m_addresses.find(name);
 	if (it != m_addresses.end()) {
-		++m_stats.cacheHits;
+		m_stats.cacheHits.fetch_add(1, std::memory_order_relaxed);
 		return it->second;
 	}
 	return std::nullopt;
 }
 
 std::optional<ResolvedVTable> ConfigCache::GetVTable(std::string_view name) const {
-	std::shared_lock lock(m_mutex);
-	++m_stats.totalLookups;
+	m_stats.totalLookups.fetch_add(1, std::memory_order_relaxed);
 
+	std::shared_lock lock(m_mutex);
 	auto it = m_vtables.find(name);
 	if (it != m_vtables.end()) {
-		++m_stats.cacheHits;
+		m_stats.cacheHits.fetch_add(1, std::memory_order_relaxed);
 		return it->second;
 	}
 	return std::nullopt;
@@ -526,6 +511,8 @@ GameConfig::~GameConfig() {
    if (!_result) return _result; }
 
 Result<void> GameConfig::Initialize() {
+    auto start = std::chrono::high_resolution_clock::now();
+
 	std::unique_lock lock(m_mutex);
 
 	if (m_initialized) {
@@ -553,17 +540,16 @@ Result<void> GameConfig::Initialize() {
 			break;
 	}
 
-	// Phase 3: Patch modules
-	GC_TRY_VOID(ApplyAllPatches());
+	auto end = std::chrono::high_resolution_clock::now();
+	auto ns = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	plg::print(LS_DETAILED, "Initialize of [{}] took {} ms\n", plg::join(m_options.configPaths, ", "), ns);
 
 	m_initialized = true;
 	return {};
 }
 
-#undef GC_TRY_VOID
-
 Result<void> GameConfig::PreloadSignatures() {
-	std::atomic hadErrors{false};
+	std::atomic_flag hadErrors = {};
 
 	m_loader.ForEachSignature([&](const SignatureData& sig) {
 		auto result = m_signatureResolver.Resolve(sig);
@@ -573,11 +559,11 @@ Result<void> GameConfig::PreloadSignatures() {
 			plg::print(LS_WARNING, "Failed to resolve signature '{}': {}\n",
 					   sig.name, result.error());
 			m_cache.CacheSignature(ResolvedSignature::Failed(sig.name, result.error()));
-			hadErrors = true;
+			hadErrors.test_and_set(std::memory_order_relaxed);
 		}
 	});
 
-	if (hadErrors && m_options.strictMode) {
+	if (hadErrors.test_and_set(std::memory_order_relaxed) && m_options.strictMode) {
 		return MakeError("One or more signatures failed to resolve");
 	}
 
@@ -585,7 +571,7 @@ Result<void> GameConfig::PreloadSignatures() {
 }
 
 Result<void> GameConfig::PreloadAddresses() {
-	std::atomic hadErrors{false};
+	std::atomic_flag hadErrors = {};
 
 	m_loader.ForEachAddress([&](const AddressData& addr) {
 		// Get or resolve base signature
@@ -598,7 +584,7 @@ Result<void> GameConfig::PreloadAddresses() {
 				plg::print(LS_WARNING, "Failed to resolve base signature '{}' for address '{}'\n",
 						   addr.baseSignature, addr.name);
 				m_cache.CacheAddress(ResolvedAddress::Failed(addr.name, sigResult.error()));
-				hadErrors = true;
+				hadErrors.test_and_set(std::memory_order_relaxed);
 				return;
 			}
 		}
@@ -610,11 +596,11 @@ Result<void> GameConfig::PreloadAddresses() {
 			plg::print(LS_WARNING, "Failed to resolve address '{}': {}\n",
 					   addr.name, result.error());
 			m_cache.CacheAddress(ResolvedAddress::Failed(addr.name, result.error()));
-			hadErrors = true;
+			hadErrors.test_and_set(std::memory_order_relaxed);
 		}
 	});
 
-	if (hadErrors && m_options.strictMode) {
+	if (hadErrors.test_and_set(std::memory_order_relaxed) && m_options.strictMode) {
 		return MakeError("One or more addresses failed to resolve");
 	}
 
@@ -622,7 +608,7 @@ Result<void> GameConfig::PreloadAddresses() {
 }
 
 Result<void> GameConfig::PreloadVTables() {
-	std::atomic hadErrors{false};
+	std::atomic_flag hadErrors;
 
 	m_loader.ForEachVTable([&](const VTableData& vt) {
 		auto result = m_vtableResolver.Resolve(vt);
@@ -632,11 +618,11 @@ Result<void> GameConfig::PreloadVTables() {
 			plg::print(LS_WARNING, "Failed to resolve vtable '{}': {}\n",
 					   vt.name, result.error());
 			m_cache.CacheVTable(ResolvedVTable::Failed(vt.name, result.error()));
-			hadErrors = true;
+			hadErrors.test_and_set(std::memory_order_relaxed);
 		}
 	});
 
-	if (hadErrors && m_options.strictMode) {
+	if (hadErrors.test_and_set(std::memory_order_relaxed) && m_options.strictMode) {
 		return MakeError("One or more vtables failed to resolve");
 	}
 
@@ -644,18 +630,18 @@ Result<void> GameConfig::PreloadVTables() {
 }
 
 Result<void> GameConfig::ApplyAllPatches(const PatchOptions& options) {
-	bool hadErrors{false};
+	std::atomic_flag hadErrors = {};
 
 	m_loader.ForEachPatch([&](const PatchData& patch) {
 		auto result = ApplyPatch(patch.name, patch.baseAddress, options);
 		if (!result) {
 			plg::print(LS_WARNING, "Failed to apply patch '{}': {}\n",
 					   patch.name, result.error());
-			hadErrors = true;
+			hadErrors.test_and_set(std::memory_order_relaxed);
 		}
 	});
 
-	if (hadErrors && m_options.allowPartialApply) {
+	if (hadErrors.test_and_set(std::memory_order_relaxed) && m_options.allowPartialApply) {
 		return MakeError("One or more patches failed to apply");
 	}
 	return {};
@@ -667,18 +653,18 @@ Result<void> GameConfig::RestorePatch(std::string_view name) {
 }
 
 Result<void> GameConfig::RestoreAllPatches() {
-	bool hadErrors{false};
+	std::atomic_flag hadErrors = {};
 
 	m_loader.ForEachPatch([&](const PatchData& patch) {
 		auto result = RestorePatch(patch.name);
 		if (!result) {
 			plg::print(LS_WARNING, "Failed to restore patch '{}': {}\n",
 					   patch.name, result.error());
-			hadErrors = true;
+			hadErrors.test_and_set(std::memory_order_relaxed);
 		}
 	});
 
-	if (hadErrors) {
+	if (hadErrors.test_and_set(std::memory_order_relaxed)) {
 		return MakeError("One or more patches failed to restore");
 	}
 	return {};
@@ -909,8 +895,16 @@ void GameConfig::PreloadAll() {
 		return;
 	}
 
-	auto _1 = PreloadSignatures();
-	auto _2 = PreloadAddresses();
+	auto sigResult = PreloadSignatures();
+	if (!sigResult) {
+		plg::print(LS_WARNING, "Cannot preload - {}\n", sigResult.error());
+		return;
+	}
+	auto addrResult = PreloadAddresses();
+	if (!addrResult) {
+		plg::print(LS_WARNING, "Cannot preload - {}\n", addrResult.error());
+		return;
+	}
 }
 
 void GameConfig::ClearCache() {
@@ -1051,8 +1045,7 @@ Result<ResolvedAddress> AddressResolver::Resolve(
 
 	auto finalAddr = ApplyIndirections(
 		baseSignature.address,
-		address.indirections,
-		address.lastIsOffset
+		address.indirections
 	);
 
 	if (!finalAddr) {
@@ -1082,8 +1075,7 @@ Result<ResolvedAddress> AddressResolver::ResolveByName(
 
 Result<Memory> AddressResolver::ApplyIndirections(
 	Memory baseAddress,
-	const plg::vector<IndirectionStep>& steps,
-	bool lastIsOffset
+	const plg::vector<IndirectionStep>& steps
 ) const {
 	Memory current = baseAddress;
 
@@ -1092,20 +1084,12 @@ Result<Memory> AddressResolver::ApplyIndirections(
 			return MakeError("Invalid address in indirection chain");
 		}
 
-		bool isLastStep = (i == steps.size() - 1);
-		bool shouldDeref = !(lastIsOffset && isLastStep);
-
 		auto result = ApplyStep(current, steps[i]);
 		if (!result) {
 			return result;
 		}
 
 		current = *result;
-
-		// Dereference if needed
-		if (shouldDeref && steps[i].type != IndirectionStep::Type::Offset) {
-			current.DerefSelf();
-		}
 	}
 
 	return current;
@@ -1117,7 +1101,7 @@ Result<Memory> AddressResolver::ApplyStep(Memory current, const IndirectionStep&
 			return current.Offset(step.offset);
 
 		case IndirectionStep::Type::Dereference:
-			return current.Offset(step.offset);
+			return current.Offset(step.offset).DerefSelf();
 
 		case IndirectionStep::Type::RelativeOffset: {
 			auto target = current.Offset(step.offset);
@@ -1185,18 +1169,19 @@ Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
 	// Check for existing config with same paths
 	for (const auto& [id, entry] : m_configs) {
 		const auto& existingPaths = entry.config->GetOptions().configPaths;
-		bool pathsMatch = existingPaths.size() == options.configPaths.size();
 
-		if (pathsMatch) {
-			for (size_t i = 0; i < existingPaths.size(); ++i) {
-				if (existingPaths[i] != options.configPaths[i]) {
-					pathsMatch = false;
+		bool matchFound = false;
+		for (const auto& optPath : options.configPaths) {
+			for (const auto& existPath : existingPaths) {
+				if (existPath.ends_with(optPath)) {
+					matchFound = true;
 					break;
 				}
 			}
+			if (matchFound) break;
 		}
 
-		if (pathsMatch) {
+		if (matchFound) {
 			// Reuse existing config
 			const_cast<ConfigEntry&>(entry).refCount++;
 			return id;
@@ -1209,6 +1194,8 @@ Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
 	if (auto result = config->Initialize(); !result) {
 		return MakeError(std::move(result.error()));
 	}
+
+	config->ApplyAllPatches();
 
 	uint32_t id = m_nextId++;
 	m_configs.emplace(id, ConfigEntry{std::move(config)});
@@ -1245,3 +1232,5 @@ ModuleProvider& GameConfigManager::GetModuleProvider() {
 PatchManager& GameConfigManager::GetPatchManager() {
 	return m_patchManager;
 }
+
+#undef GC_TRY_VOID

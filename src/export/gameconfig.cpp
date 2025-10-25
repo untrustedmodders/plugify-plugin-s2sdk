@@ -30,7 +30,7 @@ extern "C" PLUGIN_API void CloseGameConfigFile(uint32_t id) {
 extern "C" PLUGIN_API uint32_t LoadGameConfigFile(const plg::vector<plg::string>& paths) {
 	auto config = GameConfigManager::Instance().LoadConfig({ paths });
 	if (!config) {
-		plg::print(LS_WARNING, "Could not load config: [{}] - {}\n", plg::join(paths, ", "), *config);
+		plg::print(LS_WARNING, "Could not load config: [{}] - {}\n", plg::join(paths, ", "), config.error());
 		return 0;
 	}
 	return *config;

@@ -5,7 +5,7 @@
 #include <plugify-configs/plugify-configs.hpp>
 
 using Memory = DynLibUtils::CMemory;
-using MemoryProtection = DynLibUtils::VirtualUnprotector;
+using MemoryProtection = DynLibUtils::CMemProtector;
 
 enum class PatchState {
 	NotApplied,
