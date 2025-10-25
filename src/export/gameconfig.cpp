@@ -16,7 +16,7 @@ PLUGIFY_WARN_IGNORE(4190)
  * @param id An id to the GameConfig object to be closed.
  */
 extern "C" PLUGIN_API void CloseGameConfigFile(uint32_t id) {
-	g_GameConfigManager.CloseGameConfigFile(id);
+	GameConfigManager::Instance().UnloadConfig(id);
 }
 
 /**
@@ -28,82 +28,12 @@ extern "C" PLUGIN_API void CloseGameConfigFile(uint32_t id) {
  * @return A handle to the loaded CGameConfig object, or nullptr if loading fails.
  */
 extern "C" PLUGIN_API uint32_t LoadGameConfigFile(const plg::vector<plg::string>& paths) {
-	return g_GameConfigManager.LoadGameConfigFile(paths);
-}
-
-/**
- * @brief Retrieves the path of a game configuration.
- *
- * This function retrieves the paths of the specified game configuration and
- * stores it in the provided output array.
- *
- * @param id An id to the GameConfig object whose path is to be retrieved.
- * @return Am array of paths where the configuration is stored.
- */
-extern "C" PLUGIN_API plg::vector<plg::string> GetGameConfigPaths(uint32_t id) {
-	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
-		return gameConfig->GetPaths();
-	} else {
-		plg::print(LS_WARNING, "Could not get find config: {}\n", id);
-		return {};
+	auto config = GameConfigManager::Instance().LoadConfig({ paths });
+	if (!config) {
+		plg::print(LS_WARNING, "Could not load config: [{}] - {}\n", plg::join(paths, ", "), *config);
+		return 0;
 	}
-}
-
-/**
- * @brief Retrieves a library associated with the game configuration.
- *
- * This function retrieves a library by name from the specified game configuration
- * and stores it in the provided output string.
- *
- * @param id An id to the GameConfig object from which to retrieve the library.
- * @param name The name of the library to be retrieved.
- * @return A string where the library will be stored.
- */
-extern "C" PLUGIN_API plg::string GetGameConfigLibrary(uint32_t id, const plg::string& name) {
-	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
-		return gameConfig->GetLibrary(name);
-	} else {
-		plg::print(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
-		return {};
-	}
-}
-
-/**
- * @brief Retrieves the signature associated with the game configuration.
- *
- * This function retrieves a signature by name from the specified game configuration
- * and stores it in the provided output string.
- *
- * @param id An id to the GameConfig object from which to retrieve the signature.
- * @param name The name of the signature to be retrieved.
- * @return A string where the signature will be stored.
- */
-extern "C" PLUGIN_API plg::string GetGameConfigSignature(uint32_t id, const plg::string& name) {
-	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
-		return gameConfig->GetSignature(name);
-	} else {
-		plg::print(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
-		return {};
-	}
-}
-
-/**
- * @brief Retrieves a symbol associated with the game configuration.
- *
- * This function retrieves a symbol by name from the specified game configuration
- * and stores it in the provided output string.
- *
- * @param id An id to the GameConfig object from which to retrieve the symbol.
- * @param name The name of the symbol to be retrieved.
- * @return A string where the symbol will be stored.
- */
-extern "C" PLUGIN_API plg::string GetGameConfigSymbol(uint32_t id, const plg::string& name) {
-	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
-		return gameConfig->GetSymbol(name);
-	} else {
-		plg::print(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
-		return {};
-	}
+	return *config;
 }
 
 /**
@@ -117,12 +47,16 @@ extern "C" PLUGIN_API plg::string GetGameConfigSymbol(uint32_t id, const plg::st
  * @return A string where the patch will be stored.
  */
 extern "C" PLUGIN_API plg::string GetGameConfigPatch(uint32_t id, const plg::string& name) {
-	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
-		return gameConfig->GetPatch(name);
+	if (auto gameConfig = GameConfigManager::Instance().GetConfig(id)) {
+		if (auto patch = gameConfig->GetPatch(name)) {
+			return *patch;
+		} else {
+			plg::print(LS_WARNING, "Could not get patch: {} - {}\n", name, patch.error());
+		}
 	} else {
-		plg::print(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
-		return {};
+		plg::print(LS_WARNING, "Could not get find config: {} - {}\n", id, name);
 	}
+	return {};
 }
 
 /**
@@ -135,12 +69,16 @@ extern "C" PLUGIN_API plg::string GetGameConfigPatch(uint32_t id, const plg::str
  * @return The offset associated with the specified name.
  */
 extern "C" PLUGIN_API int GetGameConfigOffset(uint32_t id, const plg::string& name) {
-	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
-		return gameConfig->GetOffset(name);
+	if (auto gameConfig = GameConfigManager::Instance().GetConfig(id)) {
+		if (auto offset = gameConfig->GetOffset(name)) {
+			return *offset;
+		} else {
+			plg::print(LS_WARNING, "Could not get offset: {} - {}\n", name, offset.error());
+		}
 	} else {
-		plg::print(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
-		return -1;
+		plg::print(LS_WARNING, "Could not get find config: {} - {}\n", id, name);
 	}
+	return -1;
 }
 
 /**
@@ -153,30 +91,60 @@ extern "C" PLUGIN_API int GetGameConfigOffset(uint32_t id, const plg::string& na
  * @return A pointer to the address associated with the specified name.
  */
 extern "C" PLUGIN_API void* GetGameConfigAddress(uint32_t id, const plg::string& name) {
-	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
-		return gameConfig->GetAddress(name);
+	if (auto gameConfig = GameConfigManager::Instance().GetConfig(id)) {
+		if (auto address = gameConfig->GetAddress(name)) {
+			return *address;
+		} else {
+			plg::print(LS_WARNING, "Could not get address: {} - {}\n", name, address.error());
+		}
 	} else {
-		plg::print(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
-		return nullptr;
+		plg::print(LS_WARNING, "Could not get find config: {} - {}\n", id, name);
 	}
+	return nullptr;
 }
 
 /**
- * @brief Retrieves the memory signature associated with a name from the game configuration.
+ * @brief Retrieves the vtable associated with a name from the game configuration.
  *
- * This function resolves and retrieves the memory signature of the specified name from the game configuration.
+ * This function retrieves the vtable of the specified name from the game configuration.
  *
- * @param id An id to the GameConfig object from which to retrieve the memory signature.
- * @param name The name whose memory signature is to be resolved and retrieved.
- * @return A pointer to the memory signature associated with the specified name.
+ * @param id An id to the GameConfig object from which to retrieve the vtable.
+ * @param name The name whose vtable is to be retrieved.
+ * @return A pointer to the vtable associated with the specified name.
  */
-extern "C" PLUGIN_API void* GetGameConfigMemSig(uint32_t id, const plg::string& name) {
-	if (auto gameConfig = g_GameConfigManager.GetGameConfig(id)) {
-		return gameConfig->ResolveSignature(name);
+extern "C" PLUGIN_API void* GetGameConfigVTable(uint32_t id, const plg::string& name) {
+	if (auto gameConfig = GameConfigManager::Instance().GetConfig(id)) {
+		if (auto vtable = gameConfig->GetVTable(name)) {
+			return *vtable;
+		} else {
+			plg::print(LS_WARNING, "Could not get vtable: {} - {}\n", name, vtable.error());
+		}
 	} else {
-		plg::print(LS_WARNING, "Could not get find config: {} for {}\n", id, name);
-		return nullptr;
+		plg::print(LS_WARNING, "Could not get find config: {} - {}\n", id, name);
 	}
+	return nullptr;
+}
+
+/**
+ * @brief Retrieves the signature associated with a name from the game configuration.
+ *
+ * This function resolves and retrieves the signature of the specified name from the game configuration.
+ *
+ * @param id An id to the GameConfig object from which to retrieve the signature.
+ * @param name The name whose signature is to be resolved and retrieved.
+ * @return A pointer to the signature associated with the specified name.
+ */
+extern "C" PLUGIN_API void* GetGameConfigSignature(uint32_t id, const plg::string& name) {
+	if (auto gameConfig = GameConfigManager::Instance().GetConfig(id)) {
+		if (auto signature = gameConfig->GetSignature(name)) {
+			return *signature;
+		} else {
+			plg::print(LS_WARNING, "Could not get signature: {} - {}\n", name, signature.error());
+		}
+	} else {
+		plg::print(LS_WARNING, "Could not get find config: {} - {}\n", id, name);
+	}
+	return nullptr;
 }
 
 PLUGIFY_WARN_POP()

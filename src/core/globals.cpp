@@ -13,58 +13,69 @@
 #include "game_config.hpp"
 #include "hook_holder.hpp"
 
-#define RESOLVE_SIG(gameConfig, name, variable) \
-	variable = (gameConfig)->ResolveSignature(name).RCast<decltype(variable)>(); \
-	if (!(variable)) { \
-		plg::print(LS_ERROR, "Failed to resolve signature for {}\n", #name); \
-		return; \
-	} \
-
 CoreConfig* g_pCoreConfig = nullptr;
 GameConfig* g_pGameConfig = nullptr;
 
 namespace globals {
 	void Initialize(plg::flat_map<plg::string, plg::string> paths) {
-		g_pCoreConfig = new CoreConfig(plg::vector{
-				paths["base"] + "/settings.jsonc",
-				paths["configs"] + "/settings.jsonc",
-				paths["data"] + "/settings.jsonc"
-		});
-		if (!g_pCoreConfig->Initialize()) {
-			plg::print(LS_ERROR, "Failed to load settings configuration!\n");
-			return;
+		{
+			g_pCoreConfig = new CoreConfig(plg::vector{
+				   paths["base"] + "/settings.jsonc",
+				   paths["configs"] + "/settings.jsonc",
+				   paths["data"] + "/settings.jsonc"
+		   });
+			if (!g_pCoreConfig->Initialize()) {
+				plg::print(LS_ERROR, "Failed to load settings configuration!\n");
+				return;
+			}
 		}
-		uint32_t id = g_GameConfigManager.LoadGameConfigFile(plg::vector{
-				paths["base"] + "/gamedata.jsonc",
-				paths["configs"] + "/gamedata.jsonc",
-				paths["data"] + "/gamedata.jsonc"
-		});
-		g_pGameConfig = g_GameConfigManager.GetGameConfig(id);
-		if (!g_pGameConfig) {
-			plg::print(LS_ERROR, "Failed to load gamedata configuration!\n");
-			return;
+		{
+			auto result = GameConfigManager::Instance().LoadConfig({ plg::vector{
+				   paths["base"] + "/gamedata.jsonc",
+				   paths["configs"] + "/gamedata.jsonc",
+				   paths["data"] + "/gamedata.jsonc"
+			   }
+		   });
+			if (!result) {
+				plg::print(LS_WARNING, "Failed to load gamedata configuration: {}\n", result.error());
+			}
+
+			g_pGameConfig = GameConfigManager::Instance().GetConfig(*result);
+			if (!g_pGameConfig) {
+				plg::print(LS_ERROR, "Failed to load gamedata configuration!\n");
+				return;
+			}
 		}
 
-		CAppSystemDict** p_ppCurrentAppSystem = g_pGameConfig->GetAddress("&s_pCurrentAppSystem").RCast<CAppSystemDict**>();
-		if (!p_ppCurrentAppSystem) {
-			plg::print(LS_ERROR, "s_pCurrentAppSystem not found!\n");
-			return;
-		}
-		g_pCurrentAppSystem = *p_ppCurrentAppSystem;
+		TRY_GET_ADDRESS(g_pGameConfig, "&s_pCurrentAppSystem", g_pCurrentAppSystem);
+		TRY_GET_ADDRESS(g_pGameConfig, "&s_GameEventManager", g_pGameEventManager);
+#if defined (CS2)
+		TRY_GET_ADDRESS(g_pGameConfig, "&s_pScripts", g_pScripts);
+#endif
 
-		IGameEventManager2** p_ppGameEventManager = g_pGameConfig->GetAddress("&s_GameEventManager").RCast<IGameEventManager2**>();
-		if (!p_ppGameEventManager) {
-			plg::print(LS_ERROR, "s_GameEventManager not found!\n");
-			return;
-		}
-		g_pGameEventManager = *p_ppGameEventManager;
+		// load more if needed
+		TRY_GET_SIGNATURE(g_pGameConfig, "LegacyGameEventListener", addresses::GetLegacyGameEventListener);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CBasePlayerController::SetPawn", addresses::CBasePlayerController_SetPawn);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseModelEntity::SetModel", addresses::CBaseModelEntity_SetModel);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CGameEntitySystem::FindEntityByClassName", addresses::CGameEntitySystem_FindEntityByClassName);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CGameEntitySystem::FindEntityByName", addresses::CGameEntitySystem_FindEntityByName);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CreateEntityByName", addresses::CreateEntityByName);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::DispatchSpawn", addresses::DispatchSpawn);
+		TRY_GET_SIGNATURE(g_pGameConfig, "UTIL_Remove", addresses::UTIL_Remove);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CEntityInstance::AcceptInput", addresses::CEntityInstance_AcceptInput);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CEntityIdentity::SetEntityName", addresses::CEntityIdentity_SetEntityName);
+		//TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity_EmitSoundParams", addresses::CBaseEntity_EmitSoundParams);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::SetParent", addresses::CBaseEntity_SetParent);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::EmitSoundFilter", addresses::CBaseEntity_EmitSoundFilter);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::SetMoveType", addresses::CBaseEntity_SetMoveType);
+		//TRY_GET_SIGNATURE(g_pGameConfig, "CCSServerPointScriptEntityEnterScope", addresses::CCSServerPointScriptEntityEnterScope);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CSScript::ResolveModule", addresses::CSScript_ResolveModule);
 
 #if defined (CS2)
-		g_pScripts = g_pGameConfig->GetAddress("&s_pScripts").RCast<CUtlVector<void*>*>();
-		if (!g_pScripts) {
-			plg::print(LS_ERROR, "s_pScripts not found!\n");
-			return;
-		}
+		TRY_GET_SIGNATURE(g_pGameConfig, "CCSPlayer_WeaponServices::RemoveItem", addresses::CCSPlayer_WeaponServices_RemoveItem);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CCSPlayerController::SwitchTeam", addresses::CCSPlayerController_SwitchTeam);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CGameRules::TerminateRound", addresses::CGameRules_TerminateRound);
+		TRY_GET_SIGNATURE(g_pGameConfig, "GetCSWeaponDataFromKey", addresses::GetCSWeaponDataFromKey);
 #endif
 
 		g_pCVar = static_cast<ICvar*>(QueryInterface("tier0", CVAR_INTERFACE_VERSION));
@@ -82,31 +93,6 @@ namespace globals {
 		g_pNetworkMessages = static_cast<INetworkMessages*>(QueryInterface("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
 
 		ConVarManager::Init();
-
-		// load more if needed
-		RESOLVE_SIG(g_pGameConfig, "LegacyGameEventListener", addresses::GetLegacyGameEventListener);
-		RESOLVE_SIG(g_pGameConfig, "CBasePlayerController::SetPawn", addresses::CBasePlayerController_SetPawn);
-		RESOLVE_SIG(g_pGameConfig, "CBaseModelEntity::SetModel", addresses::CBaseModelEntity_SetModel);
-		RESOLVE_SIG(g_pGameConfig, "CGameEntitySystem::FindEntityByClassName", addresses::CGameEntitySystem_FindEntityByClassName);
-		RESOLVE_SIG(g_pGameConfig, "CGameEntitySystem::FindEntityByName", addresses::CGameEntitySystem_FindEntityByName);
-		RESOLVE_SIG(g_pGameConfig, "CreateEntityByName", addresses::CreateEntityByName);
-		RESOLVE_SIG(g_pGameConfig, "CBaseEntity::DispatchSpawn", addresses::DispatchSpawn);
-		RESOLVE_SIG(g_pGameConfig, "UTIL_Remove", addresses::UTIL_Remove);
-		RESOLVE_SIG(g_pGameConfig, "CEntityInstance::AcceptInput", addresses::CEntityInstance_AcceptInput);
-		RESOLVE_SIG(g_pGameConfig, "CEntityIdentity::SetEntityName", addresses::CEntityIdentity_SetEntityName);
-		//RESOLVE_SIG(g_pGameConfig, "CBaseEntity_EmitSoundParams", addresses::CBaseEntity_EmitSoundParams);
-		RESOLVE_SIG(g_pGameConfig, "CBaseEntity::SetParent", addresses::CBaseEntity_SetParent);
-		RESOLVE_SIG(g_pGameConfig, "CBaseEntity::EmitSoundFilter", addresses::CBaseEntity_EmitSoundFilter);
-		RESOLVE_SIG(g_pGameConfig, "CBaseEntity::SetMoveType", addresses::CBaseEntity_SetMoveType);
-		//RESOLVE_SIG(g_pGameConfig, "CCSServerPointScriptEntityEnterScope", addresses::CCSServerPointScriptEntityEnterScope);
-		RESOLVE_SIG(g_pGameConfig, "CSScript::ResolveModule", addresses::CSScript_ResolveModule);
-
-#if defined (CS2)
-		RESOLVE_SIG(g_pGameConfig, "CCSPlayer_WeaponServices::RemoveItem", addresses::CCSPlayer_WeaponServices_RemoveItem);
-		RESOLVE_SIG(g_pGameConfig, "CCSPlayerController::SwitchTeam", addresses::CCSPlayerController_SwitchTeam);
-		RESOLVE_SIG(g_pGameConfig, "CGameRules::TerminateRound", addresses::CGameRules_TerminateRound);
-		RESOLVE_SIG(g_pGameConfig, "GetCSWeaponDataFromKey", addresses::GetCSWeaponDataFromKey);
-#endif
 	}
 
 	void Terminate() {

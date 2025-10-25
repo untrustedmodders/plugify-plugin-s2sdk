@@ -64,8 +64,8 @@ public:
 	}
 
 	void ChangeTeam(int iTeam) {
-		static int offset = g_pGameConfig->GetOffset("CBaseEntity::ChangeTeam");
-		CALL_VIRTUAL(void, offset, this, iTeam);
+		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::ChangeTeam", offset);
+		CALL_VIRTUAL(void, *offset, this, iTeam);
 	}
 
 	void SwitchTeam(int iTeam) {
@@ -88,7 +88,7 @@ public:
 			return;
 
 		SetPawn(pawn);
-		static int offset = g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn");
-		CALL_VIRTUAL(void, offset, this);
+		TRY_GET_OFFSET(g_pGameConfig, "CBasePlayerController::RoundRespawn", offset);
+		CALL_VIRTUAL(void, *offset, this);
 	}
 };

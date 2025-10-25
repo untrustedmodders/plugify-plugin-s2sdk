@@ -202,12 +202,12 @@ public:
 	static std::expected<ConVarMap, std::string> ParseConfigFile(const fs::path& filePath) {
 		std::error_code ec;
 		if (!fs::exists(filePath, ec)) {
-			return std::unexpected("Config file does not exist");
+			return MakeError("Config file does not exist");
 		}
 
 		std::ifstream file(filePath);
 		if (!file.is_open()) {
-			return std::unexpected(std::format("Failed to open config file: {}", plg::as_string(filePath)));
+			return MakeError("Failed to open config file: {}", plg::as_string(filePath));
 		}
 
 		auto trim = [](std::string_view str) -> std::string_view {

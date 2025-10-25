@@ -289,11 +289,17 @@
         "win64": [
           {
             "read_offs32": 98
+          },
+          {
+            "read": 0
           }
         ],
         "linuxsteamrt64": [
           {
             "read_offs32": 106
+          },
+          {
+            "read": 0
           }
         ]
       },
@@ -303,11 +309,17 @@
         "win64": [
           {
             "read_offs32": 15
+          },
+          {
+            "read": 0
           }
         ],
         "linuxsteamrt64": [
           {
             "read_offs32": 29
+          },
+          {
+            "read": 0
           }
         ]
       },

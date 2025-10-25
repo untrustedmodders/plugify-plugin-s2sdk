@@ -4,13 +4,10 @@
   "title": "GameConfig",
   "type": "object",
   "$defs": {
-    "addressActionsSection": {
+    "addressObject": {
+      "description": "A address steps",
       "type": "object",
       "properties": {
-        "signature": {
-          "description": "An address name from \"Addressess\" and \"Signatures\" sections",
-          "type": "string"
-        },
         "offset": {
           "description": "A offset number in bytes",
           "type": "number"
@@ -22,18 +19,6 @@
         "read_offs32": {
           "description": "A offset number to 32-bit relative cell to read",
           "type": "number"
-        },
-        "win64": {
-          "description": "Address actions on Windows side",
-          "$ref": "#/$defs/addressActionsSection"
-        },
-        "linuxsteamrt64": {
-          "description": "Address actions on Linux side",
-          "$ref": "#/$defs/addressActionsSection"
-        },
-        "osx64": {
-          "description": "Address actions on macOS side",
-          "$ref": "#/$defs/addressActionsSection"
         }
       }
     }
@@ -50,7 +35,31 @@
             "^.+$": {
               "description": "A address name",
               "type": "object",
-              "$ref": "#/$defs/addressActionsSection"
+              "signature": {
+                "description": "An address name from \"Addressess\" and \"Signatures\" sections",
+                "type": "string"
+              },
+              "win64": {
+                "description": "Address actions on Windows side",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/addressObject"
+                }
+              },
+              "linuxsteamrt64": {
+                "description": "Address actions on Linux side",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/addressObject"
+                }
+              },
+              "osx64": {
+                "description": "Address actions on macOS side",
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/addressObject"
+                }
+              }
             }
           }
         },
@@ -162,7 +171,7 @@
               "description": "A patch name",
               "type": "object",
               "properties": {
-                "signature": {
+                "address": {
 				  "description": "An address name from \"Addressess\" and \"Signatures\" sections",
 				  "type": "string"
 				},
@@ -197,7 +206,7 @@
                   "description": "The shared library name",
                   "type": "string"
                 },
-                "name": {
+                "table": {
                   "description": "A virtual table name",
                   "type": "string"
                 }

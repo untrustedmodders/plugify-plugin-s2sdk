@@ -183,13 +183,13 @@ public:
 	}
 
 	bool IsPawn() {
-		static int offset = g_pGameConfig->GetOffset("CBaseEntity::IsPlayerPawn");
-		return CALL_VIRTUAL(bool, offset, this);
+		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::IsPlayerPawn", offset);
+		return CALL_VIRTUAL(bool, *offset, this);
 	}
 
 	bool IsController() {
-		static int offset = g_pGameConfig->GetOffset("CBaseEntity::IsPlayerController");
-		return CALL_VIRTUAL(bool, offset, this);
+		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::IsPlayerController", offset);
+		return CALL_VIRTUAL(bool, *offset, this);
 	}
 
 	bool IsAlive() {
@@ -197,8 +197,8 @@ public:
 	}
 
 	void CollisionRulesChanged() {
-		static int offset = g_pGameConfig->GetOffset("CBaseEntity::CollisionRulesChanged");
-		CALL_VIRTUAL(void, offset, this);
+		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::CollisionRulesChanged", offset);
+		CALL_VIRTUAL(void, *offset, this);
 	}
 
 	/*void StartTouch(CBaseEntity* pOther) {
@@ -215,8 +215,8 @@ public:
 	}*/
 
 	void Teleport(const Vector* newPosition, const QAngle* newAngles, const Vector* newVelocity) {
-		static int offset = g_pGameConfig->GetOffset("CBaseEntity::Teleport");
-		CALL_VIRTUAL(bool, offset, this, newPosition, newAngles, newVelocity);
+		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::Teleport", offset);
+		CALL_VIRTUAL(bool, *offset, this, newPosition, newAngles, newVelocity);
 	}
 
 	CHandle<CBaseEntity> GetHandle() { return m_pEntity->m_EHandle; }
@@ -317,13 +317,13 @@ public:
 	}
 
 	void SetOwner(CBaseEntity* pNewOwner) {
-		static int offset = g_pGameConfig->GetOffset("CBaseEntity::SetOwner");
-		CALL_VIRTUAL(void, offset, this, pNewOwner);
+		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::SetOwner", offset);
+		CALL_VIRTUAL(void, *offset, this, pNewOwner);
 	}
 
 	bool IsWeapon() {
-		static auto offset = g_pGameConfig->GetOffset("CBaseEntity::IsWeapon");
-		return CALL_VIRTUAL(bool, offset, this);
+		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::IsWeapon", offset);
+		return CALL_VIRTUAL(bool, *offset, this);
 	}
 
 	void Remove() {

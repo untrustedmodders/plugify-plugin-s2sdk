@@ -3,7 +3,7 @@
 #include <edict.h>
 
 void ServerManager::OnGameFrame() {
-	plg::hybrid_vector<Task, 16> tasksToExecute;
+	std::vector<Task> tasksToExecute;
 
 	{
 		std::scoped_lock lock(m_frameTasksMutex);
@@ -15,13 +15,13 @@ void ServerManager::OnGameFrame() {
 
 	plg::print(LS_DETAILED, "Executing queued tasks of size: {} on tick number {}\n", tasksToExecute.size(), gpGlobals->tickcount);
 
-	for (auto& [callback, userData] : tasksToExecute) {
+	for (const auto& [callback, userData] : tasksToExecute) {
 		callback(userData);
 	}
 }
 
 void ServerManager::OnPreWorldUpdate() {
-	plg::hybrid_vector<Task, 16> tasksToExecute;
+	std::vector<Task> tasksToExecute;
 
 	{
 		std::scoped_lock lock(m_worldUpdateMutex);
@@ -33,7 +33,7 @@ void ServerManager::OnPreWorldUpdate() {
 
 	plg::print(LS_DETAILED, "Executing queued tasks of size: {} at time {}\n", tasksToExecute.size(), gpGlobals->curtime);
 
-	for (auto& [callback, userData] : tasksToExecute) {
+	for (const auto& [callback, userData] : tasksToExecute) {
 		callback(userData);
 	}
 }

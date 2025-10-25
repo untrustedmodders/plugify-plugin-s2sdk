@@ -11558,96 +11558,6 @@
       }
     },
     {
-      "name": "GetGameConfigPaths",
-      "group": "Gameconfig",
-      "description": "Retrieves the paths of a game configuration.",
-      "funcName": "GetGameConfigPaths",
-      "paramTypes": [
-        {
-          "name": "id",
-          "type": "uint32",
-          "ref": false,
-          "description": "An id to the game configuration whose path is to be retrieved."
-        }
-      ],
-      "retType": {
-        "type": "string[]",
-        "description": "An array of paths where the configuration is stored."
-      }
-    },
-    {
-      "name": "GetGameConfigLibrary",
-      "group": "Gameconfig",
-      "description": "Retrieves a library associated with the game configuration.",
-      "funcName": "GetGameConfigLibrary",
-      "paramTypes": [
-        {
-          "name": "id",
-          "type": "uint32",
-          "ref": false,
-          "description": "An id to the game configuration from which to retrieve the library."
-        },
-        {
-          "name": "name",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the library to be retrieved."
-        }
-      ],
-      "retType": {
-        "type": "string",
-        "description": "A string where the library will be stored."
-      }
-    },
-    {
-      "name": "GetGameConfigSignature",
-      "group": "Gameconfig",
-      "description": "Retrieves the signature associated with the game configuration.",
-      "funcName": "GetGameConfigSignature",
-      "paramTypes": [
-        {
-          "name": "id",
-          "type": "uint32",
-          "ref": false,
-          "description": "An id to the game configuration from which to retrieve the signature."
-        },
-        {
-          "name": "name",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the signature to be retrieved."
-        }
-      ],
-      "retType": {
-        "type": "string",
-        "description": "A string where the signature will be stored."
-      }
-    },
-    {
-      "name": "GetGameConfigSymbol",
-      "group": "Gameconfig",
-      "description": "Retrieves a symbol associated with the game configuration.",
-      "funcName": "GetGameConfigSymbol",
-      "paramTypes": [
-        {
-          "name": "id",
-          "type": "uint32",
-          "ref": false,
-          "description": "An id to the game configuration from which to retrieve the symbol."
-        },
-        {
-          "name": "name",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the symbol to be retrieved."
-        }
-      ],
-      "retType": {
-        "type": "string",
-        "description": "A string where the symbol will be stored."
-      }
-    },
-    {
       "name": "GetGameConfigPatch",
       "group": "Gameconfig",
       "description": "Retrieves a patch associated with the game configuration.",
@@ -11720,27 +11630,51 @@
       }
     },
     {
-      "name": "GetGameConfigMemSig",
+      "name": "GetGameConfigVTable",
       "group": "Gameconfig",
-      "description": "Retrieves the memory signature associated with a name from the game configuration.",
-      "funcName": "GetGameConfigMemSig",
+      "description": "Retrieves a vtable associated with the game configuration.",
+      "funcName": "GetGameConfigLibrary",
       "paramTypes": [
         {
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the memory signature."
+          "description": "An id to the game configuration from which to retrieve the vtable."
         },
         {
           "name": "name",
           "type": "string",
           "ref": false,
-          "description": "The name whose memory signature is to be resolved and retrieved."
+          "description": "The name of the vtable to be retrieved."
         }
       ],
       "retType": {
         "type": "ptr64",
-        "description": "A pointer to the memory signature associated with the specified name."
+        "description": "A pointer to the vtable associated with the specified name"
+      }
+    },
+    {
+      "name": "GetGameConfigSignature",
+      "group": "Gameconfig",
+      "description": "Retrieves the signature associated with a name from the game configuration.",
+      "funcName": "GetGameConfigSignature",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "An id to the game configuration from which to retrieve the signature."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name whose signature is to be resolved and retrieved."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the signature associated with the specified name."
       }
     },
     {

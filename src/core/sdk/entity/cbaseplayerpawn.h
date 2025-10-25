@@ -39,8 +39,8 @@ public:
 
 	void CommitSuicide(bool bExplode, bool bForce) {
 		m_bTakesDamage = true;
-		static int offset = g_pGameConfig->GetOffset("CBasePlayerPawn::CommitSuicide");
-		CALL_VIRTUAL(void, offset, this, bExplode, bForce);
+		TRY_GET_OFFSET(g_pGameConfig, "CBasePlayerPawn::CommitSuicide", offset);
+		CALL_VIRTUAL(void, *offset, this, bExplode, bForce);
 		m_bTakesDamage = false;
 	}
 

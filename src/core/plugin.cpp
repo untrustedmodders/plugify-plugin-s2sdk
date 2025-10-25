@@ -33,8 +33,8 @@ Source2SDK g_sdk;
 EXPOSE_PLUGIN(PLUGIN_API, Source2SDK, &g_sdk)
 
 CGameEntitySystem* GameEntitySystem() {
-	static int offset = g_pGameConfig->GetOffset("GameEntitySystem");
-	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + offset);
+	TRY_GET_OFFSET(g_pGameConfig, "GameEntitySystem", offset);
+	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + *offset);
 }
 
 namespace {
@@ -456,7 +456,8 @@ poly::ReturnAction Hook_OnAddEntity(poly::PHook& hook, poly::Params& params, int
 			{"target_name", "script_main" },
 			{"cs_script", CS_SCRIPT_PATH}
 		});
-		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pPointScript) + g_pGameConfig->GetOffset("CCSScript_EntityScript"));
+		TRY_GET_OFFSET(g_pGameConfig, "CCSScript_EntityScript", offset);
+		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pPointScript) + *offset);
 	} else if (name == "cs_team_manager") {
 		g_pTeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
 	}
@@ -623,12 +624,14 @@ void Source2SDK::OnPluginStart() {
 	using FireOutputInternalFn = uint64_t(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, int32_t*, int16_t*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
-	auto engine2 = g_GameConfigManager.GetModule("engine2");
+	auto& provider = GameConfigManager::Instance().GetModuleProvider();
+
+	auto engine2 = provider.GetModule("engine2");
 	auto table = engine2->GetVirtualTableByName("CServerSideClient");
 	g_PH.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, &table, Hook_ProcessRespondCvarValue, Pre);
 	g_PH.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, &table, Hook_SendNetMessage, Pre);
 
-	auto server = g_GameConfigManager.GetModule("server");
+	auto server = provider.GetModule("server");
 	auto table2 = server->GetVirtualTableByName("CGameRulesGameSystem");
 	g_PH.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &table2, Hook_BuildGameSessionManifest, Pre);
 
@@ -637,38 +640,29 @@ void Source2SDK::OnPluginStart() {
 
 	using v8IsolateFn = void(*)(v8::Isolate*);
 
-	auto v8IsolateEnterPtr = g_pGameConfig->GetAddress("v8::Isolate::Enter").CCast<void*>();
-	if (!v8IsolateEnterPtr) {
-		plg::print(LS_ERROR, "v8::Isolate::Enter not found!\n");
-		return;
-	}
+	void* v8IsolateEnterPtr;
+	TRY_GET_ADDRESS(g_pGameConfig, "8::Isolate::Enter", v8IsolateEnterPtr);
 
-	auto v8IsolateExitPtr = g_pGameConfig->GetAddress("v8::Isolate::Exit").CCast<void*>();
-	if (!v8IsolateExitPtr) {
-		plg::print(LS_ERROR, "v8::Isolate::Exit not found!\n");
-		return;
-	}
+	void* v8IsolateExitPtr;
+	TRY_GET_ADDRESS(g_pGameConfig, "8::Isolate::Exit", v8IsolateExitPtr);
 
 #if S2SDK_PLATFORM_WINDOWS
 	const uint8_t fix = 0;
 #else
-	const uint8_t fix = 6;
+	const uint8_t fix = 6; // skip plt staff
 #endif
 
-	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)((uint8_t*)(v8IsolateEnterPtr) + fix), Hook_IsolateEnter, Pre);
-	g_PH.AddHookDetourFunc<v8IsolateFn>((uintptr_t)((uint8_t*)(v8IsolateExitPtr) + fix), Hook_IsolateExit, Post);
+	g_PH.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(static_cast<uint8_t*>(v8IsolateEnterPtr) + fix), Hook_IsolateEnter, Pre);
+	g_PH.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(static_cast<uint8_t*>(v8IsolateExitPtr) + fix), Hook_IsolateExit, Post);
 
-	{
-		Module v8("plugify-module-v8");
-		if (v8.IsValid()) {
-			using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
-			auto resolve = v8.GetFunctionByName("SetModuleResolver").RCast<SetModuleResolverFn>();
-			if (!resolve) {
-				plg::print(LS_ERROR, "SetModuleResolver not found!\n");
-				return;
-			}
-			resolve(addresses::CSScript_ResolveModule);
+	if (Module v8("plugify-module-v8"); v8.IsValid()) {
+		using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
+		auto resolve = v8.GetFunctionByName("SetModuleResolver").RCast<SetModuleResolverFn>();
+		if (!resolve) {
+			plg::print(LS_ERROR, "SetModuleResolver not found!\n");
+			return;
 		}
+		resolve(addresses::CSScript_ResolveModule);
 	}
 #endif
 

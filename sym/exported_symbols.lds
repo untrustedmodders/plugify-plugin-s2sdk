@@ -283,14 +283,11 @@ LoadEventsFromFile
 
 CloseGameConfigFile
 LoadGameConfigFile
-GetGameConfigPaths
-GetGameConfigLibrary
-GetGameConfigSignature
-GetGameConfigSymbol
 GetGameConfigPatch
 GetGameConfigOffset
 GetGameConfigAddress
-GetGameConfigMemSig
+GetGameConfigVTable
+GetGameConfigSignature
 
 GetGameRulesProxy
 GetGameRules

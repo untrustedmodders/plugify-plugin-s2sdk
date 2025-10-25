@@ -48,7 +48,7 @@ private:
 	float m_lastTickedTime{};
 	std::set<Timer> m_timers;
 	std::recursive_mutex m_mutex;
-	static inline uint32_t s_nextId = static_cast<uint32_t>(-1);
+	uint32_t m_nextId{};
 };
 
 inline TimerFlag operator|(TimerFlag lhs, TimerFlag rhs) noexcept {

@@ -87,13 +87,13 @@ public:
 			return it->second->GetAddress();
 		}
 
-		auto addr = g_pGameConfig->ResolveSignature(name);
+		auto addr = g_pGameConfig->GetSignature(name);
 		if (!addr) {
 			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;
 		}
 
-		auto ihook = poly::DetourHook::Find(addr);
+		auto ihook = poly::DetourHook::Find(*addr);
 		if (ihook != nullptr) {
 			callback(*ihook);
 			return ihook->GetAddress();
@@ -103,7 +103,7 @@ public:
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		ihook = poly::DetourHook::Create(addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		ihook = poly::DetourHook::Create(*addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;

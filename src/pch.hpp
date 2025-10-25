@@ -29,6 +29,7 @@
 #include <source_location>
 #include <string>
 #include <thread>
+#include <execution>
 //#include <regex>
 
 namespace fs = std::filesystem;

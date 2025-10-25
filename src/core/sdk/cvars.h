@@ -10,16 +10,16 @@ namespace cvars {
 	void NotifyConVar(ConVarRefAbstract conVar, std::string_view value);
 	void ReplicateConVar(ConVarRefAbstract conVar, std::string_view value);
 
-	static std::expected<ConVarRefAbstract, std::string> CreateConVar(uint64 conVarHandle) {
+	static Result<ConVarRefAbstract> CreateConVar(uint64 conVarHandle) {
 		ConVarRef conVarRef(conVarHandle);
 
 		if (!conVarRef.IsValidRef()) {
-			return std::unexpected(std::format("Invalid ConVar handle: {}\n", conVarHandle));
+			return MakeError("Invalid ConVar handle: {}\n", conVarHandle);
 		}
 
 		ConVarData* conVarData = g_pCVar->GetConVarData(conVarRef);
 		if (conVarData == nullptr) {
-			return std::unexpected(std::format("Failed to get ConVar data for handle: {}\n", conVarHandle));
+			return MakeError("Failed to get ConVar data for handle: {}\n", conVarHandle);
 		}
 
 		return ConVarRefAbstract(conVarRef, conVarData);

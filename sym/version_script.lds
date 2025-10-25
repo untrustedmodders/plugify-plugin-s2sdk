@@ -285,12 +285,9 @@
 
         CloseGameConfigFile;
         LoadGameConfigFile;
-        GetGameConfigPaths;
-        GetGameConfigLibrary;
-        GetGameConfigSignature;
-        GetGameConfigSymbol;
         GetGameConfigPatch;
         GetGameConfigOffset;
+        GetGameConfigVTable;
         GetGameConfigAddress;
         GetGameConfigMemSig;
 
