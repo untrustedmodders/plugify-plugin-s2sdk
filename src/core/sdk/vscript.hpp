@@ -25,8 +25,8 @@ using VScriptClassMap = plg::flat_hash_map<plg::string, VScriptClass, plg::strin
 namespace vscript {
 	void RegisterFunction(ScriptFunctionBinding_t* pScriptFunction);
 	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc);
-	void RegisterInstance(ScriptClassDesc_t* pClassDesc, void* pInstance);
-	void SetValue(IScriptVM* vm, const ScriptVariant_t& value);
+	//void RegisterInstance(ScriptClassDesc_t* pClassDesc, void* pInstance);
+	//void SetValue(IScriptVM* vm, const ScriptVariant_t& value);
 
 	VScriptBinding GetBinding(std::string_view functionName);
 	VScriptBinding GetBinding(std::string_view className, std::string_view functionName);
