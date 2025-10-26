@@ -172,7 +172,7 @@ namespace schema {
 	std::pair<ElementType, int> IsIntType(CSchemaType* type) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* elementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
+				auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
 				switch (elementType->m_eTypeCategory) {
 					case SCHEMA_TYPE_BUILTIN: {
 						switch (static_cast<CSchemaType_Builtin*>(elementType)->m_eBuiltinType) {
@@ -286,7 +286,7 @@ namespace schema {
 	std::pair<ElementType, int> IsFloatType(CSchemaType* type) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* elementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
+				auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
 				switch (elementType->m_eTypeCategory) {
 					case SCHEMA_TYPE_BUILTIN: {
 						auto* elementTypeBuiltin = static_cast<CSchemaType_Builtin*>(elementType);
@@ -312,7 +312,7 @@ namespace schema {
 				return {Invalid, -1};
 			}
 			case SCHEMA_TYPE_DECLARED_CLASS: {
-				int size = static_cast<CSchemaType_DeclaredClass*>(type)->m_pClassInfo->m_nSize;
+				int size = static_cast<const CSchemaType_DeclaredClass*>(type)->m_pClassInfo->m_nSize;
 				if (size <= sizeof(double)) {
 					return {Single, size};
 				}
@@ -320,7 +320,7 @@ namespace schema {
 			}
 			case SCHEMA_TYPE_ATOMIC: {
 				if (type->m_eAtomicCategory == SCHEMA_ATOMIC_COLLECTION_OF_T) {
-					switch (static_cast<CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize) {
+					switch (static_cast<const CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize) {
 						case sizeof(float32):
 							return {Collection, static_cast<int>(sizeof(float32))};
 						case sizeof(float64):
@@ -332,7 +332,7 @@ namespace schema {
 				return {Invalid, -1};
 			}
 			case SCHEMA_TYPE_BUILTIN: {
-				switch (static_cast<CSchemaType_Builtin*>(type)->m_eBuiltinType) {
+				switch (static_cast<const CSchemaType_Builtin*>(type)->m_eBuiltinType) {
 					case SCHEMA_BUILTIN_TYPE_FLOAT32:
 						return {Single, static_cast<int>(sizeof(float32))};
 					case SCHEMA_BUILTIN_TYPE_FLOAT64:
@@ -350,7 +350,7 @@ namespace schema {
 	ElementType IsPlainType(CSchemaType* type, size_t size) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* elementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
+				auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
 				if (elementType->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && elementType->m_eAtomicCategory == SCHEMA_ATOMIC_PLAIN) {
 					if (static_cast<CSchemaType_Atomic*>(elementType)->m_nSize == size)
 						return Array;
@@ -360,11 +360,11 @@ namespace schema {
 			case SCHEMA_TYPE_ATOMIC: {
 				switch (type->m_eAtomicCategory) {
 					case SCHEMA_ATOMIC_PLAIN:
-						if (static_cast<CSchemaType_Atomic*>(type)->m_nSize == size)
+						if (static_cast<const CSchemaType_Atomic*>(type)->m_nSize == size)
 							return Single;
 						break;
 					case SCHEMA_ATOMIC_COLLECTION_OF_T:
-						if (static_cast<CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize == size)
+						if (static_cast<const CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize == size)
 							return Collection;
 						break;
 					default:
@@ -381,7 +381,7 @@ namespace schema {
 	ElementType IsAtomicType(CSchemaType* type, size_t size) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* elementType = static_cast<CSchemaType_FixedArray*>(type)->m_pElementType;
+				auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
 				if (elementType->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && elementType->m_eAtomicCategory == SCHEMA_ATOMIC_T) {
 					if (static_cast<CSchemaType_Atomic_T*>(elementType)->m_nSize == size)
 						return Array;
@@ -391,11 +391,11 @@ namespace schema {
 			case SCHEMA_TYPE_ATOMIC: {
 				switch (type->m_eAtomicCategory) {
 					case SCHEMA_ATOMIC_T:
-						if (static_cast<CSchemaType_Atomic_T*>(type)->m_nSize == size)
+						if (static_cast<const CSchemaType_Atomic_T*>(type)->m_nSize == size)
 							return Single;
 						break;
 					case SCHEMA_ATOMIC_COLLECTION_OF_T:
-						if (static_cast<CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize == size)
+						if (static_cast<const CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize == size)
 							return Collection;
 						break;
 					default:

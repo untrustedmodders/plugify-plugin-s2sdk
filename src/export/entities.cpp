@@ -395,7 +395,7 @@ extern "C" PLUGIN_API void SetEntityName(int entityHandle, const plg::string& na
 		return;
 	}
 
-	entity->SetName(name.c_str());
+	entity->SetEntityName(name.c_str());
 }
 
 /**
@@ -773,8 +773,9 @@ extern "C" PLUGIN_API int GetEntityParent(int entityHandle) {
  *
  * @param entityHandle The handle of the entity whose parent is to be set.
  * @param parentHandle The handle of the new parent entity.
+ * @param attachmentName The name of the entity's attachment.
  */
-extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle) {
+extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle, const plg::string& attachmentName) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
 	if (!entity) {
 		plg::print(LS_WARNING, "Cannot execute 'SetEntityParent' on invalid entity handle: {}\n", entityHandle);
@@ -787,7 +788,7 @@ extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle) {
 		return;
 	}
 
-	entity->SetParent(pNewParent);
+	entity->SetParent(pNewParent, attachmentName.c_str());
 }
 
 /**
@@ -884,7 +885,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAbsVelocity(int entityHandle) {
 		return {};
 	}
 
-	const Vector& vec = entity->m_vecAbsVelocity;
+	const Vector& vec = entity->GetVelocity();
 	return *reinterpret_cast<const plg::vec3*>(&vec);
 }
 

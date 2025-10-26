@@ -56,19 +56,13 @@ namespace globals {
 		// load more if needed
 		TRY_GET_SIGNATURE(g_pGameConfig, "LegacyGameEventListener", addresses::GetLegacyGameEventListener);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CBasePlayerController::SetPawn", addresses::CBasePlayerController_SetPawn);
-		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseModelEntity::SetModel", addresses::CBaseModelEntity_SetModel);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CGameEntitySystem::FindEntityByClassName", addresses::CGameEntitySystem_FindEntityByClassName);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CGameEntitySystem::FindEntityByName", addresses::CGameEntitySystem_FindEntityByName);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CreateEntityByName", addresses::CreateEntityByName);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::DispatchSpawn", addresses::DispatchSpawn);
-		TRY_GET_SIGNATURE(g_pGameConfig, "UTIL_Remove", addresses::UTIL_Remove);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CEntityInstance::AcceptInput", addresses::CEntityInstance_AcceptInput);
-		TRY_GET_SIGNATURE(g_pGameConfig, "CEntityIdentity::SetEntityName", addresses::CEntityIdentity_SetEntityName);
-		//TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity_EmitSoundParams", addresses::CBaseEntity_EmitSoundParams);
-		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::SetParent", addresses::CBaseEntity_SetParent);
-		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::EmitSoundFilter", addresses::CBaseEntity_EmitSoundFilter);
+		//TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::EmitSoundFilter", addresses::CBaseEntity_EmitSoundFilter);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::SetMoveType", addresses::CBaseEntity_SetMoveType);
-		//TRY_GET_SIGNATURE(g_pGameConfig, "CCSServerPointScriptEntityEnterScope", addresses::CCSServerPointScriptEntityEnterScope);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CSScript::ResolveModule", addresses::CSScript_ResolveModule);
 
 #if defined (CS2)

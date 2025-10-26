@@ -516,7 +516,7 @@ extern "C" PLUGIN_API int GetEntSchemaArraySize2(CEntityInstance* entity, const 
 	auto elementType = schema::GetElementType(type);
 	switch (elementType) {
 		case schema::ElementType::Array:
-			return static_cast<CSchemaType_FixedArray*>(type)->m_nElementCount;
+			return static_cast<const CSchemaType_FixedArray*>(type)->m_nElementCount;
 		case schema::ElementType::Collection:
 			return reinterpret_cast<CUtlVector<intptr_t>*>(reinterpret_cast<intptr_t>(entity) + offset)->Count();
 		default:

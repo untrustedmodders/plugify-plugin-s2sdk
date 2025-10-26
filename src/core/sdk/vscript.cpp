@@ -24,14 +24,14 @@
 #include "utils.h"
 
 namespace {
-	VScriptBinding ScriptConvertFuncPtrToBinding(const ScriptFunctionBinding_t& binding) {
+	VScriptBinding ScriptConvertFuncPtrToBinding(ScriptFunctionBinding_t& pScriptFunction) {
 	    VScriptBinding result = {};
 
 #if defined(_MSC_VER)
 	    result.funcadr = binding.m_pFunction;
 		result.is_virtual = false;
 #elif defined(__GNUC__) || defined(__clang__)
-	    if (binding.m_flags & SF_MEMBER_FUNC) {
+	    if (pScriptFunction.m_flags & SF_MEMBER_FUNC) {
 	        struct GnuMFP {
 	            union {
 	                void* funcadr;
@@ -40,49 +40,49 @@ namespace {
 	            intptr_t delta;
 	        };
 
-	        GnuMFP* p = (GnuMFP*)&binding.m_pFunction;
+	        const GnuMFP* p = reinterpret_cast<const GnuMFP*>(&pScriptFunction.m_pFunction);
 
 	        if (p->vti_plus1 & 1) {
 	            // Virtual function
-	            result.is_virtual = true;
 	            result.vtable_index = (p->vti_plus1 - 1) / sizeof(void*);
 	        	result.delta = p->delta;
 	            result.funcadr = nullptr;
 	        } else {
 	            // Non-virtual
 	            result.funcadr = p->funcadr;
-	            result.is_virtual = false;
+	            result.vtable_index = -1;
 	        }
 	    } else {
-    		result.funcadr = binding.m_pFunction;
-    		result.is_virtual = false;
+    		result.funcadr = pScriptFunction.m_pFunction;
+    		result.vtable_index = -1;
 	    }
 #endif
 
+		result.binding = &pScriptFunction;
 	    return result;
 	}
 
-	using VScriptFuncMap = plg::flat_hash_map<plg::string, VScriptBinding, plg::string_hash, std::equal_to<>>;
-	using VScriptTableMap = plg::flat_hash_map<plg::string, VScriptFuncMap, plg::string_hash, std::equal_to<>>;
+	VScriptClassMap scriptClassMap;
+	ScriptClassDesc_t* lastClass;
+	void* lastInstance;
 
-	VScriptFuncMap scriptFuncMap;
-	VScriptTableMap scriptTableMap;
 }// namespace
 
 namespace vscript {
 	void RegisterFunction(ScriptFunctionBinding_t* pScriptFunction) {
-		std::string_view funcName = pScriptFunction->m_desc.m_pszFunction;
-		if (scriptTableMap.contains(funcName)) {
+		VScriptClass& globalClass = scriptClassMap[""];
+
+		std::string_view funcName = pScriptFunction->m_desc.m_pszScriptName;
+		if (globalClass.m_functions.contains(funcName)) {
 			return;
 		}
 
 		auto binding = ScriptConvertFuncPtrToBinding(*pScriptFunction);
-		scriptFuncMap.emplace(funcName, binding);
 
-#if 1
+#if 0
 		// Pretty print registration info
 		plg::print(LS_DETAILED, "┌─ Registered Function ────────────────────────────────\n");
-		plg::print(LS_DETAILED, "│ Name:        {}\n", pScriptFunction->m_desc.m_pszFunction);
+		plg::print(LS_DETAILED, "│ Name:        {}\n", pScriptFunction->m_desc.m_pszScriptName);
 		plg::print(LS_DETAILED, "│ Description: {}\n", pScriptFunction->m_desc.m_pszDescription ? 
 										   pScriptFunction->m_desc.m_pszDescription : "(none)");
 		plg::print(LS_DETAILED, "│ Returns:     {}\n", GetScriptTypeName(pScriptFunction->m_desc.m_ReturnType));
@@ -94,26 +94,27 @@ namespace vscript {
 		}
 		plg::print(LS_DETAILED, "└──────────────────────────────────────────────────────\n\n");
 #endif
+
+		globalClass.m_functions.emplace(funcName, binding);
 	}
 
 	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc) {
 		std::string_view className = pClassDesc->m_pszClassname;
-		if (scriptTableMap.contains(className)) {
+		if (scriptClassMap.contains(className)) {
 			return;
 		}
 
-		auto createMap = [&]() {
-			VScriptFuncMap functional;
-			functional.reserve(static_cast<size_t>(pClassDesc->m_FunctionBindings.Count()));
-			for (const auto& function : pClassDesc->m_FunctionBindings) {
-				//(pScriptFunction)->m_pFunction = ScriptConvertFuncPtrToVoid( &class::func );
-				functional.emplace(function.m_desc.m_pszFunction, ScriptConvertFuncPtrToBinding(function));
+		auto createClass = [&]() {
+			VScriptClass scriptClass;
+			scriptClass.m_descriptor = pClassDesc;
+			scriptClass.m_functions.reserve(static_cast<size_t>(pClassDesc->m_FunctionBindings.Count()));
+			for (auto& function : pClassDesc->m_FunctionBindings) {
+				scriptClass.m_functions.emplace(function.m_desc.m_pszScriptName, ScriptConvertFuncPtrToBinding(function));
 			}
-			return functional;
+			return scriptClass.m_functions;
 		};
-		scriptTableMap.emplace(className, createMap());
 
-#if 1
+#if 0
 		// Pretty print class registration
 	    plg::print(LS_DETAILED, "╔═════════════════════════════════════════════════════════════\n");
 	    plg::print(LS_DETAILED, "║ Registered Script Class\n");
@@ -137,7 +138,7 @@ namespace vscript {
 	        for (const auto& function : pClassDesc->m_FunctionBindings) {
 	            auto binding = ScriptConvertFuncPtrToBinding(function);
 	            
-	            plg::print(LS_DETAILED, "║ [{:2}] {:<30} ", idx++, function.m_desc.m_pszFunction);
+	            plg::print(LS_DETAILED, "║ [{:2}] {:<30} ", idx++, function.m_desc.m_pszScriptName);
 	            plg::print(LS_DETAILED, "{} -> {}", 
 	                      function.m_desc.m_iParamCount > 0 ?
 	                          std::format("({} params)", function.m_desc.m_iParamCount) : "()",
@@ -152,36 +153,111 @@ namespace vscript {
 	    
 	    plg::print(LS_DETAILED, "╚═════════════════════════════════════════════════════════════\n\n");
 #endif
+
+		scriptClassMap.emplace(className, createClass());
 	}
 
-	VScriptBinding GetFunctionBinding(std::string_view className) {
-		auto it = scriptFuncMap.find(className);
-		if (it != scriptFuncMap.end()) {
+#if 0
+	void RegisterInstance(ScriptClassDesc_t* pClassDesc, void* pInstance) {
+		lastClass = pClassDesc;
+		lastInstance = pInstance;
+	}
+
+	void SetValue(IScriptVM* vm, const ScriptVariant_t& value) {
+		if (lastClass && lastInstance && value.m_type == FIELD_HSCRIPT) {
+			void* instance = vm->GetInstanceValue(value, lastClass);
+			if (instance == lastInstance) {
+				auto it = scriptClassMap.find(lastClass->m_pszScriptName);
+				if (it != scriptClassMap.end()) {
+					it->second.m_instance = lastInstance;
+				}
+			}
+		}
+		lastClass = nullptr;
+		lastInstance = nullptr;
+	}
+#endif
+
+	VScriptBinding GetBinding(std::string_view functionName) {
+		VScriptClass& globalClass = scriptClassMap[""];
+		auto it = globalClass.m_functions.find(functionName);
+		if (it != globalClass.m_functions.end()) {
 			return it->second;
 		}
 		plg::print(
 			LS_ERROR,
-			"vscript::GetFunctionBinding(): '{}' was not found!\n",
-			className
+			"vscript::GetBinding(): '{}' was not found!\n",
+			functionName
 		);
 		return {};
 	}
 
-	VScriptBinding GetFunctionBinding(std::string_view className, std::string_view memberName) {
-		auto it = scriptTableMap.find(className);
-		if (it != scriptTableMap.end()) {
+	VScriptBinding GetBinding(std::string_view className, std::string_view functionName) {
+		auto it = scriptClassMap.find(className);
+		if (it != scriptClassMap.end()) {
 			auto& table = it->second;
-			auto it2 = table.find(memberName);
-			if (it2 != table.end()) {
+			auto it2 = table.m_functions.find(functionName);
+			if (it2 != table.m_functions.end()) {
 				return it2->second;
 			}
 			plg::print(
 				LS_ERROR,
-				"vscript::GetFunctionBinding(): '{}' was not found in '{}'!\n",
-				memberName,
+				"vscript::GetBinding(): '{}' was not found in '{}'!\n",
+				functionName,
 				className
 			);
 		}
 		return {};
 	}
+
+#if 0
+	VScriptFunction GetFunction(std::string_view functionName) {
+		VScriptClass& globalClass = scriptClassMap[""];
+		auto it = globalClass.m_functions.find(functionName);
+		if (it != globalClass.m_functions.end()) {
+			return { it->second.binding, globalClass.m_instance };
+		}
+		plg::print(
+			LS_ERROR,
+			"vscript::GetFunction(): '{}' was not found!\n",
+			functionName
+		);
+		return {};
+	}
+	VScriptFunction GetFunction(std::string_view className, std::string_view functionName) {
+		auto it = scriptClassMap.find(className);
+		if (it != scriptClassMap.end()) {
+			auto& klass = it->second;
+			auto it2 = klass.m_functions.find(functionName);
+			if (it2 != klass.m_functions.end()) {
+				return { it2->second.binding, klass.m_instance };
+			}
+			plg::print(
+				LS_ERROR,
+				"vscript::GetFunction(): '{}' was not found in '{}'!\n",
+				functionName,
+				className
+			);
+		}
+		return {};
+	}
+
+	const ScriptFunctionBinding_t* LookupFunction(std::string_view className, std::string_view functionName) {
+		return scriptClassMap[className].m_functions[functionName].binding;
+	}
+
+	ScriptVariant_t CallFunction(std::string_view className, std::string_view functionName, void* context, const ScriptVariant_t* args) {
+		const ScriptFunctionBinding_t* func = LookupFunction(className, functionName);
+		return CallFunction(func, context, args);
+	}
+
+	ScriptVariant_t CallFunction(const ScriptFunctionBinding_t* func, void* context, const ScriptVariant_t* args) {
+		ScriptVariant_t ret;
+		//passing a non-NULL return value pointer for void-returning functions caused crashes
+		ScriptVariant_t * retPtr = ((func->m_desc.m_ReturnType) ? &ret : 0);
+		bool ok = func->m_pfnBinding(func->m_pFunction, context, (ScriptVariant_t*)args, func->m_desc.m_iParamCount, retPtr);
+		Assert(ok);
+		return ret;
+	}
+#endif
 }

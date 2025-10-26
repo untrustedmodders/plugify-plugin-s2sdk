@@ -63,20 +63,15 @@ public:
 		return m_fFlags & FL_CONTROLLER_FAKECLIENT;
 	}
 
-	void ChangeTeam(int iTeam) {
-		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::ChangeTeam", offset);
-		CALL_VIRTUAL(void, *offset, this, iTeam);
-	}
-
 	void SwitchTeam(int iTeam) {
 		if (!IsPlayerController())
 			return;
 
 		if (iTeam == CS_TEAM_SPECTATOR) {
-			//GetCurrentPawn()->m_iTeamNum = iTeam;
-			ChangeTeam(iTeam);
+			GetCurrentPawn()->m_iTeamNum = iTeam;
+			SetTeam(iTeam);
 		} else {
-			//GetPlayerPawn()->m_iTeamNum = iTeam;
+			GetPlayerPawn()->m_iTeamNum = iTeam;
 			addresses::CCSPlayerController_SwitchTeam(this, iTeam);
 		}
 	}

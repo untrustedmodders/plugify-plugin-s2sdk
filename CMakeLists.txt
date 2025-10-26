@@ -213,6 +213,7 @@ if(LINUX)
     target_link_libraries(${PROJECT_NAME} PRIVATE -static-libstdc++ -static-libgcc)
 endif()
 
+#target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${S2SDK_COMPILE_DEFINITIONS})
 target_compile_options(${PROJECT_NAME} PRIVATE ${S2SDK_COMPILE_OPTIONS})
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")

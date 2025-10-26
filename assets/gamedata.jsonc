@@ -64,12 +64,6 @@
         "win64": "48 83 EC ? 48 83 3D ? ? ? ? ? 74 ? 33 C9 E8 ? ? ? ? FF 15",
         "linuxsteamrt64": "55 48 89 E5 41 55 41 54 53 48 83 EC ? 48 8D 05 ? ? ? ? 48 83 38"
       },
-      // Called right after "Removed %s(%s)\n"
-      "UTIL_Remove": {
-        "library": "server",
-        "win64": "48 85 C9 74 ? 48 8B D1 48 8B 0D",
-        "linuxsteamrt64": "48 89 FE 48 85 FF"
-      },
       // "InPass" is passed to this
       "CEntityInstance::AcceptInput": {
         "library": "server",
@@ -81,12 +75,6 @@
         "library": "server",
         "win64": "4C 89 4C 24 ? 48 89 4C 24 ? 53 56",
         "linuxsteamrt64": "55 48 89 E5 41 57 49 89 FF 41 56 41 55 41 54 49 89 D4 53 48 89 F3"
-      },
-      // String: Function which pass "weapons/models/defuser/defuser.vmdl"
-      "CBaseModelEntity::SetModel": {
-        "library": "server",
-        "win64": "40 53 48 83 EC ? 48 8B D9 4C 8B C2 48 8B 0D ? ? ? ? 48 8D 54 24 ? 48 8B 01 FF 50 ? 48 8B 44 24 ? 48 8D 54 24 ? 48 8B CB 48 89 44 24 ? E8 ? ? ? ? 48 83 C4 ? 5B C3 CC CC CC CC CC 48 89 5C 24",
-        "linuxsteamrt64": "55 48 89 F2 48 89 E5 53 48 89 FB 48 8D 7D ? 48 83 EC ? 48 8D 05 ? ? ? ? 48 8B 30 48 8B 06 FF 50 ? 48 8B 45 ? 48 8D 75 ? 48 89 DF 48 89 45 ? E8 ? ? ? ? 48 8B 5D ? C9 C3 CC CC CC 55"
       },
       // String: "TerminateRound"
       "CGameRules::TerminateRound": {
@@ -117,28 +105,6 @@
         "library": "server",
         "win64": "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 8B F9 48 85 C9 0F 84 ? ? ? ? 48 85 D2",
         "linuxsteamrt64": "48 85 FF 74 ? 55 48 89 E5 41 55 49 89 FD"
-      },
-      // Look for "SetEntityName" or "Set the name of an entity.", that will be the vscript binding definition
-      // Scroll a bit down and you'll find something like this (note the offset): *(_QWORD *)(v453 + 64) = sub_1807B0350;
-      // that function is just a jump to the one we want
-      "CEntityIdentity::SetEntityName": {
-        "library": "server",
-        "win64": "48 89 5C 24 ? 57 48 83 EC ? 48 8B D9 4C 8B C2",
-        "linuxsteamrt64": "55 48 89 F2 48 89 E5 41 55 41 54 53"
-      },
-      // Look for "EmitSoundParams" or "Set the name of an entity.", that will be the vscript binding definition
-      // Scroll a bit down and you'll find something like this (note the offset): *(_QWORD *)(v453 + 64) = sub_1807B0350;
-      // that function is just a jump to the one we want
-      "CBaseEntity::EmitSoundParams": {
-        "library": "server",
-        "win64": "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 8B F9 41 83 F9 ? 75 ? 48 83 7C 24 ? ? 75 ? 48 85 D2 74 ? 49 8B C8 E8 ? ? ? ? 48 8B D0 48 8B CB FF D7 B0 ? 48 8B 5C 24 ? 48 83 C4 ? 5F C3 48 8B 5C 24 ? 32 C0 48 83 C4 ? 5F C3 CC CC CC 48 83 EC ? 4C 8B D2 4C 8B D9 41 83 F9 ? 75 ? 48 83 7C 24 ? ? 75 ? 48 85 D2 74 ? 49 8B 00",
-        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 49 89 D4 53 48 89 F3 48 83 EC 18 4D 85 C0 0F 95 C2 48 85 F6 40 0F 94 C6 40 08 F2 75 ? 83 F9 01 75 ? 49 89 FE 40 F6 C7 01 75 ? 41 0F B6 54 24 08 80 FA 1E 0F 84 ? ? ? ? 80 FA 02 74 ? 80 FA 4F 75 ? 49 8B 34 24 48 8D 05 BF A5 B8 FF"
-      },
-      // Called right after this in win64 "Entity %s(%s) is ambiguously parented to..."
-      "CBaseEntity::SetParent": {
-        "library": "server",
-        "win64": "4D 8B D9 48 85 D2 74 ?",
-        "linuxsteamrt64": "48 85 F6 74 ? 48 8B 47 ? F6 40 ? ? 75 ? 48 8B 46 ? F6 40 ? ? 75 ? B8"
       },
       // search for "land_%s", this is called after that string is referenced (the one with 4 parameters).
       // (function that calls it also contains "Gear.JumpLand.").
@@ -216,15 +182,6 @@
       "CBaseEntity::CollisionRulesChanged": {
         "win64": 191,
         "linuxsteamrt64": 191
-      },
-      // String: "%s<%i><%s><%s>"ChangeTeam() CTMDBG..."
-      "CBaseEntity::ChangeTeam": {
-        "win64": 109,
-        "linuxsteamrt64": 108
-      },
-      "CBaseEntity::SetOwner": {
-        "win64": 50,
-        "linuxsteamrt64": 49
       },
       // StringL "item_pickup_failed"
       "CBaseEntity::IsWeapon": {
@@ -441,12 +398,6 @@
         "win64": "48 83 EC 28 48 83 3D A4 90 90 01 00",
         "linuxsteamrt64": "TODO"
       },
-      // Called right after "Removed %s(%s)\n"
-      "UTIL_Remove": {
-        "library": "server",
-        "win64": "48 85 C9 74 ? 48 8B D1 48 8B 0D ? ? ? ?",
-        "linuxsteamrt64": "48 89 FE 48 85 FF 74 ? 48 8D 05 ? ? ? ? 48"
-      },
       // "InPass" is passed to this
       "CEntityInstance::AcceptInput": {
         "library": "server",
@@ -489,27 +440,6 @@
         "win64": "48 89 5C 24 08 57 48 83 EC 60 48 8B F9 0F 29 74 24 50 48 8D 4C 24 40 41 B0 01 0F 28 F2 48 8B DA E8 ? ? ? ? 8B 44 24 40 48 8D 54 24 40 48 8B CF 89 44 24 40 C7 44 24 44 FF FF FF FF 48 89 5C 24 48 E8 ? ? ? ? 48 8B D8 48 85 C0 74 ? 33 C0 C6 44 24 30 00 89 44 24 28 45 33 C9 41 B0 18",
         "linuxsteamrt64": "TODO"
       },
-      // Look for "SetEntityName", that will be the vscript binding definition
-      // Scroll a bit down and you'll find something like this (note the offset): *(_QWORD *)(v453 + 64) = sub_1807B0350;
-      // that function is just a jump to the one we want
-      "CEntityIdentity::SetEntityName": {
-        "library": "server",
-        "win64": "48 89 5C 24 10 57 48 83 EC 20 48 8B D9 4C 8B C2",
-        "linuxsteamrt64": "55 48 89 F2 48 89 E5 41 54 49 89 FC 48 8D 7D E0 48 83 EC 18 48 8D 05 ? ? ? ? 48 8B 30 E8 ? ? ? ? 48 8B 45 E0"
-      },
-      // next to "soundname", in win64 it's the last referenced sub while in linuxsteamrt64 it's right after
-      // this is a vscript binding though so it may be removed in the future?
-      "CBaseEntity::EmitSoundParams": {
-        "library": "server",
-        "win64": "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 4C 89 74 24 20 55 48 8D 6C 24 90 48 81 EC 70 01 00 00 45 33 F6",
-        "linuxsteamrt64": ""
-      },
-      // Called right after this in win64 "Entity %s(%s) is ambiguously parented to..."
-      "CBaseEntity::SetParent": {
-        "library": "server",
-        "win64": "4D 8B D9 48 85 D2 74 ?",
-        "linuxsteamrt64": "48 85 F6 74 ? 48 8B 47 10 F6 40 31 02 75 ? 48 8B 46 10 F6 40 31 02 75 ? B8 ? ? ? ?"
-      },
       // search for "land_%s", this is called after that string is referenced (the one with 4 parameters).
       // (function that calls it also contains "T_Default.SuitLand").
       "CBaseEntity::EmitSoundFilter": {
@@ -543,36 +473,6 @@
       "CollisionRulesChanged": {
         "win64": 189,
         "linuxsteamrt64": 188
-      },
-      // 9 functions after one with "Physics_SimulateEntity""Server Game"
-      "IsEntityPawn": {
-        "win64": 153,
-        "linuxsteamrt64": 152
-      },
-      // String: "%s<%i><%s><%s>"ChangeTeam() CTMDBG..."
-      "ControllerChangeTeam": {
-        "win64": 93,
-        "linuxsteamrt64": 92
-      },
-      // Player controller respawn function offset
-      "ControllerRespawn": {
-        "win64": 244,
-        "linuxsteamrt64": 246
-      },
-      // teleport_trigger_debug cvar
-      "StartTouch": {
-        "win64": 135,
-        "linuxsteamrt64": 134
-      },
-      // Entity touch function offset
-      "Touch": {
-        "win64": 136,
-        "linuxsteamrt64": 135
-      },
-      // Entity end touch function offset
-      "EndTouch": {
-        "win64": 137,
-        "linuxsteamrt64": 136
       }
     },
     "Addresses": {

@@ -972,55 +972,6 @@
       }
     },
     {
-      "name": "ChangeClientTeam",
-      "group": "Clients",
-      "description": "Changes a client's team.",
-      "funcName": "ChangeClientTeam",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        },
-        {
-          "name": "team",
-          "type": "int32",
-          "ref": false,
-          "description": "The team index to assign the client to.",
-          "enum": {
-            "name": "CSTeam",
-            "description": "Enum representing the possible teams in Counter-Strike.",
-            "values": [
-              {
-                "value": 0,
-                "name": "None",
-                "description": "No team."
-              },
-              {
-                "value": 1,
-                "name": "Spectator",
-                "description": "Spectator team."
-              },
-              {
-                "value": 2,
-                "name": "T",
-                "description": "Terrorist team."
-              },
-              {
-                "value": 3,
-                "name": "CT",
-                "description": "Counter-Terrorist team."
-              }
-            ]
-          }
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
       "name": "SwitchClientTeam",
       "group": "Clients",
       "description": "Switches the player's team.",

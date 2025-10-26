@@ -643,6 +643,49 @@ extern "C" PLUGIN_API void SetClientSpeed(int playerSlot, float speed) {
  * @brief Returns the client's gravity value.
  *
  * @param playerSlot The index of the player's slot.
+ * @return The friction value of the client.
+ */
+extern "C" PLUGIN_API float GetClientFriction(int playerSlot) {
+	auto controller = utils::GetController(playerSlot);
+	if (!controller) {
+		plg::print(LS_WARNING, "Cannot execute 'GetClientFriction' on invalid player slot: {}\n", playerSlot);
+		return 0;
+	}
+
+	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
+	if (!pawn) {
+		plg::print(LS_WARNING, "Cannot execute 'GetClientFriction' on invalid player pawn: {}\n", playerSlot);
+		return 0;
+	}
+
+	return pawn->m_flFriction;
+}
+
+/**
+ * @brief Sets the client's gravity value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param friction The friction value to set.
+ */
+extern "C" PLUGIN_API void SetClientFriction(int playerSlot, float friction) {
+	auto controller = utils::GetController(playerSlot);
+	if (!controller) {
+		plg::print(LS_WARNING, "Cannot execute 'GetClientFriction' on invalid player slot: {}\n", playerSlot);
+		return;
+	}
+
+	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
+	if (!pawn) {
+		plg::print(LS_WARNING, "Cannot execute 'GetClientFriction' on invalid player pawn: {}\n", playerSlot);
+		return;
+	}
+
+	pawn->SetFriction(friction);
+}
+/**
+ * @brief Returns the client's gravity value.
+ *
+ * @param playerSlot The index of the player's slot.
  * @return The gravity value of the client.
  */
 extern "C" PLUGIN_API float GetClientGravity(int playerSlot) {
@@ -680,9 +723,7 @@ extern "C" PLUGIN_API void SetClientGravity(int playerSlot, float gravity) {
 		return;
 	}
 
-	pawn->m_flGravityScale = gravity;
-	pawn->m_bGravityDisabled = true;
-	pawn->m_bGravityActuallyDisabled = true;
+	pawn->SetGravity(gravity);
 }
 
 /**
@@ -930,22 +971,6 @@ extern "C" PLUGIN_API plg::vector<int> ProcessTargetString(int caller, const plg
 	plg::vector<int> output;
 	g_PlayerManager.TargetPlayerString(caller, target, output);
 	return output;
-}
-
-/**
- * @brief Changes a client's team.
- *
- * @param playerSlot The index of the player's slot.
- * @param team The team index to assign the client to.
- */
-extern "C" PLUGIN_API void ChangeClientTeam(int playerSlot, int team) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'ChangeClientTeam' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	controller->ChangeTeam(team);
 }
 
 /**

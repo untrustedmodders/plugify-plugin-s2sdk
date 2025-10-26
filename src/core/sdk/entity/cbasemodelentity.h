@@ -29,9 +29,29 @@ public:
 	SCHEMA_FIELD(Color, m_clrRender)
 	SCHEMA_FIELD(uint8, m_nRenderMode)
 
-	void SetModel(const char* szModel) {
-		addresses::CBaseModelEntity_SetModel(this, szModel);
-	}
+	VSCRIPT_MEMBER_FUNCTION(GetAttachmentAngles, Vector, int)
+    VSCRIPT_MEMBER_FUNCTION(GetAttachmentForward, Vector, int)
+    VSCRIPT_MEMBER_FUNCTION(GetAttachmentOrigin, Vector, int)
+    VSCRIPT_MEMBER_FUNCTION(GetMaterialGroupHash, unsigned)
+    VSCRIPT_MEMBER_FUNCTION(GetMaterialGroupMask, uint64)
+    VSCRIPT_MEMBER_FUNCTION(GetModelScale, float)
+    VSCRIPT_MEMBER_FUNCTION(GetRenderAlpha, int)
+    VSCRIPT_MEMBER_FUNCTION(GetRenderColor, Vector)
+    VSCRIPT_MEMBER_FUNCTION(ScriptLookupAttachment, int, string)
+    VSCRIPT_MEMBER_FUNCTION(SetBodygroup, void, int, int)
+    VSCRIPT_MEMBER_FUNCTION(SetBodygroupByName, void, string, int)
+    VSCRIPT_MEMBER_FUNCTION(SetLightGroup, void, string)
+    VSCRIPT_MEMBER_FUNCTION(SetMaterialGroup, void, string)
+    VSCRIPT_MEMBER_FUNCTION(SetMaterialGroupHash, void, unsigned)
+    VSCRIPT_MEMBER_FUNCTION(SetMaterialGroupMask, void, uint64)
+    VSCRIPT_MEMBER_FUNCTION(SetModel, void, string)
+    VSCRIPT_MEMBER_FUNCTION(SetModelScale, void, float)
+    VSCRIPT_MEMBER_FUNCTION(SetRenderAlpha, void, int)
+    VSCRIPT_MEMBER_FUNCTION(SetRenderColor, void, int, int, int)
+    VSCRIPT_MEMBER_FUNCTION(SetRenderMode, void, int)
+    VSCRIPT_MEMBER_FUNCTION(SetSingleMeshGroup, void, string)
+    VSCRIPT_MEMBER_FUNCTION(SetSize, void, Vector, Vector)
+    VSCRIPT_MEMBER_FUNCTION(SetSkin, void, int)
 
 	const char* GetModelName() {
 		CGameSceneNode* sceneNode = m_CBodyComponent->m_pSceneNode;

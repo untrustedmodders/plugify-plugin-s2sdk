@@ -112,25 +112,11 @@ namespace addresses {
 
 	inline void (*DispatchSpawn)(CEntityInstance* entity, CEntityKeyValues* entityKeyValues);
 
-	inline void (*CBaseModelEntity_SetModel)(CBaseModelEntity* entity, const char* model);
-
-	inline void (*UTIL_Remove)(CEntityInstance*);
-
 	inline void (*CEntityInstance_AcceptInput)(CEntityInstance* self, const char* inputName, CEntityInstance* activator, CEntityInstance* caller, variant_t* value, int outputID);
-
-	inline void (*CEntityIdentity_SetEntityName)(CEntityIdentity* entity, const char* name);
-
-	inline void (*CBaseEntity_EmitSoundParams)(CBaseEntity* entity, const char* sound, int pitch, float volume, float delay);
-
-	inline void (*CBaseEntity_SetParent)(CBaseEntity* entity, CBaseEntity* newParent, CUtlStringToken nBoneOrAttachName, matrix3x4a_t* offsetTransform);
 
 	inline SndOpEventGuid_t (*CBaseEntity_EmitSoundFilter)(IRecipientFilter& filter, CEntityIndex ent, const EmitSound_t& params);
 
 	inline void (*CBaseEntity_SetMoveType)(CBaseEntity* self, MoveType_t moveType, MoveCollide_t moveCollide);
-
-	inline void (*CTakeDamageInfo_Constructor)(CTakeDamageInfo* self, CBaseEntity* inflictor, CBaseEntity* attacker, CBaseEntity* ability, const Vector* damageForce, const Vector* damagePosition, float damage, int bitsDamageType, int customDamage, void* a10);
-
-	inline void (*CNetworkStringTable_DeleteAllStrings)(INetworkStringTable* self);
 
 	// cs go
 

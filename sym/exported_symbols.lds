@@ -36,6 +36,8 @@ GetClientMaxHealth
 SetClientMaxHealth
 GetClientSpeed
 SetClientSpeed
+GetClientFriction
+SetClientFriction
 GetClientGravity
 SetClientGravity
 GetClientArmor
@@ -50,7 +52,6 @@ GetClientEyeAngles
 SetClientEyeAngles
 GetClientPawn
 ProcessTargetString
-ChangeClientTeam
 SwitchClientTeam
 RespawnClient
 ForcePlayerSuicide

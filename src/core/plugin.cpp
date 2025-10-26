@@ -526,6 +526,21 @@ poly::ReturnAction Hook_RegisterScriptClass(poly::PHook& hook, poly::Params& par
 	return poly::ReturnAction::Ignored;
 }
 
+/*poly::ReturnAction Hook_RegisterInstance(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	//auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
+	auto pClassDesc = poly::GetArgument<ScriptClassDesc_t*>(params, 1);
+	auto pInstance = poly::GetArgument<void*>(params, 2);
+	vscript::RegisterInstance(pClassDesc, pInstance);
+	return poly::ReturnAction::Ignored;
+}
+
+poly::ReturnAction Hook_SetValue(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
+	auto value = poly::GetArgument<const ScriptVariant_t*>(params, 3);
+	vscript::SetValue(pScript, *value);
+	return poly::ReturnAction::Ignored;
+}*/
+
 #if defined (CS2)
 poly::ReturnAction Hook_IsolateEnter(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto isolate = poly::GetArgument<v8::Isolate*>(params, 0);
@@ -651,9 +666,14 @@ void Source2SDK::OnPluginStart() {
 	//g_PH.AddHookVTableFunc(&IScriptVM::RegisterFunction, svm, Hook_RegisterFunction, Pre);
 	//g_PH.AddHookVTableFunc(&IScriptVM::RegisterScriptClass, svm, Hook_RegisterScriptClass, Pre);
 	//g_pScriptManager->DestroyVM(svm);auto table3 = g_pGameConfig->GetVTable("CGameRulesGameSystem");
+
 	auto table3 = g_pGameConfig->GetVTable("CLuaVM");
 	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &*table3, Hook_RegisterFunction, Pre);
 	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
+	/*using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
+	g_PH.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &*table3, Hook_RegisterInstance, Pre);
+	using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
+	g_PH.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);*/
 
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
 	g_PH.AddHookDetourFunc<TerminateRoundFn>("CGameRules::TerminateRound", Hook_TerminateRound, Pre);

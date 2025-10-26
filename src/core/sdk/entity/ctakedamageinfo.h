@@ -77,11 +77,11 @@ private:
 
 public:
 	CTakeDamageInfo() {
-		addresses::CTakeDamageInfo_Constructor(this, nullptr, nullptr, nullptr, &vec3_origin, &vec3_origin, 0.f, 0, 0, nullptr);
+		//addresses::CTakeDamageInfo_Constructor(this, nullptr, nullptr, nullptr, &vec3_origin, &vec3_origin, 0.f, 0, 0, nullptr);
 	}
 
 	CTakeDamageInfo(CBaseEntity* inflictor, CBaseEntity* attacker, CBaseEntity* ability, float damage, DamageTypes_t bitsDamageType) {
-		addresses::CTakeDamageInfo_Constructor(this, inflictor, attacker, ability, &vec3_origin, &vec3_origin, damage, bitsDamageType, 0, nullptr);
+		//addresses::CTakeDamageInfo_Constructor(this, inflictor, attacker, ability, &vec3_origin, &vec3_origin, damage, bitsDamageType, 0, nullptr);
 	}
 
 	Vector m_vecDamageForce;
