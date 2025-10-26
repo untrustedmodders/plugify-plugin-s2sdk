@@ -782,14 +782,8 @@ extern "C" PLUGIN_API plg::vec3 GetClientAbsOrigin(int playerSlot) {
 		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsOrigin' on invalid player slot: {}\n", playerSlot);
 		return {};
 	}
-	
-	CGameSceneNode* pNode = controller->m_CBodyComponent->m_pSceneNode;
-	if (!pNode) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsOrigin' on invalid player node: {}\n", playerSlot);
-		return {};
-	}
-	
-	const Vector& vec = pNode->m_vecAbsOrigin;
+
+	const Vector& vec = controller->GetAbsOrigin();
 	return *reinterpret_cast<const plg::vec3*>(&vec);
 }
 
@@ -805,14 +799,8 @@ extern "C" PLUGIN_API void SetClientAbsOrigin(int playerSlot, const plg::vec3& o
 		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsOrigin' on invalid player slot: {}\n", playerSlot);
 		return;
 	}
-	
-	CGameSceneNode* pNode = controller->m_CBodyComponent->m_pSceneNode;
-	if (!pNode) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player node: {}\n", playerSlot);
-		return;
-	}
-	
-	pNode->m_vecAbsOrigin = *reinterpret_cast<const Vector*>(&origin);
+
+	controller->SetAbsOrigin(*reinterpret_cast<const Vector*>(&origin));
 }
 
 /**
@@ -827,14 +815,8 @@ extern "C" PLUGIN_API plg::vec3 GetClientAbsAngles(int playerSlot) {
 		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsAngles' on invalid player slot: {}\n", playerSlot);
 		return {};
 	}
-	
-	CGameSceneNode* pNode = controller->m_CBodyComponent->m_pSceneNode;
-	if (!pNode) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsAngles' on invalid player node: {}\n", playerSlot);
-		return {};
-	}
-	
-	const QAngle& ang = pNode->m_angRotation;
+
+	const QAngle& ang = controller->GetAngles();
 	return *reinterpret_cast<const plg::vec3*>(&ang);
 }
 
@@ -851,13 +833,8 @@ extern "C" PLUGIN_API void SetClientAbsAngles(int playerSlot, const plg::vec3& a
 		return;
 	}
 
-	CGameSceneNode* pNode = controller->m_CBodyComponent->m_pSceneNode;
-	if (!pNode) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player node: {}\n", playerSlot);
-		return;
-	}
-	
-	pNode->m_angRotation = *reinterpret_cast<const QAngle*>(&angles);
+	//controller->SetAngles(*reinterpret_cast<const QAngle*>(&angles));
+	controller->SetAngles(angles.x, angles.y, angles.z);
 }
 
 /**
@@ -876,7 +853,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientAbsVelocity(int playerSlot) {
 		return {};
 	}
 
-	const Vector& vec = controller->m_vecAbsVelocity;
+	const Vector& vec = controller->GetVelocity();
 	return *reinterpret_cast<const plg::vec3*>(&vec);
 }
 
@@ -896,8 +873,10 @@ extern "C" PLUGIN_API void SetClientAbsVelocity(int playerSlot, const Vector& ve
 		return;
 	}
 
-	controller->m_vecAbsVelocity = velocity;
+	controller->SetVelocity(velocity);
 }
+
+// TODO add eye position
 
 /**
  * @brief Retrieves the client's eye angle.
@@ -918,7 +897,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientEyeAngles(int playerSlot) {
 		return {};
 	}
 
-	const QAngle& ang = pawn->m_angEyeAngles;
+	const QAngle& ang = pawn->EyeAngles();
 	return *reinterpret_cast<const plg::vec3*>(&ang);
 }
 
