@@ -23,7 +23,7 @@ CBasePlayerController* Player::GetController() const {
 		return nullptr;
 	}
 
-	return entity->IsController() ? static_cast<CPlayerController*>(entity) : nullptr;
+	return entity->IsPlayerController() ? static_cast<CPlayerController*>(entity) : nullptr;
 }
 
 CBasePlayerPawn* Player::GetCurrentPawn() const {
@@ -86,7 +86,7 @@ bool Player::IsValidClient() const {
 	}
 
 	auto controller = utils::GetController(client->GetPlayerSlot());
-	return controller && controller->IsController() && client->IsConnected() && client->IsInGame() && !client->IsHLTV();
+	return controller && controller->IsPlayerController() && client->IsConnected() && client->IsInGame() && !client->IsHLTV();
 }
 
 std::string_view Player::GetName() const {
@@ -326,11 +326,11 @@ Player* PlayerManager::ToPlayer(CEntityIndex entIndex) const {
 		return nullptr;
 	}
 
-	if (entity->IsPawn()) {
+	if (entity->IsPlayerPawn()) {
 		return ToPlayer(static_cast<CBasePlayerPawn*>(entity));
 	}
 
-	if (entity->IsController()) {
+	if (entity->IsPlayerController()) {
 		return ToPlayer(static_cast<CBasePlayerController*>(entity));
 	}
 
@@ -400,7 +400,7 @@ TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target
 
 			CBasePlayerController* player = utils::GetController(i);
 
-			if (!player || !player->IsController() || !player->IsConnected())
+			if (!player || !player->IsPlayerController() || !player->IsConnected())
 				continue;
 
 			clients.emplace_back(i);
@@ -412,7 +412,7 @@ TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target
 
 			CBasePlayerController* player = utils::GetController(i);
 
-			if (!player || !player->IsController() || !player->IsConnected())
+			if (!player || !player->IsPlayerController() || !player->IsConnected())
 				continue;
 
 			if (player->m_iTeamNum != (targetType == TargetType::T ? CS_TEAM_T : targetType == TargetType::CT ? CS_TEAM_CT : CS_TEAM_SPECTATOR))
@@ -434,7 +434,7 @@ TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target
 
 			CBasePlayerController* player = utils::GetController(i);
 
-			if (!player || !player->IsController() || !player->IsConnected())
+			if (!player || !player->IsPlayerController() || !player->IsConnected())
 				continue;
 
 			if (targetType >= TargetType::RANDOM_T && (player->m_iTeamNum != (targetType == TargetType::RANDOM_T ? CS_TEAM_T : CS_TEAM_CT)))
@@ -446,7 +446,7 @@ TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target
 		if (auto slot = plg::cast_to<int>(target.substr(1))) {
 			targetType = TargetType::PLAYER;
 			CBasePlayerController* player = utils::GetController(*slot);
-			if (player && player->IsController() && player->IsConnected()) {
+			if (player && player->IsPlayerController() && player->IsConnected()) {
 				clients.emplace_back(*slot);
 			}
 		}
@@ -457,7 +457,7 @@ TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target
 
 			CBasePlayerController* player = utils::GetController(i);
 
-			if (!player || !player->IsController() || !player->IsConnected())
+			if (!player || !player->IsPlayerController() || !player->IsConnected())
 				continue;
 
 			if (target.find(player->GetPlayerName()) != std::string_view::npos) {

@@ -116,6 +116,7 @@ Result<void> ConfigLoader::ParseConfigFile(std::string_view gameName) {
 		{"Offsets", &ConfigLoader::LoadOffsets},
 		{"Patches", &ConfigLoader::LoadPatches},
 		{"Addresses", &ConfigLoader::LoadAddresses},
+		{"VTables", &ConfigLoader::LoadVTables},
 	};
 
 	bool hasErrors = false;

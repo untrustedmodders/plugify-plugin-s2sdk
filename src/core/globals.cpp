@@ -91,6 +91,7 @@ namespace globals {
 		g_pGameEventSystem = static_cast<IGameEventSystem*>(QueryInterface("engine2", GAMEEVENTSYSTEM_INTERFACE_VERSION));
 		g_pNetworkServerService = static_cast<INetworkServerService*>(QueryInterface("engine", NETWORKSERVERSERVICE_INTERFACE_VERSION));
 		g_pNetworkMessages = static_cast<INetworkMessages*>(QueryInterface("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
+		g_pScriptManager = static_cast<IScriptManager*>(QueryInterface("vscript", VSCRIPT_INTERFACE_VERSION));
 
 		ConVarManager::Init();
 	}

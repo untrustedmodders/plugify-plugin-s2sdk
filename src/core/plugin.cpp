@@ -512,6 +512,20 @@ poly::ReturnAction Hook_BuildGameSessionManifest(poly::PHook& hook, poly::Params
 	return poly::ReturnAction::Ignored;
 }
 
+poly::ReturnAction Hook_RegisterFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	//auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
+	auto pBinding = poly::GetArgument<ScriptFunctionBinding_t*>(params, 1);
+	vscript::RegisterFunction(pBinding);
+	return poly::ReturnAction::Ignored;
+}
+
+poly::ReturnAction Hook_RegisterScriptClass(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	//auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
+	auto pClassDesc = poly::GetArgument<ScriptClassDesc_t*>(params, 1);
+	vscript::RegisterScriptClass(pClassDesc);
+	return poly::ReturnAction::Ignored;
+}
+
 #if defined (CS2)
 poly::ReturnAction Hook_IsolateEnter(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto isolate = poly::GetArgument<v8::Isolate*>(params, 0);
@@ -626,14 +640,20 @@ void Source2SDK::OnPluginStart() {
 
 	auto& provider = GameConfigManager::Instance().GetModuleProvider();
 
-	auto engine2 = provider.GetModule("engine2");
-	auto table = engine2->GetVirtualTableByName("CServerSideClient");
-	g_PH.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, &table, Hook_ProcessRespondCvarValue, Pre);
-	g_PH.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, &table, Hook_SendNetMessage, Pre);
+	auto table = g_pGameConfig->GetVTable("CServerSideClient");
+	g_PH.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, &*table, Hook_ProcessRespondCvarValue, Pre);
+	g_PH.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, &*table, Hook_SendNetMessage, Pre);
 
-	auto server = provider.GetModule("server");
-	auto table2 = server->GetVirtualTableByName("CGameRulesGameSystem");
-	g_PH.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &table2, Hook_BuildGameSessionManifest, Pre);
+	auto table2 = g_pGameConfig->GetVTable("CGameRulesGameSystem");
+	g_PH.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &*table2, Hook_BuildGameSessionManifest, Pre);
+
+	//IScriptVM * svm = g_pScriptManager->CreateVM();
+	//g_PH.AddHookVTableFunc(&IScriptVM::RegisterFunction, svm, Hook_RegisterFunction, Pre);
+	//g_PH.AddHookVTableFunc(&IScriptVM::RegisterScriptClass, svm, Hook_RegisterScriptClass, Pre);
+	//g_pScriptManager->DestroyVM(svm);auto table3 = g_pGameConfig->GetVTable("CGameRulesGameSystem");
+	auto table3 = g_pGameConfig->GetVTable("CLuaVM");
+	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &*table3, Hook_RegisterFunction, Pre);
+	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
 
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
 	g_PH.AddHookDetourFunc<TerminateRoundFn>("CGameRules::TerminateRound", Hook_TerminateRound, Pre);
@@ -641,10 +661,10 @@ void Source2SDK::OnPluginStart() {
 	using v8IsolateFn = void(*)(v8::Isolate*);
 
 	void* v8IsolateEnterPtr;
-	TRY_GET_ADDRESS(g_pGameConfig, "8::Isolate::Enter", v8IsolateEnterPtr);
+	TRY_GET_ADDRESS(g_pGameConfig, "v8::Isolate::Enter", v8IsolateEnterPtr);
 
 	void* v8IsolateExitPtr;
-	TRY_GET_ADDRESS(g_pGameConfig, "8::Isolate::Exit", v8IsolateExitPtr);
+	TRY_GET_ADDRESS(g_pGameConfig, "v8::Isolate::Exit", v8IsolateExitPtr);
 
 #if S2SDK_PLATFORM_WINDOWS
 	const uint8_t fix = 0;

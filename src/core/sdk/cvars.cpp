@@ -10,8 +10,6 @@
 
 #include "entity/cbaseplayerpawn.h"
 
-#include <tier0/memdbgon.h>
-
 #undef CreateEvent
 
 void cvars::NotifyConVar(ConVarRefAbstract conVar, std::string_view value) {

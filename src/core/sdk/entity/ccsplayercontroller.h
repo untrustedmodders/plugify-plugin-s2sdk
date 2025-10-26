@@ -69,7 +69,7 @@ public:
 	}
 
 	void SwitchTeam(int iTeam) {
-		if (!IsController())
+		if (!IsPlayerController())
 			return;
 
 		if (iTeam == CS_TEAM_SPECTATOR) {

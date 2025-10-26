@@ -21,6 +21,7 @@
 
 #include <core/game_config.hpp>
 #include <core/sdk/schema.h>
+#include <core/sdk/vscript.h>
 #include <ehandle.h>
 #include <entitykeyvalues.h>
 
@@ -148,6 +149,8 @@ public:
 	SCHEMA_FIELD(int, m_fEffects)
 	SCHEMA_FIELD(bool, m_bIsHLTV)
 
+
+
 	int entindex() { return m_pEntity->m_EHandle.GetEntryIndex(); }
 
 	// TODO: Validate
@@ -182,15 +185,18 @@ public:
 		CollisionRulesChanged();
 	}
 
-	bool IsPawn() {
+	VSCRIPT_RAW_FUNCTION(IsPlayerController, bool)
+    VSCRIPT_RAW_FUNCTION(IsPlayerPawn, bool)
+
+	/*bool IsPawn() {
 		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::IsPlayerPawn", offset);
 		return CALL_VIRTUAL(bool, *offset, this);
 	}
 
-	bool IsController() {
+	bool IsPlayerController() {
 		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::IsPlayerController", offset);
 		return CALL_VIRTUAL(bool, *offset, this);
-	}
+	}*/
 
 	bool IsAlive() {
 		return this->m_lifeState == LIFE_ALIVE;
@@ -339,6 +345,98 @@ public:
 	}
 
 	const char* GetName() const { return m_pEntity->m_name.String(); }
+
+	/*VSCRIPT_FUNCTION(AddEffects, void, int)
+    VSCRIPT_FUNCTION(ApplyAbsVelocityImpulse, void, Vector)
+    VSCRIPT_FUNCTION(ApplyLocalAngularVelocityImpulse, void, Vector)
+    VSCRIPT_FUNCTION(Attribute_GetFloatValue, float, string, float)
+    VSCRIPT_FUNCTION(Attribute_GetIntValue, int, string, int)
+    VSCRIPT_FUNCTION(Attribute_SetFloatValue, void, string, float)
+    VSCRIPT_FUNCTION(Attribute_SetIntValue, void, string, int)
+    VSCRIPT_FUNCTION(DeleteAttribute, void, string)
+    VSCRIPT_FUNCTION(EmitSound, void, string)
+    VSCRIPT_FUNCTION(EmitSoundParams, void, string, int, float, float)
+    VSCRIPT_FUNCTION(EyeAngles, QAngle)
+    VSCRIPT_FUNCTION(EyePosition, Vector)
+    VSCRIPT_FUNCTION(FirstMoveChild, handle)
+    VSCRIPT_FUNCTION(FollowEntity, void, handle, bool)
+    VSCRIPT_FUNCTION(FollowEntityMerge, void, handle, string)
+    VSCRIPT_FUNCTION(GatherCriteria, void, handle)
+    VSCRIPT_FUNCTION(GetAbsOrigin, Vector)
+    VSCRIPT_FUNCTION(GetAbsScale, float)
+    VSCRIPT_FUNCTION(GetAngles, QAngle)
+    VSCRIPT_FUNCTION(GetAnglesAsVector, Vector)
+    VSCRIPT_FUNCTION(GetAngularVelocity, Vector)
+    VSCRIPT_FUNCTION(GetBaseVelocity, Vector)
+    VSCRIPT_FUNCTION(GetBoundingMaxs, Vector)
+    VSCRIPT_FUNCTION(GetBoundingMins, Vector)
+    VSCRIPT_FUNCTION(GetBounds, table)
+    VSCRIPT_FUNCTION(GetCenter, Vector)
+    VSCRIPT_FUNCTION(GetChildren, handle)
+    VSCRIPT_FUNCTION(GetContext, table, string)
+    VSCRIPT_FUNCTION(GetForwardVector, Vector)
+    VSCRIPT_FUNCTION(GetHealth, int)
+    VSCRIPT_FUNCTION(GetLeftVector, Vector)
+    VSCRIPT_FUNCTION(GetLocalAngles, QAngle)
+    VSCRIPT_FUNCTION(GetLocalAngularVelocity, QAngle)
+    VSCRIPT_FUNCTION(GetLocalOrigin, Vector)
+    VSCRIPT_FUNCTION(GetLocalScale, float)
+    VSCRIPT_FUNCTION(GetLocalVelocity, Vector)
+    VSCRIPT_FUNCTION(GetMass, float)
+    VSCRIPT_FUNCTION(GetMaxHealth, int)
+    VSCRIPT_FUNCTION(GetModelName, string)
+    VSCRIPT_FUNCTION(GetMoveParent, handle)
+    VSCRIPT_FUNCTION(GetOrigin, Vector)
+    VSCRIPT_FUNCTION(GetOwner, handle)
+    VSCRIPT_FUNCTION(GetOwnerEntity, handle)
+    VSCRIPT_FUNCTION(GetRightVector, Vector)
+    VSCRIPT_FUNCTION(GetRootMoveParent, handle)
+    VSCRIPT_FUNCTION(GetSoundDuration, float, string, string)
+    VSCRIPT_FUNCTION(GetSpawnGroupHandle, int)
+    VSCRIPT_FUNCTION(GetTeam, int)
+    VSCRIPT_FUNCTION(GetTeamNumber, int)
+    VSCRIPT_FUNCTION(GetUpVector, Vector)
+    VSCRIPT_FUNCTION(GetVelocity, Vector)
+    VSCRIPT_FUNCTION(HasAttribute, bool, string)
+    VSCRIPT_FUNCTION(IsAlive, bool)
+    VSCRIPT_FUNCTION(IsNPC, bool)
+    VSCRIPT_FUNCTION(IsPlayerController, bool)
+    VSCRIPT_FUNCTION(IsPlayerPawn, bool)
+    VSCRIPT_FUNCTION(Kill, void)
+    VSCRIPT_FUNCTION(NextMovePeer, handle)
+    VSCRIPT_FUNCTION(OverrideFriction, void, float, float)
+    VSCRIPT_FUNCTION(PrecacheScriptSound, void, string)
+    VSCRIPT_FUNCTION(RemoveEffects, void, int)
+    VSCRIPT_FUNCTION(SetAbsAngles, void, float, float, float)
+    VSCRIPT_FUNCTION(SetAbsOrigin, void, Vector)
+    VSCRIPT_FUNCTION(SetAbsScale, void, float)
+    VSCRIPT_FUNCTION(SetAngles, void, float, float, float)
+    VSCRIPT_FUNCTION(SetAngularVelocity, void, float, float, float)
+    VSCRIPT_FUNCTION(SetConstraint, void, Vector)
+    VSCRIPT_FUNCTION(SetContext, void, string, string, float)
+    VSCRIPT_FUNCTION(SetContextNum, void, string, float, float)
+    VSCRIPT_FUNCTION(SetContextThink, void, string, handle, float)
+    VSCRIPT_FUNCTION(SetEntityName, void, string)
+    VSCRIPT_FUNCTION(SetForwardVector, void, Vector)
+    VSCRIPT_FUNCTION(SetFriction, void, float)
+    VSCRIPT_FUNCTION(SetGravity, void, float)
+    VSCRIPT_FUNCTION(SetHealth, void, int)
+    VSCRIPT_FUNCTION(SetLocalAngles, void, float, float, float)
+    VSCRIPT_FUNCTION(SetLocalOrigin, void, Vector)
+    VSCRIPT_FUNCTION(SetLocalScale, void, float)
+    VSCRIPT_FUNCTION(SetMass, void, float)
+    VSCRIPT_FUNCTION(SetMaxHealth, void, int)
+    VSCRIPT_FUNCTION(SetOrigin, void, Vector)
+    VSCRIPT_FUNCTION(SetOwner, void, handle)
+    VSCRIPT_FUNCTION(SetParent, void, handle, string)
+    VSCRIPT_FUNCTION(SetTeam, void, int)
+    VSCRIPT_FUNCTION(SetVelocity, void, Vector)
+    VSCRIPT_FUNCTION(StopSound, void, string)
+    VSCRIPT_FUNCTION(TakeDamage, int, handle)
+    VSCRIPT_FUNCTION(TransformPointEntityToWorld, Vector, Vector)
+    VSCRIPT_FUNCTION(TransformPointWorldToEntity, Vector, Vector)
+    VSCRIPT_FUNCTION(Trigger, void)
+    VSCRIPT_FUNCTION(ValidatePrivateScriptScope, void)*/
 };
 
 class SpawnPoint : public CBaseEntity {

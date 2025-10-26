@@ -217,16 +217,6 @@
         "win64": 191,
         "linuxsteamrt64": 191
       },
-      // 9 functions after one with "Physics_SimulateEntity" "Server Game"
-      "CBaseEntity::IsPlayerPawn": {
-        "win64": 174,
-        "linuxsteamrt64": 173
-      },
-      // Right after IsEntityPawn
-      "CBaseEntity::IsPlayerController": {
-        "win64": 175,
-        "linuxsteamrt64": 174
-      },
       // String: "%s<%i><%s><%s>"ChangeTeam() CTMDBG..."
       "CBaseEntity::ChangeTeam": {
         "win64": 109,

@@ -81,7 +81,7 @@ CBasePlayerController* utils::GetController(CBaseEntity* entity) {
 		}
 		return *pawn->m_hController;
 	}
-	if (entity->IsPawn()) {
+	if (entity->IsPlayerPawn()) {
 		CBasePlayerPawn* pawn = static_cast<CBasePlayerPawn*>(entity);
 		if (!pawn->m_hController->IsValid() || pawn->m_hController == nullptr) {
 			// Seems like the pawn lost its controller, we can try looping through the controllers to find this pawn instead.
@@ -94,7 +94,7 @@ CBasePlayerController* utils::GetController(CBaseEntity* entity) {
 			return nullptr;
 		}
 		return *pawn->m_hController;
-	} else if (entity->IsController()) {
+	} else if (entity->IsPlayerController()) {
 		return static_cast<CBasePlayerController*>(entity);
 	} else {
 		return nullptr;
