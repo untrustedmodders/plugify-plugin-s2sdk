@@ -103,6 +103,7 @@ PrintAlertTextAll
 PrintCentreHtmlAll
 PrintToChatColored
 PrintToChatColoredAll
+ReplyToCommand
 
 CreateConVar
 CreateConVarBool
