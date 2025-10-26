@@ -223,7 +223,7 @@ extern "C" PLUGIN_API void EmitSound(int entityHandle, const plg::string& sound,
 		return;
 	}
 
-	addresses::CBaseEntity_EmitSoundParams(entity, sound.c_str(), pitch, volume, delay);
+	entity->EmitSoundParams(sound.c_str(), pitch, volume, delay);
 }
 
 /**
