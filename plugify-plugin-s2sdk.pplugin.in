@@ -2886,7 +2886,7 @@
       "funcName": "ReplyToCommand",
       "paramTypes": [
         {
-          "name": "ctx",
+          "name": "context",
           "type": "int32",
           "ref": false,
           "description": "The context from which the command was called (e.g., Console or Chat).",
@@ -10095,6 +10095,12 @@
           "type": "int32",
           "ref": false,
           "description": "The handle of the new parent entity."
+        },
+        {
+          "name": "attachmentName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the entity's attachment."
         }
       ],
       "retType": {

@@ -58,7 +58,7 @@ CBaseEntity* utils::CreateBeam(const Vector& from, const Vector& to, Color color
 
 CBaseEntity* utils::FindEntityByClassname(CEntityInstance* start, const char* name) {
 	if (!g_pGameEntitySystem) {
-		return NULL;
+		return nullptr;
 	}
 	EntityInstanceByClassIter_t iter(start, name);
 	return static_cast<CBaseEntity*>(iter.Next());

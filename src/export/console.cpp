@@ -124,17 +124,17 @@ extern "C" PLUGIN_API void PrintToChatColoredAll(const plg::string& message) {
 /**
  * @brief Sends a reply message to a player or to the server console depending on the command context.
  *
- * @param ctx         The context from which the command was called (e.g., Console or Chat).
+ * @param context     The context from which the command was called (e.g., Console or Chat).
  * @param playerSlot  The slot/index of the player receiving the message.
  *                    A negative value indicates a server-level message (no specific player).
  * @param message     The message string to be sent as a reply.
  */
-extern "C" PLUGIN_API void ReplyToCommand(CommandCallingContext ctx, int playerSlot, const plg::string& message) {
+extern "C" PLUGIN_API void ReplyToCommand(CommandCallingContext context, int playerSlot, const plg::string& message) {
 	if (playerSlot < 0) {
 		ConMsg("%s", message.c_str());
 		return;
 	}
-	switch (ctx) {
+	switch (context) {
 		case CommandCallingContext::Console:
 			utils::PrintConsole(playerSlot, message);
 			return;
