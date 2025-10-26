@@ -15,7 +15,7 @@
 
 #include "core_config.hpp"
 #include "game_config.hpp"
-#include "sdk/utils.h"
+#include "sdk/utils.hpp"
 
 CConVar<bool> s2_addon_mount_download("s2_addon_mount_download", FCVAR_NONE, "Whether to download an addon upon mounting even if it's installed", false);
 CConVar<bool> s2_block_disconnect_messages("s2_block_disconnect_messages", FCVAR_NONE, "Whether to block \"loop shutdown\" disconnect messages", false);

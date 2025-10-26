@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <core/sdk/schema.h>
+#include <core/sdk/schema.hpp>
 
 class CInButtonState {
 	DECLARE_SCHEMA_CLASS(CInButtonState);

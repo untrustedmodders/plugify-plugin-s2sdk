@@ -1,7 +1,7 @@
 #include <core/output_manager.hpp>
 #include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/entity/cbasemodelentity.h>
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 
 PLUGIFY_WARN_PUSH()
 

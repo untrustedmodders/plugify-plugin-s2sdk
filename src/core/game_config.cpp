@@ -1,4 +1,4 @@
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 
 #include "game_config.hpp"
 

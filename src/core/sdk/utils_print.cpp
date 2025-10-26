@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "utils.hpp"
 
 #include "entity/globaltypes.h"
 #include <recipientfilter.h>

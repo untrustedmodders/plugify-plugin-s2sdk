@@ -17,8 +17,8 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "schema.h"
-#include "utils.h"
+#include "schema.hpp"
+#include "utils.hpp"
 
 #include <schemasystem/schemasystem.h>
 

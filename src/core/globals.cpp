@@ -1,6 +1,6 @@
 
-#include <core/sdk/utils.h>
-#include <core/sdk/virtual.h>
+#include <core/sdk/utils.hpp>
+#include <core/sdk/virtual.hpp>
 #include <engine/igameeventsystem.h>
 #include <IEngineSound.h>
 #include <igameevents.h>

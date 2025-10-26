@@ -17,11 +17,8 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "vscript.h"
-
-#include "entity/cbaseentity.h"
-
-#include "utils.h"
+#include "vscript.hpp"
+#include "utils.hpp"
 
 namespace {
 	VScriptBinding ScriptConvertFuncPtrToBinding(ScriptFunctionBinding_t& pScriptFunction) {

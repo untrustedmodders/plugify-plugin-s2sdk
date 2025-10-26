@@ -21,7 +21,7 @@
 
 #include <cstdint>
 
-#include "virtual.h"
+#include "virtual.hpp"
 #include <entityinstance.h>
 #include <smartptr.h>
 #include <tier0/dbg.h>

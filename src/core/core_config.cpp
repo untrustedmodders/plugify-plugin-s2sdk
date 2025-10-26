@@ -1,5 +1,5 @@
 #include "core_config.hpp"
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 #include <plugify-configs/plugify-configs.hpp>
 
 using namespace std::string_view_literals;

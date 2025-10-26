@@ -1,8 +1,8 @@
 #include <core/sdk/entity/cbaseplayercontroller.h>
 #include <core/sdk/entity/cplayercontroller.h>
 #include <core/sdk/entity/cplayerpawn.h>
-#include <core/sdk/utils.h>
-#include <core/sdk/cvars.h>
+#include <core/sdk/utils.hpp>
+#include <core/sdk/cvars.hpp>
 #include <eiface.h>
 #include <inetchannelinfo.h>
 #include <iserver.h>

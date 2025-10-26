@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 #include <dynlibutils/memaddr.hpp>
 #include <dynlibutils/module.hpp>
 #include <plugify-configs/plugify-configs.hpp>

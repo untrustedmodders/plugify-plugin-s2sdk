@@ -1,6 +1,6 @@
 #include <core/event_manager.hpp>
 #include <entity2/entitysystem.h>
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 
 PLUGIFY_WARN_PUSH()
 

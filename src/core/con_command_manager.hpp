@@ -2,7 +2,7 @@
 
 #include "listener_manager.hpp"
 #include "con_var_manager.hpp"
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 
 #include <convar.h>
 

@@ -2,7 +2,7 @@
 #include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/entity/cbaseplayercontroller.h>
 #include <core/sdk/entity/cplayercontroller.h>
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 
 #include <core/sdk/entity/cplayerpawn.h>
 

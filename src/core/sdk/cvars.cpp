@@ -1,4 +1,4 @@
-#include "cvars.h"
+#include "cvars.hpp"
 
 #include <entity2/entitysystem.h>
 #include <igameevents.h>

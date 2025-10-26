@@ -1,7 +1,7 @@
 #pragma once
 
 #include "listener_manager.hpp"
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 #include <core/sdk/entity/entityio.h>
 
 #include <entity2/entitysystem.h>

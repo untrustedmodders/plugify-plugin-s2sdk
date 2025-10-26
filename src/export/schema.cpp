@@ -1,7 +1,7 @@
 #include <core/core_config.hpp>
 #include <core/sdk/entity/cbaseentity.h>
-#include <core/sdk/schema.h>
-#include <core/sdk/utils.h>
+#include <core/sdk/schema.hpp>
+#include <core/sdk/utils.hpp>
 #include <schemasystem/schemasystem.h>
 #include <tier0/utlstring.h>
 

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <core/sdk/schema.h>
+#include <core/sdk/schema.hpp>
 
 struct VPhysicsCollisionAttribute_t {
 	DECLARE_SCHEMA_CLASS_INLINE(VPhysicsCollisionAttribute_t)

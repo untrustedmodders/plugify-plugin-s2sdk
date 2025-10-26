@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game_config.hpp"
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 
 #include <polyhook/polyhook.hpp>
 

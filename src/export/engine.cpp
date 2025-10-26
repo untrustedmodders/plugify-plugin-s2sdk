@@ -1,5 +1,5 @@
 #include <core/sdk/entity/cbaseentity.h>
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 #include <core/server_manager.hpp>
 #include <core/timer_system.hpp>
 #include <engine/IEngineSound.h>

@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "utils.hpp"
 
 #include <engine/igameeventsystem.h>
 #include <entity2/entitysystem.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "schema.h"
+#include "schema.hpp"
 #include <eiface.h>
 #include <igameevents.h>
 #include <iserver.h>

@@ -1,4 +1,4 @@
-#include <core/sdk/utils.h>
+#include <core/sdk/utils.hpp>
 #include <core/con_command_manager.hpp>
 
 PLUGIFY_WARN_PUSH()

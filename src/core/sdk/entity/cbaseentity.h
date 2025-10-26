@@ -20,8 +20,8 @@
 #pragma once
 
 #include <core/game_config.hpp>
-#include <core/sdk/schema.h>
-#include <core/sdk/vscript.h>
+#include <core/sdk/schema.hpp>
+#include <core/sdk/vscript.hpp>
 #include <ehandle.h>
 #include <entitykeyvalues.h>
 

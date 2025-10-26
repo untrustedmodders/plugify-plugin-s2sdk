@@ -1,7 +1,7 @@
 #include "con_var_manager.hpp"
 
-#include <core/sdk/utils.h>
-#include <core/sdk/cvars.h>
+#include <core/sdk/utils.hpp>
+#include <core/sdk/cvars.hpp>
 
 ConVarManager::~ConVarManager() {
 	if (!g_pCVar) {

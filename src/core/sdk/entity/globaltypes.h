@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <core/sdk/schema.h>
+#include <core/sdk/schema.hpp>
 #include <platform.h>
 #include <soundflags.h>
 

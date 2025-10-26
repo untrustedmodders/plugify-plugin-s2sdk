@@ -3,9 +3,9 @@
 #include <core/con_var_manager.hpp>
 #include <core/core_config.hpp>
 #include <core/game_config.hpp>
-#include <core/sdk/utils.h>
-#include <core/sdk/cvars.h>
-#include <core/sdk/virtual.h>
+#include <core/sdk/utils.hpp>
+#include <core/sdk/cvars.hpp>
+#include <core/sdk/virtual.hpp>
 
 #include "core/player_manager.hpp"
 
