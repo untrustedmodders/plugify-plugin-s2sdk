@@ -67,11 +67,7 @@ bool ConVarManager::HookConVarChange(std::string_view name, ConVarChangeListener
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
 		auto conVarInfo = it->second;
-		auto status = conVarInfo->callbacks.Unregister(callback);
-		/*if (conVarInfo->hook.Empty()) {
-			m_cnvLookup.erase(it);
-		}*/
-		return status;
+		return conVarInfo->callbacks.Register(callback);;
 	}
 
 	return false;
