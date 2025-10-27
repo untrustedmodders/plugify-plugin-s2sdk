@@ -85,8 +85,8 @@ namespace vscript {
 		plg::print(LS_DETAILED, "│ Returns:     {}\n", GetScriptTypeName(pScriptFunction->m_desc.m_ReturnType));
 		plg::print(LS_DETAILED, "│ Parameters:  {}\n", pScriptFunction->m_desc.m_iParamCount);
 		plg::print(LS_DETAILED, "│ Address:     {:#x}\n", reinterpret_cast<uintptr_t>(binding.funcadr));
-		plg::print(LS_DETAILED, "│ Virtual:     {}\n", binding.is_virtual ? "yes" : "no");
-		if (binding.is_virtual) {
+		plg::print(LS_DETAILED, "│ Virtual:     {}\n", binding.vtable_index != -1 ? "yes" : "no");
+		if (binding.vtable_index != -1) {
 			plg::print(LS_DETAILED, "│ VTable idx:  {}\n", binding.vtable_index);
 		}
 		plg::print(LS_DETAILED, "└──────────────────────────────────────────────────────\n\n");
@@ -95,8 +95,8 @@ namespace vscript {
 		globalClass.m_functions.emplace(funcName, binding);
 	}
 
-	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc) {
-		std::string_view className = pClassDesc->m_pszClassname;
+	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc, void* pInstance) {
+		std::string_view className = pClassDesc->m_pszScriptName;
 		if (scriptClassMap.contains(className)) {
 			return;
 		}
@@ -104,6 +104,7 @@ namespace vscript {
 		auto createClass = [&]() {
 			VScriptClass scriptClass;
 			scriptClass.m_descriptor = pClassDesc;
+			scriptClass.m_instance = pInstance;
 			scriptClass.m_functions.reserve(static_cast<size_t>(pClassDesc->m_FunctionBindings.Count()));
 			for (auto& function : pClassDesc->m_FunctionBindings) {
 				scriptClass.m_functions.emplace(function.m_desc.m_pszScriptName, ScriptConvertFuncPtrToBinding(function));
@@ -132,7 +133,7 @@ namespace vscript {
 	        plg::print(LS_DETAILED, "╠═════════════════════════════════════════════════════════════\n");
 	        
 	        int idx = 1;
-	        for (const auto& function : pClassDesc->m_FunctionBindings) {
+	        for (auto& function : pClassDesc->m_FunctionBindings) {
 	            auto binding = ScriptConvertFuncPtrToBinding(function);
 	            
 	            plg::print(LS_DETAILED, "║ [{:2}] {:<30} ", idx++, function.m_desc.m_pszScriptName);
@@ -141,7 +142,7 @@ namespace vscript {
 	                          std::format("({} params)", function.m_desc.m_iParamCount) : "()",
 	                      GetScriptTypeName(function.m_desc.m_ReturnType));
 	            
-	            if (binding.is_virtual) {
+	            if (binding.vtable_index != -1) {
 	                plg::print(LS_DETAILED, " [virtual]");
 	            }
 	            plg::print(LS_DETAILED, "\n");
@@ -197,13 +198,13 @@ namespace vscript {
 			if (it2 != table.m_functions.end()) {
 				return it2->second;
 			}
-			plg::print(
-				LS_ERROR,
-				"vscript::GetBinding(): '{}' was not found in '{}'!\n",
-				functionName,
-				className
-			);
 		}
+		plg::print(
+			LS_ERROR,
+			"vscript::GetBinding(): '{}' was not found in '{}'!\n",
+			functionName,
+			className
+		);
 		return {};
 	}
 

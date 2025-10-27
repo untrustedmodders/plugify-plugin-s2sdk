@@ -18,11 +18,14 @@ T GetVMethod(size_t index, void* klass) {
 
 template<typename T, typename... Args>
 T CallVirtual(size_t index, void* klass, Args... args) {
-#if S2SDK_PLATFORM_WINDOWS
-	auto func = GetVMethod<T(__thiscall*)(void*, Args...)>(index, klass);
+#if defined(_MSC_VER)
+	using MemberFunc = T (__thiscall*)(void*, Args...);
+#elif defined(__GNUC__) || defined(__clang__)
+	using MemberFunc = T (*)(void*, Args...);
 #else
-	auto func = GetVMethod<T (*)(void*, Args...)>(index, klass);
+#	error "Unsupported compiler"
 #endif
+	auto func = GetVMethod<MemberFunc>(index, klass);
 	if (!func) {
 		if constexpr (std::is_void_v<T>) {
 			return;

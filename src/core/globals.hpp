@@ -4,8 +4,8 @@
 #include <steam_api.h>
 #include <tier0/platform.h>
 #include <tier0/utlstring.h>
-#include <variant.h>
 #include <v8.h>
+#include <variant.h>
 
 #define CS_TEAM_NONE 0
 #define CS_TEAM_SPECTATOR 1
@@ -30,6 +30,7 @@ class CNetworkGameServerBase;
 class CGlobalVars;
 class CGameEntitySystem;
 class IGameEventListener2;
+class IScriptVM;
 class CEntitySystem;
 
 class CEntityInstance;
@@ -61,6 +62,7 @@ inline CGameEntitySystem* g_pGameEntitySystem = nullptr;
 inline CBaseGameRules* g_pGameRules = nullptr;
 inline CBaseGameRulesProxy* g_pGameRulesProxy = nullptr;
 inline CBaseEntity* g_pPointScript = nullptr;
+inline IScriptVM* g_pScriptVM = nullptr;
 inline plg::flat_map<int, CTeam*> g_pTeamManagers;
 //inline ISteamHTTP* g_http = nullptr;
 inline CSteamGameServerAPIContext g_SteamAPI = {};
@@ -104,12 +106,6 @@ namespace addresses {
 
 	inline void (*CBasePlayerController_SetPawn)(CBasePlayerController* controller, CBasePlayerPawn* pawn, bool, bool, bool);
 
-	inline CEntityInstance* (*CGameEntitySystem_FindEntityByClassName)(CEntitySystem* entitySystem, CEntityInstance* startEntity, const char* szName);
-
-	inline CEntityInstance* (*CGameEntitySystem_FindEntityByName)(CEntitySystem* entitySystem, CEntityInstance* startEntity, const char* name, CEntityInstance* searchingEntity, CEntityInstance* activator, CEntityInstance* caller, IEntityFindFilter* filter);
-
-	inline CEntityInstance* (*CreateEntityByName)(const char* className, int forceEdictIndex);
-
 	inline void (*DispatchSpawn)(CEntityInstance* entity, CEntityKeyValues* entityKeyValues);
 
 	inline void (*CEntityInstance_AcceptInput)(CEntityInstance* self, const char* inputName, CEntityInstance* activator, CEntityInstance* caller, variant_t* value, int outputID);
@@ -133,3 +129,13 @@ namespace addresses {
 	inline v8::MaybeLocal<v8::Module> (*CSScript_ResolveModule)(v8::Local<v8::Context> context, v8::Local<v8::String> specifier, v8::Local<v8::FixedArray> import_assertions, v8::Local<v8::Module> referrer);
 
 }// namespace addresses
+
+namespace entities {
+
+	CEntityInstance* CreateEntityByName(const char* className);
+
+	CEntityInstance* FindEntityByName(CEntityInstance* startEntity, const char* name);
+
+	CEntityInstance* FindEntityByClassName(CEntityInstance* startEntity, const char* name);
+
+}

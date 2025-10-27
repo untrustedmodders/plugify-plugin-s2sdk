@@ -149,7 +149,7 @@ public:
 	SCHEMA_FIELD(int, m_fEffects)
 
 	using string = const char*;
-	using handle = CBaseEntity*;
+	using handle = HSCRIPT;
 	VSCRIPT_MEMBER_FUNCTION(AddEffects, void, int)
     VSCRIPT_MEMBER_FUNCTION(ApplyAbsVelocityImpulse, void, Vector)
     VSCRIPT_MEMBER_FUNCTION(ApplyLocalAngularVelocityImpulse, void, Vector)
@@ -359,6 +359,23 @@ public:
 	}
 
 	const char* GetName() const { return m_pEntity->m_name.String(); }
+};
+
+class CEntities {
+public:
+	DECLARE_SCHEMA_CLASS(CEntities);
+
+	VSCRIPT_MEMBER_FUNCTION(CreateByClassname, HSCRIPT, const char*)
+	VSCRIPT_MEMBER_FUNCTION(FindByName, HSCRIPT, HSCRIPT, const char*)
+	VSCRIPT_MEMBER_FUNCTION(FindByNameNearest, HSCRIPT, const char*, const Vector&, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByNameWithin, HSCRIPT, HSCRIPT, const char*, const Vector&, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByClassname, HSCRIPT, HSCRIPT, const char*)
+	VSCRIPT_MEMBER_FUNCTION(FindByClassnameNearest, HSCRIPT, const char*, const Vector&, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByClassnameWithin, HSCRIPT, HSCRIPT, const char*, const Vector&, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByModel, HSCRIPT, HSCRIPT, const char*)
+	VSCRIPT_MEMBER_FUNCTION(FindByModelWithin, HSCRIPT, HSCRIPT, const char*, const Vector&, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByTarget, HSCRIPT, HSCRIPT, const char*)
+	VSCRIPT_MEMBER_FUNCTION(FindInSphere, HSCRIPT, HSCRIPT, const char*, const Vector&, float)
 };
 
 class SpawnPoint : public CBaseEntity {

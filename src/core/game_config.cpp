@@ -1,6 +1,12 @@
+#include "game_config.hpp"
+
 #include <core/sdk/utils.hpp>
 
-#include "game_config.hpp"
+#if _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 
 ModuleProvider::ModuleProvider() {
 	PreloadModules();
@@ -10,7 +16,7 @@ void ModuleProvider::PreloadModules() {
 	// Metamod workaround - check if metamod is loaded
 	const bool hasMetamod = Module("metamod.2.cs2").GetHandle() != nullptr;
 
-#if S2SDK_PLATFORM_WINDOWS
+#if _WIN32
 	const int flags = hasMetamod ? DONT_RESOLVE_DLL_REFERENCES : 0;
 #else
 	const int flags = hasMetamod ? (RTLD_LAZY | RTLD_NOLOAD) : 0;
@@ -69,7 +75,6 @@ bool ModuleProvider::HasModule(std::string_view name) const {
 	std::shared_lock lock(m_mutex);
 	return m_modules.contains(name);
 }
-
 
 Result<void> ConfigLoader::Load() {
 	// Parse config files

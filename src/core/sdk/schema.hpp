@@ -82,17 +82,23 @@ namespace schema {
 		Class
 	};
 
+	struct ElementSizedType {
+		ElementType type;
+		int size;
+	};
+
     int32_t FindChainOffset(std::string_view className);
     SchemaKey GetOffset(std::string_view className, std::string_view memberName);
 
+	// for llvm debug mode
     int32_t FindChainOffset(const char* className);
     SchemaKey GetOffset(const char* className, const char* memberName);
 
     void NetworkStateChanged(intptr_t chainEntity, uint32_t localOffset, int32_t arrayIndex = 0xFFFFFFFF);
 
 	ElementType GetElementType(CSchemaType* type);
-	std::pair<ElementType, int> IsIntType(CSchemaType* type);
-	std::pair<ElementType, int> IsFloatType(CSchemaType* type);
+	ElementSizedType IsIntType(CSchemaType* type);
+	ElementSizedType IsFloatType(CSchemaType* type);
 	ElementType IsPlainType(CSchemaType* type, size_t size);
 	ElementType IsAtomicType(CSchemaType* type, size_t size);
 

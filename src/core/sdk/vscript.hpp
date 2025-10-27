@@ -24,19 +24,21 @@ struct VScriptClass {
 using VScriptClassMap = plg::flat_hash_map<plg::string, VScriptClass, plg::string_hash, std::equal_to<>>;
 namespace vscript {
 	void RegisterFunction(ScriptFunctionBinding_t* pScriptFunction);
-	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc);
+	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc, void* pInstance = nullptr);
 	//void RegisterInstance(ScriptClassDesc_t* pClassDesc, void* pInstance);
 	//void SetValue(IScriptVM* vm, const ScriptVariant_t& value);
 
 	VScriptBinding GetBinding(std::string_view functionName);
 	VScriptBinding GetBinding(std::string_view className, std::string_view functionName);
 
+#if 0
 	VScriptFunction GetFunction(std::string_view functionName);
 	VScriptFunction GetFunction(std::string_view className, std::string_view functionName);
 
 	const ScriptFunctionBinding_t* LookupFunction(std::string_view className, std::string_view functionName);
 	ScriptVariant_t CallFunction(std::string_view className, std::string_view functionName, void* context, const ScriptVariant_t* args);
 	ScriptVariant_t CallFunction(const ScriptFunctionBinding_t* func, void* context, const ScriptVariant_t* args);
+#endif
 }// namespace schema
 
 #if 0
@@ -106,12 +108,12 @@ public:
 	Ret operator()(Args... args) {
 		static VScriptBinding binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
 		void* instance = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(this) - MemberOffset());
-#if S2SDK_PLATFORM_WINDOWS
+#if defined(_MSC_VER)
 		// MSVC: Direct member function pointer call
 		using MemberFunc = Ret(__thiscall*)(void*, Args...);
 		auto func = reinterpret_cast<MemberFunc>(binding.funcadr);
 		return func(instance, std::forward<Args>(args)...);
-#elif S2SDK_PLATFORM_LINUX
+#elif defined(__GNUC__) || defined(__clang__)
 		// GCC: Handle member function pointer structure
 		using MemberFunc = Ret(*)(void*, Args...);
 		if (binding.vtable_index != -1) {
@@ -130,16 +132,20 @@ public:
 	}
 };
 
-template<const char* FunctionName, typename Ret, typename... Args>
+template<
+	typename ThisClass,
+	char const* FunctionName,
+	typename Ret, typename... Args
+>
 class VScriptGlobalFunction {
 public:
 	static Ret operator()(Args... args) {
-		static VScriptBinding binding = vscript::GetBinding(FunctionName);
-#if S2SDK_PLATFORM_WINDOWS
+		static VScriptBinding binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
+#if defined(_MSC_VER)
 		using Func = Ret(__cdecl*)(Args...);
 		auto fn = reinterpret_cast<Func>(binding.funcadr);
 		return fn(std::forward<Args>(args)...);
-#elif S2SDK_PLATFORM_LINUX
+#elif defined(__GNUC__) || defined(__clang__)
 		using Func = Ret(*)(Args...);
 		auto fn = reinterpret_cast<Func>(binding.funcadr);
 		return fn(std::forward<Args>(args)...);
@@ -160,7 +166,7 @@ public: \
 private: \
 	static constexpr const char name##_str[] = #name; \
 public: \
-    PLUGIFY_NO_UNIQUE_ADDRESS VScriptGlobalFunction<name##_str, ret __VA_OPT__(,) __VA_ARGS__> name;
+    PLUGIFY_NO_UNIQUE_ADDRESS VScriptGlobalFunction<ThisClass, name##_str, ret __VA_OPT__(,) __VA_ARGS__> name;
 
 #define VSCRIPT_MEMBER_FUNCTION(name, ret, ...) \
 private: \

@@ -169,7 +169,7 @@ namespace schema {
 		PLUGIFY_UNREACHABLE();
 	}
 
-	std::pair<ElementType, int> IsIntType(CSchemaType* type) {
+	ElementSizedType IsIntType(CSchemaType* type) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
 				auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
@@ -283,7 +283,7 @@ namespace schema {
 		PLUGIFY_UNREACHABLE();
 	}
 
-	std::pair<ElementType, int> IsFloatType(CSchemaType* type) {
+	ElementSizedType IsFloatType(CSchemaType* type) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
 				auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;

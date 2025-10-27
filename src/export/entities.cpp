@@ -222,7 +222,7 @@ extern "C" PLUGIN_API int FindEntityByClassname(int startEntity, const plg::stri
 		return INVALID_EHANDLE_INDEX;
 	}*/
 
-	CBaseEntity* entity = static_cast<CBaseEntity*>(addresses::CGameEntitySystem_FindEntityByClassName(g_pGameEntitySystem, pStartStart, classname.c_str()));
+	CBaseEntity* entity = static_cast<CBaseEntity*>(entities::FindEntityByClassName(pStartStart, classname.c_str()));
 	if (!entity) {
 		//plg::print(LS_WARNING, "Cannot execute 'FindEntityByClassname' with invalid entity classname: {}\n", classname);
 		return INVALID_EHANDLE_INDEX;
@@ -248,7 +248,7 @@ extern "C" PLUGIN_API int FindEntityByName(int startEntity, const plg::string& n
 		return INVALID_EHANDLE_INDEX;
 	}*/
 
-	CBaseEntity* entity = static_cast<CBaseEntity*>(addresses::CGameEntitySystem_FindEntityByName(g_pGameEntitySystem, start, name.c_str(), nullptr, nullptr, nullptr, nullptr));
+	CBaseEntity* entity = static_cast<CBaseEntity*>(entities::FindEntityByName(start, name.c_str()));
 	if (!entity) {
 		//plg::print(LS_WARNING, "Cannot execute 'FindEntityByName' with invalid entity name: {}\n", name);
 		return INVALID_EHANDLE_INDEX;
@@ -269,7 +269,7 @@ extern "C" PLUGIN_API int FindEntityByName(int startEntity, const plg::string& n
  * @return The entity handle of the created entity, or INVALID_EHANDLE_INDEX if the entity could not be created.
  */
 extern "C" PLUGIN_API int CreateEntityByName(const plg::string& className) {
-	CBaseEntity* entity = static_cast<CBaseEntity*>(addresses::CreateEntityByName(className.c_str(), -1));
+	CBaseEntity* entity = static_cast<CBaseEntity*>(entities::CreateEntityByName(className.c_str()));
 	if (!entity) {
 		plg::print(LS_WARNING, "Cannot execute 'CreateEntityByName' with invalid entity classname: {}\n", className);
 		return INVALID_EHANDLE_INDEX;
@@ -743,7 +743,7 @@ extern "C" PLUGIN_API void SetEntityOwner(int entityHandle, int ownerHandle) {
 		return;
 	}
 
-	entity->SetOwner(pOwner);
+	entity->SetOwner(pOwner->m_hScriptInstance);
 }
 
 /**
@@ -788,7 +788,7 @@ extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle, c
 		return;
 	}
 
-	entity->SetParent(pNewParent, attachmentName.c_str());
+	entity->SetParent(pNewParent->m_hScriptInstance, attachmentName.c_str());
 }
 
 /**

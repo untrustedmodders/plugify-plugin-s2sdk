@@ -450,7 +450,7 @@ poly::ReturnAction Hook_OnAddEntity(poly::PHook& hook, poly::Params& params, int
 		v8::Isolate::Scope isolateScope(isolate);
 		v8::HandleScope handleScope(isolate);
 
-		auto pPointScript = addresses::CreateEntityByName("point_script", -1);
+		auto pPointScript = entities::CreateEntityByName("point_script");
 		g_pPointScript = static_cast<CBaseEntity*>(pPointScript);
 		g_pPointScript->DispatchSpawn({
 			{"target_name", "script_main" },
@@ -513,27 +513,28 @@ poly::ReturnAction Hook_BuildGameSessionManifest(poly::PHook& hook, poly::Params
 }
 
 poly::ReturnAction Hook_RegisterFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
+	g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
 	auto pBinding = poly::GetArgument<ScriptFunctionBinding_t*>(params, 1);
 	vscript::RegisterFunction(pBinding);
 	return poly::ReturnAction::Ignored;
 }
 
 poly::ReturnAction Hook_RegisterScriptClass(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
+	g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
 	auto pClassDesc = poly::GetArgument<ScriptClassDesc_t*>(params, 1);
 	vscript::RegisterScriptClass(pClassDesc);
 	return poly::ReturnAction::Ignored;
 }
 
-/*poly::ReturnAction Hook_RegisterInstance(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
+poly::ReturnAction Hook_RegisterInstance(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
 	auto pClassDesc = poly::GetArgument<ScriptClassDesc_t*>(params, 1);
 	auto pInstance = poly::GetArgument<void*>(params, 2);
-	vscript::RegisterInstance(pClassDesc, pInstance);
+	vscript::RegisterScriptClass(pClassDesc, pInstance);
+	//vscript::RegisterInstance(pClassDesc, pInstance);
 	return poly::ReturnAction::Ignored;
 }
-
+/*
 poly::ReturnAction Hook_SetValue(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
 	auto value = poly::GetArgument<const ScriptVariant_t*>(params, 3);
@@ -556,7 +557,7 @@ poly::ReturnAction Hook_IsolateExit(poly::PHook& hook, poly::Params& params, int
 }
 #endif
 
-#if S2SDK_PLATFORM_WINDOWS
+#if _WIN32
 
 #if PLUGIFY_ARCH_BITS == 64
 constexpr WORD PE_FILE_MACHINE = IMAGE_FILE_MACHINE_AMD64;
@@ -653,8 +654,6 @@ void Source2SDK::OnPluginStart() {
 	using FireOutputInternalFn = uint64_t(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, int32_t*, int16_t*, float);
 	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
-	auto& provider = GameConfigManager::Instance().GetModuleProvider();
-
 	auto table = g_pGameConfig->GetVTable("CServerSideClient");
 	g_PH.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, &*table, Hook_ProcessRespondCvarValue, Pre);
 	g_PH.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, &*table, Hook_SendNetMessage, Pre);
@@ -662,7 +661,7 @@ void Source2SDK::OnPluginStart() {
 	auto table2 = g_pGameConfig->GetVTable("CGameRulesGameSystem");
 	g_PH.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &*table2, Hook_BuildGameSessionManifest, Pre);
 
-	//IScriptVM * svm = g_pScriptManager->CreateVM();
+	plg::print(LS_MESSAGE, "{}\n", (void*)g_pScriptVM);
 	//g_PH.AddHookVTableFunc(&IScriptVM::RegisterFunction, svm, Hook_RegisterFunction, Pre);
 	//g_PH.AddHookVTableFunc(&IScriptVM::RegisterScriptClass, svm, Hook_RegisterScriptClass, Pre);
 	//g_pScriptManager->DestroyVM(svm);auto table3 = g_pGameConfig->GetVTable("CGameRulesGameSystem");
@@ -670,9 +669,9 @@ void Source2SDK::OnPluginStart() {
 	auto table3 = g_pGameConfig->GetVTable("CLuaVM");
 	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &*table3, Hook_RegisterFunction, Pre);
 	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
-	/*using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
+	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
 	g_PH.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &*table3, Hook_RegisterInstance, Pre);
-	using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
+	/*using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
 	g_PH.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);*/
 
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
@@ -686,7 +685,7 @@ void Source2SDK::OnPluginStart() {
 	void* v8IsolateExitPtr;
 	TRY_GET_ADDRESS(g_pGameConfig, "v8::Isolate::Exit", v8IsolateExitPtr);
 
-#if S2SDK_PLATFORM_WINDOWS
+#if _WIN32
 	const uint8_t fix = 0;
 #else
 	const uint8_t fix = 6; // skip plt staff
@@ -706,7 +705,7 @@ void Source2SDK::OnPluginStart() {
 	}
 #endif
 
-#if S2SDK_PLATFORM_WINDOWS
+#if _WIN32
 	using PreloadLibrary = void(*)(void*);
 	g_PH.AddHookDetourFunc<PreloadLibrary>("PreloadLibrary", Hook_PreloadLibrary, Pre);
 #endif
