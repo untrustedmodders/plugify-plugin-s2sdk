@@ -21,10 +21,13 @@ DEFINE_MANAGER_CREATOR(OnLevelInit, void, const plg::string&, const plg::string&
 DEFINE_MANAGER_CREATOR(OnLevelShutdown, void)
 DEFINE_MANAGER_CREATOR(OnRoundTerminated, void, float, int)
 
+class KeyValues;
 DEFINE_MANAGER_CREATOR(OnEntitySpawned, void, int)
 DEFINE_MANAGER_CREATOR(OnEntityCreated, void, int)
 DEFINE_MANAGER_CREATOR(OnEntityDeleted, void, int)
 DEFINE_MANAGER_CREATOR(OnEntityParentChanged, void, int, int)
+//DEFINE_MANAGER_CREATOR(OnEntitySpawn, void, int, KeyValues*)
+//DEFINE_MANAGER_CREATOR(OnEntityPrecache, plg::vector<plg::string>, int)
 
 DEFINE_MANAGER_CREATOR(OnServerStartup, void)
 DEFINE_MANAGER_CREATOR(OnServerActivate, void)

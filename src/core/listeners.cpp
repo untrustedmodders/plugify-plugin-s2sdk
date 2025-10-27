@@ -35,6 +35,8 @@ DEFINE_MANAGER_ACCESSOR(OnEntitySpawned, void, int)
 DEFINE_MANAGER_ACCESSOR(OnEntityCreated, void, int)
 DEFINE_MANAGER_ACCESSOR(OnEntityDeleted, void, int)
 DEFINE_MANAGER_ACCESSOR(OnEntityParentChanged, void, int, int)
+//DEFINE_MANAGER_ACCESSOR(OnEntitySpawn, void, int, KeyValues*)
+//DEFINE_MANAGER_ACCESSOR(OnEntityPrecache, plg::vector<plg::string>, int)
 
 DEFINE_MANAGER_ACCESSOR(OnServerStartup, void)
 DEFINE_MANAGER_ACCESSOR(OnServerActivate, void)

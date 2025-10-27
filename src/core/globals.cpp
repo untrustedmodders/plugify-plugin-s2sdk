@@ -57,7 +57,6 @@ namespace globals {
 		// load more if needed
 		TRY_GET_SIGNATURE(g_pGameConfig, "LegacyGameEventListener", addresses::GetLegacyGameEventListener);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CBasePlayerController::SetPawn", addresses::CBasePlayerController_SetPawn);
-		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::DispatchSpawn", addresses::DispatchSpawn);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CEntityInstance::AcceptInput", addresses::CEntityInstance_AcceptInput);
 		//TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::EmitSoundFilter", addresses::CBaseEntity_EmitSoundFilter);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::SetMoveType", addresses::CBaseEntity_SetMoveType);

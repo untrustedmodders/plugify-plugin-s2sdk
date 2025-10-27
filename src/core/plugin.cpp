@@ -6,11 +6,12 @@
 #include <eiface.h>
 #include <engine/igameeventsystem.h>
 #include <entity2/entitysystem.h>
-#include <vscript/ccscript.h>
 #include <igameevents.h>
 #include <iserver.h>
 #include <netmessages.h>
 #include <steam_gameserver.h>
+#include <vscript/ccscript.h>
+#include <vscript_server.h>
 
 #include "plugin.hpp"
 
@@ -21,13 +22,13 @@
 #include "event_manager.hpp"
 #include "hook_holder.hpp"
 #include "listeners.hpp"
+#include "multi_addon_manager.hpp"
 #include "output_manager.hpp"
 #include "panorama_vote.hpp"
 #include "player_manager.hpp"
 #include "server_manager.hpp"
 #include "timer_system.hpp"
 #include "user_message_manager.hpp"
-#include "multi_addon_manager.hpp"
 
 Source2SDK g_sdk;
 EXPOSE_PLUGIN(PLUGIN_API, Source2SDK, &g_sdk)
@@ -534,6 +535,64 @@ poly::ReturnAction Hook_RegisterInstance(poly::PHook& hook, poly::Params& params
 	//vscript::RegisterInstance(pClassDesc, pInstance);
 	return poly::ReturnAction::Ignored;
 }
+
+thread_local std::string_view currentlyExecutingScriptFunction = {};
+
+poly::ReturnAction Hook_LookupFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
+	auto pszFunction = poly::GetArgument<const char *>(params, 1);
+	auto hScope = poly::GetArgument<HSCRIPT>(params, 2);
+	//auto raw = poly::GetArgument<bool>(params, 3);
+	auto hScript = poly::GetReturn<HSCRIPT>(ret);
+	currentlyExecutingScriptFunction = pszFunction;
+	return poly::ReturnAction::Ignored;
+}
+
+/*poly::ReturnAction Hook_ReleaseFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
+	auto hScript = poly::GetArgument<HSCRIPT>(params, 1);
+	scriptFunctionNames.erase(hScript);
+	return poly::ReturnAction::Ignored;
+}*/
+
+poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
+	auto hFunction = poly::GetArgument<HSCRIPT>(params, 1);
+	auto pArgs = poly::GetArgument<ScriptVariant_t*>(params, 2);
+	auto nArgs = poly::GetArgument<int>(params, 3);
+	auto pReturn = poly::GetArgument<ScriptVariant_t*>(params, 4);
+	auto hScope = poly::GetArgument<HSCRIPT>(params, 5);
+	//auto bWait = poly::GetArgument<bool>(params, 6);
+
+	CBaseEntity* entity = nullptr;
+	ScriptVariant_t thisEntity;
+	if (g_pScriptVM->GetValue(hScope, "thisEntity", &thisEntity)) {
+		entity = (CBaseEntity*)g_pScriptVM->GetInstanceValue(thisEntity);
+	}
+	if (entity == nullptr) {
+		return poly::ReturnAction::Ignored;
+	}
+
+	if (currentlyExecutingScriptFunction == "OnSpawn") {
+		CScriptKeyValues* spawnkeys = reinterpret_cast<CScriptKeyValues*>(g_pScriptVM->GetInstanceValue((HSCRIPT)pArgs[0]));
+
+		//GetOnEntitySpawnListenerManager()(entity->GetRefEHandle().ToInt(), spawnkeys->m_pKeyValues);
+
+	} /*else if (currentlyExecutingScriptFunction == "OnDelete") {
+	} */else if (currentlyExecutingScriptFunction == "DispatchPrecache") {
+		CScriptPrecacheContext* context = reinterpret_cast<CScriptPrecacheContext*>(g_pScriptVM->GetInstanceValue((HSCRIPT)pArgs[0]));
+		auto funcs = GetOnEntityPrecacheListenerManager().Get();
+		for (const auto& func : funcs) {
+			auto precached = func(entity->GetRefEHandle().ToInt());
+			for (const auto& precache : precached) {
+				context->AddResource(precache.c_str());
+			}
+		}
+	}
+
+	return poly::ReturnAction::Ignored;
+}
+
 /*
 poly::ReturnAction Hook_SetValue(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
@@ -646,6 +705,17 @@ void Source2SDK::OnPluginStart() {
 	//using LogDirect = LoggingResponse_t (*)(void* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, LeafCodeInfo_t*, LoggingMetaData_t*, Color, char const*, va_list*);
 	//g_PH.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, Pre);
 
+	auto table3 = g_pGameConfig->GetVTable("CLuaVM");
+	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &*table3, Hook_RegisterFunction, Pre);
+	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
+	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
+	g_PH.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &*table3, Hook_RegisterInstance, Pre);
+	/*using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
+	g_PH.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);*/
+	g_PH.AddHookVFuncFunc(&IScriptVM::LookupFunction, &*table3, Hook_LookupFunction, Post);
+	//g_PH.AddHookVFuncFunc(&IScriptVM::ReleaseFunction, &*table3, Hook_ReleaseFunction, Pre);
+	g_PH.AddHookVFuncFunc(&IScriptVM::ExecuteFunction, &*table3, Hook_ExecuteFunction, Pre);
+
 #if defined (CS2)
 	using HostStateRequestFn = void* (*)(CHostStateMgr *manager, CHostStateRequest* request);
 	g_PH.AddHookDetourFunc<HostStateRequestFn>("CHostStateMgr::StartNewRequest", Hook_HostStateRequest, Pre);
@@ -660,19 +730,6 @@ void Source2SDK::OnPluginStart() {
 
 	auto table2 = g_pGameConfig->GetVTable("CGameRulesGameSystem");
 	g_PH.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &*table2, Hook_BuildGameSessionManifest, Pre);
-
-	plg::print(LS_MESSAGE, "{}\n", (void*)g_pScriptVM);
-	//g_PH.AddHookVTableFunc(&IScriptVM::RegisterFunction, svm, Hook_RegisterFunction, Pre);
-	//g_PH.AddHookVTableFunc(&IScriptVM::RegisterScriptClass, svm, Hook_RegisterScriptClass, Pre);
-	//g_pScriptManager->DestroyVM(svm);auto table3 = g_pGameConfig->GetVTable("CGameRulesGameSystem");
-
-	auto table3 = g_pGameConfig->GetVTable("CLuaVM");
-	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &*table3, Hook_RegisterFunction, Pre);
-	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
-	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
-	g_PH.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &*table3, Hook_RegisterInstance, Pre);
-	/*using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
-	g_PH.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);*/
 
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
 	g_PH.AddHookDetourFunc<TerminateRoundFn>("CGameRules::TerminateRound", Hook_TerminateRound, Pre);
