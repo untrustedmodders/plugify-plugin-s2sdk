@@ -137,20 +137,10 @@ public:
 	bool HookConVarChange(std::string_view name, ConVarChangeListenerCallback callback);
 	bool UnhookConVarChange(std::string_view name, ConVarChangeListenerCallback callback);
 
-	static void ChangeDefault(
+	static void OnCvarsChanged(
 		ConVarRefAbstract* ref,
-		CSplitScreenSlot slot,
 		const char* newValue,
-		const char* oldValue,
-		void*
-	);
-
-	static void ChangeGlobal(
-		ConVarRefAbstract* ref,
-		CSplitScreenSlot slot,
-		const char* newValue,
-		const char* oldValue,
-		void*
+		const char* oldValue
 	);
 
 	static bool AutoExecConfig(

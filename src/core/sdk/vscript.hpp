@@ -25,77 +25,10 @@ using VScriptClassMap = plg::flat_hash_map<plg::string, VScriptClass, plg::strin
 namespace vscript {
 	void RegisterFunction(ScriptFunctionBinding_t* pScriptFunction);
 	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc, void* pInstance = nullptr);
-	//void RegisterInstance(ScriptClassDesc_t* pClassDesc, void* pInstance);
-	//void SetValue(IScriptVM* vm, const ScriptVariant_t& value);
 
 	VScriptBinding GetBinding(std::string_view functionName);
 	VScriptBinding GetBinding(std::string_view className, std::string_view functionName);
-
-#if 0
-	VScriptFunction GetFunction(std::string_view functionName);
-	VScriptFunction GetFunction(std::string_view className, std::string_view functionName);
-
-	const ScriptFunctionBinding_t* LookupFunction(std::string_view className, std::string_view functionName);
-	ScriptVariant_t CallFunction(std::string_view className, std::string_view functionName, void* context, const ScriptVariant_t* args);
-	ScriptVariant_t CallFunction(const ScriptFunctionBinding_t* func, void* context, const ScriptVariant_t* args);
-#endif
 }// namespace schema
-
-#if 0
-template<
-	typename ThisClass,
-	char const* FunctionName,
-	typename Ret, typename... Args
->
-class VScriptJitFunction {
-public:
-	Ret operator()(Args... args) const {
-		auto [binding, instance] = vscript::GetFunction(ThisClass::m_className, FunctionName);
-
-		ScriptVariant_t argv[sizeof...(Args)] = {};
-		FillVariants(argv, std::forward<Args>(args)...);
-
-		ScriptVariant_t ret;
-		ScriptVariant_t* retPtr = (binding->m_desc.m_ReturnType != 0) ? &ret : nullptr;
-
-		bool ok = binding->m_pfnBinding(
-		    binding->m_pFunction,
-		    instance,
-		    argv,
-		    sizeof...(Args),
-		    retPtr
-		);
-		Assert(ok);
-		return GetReturn(ret);
-	}
-
-private:
-	template <size_t Index = 0, typename T, typename... Rest>
-	static void FillVariants(ScriptVariant_t* argv, T&& arg, Rest&&... rest) {
-		ConvertToVariant(argv[Index], std::forward<T>(arg));
-		if constexpr (sizeof...(Rest) > 0) {
-			FillVariants<Index + 1>(argv, std::forward<Rest>(rest)...);
-		}
-	}
-
-	static void FillVariants(ScriptVariant_t* /*argv*/) {}
-
-	template<typename T>
-	static void ConvertToVariant(ScriptVariant_t& var, T&& value) {
-		var = std::forward<T>(value);
-	}
-
-	static Ret GetReturn(const ScriptVariant_t& var) {
-		if constexpr (std::is_void_v<Ret>) {
-			return;
-		} else {
-			Ret ret;
-			var.AssignTo<Ret>(ret);
-			return ret;
-		}
-	}
-};
-#endif
 
 template<
 	typename ThisClass,
@@ -154,13 +87,6 @@ public:
 #endif
 	}
 };
-
-/*#define VSCRIPT_JIT_FUNCTION(name, ret, ...) \
-private: \
-	static constexpr const char name##_str[] = #name; \
-public: \
-    PLUGIFY_NO_UNIQUE_ADDRESS VScriptJitFunction<ThisClass, name##_str, ret __VA_OPT__(,) __VA_ARGS__> name;
-*/
 
 #define VSCRIPT_GLOBAL_FUNCTION(name, ret, ...) \
 private: \

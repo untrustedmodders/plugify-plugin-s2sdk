@@ -155,27 +155,6 @@ namespace vscript {
 		scriptClassMap.emplace(className, createClass());
 	}
 
-#if 0
-	void RegisterInstance(ScriptClassDesc_t* pClassDesc, void* pInstance) {
-		lastClass = pClassDesc;
-		lastInstance = pInstance;
-	}
-
-	void SetValue(IScriptVM* vm, const ScriptVariant_t& value) {
-		if (lastClass && lastInstance && value.m_type == FIELD_HSCRIPT) {
-			void* instance = vm->GetInstanceValue(value, lastClass);
-			if (instance == lastInstance) {
-				auto it = scriptClassMap.find(lastClass->m_pszScriptName);
-				if (it != scriptClassMap.end()) {
-					it->second.m_instance = lastInstance;
-				}
-			}
-		}
-		lastClass = nullptr;
-		lastInstance = nullptr;
-	}
-#endif
-
 	VScriptBinding GetBinding(std::string_view functionName) {
 		VScriptClass& globalClass = scriptClassMap[""];
 		auto it = globalClass.m_functions.find(functionName);
@@ -208,54 +187,4 @@ namespace vscript {
 		return {};
 	}
 
-#if 0
-	VScriptFunction GetFunction(std::string_view functionName) {
-		VScriptClass& globalClass = scriptClassMap[""];
-		auto it = globalClass.m_functions.find(functionName);
-		if (it != globalClass.m_functions.end()) {
-			return { it->second.binding, globalClass.m_instance };
-		}
-		plg::print(
-			LS_ERROR,
-			"vscript::GetFunction(): '{}' was not found!\n",
-			functionName
-		);
-		return {};
-	}
-	VScriptFunction GetFunction(std::string_view className, std::string_view functionName) {
-		auto it = scriptClassMap.find(className);
-		if (it != scriptClassMap.end()) {
-			auto& klass = it->second;
-			auto it2 = klass.m_functions.find(functionName);
-			if (it2 != klass.m_functions.end()) {
-				return { it2->second.binding, klass.m_instance };
-			}
-			plg::print(
-				LS_ERROR,
-				"vscript::GetFunction(): '{}' was not found in '{}'!\n",
-				functionName,
-				className
-			);
-		}
-		return {};
-	}
-
-	const ScriptFunctionBinding_t* LookupFunction(std::string_view className, std::string_view functionName) {
-		return scriptClassMap[className].m_functions[functionName].binding;
-	}
-
-	ScriptVariant_t CallFunction(std::string_view className, std::string_view functionName, void* context, const ScriptVariant_t* args) {
-		const ScriptFunctionBinding_t* func = LookupFunction(className, functionName);
-		return CallFunction(func, context, args);
-	}
-
-	ScriptVariant_t CallFunction(const ScriptFunctionBinding_t* func, void* context, const ScriptVariant_t* args) {
-		ScriptVariant_t ret;
-		//passing a non-NULL return value pointer for void-returning functions caused crashes
-		ScriptVariant_t * retPtr = ((func->m_desc.m_ReturnType) ? &ret : 0);
-		bool ok = func->m_pfnBinding(func->m_pFunction, context, (ScriptVariant_t*)args, func->m_desc.m_iParamCount, retPtr);
-		Assert(ok);
-		return ret;
-	}
-#endif
 }

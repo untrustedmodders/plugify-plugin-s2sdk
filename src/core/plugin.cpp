@@ -405,6 +405,18 @@ poly::ReturnAction Hook_DispatchConCommand(poly::PHook& hook, poly::Params& para
 	return poly::ReturnAction::Ignored;
 }
 
+poly::ReturnAction Hook_CallGlobalChangeCallbacks(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	// auto cmd = poly::GetArgument<ICvar* const>(params, 0);
+	auto ref = poly::GetArgument<ConVarRefAbstract*>(params, 1);
+	//auto nSlot = poly::GetArgument<CSplitScreenSlot>(params, 2);
+	auto newValue = poly::GetArgument<const char*>(params, 3);
+	auto oldValue = poly::GetArgument<const char*>(params, 4);
+
+	g_ConVarManager.OnCvarsChanged(ref, newValue, oldValue);
+
+	return poly::ReturnAction::Ignored;
+}
+
 poly::ReturnAction Hook_HostStateRequest(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto mgr = poly::GetArgument<CHostStateMgr*>(params, 0);
 	auto request = poly::GetArgument<CHostStateRequest*>(params, 1);

@@ -8,9 +8,6 @@ ConVarManager::~ConVarManager() {
 		return;
 	}
 
-	g_pCVar->RemoveGlobalChangeCallback(&ChangeDefault);
-	g_pCVar->RemoveGlobalChangeCallback(&ChangeGlobal);
-
 	for (const auto& [_, cv] : m_cnvLookup) {
 		g_pCVar->UnregisterConVarCallbacks(*cv->conVar);
 	}
@@ -20,13 +17,6 @@ ConVarManager::~ConVarManager() {
 
 void ConVarManager::Init() {
 	ConVar_Register(FCVAR_RELEASE | FCVAR_SERVER_CAN_EXECUTE | FCVAR_GAMEDLL);
-
-	if (!g_pCVar) {
-		return;
-	}
-
-	g_pCVar->InstallGlobalChangeCallback(&ChangeGlobal);
-	g_pCVar->InstallGlobalChangeCallback(&ChangeDefault);
 }
 
 bool ConVarManager::RemoveConVar(std::string_view name) {
@@ -67,7 +57,7 @@ bool ConVarManager::HookConVarChange(std::string_view name, ConVarChangeListener
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {
 		auto conVarInfo = it->second;
-		return conVarInfo->callbacks.Register(callback);;
+		return conVarInfo->callbacks.Register(callback);
 	}
 
 	return false;
@@ -89,8 +79,10 @@ bool ConVarManager::UnhookConVarChange(std::string_view name, ConVarChangeListen
 	return false;
 }
 
-void ConVarManager::ChangeDefault(ConVarRefAbstract* ref, CSplitScreenSlot , const char* newValue, const char* oldValue, void*) {
+void ConVarManager::OnCvarsChanged(ConVarRefAbstract* ref, const char* newValue, const char* oldValue) {
 	std::scoped_lock lock(g_ConVarManager.m_mutex);
+
+	g_ConVarManager.m_globalCallbacks(*ref, newValue, oldValue);
 
 	std::string_view key = ref->GetName();
 	auto it = g_ConVarManager.m_cnvLookup.find(key);
@@ -98,12 +90,6 @@ void ConVarManager::ChangeDefault(ConVarRefAbstract* ref, CSplitScreenSlot , con
 		auto conVarInfo = it->second;
 		conVarInfo->callbacks(*ref, newValue, oldValue);
 	}
-}
-
-void ConVarManager::ChangeGlobal(ConVarRefAbstract* ref, CSplitScreenSlot, const char* newValue, const char* oldValue, void*) {
-	std::scoped_lock lock(g_ConVarManager.m_mutex);
-
-	g_ConVarManager.m_globalCallbacks(*ref, newValue, oldValue);
 }
 
 struct ConVal {
