@@ -57,6 +57,8 @@ namespace globals {
 		// load more if needed
 		TRY_GET_SIGNATURE(g_pGameConfig, "LegacyGameEventListener", addresses::GetLegacyGameEventListener);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CBasePlayerController::SetPawn", addresses::CBasePlayerController_SetPawn);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CGameEntitySystem::CreateEntityByName", addresses::CreateEntityByName);
+		TRY_GET_SIGNATURE(g_pGameConfig, "CGameEntitySystem::DispatchSpawn", addresses::DispatchSpawn);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CEntityInstance::AcceptInput", addresses::CEntityInstance_AcceptInput);
 		//TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::EmitSoundFilter", addresses::CBaseEntity_EmitSoundFilter);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::SetMoveType", addresses::CBaseEntity_SetMoveType);
@@ -132,18 +134,18 @@ namespace globals {
 }// namespace globals
 
 namespace entities {
-	CEntityInstance* CreateEntityByName(const char* className) {
+	/*CEntityInstance* CreateEntityByName(const char* className) {
 		auto handle = CEntities{}.CreateByClassname(className);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
-	}
+	}*/
 
 	CEntityInstance* FindEntityByName(CEntityInstance* startEntity, const char* name) {
 		auto handle = CEntities{}.FindByName(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
-	CEntityInstance* FindEntityByClassName(CEntityInstance* startEntity, const char* szName) {
-		auto handle = CEntities{}.FindByClassname(startEntity ? startEntity->GetScriptInstance() : nullptr, szName);
+	CEntityInstance* FindEntityByClassName(CEntityInstance* startEntity, const char* name) {
+		auto handle = CEntities{}.FindByClassname(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 }// namespace entities

@@ -269,7 +269,7 @@ extern "C" PLUGIN_API int FindEntityByName(int startEntity, const plg::string& n
  * @return The entity handle of the created entity, or INVALID_EHANDLE_INDEX if the entity could not be created.
  */
 extern "C" PLUGIN_API int CreateEntityByName(const plg::string& className) {
-	CBaseEntity* entity = static_cast<CBaseEntity*>(entities::CreateEntityByName(className.c_str()));
+	CBaseEntity* entity = static_cast<CBaseEntity*>(addresses::CreateEntityByName(className.c_str(), -1));
 	if (!entity) {
 		plg::print(LS_WARNING, "Cannot execute 'CreateEntityByName' with invalid entity classname: {}\n", className);
 		return INVALID_EHANDLE_INDEX;

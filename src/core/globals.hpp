@@ -106,6 +106,8 @@ namespace addresses {
 
 	inline void (*CBasePlayerController_SetPawn)(CBasePlayerController* controller, CBasePlayerPawn* pawn, bool, bool, bool);
 
+	inline CEntityInstance* (*CreateEntityByName)(const char* className, int forceEdictIndex);
+
 	inline void (*DispatchSpawn)(CEntityInstance* entity, CEntityKeyValues* entityKeyValues);
 
 	inline void (*CEntityInstance_AcceptInput)(CEntityInstance* self, const char* inputName, CEntityInstance* activator, CEntityInstance* caller, variant_t* value, int outputID);
@@ -132,7 +134,7 @@ namespace addresses {
 
 namespace entities {
 
-	CEntityInstance* CreateEntityByName(const char* className);
+	//CEntityInstance* CreateEntityByName(const char* className);
 
 	CEntityInstance* FindEntityByName(CEntityInstance* startEntity, const char* name);
 

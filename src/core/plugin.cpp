@@ -463,7 +463,7 @@ poly::ReturnAction Hook_OnAddEntity(poly::PHook& hook, poly::Params& params, int
 		v8::Isolate::Scope isolateScope(isolate);
 		v8::HandleScope handleScope(isolate);
 
-		auto pPointScript = entities::CreateEntityByName("point_script");
+		auto pPointScript = addresses::CreateEntityByName("point_script", -1);
 		g_pPointScript = static_cast<CBaseEntity*>(pPointScript);
 		g_pPointScript->DispatchSpawn({
 			{"target_name", "script_main" },
@@ -544,28 +544,28 @@ poly::ReturnAction Hook_RegisterInstance(poly::PHook& hook, poly::Params& params
 	auto pClassDesc = poly::GetArgument<ScriptClassDesc_t*>(params, 1);
 	auto pInstance = poly::GetArgument<void*>(params, 2);
 	vscript::RegisterScriptClass(pClassDesc, pInstance);
-	//vscript::RegisterInstance(pClassDesc, pInstance);
 	return poly::ReturnAction::Ignored;
 }
 
-thread_local std::string_view currentlyExecutingScriptFunction = {};
+plg::flat_hash_map<HSCRIPT, const char*> scriptFunctionMap = {};
 
 poly::ReturnAction Hook_LookupFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
 	auto pszFunction = poly::GetArgument<const char *>(params, 1);
-	auto hScope = poly::GetArgument<HSCRIPT>(params, 2);
+	//auto hScope = poly::GetArgument<HSCRIPT>(params, 2);
 	//auto raw = poly::GetArgument<bool>(params, 3);
 	auto hScript = poly::GetReturn<HSCRIPT>(ret);
-	currentlyExecutingScriptFunction = pszFunction;
+	scriptFunctionMap[hScript] = pszFunction;
+	plg::print(LS_MESSAGE, "LookupFunction - {}\n", pszFunction);
 	return poly::ReturnAction::Ignored;
 }
 
-/*poly::ReturnAction Hook_ReleaseFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+poly::ReturnAction Hook_ReleaseFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
 	auto hScript = poly::GetArgument<HSCRIPT>(params, 1);
-	scriptFunctionNames.erase(hScript);
+	//scriptFunctionMap.erase(hScript);
 	return poly::ReturnAction::Ignored;
-}*/
+}
 
 poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
@@ -576,6 +576,10 @@ poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params,
 	auto hScope = poly::GetArgument<HSCRIPT>(params, 5);
 	//auto bWait = poly::GetArgument<bool>(params, 6);
 
+	std::string_view current = scriptFunctionMap[hFunction];
+
+	plg::print(LS_MESSAGE, "ExecuteFunction - {}\n", current);
+
 	CBaseEntity* entity = nullptr;
 	ScriptVariant_t thisEntity;
 	if (g_pScriptVM->GetValue(hScope, "thisEntity", &thisEntity)) {
@@ -585,33 +589,34 @@ poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params,
 		return poly::ReturnAction::Ignored;
 	}
 
-	if (currentlyExecutingScriptFunction == "OnSpawn") {
-		CScriptKeyValues* spawnkeys = reinterpret_cast<CScriptKeyValues*>(g_pScriptVM->GetInstanceValue((HSCRIPT)pArgs[0]));
+	if (current == "OnSpawn") {
+		CScriptKeyValues* spawnkeys = reinterpret_cast<CScriptKeyValues*>(g_pScriptVM->GetInstanceValue(pArgs[0]));
 
 		//GetOnEntitySpawnListenerManager()(entity->GetRefEHandle().ToInt(), spawnkeys->m_pKeyValues);
 
 	} /*else if (currentlyExecutingScriptFunction == "OnDelete") {
-	} */else if (currentlyExecutingScriptFunction == "DispatchPrecache") {
-		CScriptPrecacheContext* context = reinterpret_cast<CScriptPrecacheContext*>(g_pScriptVM->GetInstanceValue((HSCRIPT)pArgs[0]));
-		auto funcs = GetOnEntityPrecacheListenerManager().Get();
+	} */else if (current == "DispatchPrecache") {
+		CScriptPrecacheContext* context = reinterpret_cast<CScriptPrecacheContext*>(g_pScriptVM->GetInstanceValue(pArgs[0]));
+		/*auto funcs = GetOnEntityPrecacheListenerManager().Get();
 		for (const auto& func : funcs) {
 			auto precached = func(entity->GetRefEHandle().ToInt());
 			for (const auto& precache : precached) {
-				context->AddResource(precache.c_str());
+				context->m_pContext->m_pManifest->AddResource(precache.c_str());
 			}
+		}*/
+		if (context != nullptr) {
 		}
 	}
 
 	return poly::ReturnAction::Ignored;
 }
 
-/*
 poly::ReturnAction Hook_SetValue(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
 	auto value = poly::GetArgument<const ScriptVariant_t*>(params, 3);
-	vscript::SetValue(pScript, *value);
+	//vscript::SetValue(pScript, *value);
 	return poly::ReturnAction::Ignored;
-}*/
+}
 
 #if defined (CS2)
 poly::ReturnAction Hook_IsolateEnter(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
@@ -713,6 +718,7 @@ void Source2SDK::OnPluginStart() {
 	g_PH.AddHookVTableFunc(&ISource2Server::PreWorldUpdate, g_pSource2Server, Hook_PreWorldUpdate, Post);
 	g_PH.AddHookVTableFunc(&IServerGameDLL::GameFrame, g_pSource2Server, Hook_GameFrame, Post);
 	g_PH.AddHookVTableFunc(&ICvar::DispatchConCommand, g_pCVar, Hook_DispatchConCommand, Pre, Post);
+	g_PH.AddHookVTableFunc(&ICvar::CallGlobalChangeCallbacks, g_pCVar, Hook_CallGlobalChangeCallbacks, Post);
 
 	//using LogDirect = LoggingResponse_t (*)(void* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, LeafCodeInfo_t*, LoggingMetaData_t*, Color, char const*, va_list*);
 	//g_PH.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, Pre);
@@ -722,10 +728,10 @@ void Source2SDK::OnPluginStart() {
 	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
 	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
 	g_PH.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &*table3, Hook_RegisterInstance, Pre);
-	/*using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
-	g_PH.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);*/
+	using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
+	g_PH.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);
 	g_PH.AddHookVFuncFunc(&IScriptVM::LookupFunction, &*table3, Hook_LookupFunction, Post);
-	//g_PH.AddHookVFuncFunc(&IScriptVM::ReleaseFunction, &*table3, Hook_ReleaseFunction, Pre);
+	g_PH.AddHookVFuncFunc(&IScriptVM::ReleaseFunction, &*table3, Hook_ReleaseFunction, Pre);
 	g_PH.AddHookVFuncFunc(&IScriptVM::ExecuteFunction, &*table3, Hook_ExecuteFunction, Pre);
 
 #if defined (CS2)
