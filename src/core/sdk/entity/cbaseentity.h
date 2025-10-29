@@ -236,7 +236,7 @@ public:
     VSCRIPT_MEMBER_FUNCTION(SetTeam, void, int)
     VSCRIPT_MEMBER_FUNCTION(SetVelocity, void, Vector)
     VSCRIPT_MEMBER_FUNCTION(StopSound, void, string)
-    VSCRIPT_MEMBER_FUNCTION(TakeDamage, int, CTakeDamageInfo&)
+    VSCRIPT_MEMBER_FUNCTION(TakeDamage, int, handle)
     VSCRIPT_MEMBER_FUNCTION(TransformPointEntityToWorld, Vector, Vector)
     VSCRIPT_MEMBER_FUNCTION(TransformPointWorldToEntity, Vector, Vector)
     VSCRIPT_MEMBER_FUNCTION(Trigger, void)

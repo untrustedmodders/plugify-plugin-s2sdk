@@ -1201,7 +1201,9 @@ Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
 		return MakeError(std::move(result.error()));
 	}
 
-	config->ApplyAllPatches();
+	if (auto result = config->ApplyAllPatches(); !result) {
+		return MakeError(std::move(result.error()));
+	}
 
 	uint32_t id = m_nextId++;
 	m_configs.emplace(id, ConfigEntry{std::move(config)});

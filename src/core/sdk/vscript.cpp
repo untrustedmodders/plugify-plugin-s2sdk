@@ -25,8 +25,8 @@ namespace {
 	    VScriptBinding result = {};
 
 #if defined(_MSC_VER)
-	    result.funcadr = binding.m_pFunction;
-		result.is_virtual = false;
+	    result.funcadr = pScriptFunction.m_pFunction;
+		result.vtable_index = -1;
 #elif defined(__GNUC__) || defined(__clang__)
 	    if (pScriptFunction.m_flags & SF_MEMBER_FUNC) {
 	        struct GnuMFP {

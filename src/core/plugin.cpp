@@ -546,7 +546,7 @@ poly::ReturnAction Hook_RegisterInstance(poly::PHook& hook, poly::Params& params
 	vscript::RegisterScriptClass(pClassDesc, pInstance);
 	return poly::ReturnAction::Ignored;
 }
-
+/*
 plg::flat_hash_map<HSCRIPT, const char*> scriptFunctionMap = {};
 
 poly::ReturnAction Hook_LookupFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
@@ -571,8 +571,8 @@ poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params,
 	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
 	auto hFunction = poly::GetArgument<HSCRIPT>(params, 1);
 	auto pArgs = poly::GetArgument<ScriptVariant_t*>(params, 2);
-	auto nArgs = poly::GetArgument<int>(params, 3);
-	auto pReturn = poly::GetArgument<ScriptVariant_t*>(params, 4);
+	//auto nArgs = poly::GetArgument<int>(params, 3);
+	//auto pReturn = poly::GetArgument<ScriptVariant_t*>(params, 4);
 	auto hScope = poly::GetArgument<HSCRIPT>(params, 5);
 	//auto bWait = poly::GetArgument<bool>(params, 6);
 
@@ -594,16 +594,16 @@ poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params,
 
 		//GetOnEntitySpawnListenerManager()(entity->GetRefEHandle().ToInt(), spawnkeys->m_pKeyValues);
 
-	} /*else if (currentlyExecutingScriptFunction == "OnDelete") {
-	} */else if (current == "DispatchPrecache") {
+	} else if (currentlyExecutingScriptFunction == "OnDelete") {
+	} else if (current == "DispatchPrecache") {
 		CScriptPrecacheContext* context = reinterpret_cast<CScriptPrecacheContext*>(g_pScriptVM->GetInstanceValue(pArgs[0]));
-		/*auto funcs = GetOnEntityPrecacheListenerManager().Get();
+		auto funcs = GetOnEntityPrecacheListenerManager().Get();
 		for (const auto& func : funcs) {
 			auto precached = func(entity->GetRefEHandle().ToInt());
 			for (const auto& precache : precached) {
 				context->m_pContext->m_pManifest->AddResource(precache.c_str());
 			}
-		}*/
+		}
 		if (context != nullptr) {
 		}
 	}
@@ -617,7 +617,7 @@ poly::ReturnAction Hook_SetValue(poly::PHook& hook, poly::Params& params, int co
 	//vscript::SetValue(pScript, *value);
 	return poly::ReturnAction::Ignored;
 }
-
+*/
 #if defined (CS2)
 poly::ReturnAction Hook_IsolateEnter(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	auto isolate = poly::GetArgument<v8::Isolate*>(params, 0);
@@ -728,11 +728,11 @@ void Source2SDK::OnPluginStart() {
 	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
 	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
 	g_PH.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &*table3, Hook_RegisterInstance, Pre);
-	using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
-	g_PH.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);
-	g_PH.AddHookVFuncFunc(&IScriptVM::LookupFunction, &*table3, Hook_LookupFunction, Post);
-	g_PH.AddHookVFuncFunc(&IScriptVM::ReleaseFunction, &*table3, Hook_ReleaseFunction, Pre);
-	g_PH.AddHookVFuncFunc(&IScriptVM::ExecuteFunction, &*table3, Hook_ExecuteFunction, Pre);
+	//using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
+	//g_PH.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);
+	//g_PH.AddHookVFuncFunc(&IScriptVM::LookupFunction, &*table3, Hook_LookupFunction, Post);
+	//g_PH.AddHookVFuncFunc(&IScriptVM::ReleaseFunction, &*table3, Hook_ReleaseFunction, Pre);
+	//g_PH.AddHookVFuncFunc(&IScriptVM::ExecuteFunction, &*table3, Hook_ExecuteFunction, Pre);
 
 #if defined (CS2)
 	using HostStateRequestFn = void* (*)(CHostStateMgr *manager, CHostStateRequest* request);
@@ -824,20 +824,5 @@ void Source2SDK::OnServerStartup() {
 	g_MultiAddonManager.OnStartupServer();
 
 	RegisterEventListeners();
-
-	/*ConVarFlag flags = ConVarFlag::LinkedConcommand | ConVarFlag::Release | ConVarFlag::ClientCanExecute;
-	auto result = g_CommandManager.AddValveCommand("test_vote", "", flags);
-	g_CommandManager.AddCommandListener("test_vote", [](int caller, CommandCallingContext context, const plg::vector<plg::string>& arguments) {
-		g_PanoramaVoteHandler.SendYesNoVote(30, caller, "#SFUI_vote_swap_teams", "", "#SFUI_vote_swap_teams", "", 0, static_cast<uint64>(-1), [](int numVotes, int yesVotes, int noVotes, int numClients, const plg::vector<int>& clientInfoSlot, const plg::vector<int>& clientInfoItem) {
-			if (yesVotes > noVotes) {
-				utils::PrintChatAll("HUI!!!!!!!!!");
-				return true;
-			}
-			return false;
-		}, [](VoteAction, int, int) {
-
-		});
-		return ResultType::Continue;
-	}, HookMode::Post);*/
 }
 

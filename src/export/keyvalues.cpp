@@ -92,7 +92,7 @@ extern "C" PLUGIN_API KeyValues* KvFindKeyOrCreate(KeyValues* kv, const plg::str
  * @return Pointer to the newly created KeyValues subkey
  */
 extern "C" PLUGIN_API KeyValues* KvCreateKey(KeyValues* kv, const plg::string& keyName) {
-	return kv->CreateKey(keyName.c_str());
+	return kv->CreatePeerKey(keyName.c_str());
 }
 
 /**

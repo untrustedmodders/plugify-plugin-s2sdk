@@ -71,19 +71,21 @@ struct CTakeDamageInfoContainer {
 	//CTakeDamageInfo* info;
 };
 
+class CTakeDamage {
+public:
+	using ThisClass = CTakeDamage;
+	static constexpr const char m_className[] = "";
+
+	using handle = HSCRIPT;
+	VSCRIPT_GLOBAL_FUNCTION(CreateDamageInfo, handle, handle, handle, Vector, Vector, float, int)
+	VSCRIPT_GLOBAL_FUNCTION(DestroyDamageInfo, void, handle);
+};
+
 class CTakeDamageInfo {
 private:
 	[[maybe_unused]] uint8_t __pad0000[0x8];
 
 public:
-	CTakeDamageInfo() {
-		//addresses::CTakeDamageInfo_Constructor(this, nullptr, nullptr, nullptr, &vec3_origin, &vec3_origin, 0.f, 0, 0, nullptr);
-	}
-
-	CTakeDamageInfo(CBaseEntity* inflictor, CBaseEntity* attacker, CBaseEntity* ability, float damage, DamageTypes_t bitsDamageType) {
-		//addresses::CTakeDamageInfo_Constructor(this, inflictor, attacker, ability, &vec3_origin, &vec3_origin, damage, bitsDamageType, 0, nullptr);
-	}
-
 	Vector m_vecDamageForce;
 	Vector m_vecDamagePosition;
 	Vector m_vecReportedPosition;
