@@ -680,6 +680,7 @@
         GetWeaponCategory;
         GetWeaponGearSlot;
         GetWeaponItemDefinition;
+        GetWeaponItemDefinitionByName;
 
         *_Register;
         *_Unregister;

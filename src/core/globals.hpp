@@ -126,7 +126,7 @@ namespace addresses {
 
 	inline CCSWeaponBaseVData* (*GetCSWeaponDataFromKey)(int, const char*);
 
-	//inline int16_t (*GetItemDefinitionByName)(CEconItemSchema*, const char*);
+	inline int16_t (*GetItemDefinitionByName)(CEconItemSchema*, const char*);
 
 	inline v8::MaybeLocal<v8::Module> (*CSScript_ResolveModule)(v8::Local<v8::Context> context, v8::Local<v8::String> specifier, v8::Local<v8::FixedArray> import_assertions, v8::Local<v8::Module> referrer);
 

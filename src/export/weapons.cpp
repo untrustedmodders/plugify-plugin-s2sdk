@@ -20,10 +20,6 @@ extern "C" PLUGIN_API CCSWeaponBaseVData* GetWeaponVDataFromKey(const plg::strin
 	return addresses::GetCSWeaponDataFromKey(-1, name.c_str());
 }
 
-/*extern "C" PLUGIN_API CCSWeaponBaseVData* GetItemDefinitionByName(const plg::string& name) {
-	return addresses::GetItemDefinitionByName(name.c_str());
-}*/
-
 /**
  * @brief Retrieves the weapon VData for a given weapon.
  *
@@ -83,6 +79,18 @@ extern "C" PLUGIN_API uint16_t GetWeaponItemDefinition(int entityHandle) {
 	auto* weapon = helpers::GetEntity<CBasePlayerWeapon>(entityHandle);
 	if (!weapon) return {};
 	return weapon->m_AttributeManager->m_Item->m_iItemDefinitionIndex;
+}
+
+/**
+ * @brief Retrieves the item definition index associated with a given item name.
+ *
+ * @param name The name of the item.
+ * @return The item definition index if found; otherwise, 0 or an invalid value.
+ */
+extern "C" PLUGIN_API int16_t GetWeaponItemDefinitionByName(const plg::string& name) {
+	auto itemSchema = reinterpret_cast<CEconItemSchema*>(g_pSource2Server->GetEconItemSystem());
+	if (!itemSchema) return {};
+	return addresses::GetItemDefinitionByName(itemSchema, name.c_str());
 }
 
 PLUGIFY_WARN_POP()
