@@ -93,7 +93,8 @@ namespace helpers {
 
 		auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
 		if (!pawn) {
-			plg::print(LS_WARNING, "Cannot execute 'GetClientButtons' on invalid player pawn: {}\n", playerSlot);
+			plg::print(LS_WARNING, "Cannot execute '{}' on invalid player pawn: {}\n",
+				location.function_name(), playerSlot);
 			return {};
 		}
 

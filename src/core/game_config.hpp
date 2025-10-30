@@ -490,20 +490,30 @@ private:
 	friend class GameConfig;
 };
 
-#define TRY_GET_SIGNATURE(gameConfig, name, variable) \
-{ auto _result = (gameConfig)->GetSignature(name); \
-	if (!(_result)) { \
-		plg::print(LS_ERROR, "Failed to resolve signature: " #name " - {}\n", _result.error()); \
-	} variable = _result->RCast<decltype(variable)>(); }
+#define TRY_GET_SIGNATURE(gameConfig, name, variable)                                               \
+	{                                                                                               \
+		auto _result = (gameConfig) -> GetSignature(name);                                          \
+		if (!(_result)) {                                                                           \
+			plg::print(LS_ERROR, "Failed to resolve signature: " #name " - {}\n", _result.error()); \
+		}                                                                                           \
+		variable = _result->RCast<decltype(variable)>();                                            \
+	}
 
-#define TRY_GET_ADDRESS(gameConfig, name, variable) \
-{ auto _result = (gameConfig)->GetAddress(name); \
-	if (!(_result)) { \
-		plg::print(LS_ERROR, "Failed to resolve address: " #name " - {}\n", _result.error()); \
-	} variable = _result->RCast<decltype(variable)>(); }
+#define TRY_GET_ADDRESS(gameConfig, name, variable)                                                \
+	{                                                                                              \
+		auto _result = (gameConfig) -> GetAddress(name);                                           \
+		if (!(_result)) {                                                                          \
+			plg::print(LS_ERROR, "Failed to resolve address: " #name " - {}\n", _result.error());  \
+		}                                                                                          \
+		variable = _result->RCast<decltype(variable)>();                                           \
+	}
 
-#define TRY_GET_OFFSET(gameConfig, name, variable) \
-static std::optional<int> variable; if (!variable) { auto _result = (gameConfig)->GetOffset(name); \
-	if (!(_result)) { \
-		plg::print(LS_ERROR, "Failed to resolve offset: " #name " - {}\n", _result.error()); \
-	} variable = *_result; }
+#define TRY_GET_OFFSET(gameConfig, name, variable)                                                 \
+	static std::optional<int> variable;                                                            \
+	if (!variable) {                                                                               \
+		auto _result = (gameConfig) -> GetOffset(name);                                            \
+		if (!(_result)) {                                                                          \
+			plg::print(LS_ERROR, "Failed to resolve offset: " #name " - {}\n", _result.error());   \
+		}                                                                                          \
+		variable = *_result;                                                                       \
+	}

@@ -680,8 +680,7 @@ extern "C" PLUGIN_API double GetConVarDouble(uint64 conVarHandle) {
  * @return The current string value of the console variable.
  */
 extern "C" PLUGIN_API plg::string GetConVarString(uint64 conVarHandle) {
-	const CUtlString& str = cvars::GetConVarValueByHandle<CUtlString>(conVarHandle);
-	return { str.Get(), static_cast<size_t>(str.Length()) };
+	return cvars::GetConVarValueByHandle<CUtlString>(conVarHandle).Get();
 }
 
 /**
@@ -692,7 +691,7 @@ extern "C" PLUGIN_API plg::string GetConVarString(uint64 conVarHandle) {
  */
 extern "C" PLUGIN_API int GetConVarColor(uint64 conVarHandle) {
 	const Color& color = cvars::GetConVarValueByHandle<Color>(conVarHandle);
-	return color.GetRawColor();
+	return *reinterpret_cast<const int*>(&color);
 }
 
 /**

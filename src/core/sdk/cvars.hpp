@@ -257,7 +257,7 @@ namespace cvars {
 				}
 				case EConVarType_Color: {
 					const auto& color = GetConVarValue<Color>(*conVar);
-					return color.GetRawColor();
+					return *reinterpret_cast<const int*>(&color);
 				}
 				case EConVarType_Vector2: {
 					const auto& vec2 = GetConVarValue<Vector2D>(*conVar);

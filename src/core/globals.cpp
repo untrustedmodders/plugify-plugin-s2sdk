@@ -189,3 +189,10 @@ namespace entities {
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 }// namespace entities
+
+static_assert(std::is_trivially_copyable_v<Color>);
+static_assert(std::is_trivially_copyable_v<Vector2D>);
+static_assert(std::is_trivially_copyable_v<Vector>);
+static_assert(std::is_trivially_copyable_v<QAngle>);
+static_assert(std::is_trivially_copyable_v<Vector4D>);
+static_assert(std::is_trivially_copyable_v<Quaternion>);
