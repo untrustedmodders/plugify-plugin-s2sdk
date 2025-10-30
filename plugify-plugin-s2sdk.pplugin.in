@@ -19,9 +19,237 @@
   ],
   "methods": [
     {
+      "name": "AddBodyImpulseAtPosition",
+      "group": "Bodies",
+      "description": "Applies an impulse to an entity at a specific world position.",
+      "funcName": "AddBodyImpulseAtPosition",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "position",
+          "type": "vec3",
+          "ref": false,
+          "description": "The world position where the impulse will be applied."
+        },
+        {
+          "name": "impulse",
+          "type": "vec3",
+          "ref": false,
+          "description": "The impulse vector to apply."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "AddBodyVelocity",
+      "group": "Bodies",
+      "description": "Adds linear and angular velocity to the entity's physics object.",
+      "funcName": "AddBodyVelocity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "linearVelocity",
+          "type": "vec3",
+          "ref": false,
+          "description": "The linear velocity vector to add."
+        },
+        {
+          "name": "angularVelocity",
+          "type": "vec3",
+          "ref": false,
+          "description": "The angular velocity vector to add."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DetachBodyFromParent",
+      "group": "Bodies",
+      "description": "Detaches the entity from its parent.",
+      "funcName": "DetachBodyFromParent",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetBodySequence",
+      "group": "Bodies",
+      "description": "Retrieves the currently active sequence of the entity.",
+      "funcName": "GetBodySequence",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The sequence ID of the active sequence, or -1 if invalid."
+      }
+    },
+    {
+      "name": "IsBodyAttachedToParent",
+      "group": "Bodies",
+      "description": "Checks whether the entity is attached to a parent.",
+      "funcName": "IsBodyAttachedToParent",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if attached to a parent, false otherwise."
+      }
+    },
+    {
+      "name": "LookupBodySequence",
+      "group": "Bodies",
+      "description": "Looks up a sequence ID by its name.",
+      "funcName": "LookupBodySequence",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the sequence."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The sequence ID, or -1 if not found."
+      }
+    },
+    {
+      "name": "SetBodySequenceDuration",
+      "group": "Bodies",
+      "description": "Retrieves the duration of a specified sequence.",
+      "funcName": "SetBodySequenceDuration",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "sequenceName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the sequence."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The duration of the sequence in seconds, or 0 if invalid."
+      }
+    },
+    {
+      "name": "SetBodyAngularVelocity",
+      "group": "Bodies",
+      "description": "Sets the angular velocity of the entity.",
+      "funcName": "SetBodyAngularVelocity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "angVelocity",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new angular velocity vector."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetBodyMaterialGroup",
+      "group": "Bodies",
+      "description": "Sets the material group of the entity.",
+      "funcName": "SetBodyMaterialGroup",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "materialGroup",
+          "type": "string",
+          "ref": false,
+          "description": "The material group token to assign."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetBodyVelocity",
+      "group": "Bodies",
+      "description": "Sets the linear velocity of the entity.",
+      "funcName": "SetBodyVelocity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "velocity",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new velocity vector."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "EntPointerToPlayerSlot",
       "group": "Clients",
-      "description": "Retrieves The player slot from a given entity pointer.",
+      "description": "Retrieves the player slot from a given entity pointer.",
       "funcName": "EntPointerToPlayerSlot",
       "paramTypes": [
         {
@@ -82,7 +310,7 @@
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the client."
+          "description": "The index of the player's slot (0-based)."
         }
       ],
       "retType": {
@@ -151,7 +379,7 @@
       "funcName": "PlayerServicesToPlayerSlot",
       "paramTypes": [
         {
-          "name": "servicePtr",
+          "name": "service",
           "type": "ptr64",
           "ref": false,
           "description": "The service pointer. Like CCSPlayer_ItemServices, CCSPlayer_WeaponServices ect."
@@ -195,13 +423,13 @@
       ],
       "retType": {
         "type": "uint32",
-        "description": "Steam account ID."
+        "description": "uint32_t The client's steam account ID."
       }
     },
     {
       "name": "GetClientSteamID64",
       "group": "Clients",
-      "description": "Returns the client's SteamID64 — a unique 64-bit identifier of a Steam account.",
+      "description": "Returns the client's SteamID64 \u00e2\u20ac\u201d a unique 64-bit identifier of a Steam account.",
       "funcName": "GetClientSteamID64",
       "paramTypes": [
         {
@@ -213,7 +441,7 @@
       ],
       "retType": {
         "type": "uint64",
-        "description": "SteamID64"
+        "description": "uint64_t The client's SteamID64."
       }
     },
     {
@@ -231,7 +459,7 @@
       ],
       "retType": {
         "type": "string",
-        "description": "The IP address."
+        "description": "The client's IP address."
       }
     },
     {
@@ -520,163 +748,161 @@
       }
     },
     {
-      "name": "GetClientTeam",
+      "name": "GetClientMoveType",
       "group": "Clients",
-      "description": "Retrieves a client's team index.",
-      "funcName": "GetClientTeam",
+      "description": "Retrieves the movement type of an client.",
+      "funcName": "GetClientMoveType",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose movement type is to be retrieved."
         }
       ],
       "retType": {
         "type": "int32",
-        "description": "The team index of the client."
+        "description": "The movement type of the entity, or 0 if the entity is invalid.",
+        "enum": {
+          "name": "MoveType",
+          "description": "Enum representing various movement types for entities.",
+          "values": [
+            {
+              "value": 0,
+              "name": "None",
+              "description": "Never moves."
+            },
+            {
+              "value": 1,
+              "name": "Isometric",
+              "description": "Previously isometric movement type."
+            },
+            {
+              "value": 2,
+              "name": "Walk",
+              "description": "Player only - moving on the ground."
+            },
+            {
+              "value": 3,
+              "name": "Fly",
+              "description": "No gravity, but still collides with stuff."
+            },
+            {
+              "value": 4,
+              "name": "Flygravity",
+              "description": "Flies through the air and is affected by gravity."
+            },
+            {
+              "value": 5,
+              "name": "Vphysics",
+              "description": "Uses VPHYSICS for simulation."
+            },
+            {
+              "value": 6,
+              "name": "Push",
+              "description": "No clip to world, push and crush."
+            },
+            {
+              "value": 7,
+              "name": "Noclip",
+              "description": "No gravity, no collisions, still has velocity/avelocity."
+            },
+            {
+              "value": 8,
+              "name": "Ladder",
+              "description": "Used by players only when going onto a ladder."
+            },
+            {
+              "value": 9,
+              "name": "Observer",
+              "description": "Observer movement, depends on player's observer mode."
+            },
+            {
+              "value": 10,
+              "name": "Custom",
+              "description": "Allows the entity to describe its own physics."
+            }
+          ]
+        }
       }
     },
     {
-      "name": "SetClientTeam",
+      "name": "SetClientMoveType",
       "group": "Clients",
-      "description": "Sets a client's team index.",
-      "funcName": "SetClientTeam",
+      "description": "Sets the movement type of an client.",
+      "funcName": "SetClientMoveType",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose movement type is to be set."
         },
         {
-          "name": "team",
+          "name": "moveType",
           "type": "int32",
-          "ref": false,
-          "description": "The team index to set."
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "GetClientHealth",
-      "group": "Clients",
-      "description": "Returns the client's health.",
-      "funcName": "GetClientHealth",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        }
-      ],
-      "retType": {
-        "type": "int32",
-        "description": "The health value of the client."
-      }
-    },
-    {
-      "name": "SetClientHealth",
-      "group": "Clients",
-      "description": "Sets the client's health.",
-      "funcName": "SetClientHealth",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        },
-        {
-          "name": "health",
-          "type": "int32",
-          "ref": false,
-          "description": "The health value to set."
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "GetClientMaxHealth",
-      "group": "Clients",
-      "description": "Returns the client's max health.",
-      "funcName": "GetClientMaxHealth",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        }
-      ],
-      "retType": {
-        "type": "int32",
-        "description": "The max health value of the client."
-      }
-    },
-    {
-      "name": "SetClientMaxHealth",
-      "group": "Clients",
-      "description": "Sets the client's max health.",
-      "funcName": "SetClientMaxHealth",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        },
-        {
-          "name": "maxHealth",
-          "type": "int32",
-          "ref": false,
-          "description": "The max health value to set."
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "GetClientSpeed",
-      "group": "Clients",
-      "description": "Returns the client's speed value.",
-      "funcName": "GetClientSpeed",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        }
-      ],
-      "retType": {
-        "type": "float",
-        "description": "The speed value of the client."
-      }
-    },
-    {
-      "name": "SetClientSpeed",
-      "group": "Clients",
-      "description": "Sets the client's speed value.",
-      "funcName": "SetClientSpeed",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        },
-        {
-          "name": "speed",
-          "type": "float",
-          "ref": false,
-          "description": "The speed value to set."
+          "description": "The movement type of the entity, or 0 if the entity is invalid.",
+          "enum": {
+            "name": "MoveType",
+            "description": "Enum representing various movement types for entities.",
+            "values": [
+              {
+                "value": 0,
+                "name": "None",
+                "description": "Never moves."
+              },
+              {
+                "value": 1,
+                "name": "Isometric",
+                "description": "Previously isometric movement type."
+              },
+              {
+                "value": 2,
+                "name": "Walk",
+                "description": "Player only - moving on the ground."
+              },
+              {
+                "value": 3,
+                "name": "Fly",
+                "description": "No gravity, but still collides with stuff."
+              },
+              {
+                "value": 4,
+                "name": "Flygravity",
+                "description": "Flies through the air and is affected by gravity."
+              },
+              {
+                "value": 5,
+                "name": "Vphysics",
+                "description": "Uses VPHYSICS for simulation."
+              },
+              {
+                "value": 6,
+                "name": "Push",
+                "description": "No clip to world, push and crush."
+              },
+              {
+                "value": 7,
+                "name": "Noclip",
+                "description": "No gravity, no collisions, still has velocity/avelocity."
+              },
+              {
+                "value": 8,
+                "name": "Ladder",
+                "description": "Used by players only when going onto a ladder."
+              },
+              {
+                "value": 9,
+                "name": "Observer",
+                "description": "Observer movement, depends on player's observer mode."
+              },
+              {
+                "value": 10,
+                "name": "Custom",
+                "description": "Allows the entity to describe its own physics."
+              }
+            ]
+          }
         }
       ],
       "retType": {
@@ -686,38 +912,38 @@
     {
       "name": "GetClientGravity",
       "group": "Clients",
-      "description": "Returns the client's gravity value.",
+      "description": "Retrieves the gravity scale of an client.",
       "funcName": "GetClientGravity",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose gravity scale is to be retrieved."
         }
       ],
       "retType": {
         "type": "float",
-        "description": "The gravity value of the client."
+        "description": "The gravity scale of the client, or 0.0f if the client is invalid."
       }
     },
     {
       "name": "SetClientGravity",
       "group": "Clients",
-      "description": "Sets the client's gravity value.",
+      "description": "Sets the gravity scale of an client.",
       "funcName": "SetClientGravity",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose gravity scale is to be set."
         },
         {
           "name": "gravity",
           "type": "float",
           "ref": false,
-          "description": "The gravity value to set."
+          "description": "The new gravity scale to set for the client."
         }
       ],
       "retType": {
@@ -725,40 +951,356 @@
       }
     },
     {
-      "name": "GetClientArmor",
+      "name": "GetClientFlags",
       "group": "Clients",
-      "description": "Returns the client's armor value.",
-      "funcName": "GetClientArmor",
+      "description": "Retrieves the flags of an client.",
+      "funcName": "GetClientFlags",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose flags are to be retrieved."
         }
       ],
       "retType": {
         "type": "int32",
-        "description": "The armor value of the client."
+        "description": "The flags of the client, or 0 if the client is invalid."
       }
     },
     {
-      "name": "SetClientArmor",
+      "name": "SetClientFlags",
       "group": "Clients",
-      "description": "Sets the client's armor value.",
-      "funcName": "SetClientArmor",
+      "description": "Sets the flags of an client.",
+      "funcName": "SetClientFlags",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose flags are to be set."
         },
         {
-          "name": "armor",
+          "name": "flags",
           "type": "int32",
           "ref": false,
-          "description": "The armor value to set."
+          "description": "The new flags to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientRenderColor",
+      "group": "Clients",
+      "description": "Retrieves the render color of an client.",
+      "funcName": "GetClientRenderColor",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose render color is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The raw color value of the client's render color, or 0 if the client is invalid."
+      }
+    },
+    {
+      "name": "SetClientRenderColor",
+      "group": "Clients",
+      "description": "Sets the render color of an client.",
+      "funcName": "SetClientRenderColor",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose render color is to be set."
+        },
+        {
+          "name": "color",
+          "type": "int32",
+          "ref": false,
+          "description": "The new raw color value to set for the client's render color."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientRenderMode",
+      "group": "Clients",
+      "description": "Retrieves the render mode of an client.",
+      "funcName": "GetClientRenderMode",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose render mode is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "uint8",
+        "description": "The render mode of the client, or 0 if the client is invalid."
+      }
+    },
+    {
+      "name": "SetClientRenderMode",
+      "group": "Clients",
+      "description": "Sets the render mode of an client.",
+      "funcName": "SetClientRenderMode",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose render mode is to be set."
+        },
+        {
+          "name": "renderMode",
+          "type": "uint8",
+          "ref": false,
+          "description": "The new render mode to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientMass",
+      "group": "Clients",
+      "description": "Retrieves the mass of an client.",
+      "funcName": "GetClientMass",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose mass is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The mass of the client, or 0 if the client is invalid."
+      }
+    },
+    {
+      "name": "SetClientMass",
+      "group": "Clients",
+      "description": "Sets the mass of an client.",
+      "funcName": "SetClientMass",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose mass is to be set."
+        },
+        {
+          "name": "mass",
+          "type": "int32",
+          "ref": false,
+          "description": "The new mass value to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientFriction",
+      "group": "Clients",
+      "description": "Retrieves the friction of an client.",
+      "funcName": "GetClientFriction",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose friction is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The friction of the client, or 0 if the client is invalid."
+      }
+    },
+    {
+      "name": "SetClientFriction",
+      "group": "Clients",
+      "description": "Sets the friction of an client.",
+      "funcName": "SetClientFriction",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose friction is to be set."
+        },
+        {
+          "name": "friction",
+          "type": "float",
+          "ref": false,
+          "description": "The new friction value to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OverrideClientFriction",
+      "group": "Clients",
+      "description": "Sets the friction of an client.",
+      "funcName": "OverrideClientFriction",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose friction is to be set."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Takes duration, value for a temporary override."
+        },
+        {
+          "name": "friction",
+          "type": "float",
+          "ref": false,
+          "description": "The new friction value to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientHealth",
+      "group": "Clients",
+      "description": "Retrieves the health of an client.",
+      "funcName": "GetClientHealth",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose health is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The health of the client, or 0 if the client is invalid."
+      }
+    },
+    {
+      "name": "SetClientHealth",
+      "group": "Clients",
+      "description": "Sets the health of an client.",
+      "funcName": "SetClientHealth",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose health is to be set."
+        },
+        {
+          "name": "health",
+          "type": "int32",
+          "ref": false,
+          "description": "The new health value to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientMaxHealth",
+      "group": "Clients",
+      "description": "Retrieves the max health of an client.",
+      "funcName": "GetClientMaxHealth",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose max health is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The max health of the client, or 0 if the client is invalid."
+      }
+    },
+    {
+      "name": "SetClientMaxHealth",
+      "group": "Clients",
+      "description": "Sets the max health of an client.",
+      "funcName": "SetClientMaxHealth",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose max health is to be set."
+        },
+        {
+          "name": "maxHealth",
+          "type": "int32",
+          "ref": false,
+          "description": "The new max health value to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientTeam",
+      "group": "Clients",
+      "description": "Retrieves the team number of an client.",
+      "funcName": "GetClientTeam",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose team number is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The team number of the client, or 0 if the client is invalid."
+      }
+    },
+    {
+      "name": "SetClientTeam",
+      "group": "Clients",
+      "description": "Sets the team number of an client.",
+      "funcName": "SetClientTeam",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose team number is to be set."
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The new team number to set for the client."
         }
       ],
       "retType": {
@@ -768,38 +1310,79 @@
     {
       "name": "GetClientAbsOrigin",
       "group": "Clients",
-      "description": "Retrieves the client's origin vector.",
+      "description": "Retrieves the absolute origin of an client.",
       "funcName": "GetClientAbsOrigin",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose absolute origin is to be retrieved."
         }
       ],
       "retType": {
         "type": "vec3",
-        "description": "A Vector where the client's origin will be stored."
+        "description": "A vector where the absolute origin will be stored."
       }
     },
     {
       "name": "SetClientAbsOrigin",
       "group": "Clients",
-      "description": "Sets the client's origin vector.",
+      "description": "Sets the absolute origin of an client.",
       "funcName": "SetClientAbsOrigin",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose absolute origin is to be set."
         },
         {
           "name": "origin",
           "type": "vec3",
           "ref": false,
-          "description": "The new origin vector to set."
+          "description": "The new absolute origin to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientAbsScale",
+      "group": "Clients",
+      "description": "Retrieves the absolute scale of an client.",
+      "funcName": "GetClientAbsScale",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose absolute scale is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "A vector where the absolute scale will be stored."
+      }
+    },
+    {
+      "name": "SetClientAbsScale",
+      "group": "Clients",
+      "description": "Sets the absolute scale of an client.",
+      "funcName": "SetClientAbsScale",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose absolute scale is to be set."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "ref": false,
+          "description": "The new absolute scale to set for the client."
         }
       ],
       "retType": {
@@ -809,38 +1392,161 @@
     {
       "name": "GetClientAbsAngles",
       "group": "Clients",
-      "description": "Retrieves the client's position angle.",
+      "description": "Retrieves the angular rotation of an client.",
       "funcName": "GetClientAbsAngles",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose angular rotation is to be retrieved."
         }
       ],
       "retType": {
         "type": "vec3",
-        "description": "A QAngle where the client's position angle will be stored."
+        "description": "A QAngle where the angular rotation will be stored."
       }
     },
     {
       "name": "SetClientAbsAngles",
       "group": "Clients",
-      "description": "Sets the client's absolute rotation angles.",
+      "description": "Sets the angular rotation of an client.",
       "funcName": "SetClientAbsAngles",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose angular rotation is to be set."
         },
         {
-          "name": "angles",
+          "name": "angle",
           "type": "vec3",
           "ref": false,
-          "description": "The new rotation angles to set."
+          "description": "The new angular rotation to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientLocalOrigin",
+      "group": "Clients",
+      "description": "Retrieves the local origin of an client.",
+      "funcName": "GetClientLocalOrigin",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose local origin is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the local origin will be stored."
+      }
+    },
+    {
+      "name": "SetClientLocalOrigin",
+      "group": "Clients",
+      "description": "Sets the local origin of an client.",
+      "funcName": "SetClientLocalOrigin",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose local origin is to be set."
+        },
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new local origin to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientLocalScale",
+      "group": "Clients",
+      "description": "Retrieves the local scale of an client.",
+      "funcName": "GetClientLocalScale",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose local scale is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "A vector where the local scale will be stored."
+      }
+    },
+    {
+      "name": "SetClientLocalScale",
+      "group": "Clients",
+      "description": "Sets the local scale of an client.",
+      "funcName": "SetClientLocalScale",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose local scale is to be set."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "ref": false,
+          "description": "The new local scale to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientLocalAngles",
+      "group": "Clients",
+      "description": "Retrieves the angular rotation of an client.",
+      "funcName": "GetClientLocalAngles",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose angular rotation is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A QAngle where the angular rotation will be stored."
+      }
+    },
+    {
+      "name": "SetClientLocalAngles",
+      "group": "Clients",
+      "description": "Sets the angular rotation of an client.",
+      "funcName": "SetClientLocalAngles",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose angular rotation is to be set."
+        },
+        {
+          "name": "angle",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new angular rotation to set for the client."
         }
       ],
       "retType": {
@@ -850,14 +1556,14 @@
     {
       "name": "GetClientAbsVelocity",
       "group": "Clients",
-      "description": "Retrieves the absolute velocity of a client.",
+      "description": "Retrieves the absolute velocity of an client.",
       "funcName": "GetClientAbsVelocity",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The handle of the client whose absolute velocity is to be retrieved."
+          "description": "The index of the player's slot whose absolute velocity is to be retrieved."
         }
       ],
       "retType": {
@@ -868,14 +1574,14 @@
     {
       "name": "SetClientAbsVelocity",
       "group": "Clients",
-      "description": "Sets the absolute velocity of a client.",
+      "description": "Sets the absolute velocity of an client.",
       "funcName": "SetClientAbsVelocity",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The handle of the client whose absolute velocity is to be set."
+          "description": "The index of the player's slot whose absolute velocity is to be set."
         },
         {
           "name": "velocity",
@@ -889,44 +1595,1128 @@
       }
     },
     {
+      "name": "GetClientBaseVelocity",
+      "group": "Clients",
+      "description": "Retrieves the base velocity of an client.",
+      "funcName": "GetClientBaseVelocity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose base velocity is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the base velocity will be stored."
+      }
+    },
+    {
+      "name": "GetClientLocalAngVelocity",
+      "group": "Clients",
+      "description": "Retrieves the local angular velocity of an client.",
+      "funcName": "GetClientLocalAngVelocity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose local angular velocity is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the local angular velocity will be stored."
+      }
+    },
+    {
+      "name": "GetClientAngVelocity",
+      "group": "Clients",
+      "description": "Retrieves the angular velocity of an client.",
+      "funcName": "GetClientAngVelocity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose angular velocity is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the angular velocity will be stored."
+      }
+    },
+    {
+      "name": "SetClientAngVelocity",
+      "group": "Clients",
+      "description": "Sets the angular velocity of an client.",
+      "funcName": "SetClientAngVelocity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose angular velocity is to be set."
+        },
+        {
+          "name": "velocity",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new angular velocity to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientLocalVelocity",
+      "group": "Clients",
+      "description": "Retrieves the local velocity of an client.",
+      "funcName": "GetClientLocalVelocity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose local velocity is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the local velocity will be stored."
+      }
+    },
+    {
+      "name": "TransformPointClientToWorld",
+      "group": "Clients",
+      "description": "Returns the input Vector transformed from client to world space.",
+      "funcName": "TransformPointClientToWorld",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot"
+        },
+        {
+          "name": "point",
+          "type": "vec3",
+          "ref": false,
+          "description": "Point in client local space to transform"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "The point transformed to world space coordinates"
+      }
+    },
+    {
+      "name": "TransformPointWorldToClient",
+      "group": "Clients",
+      "description": "Returns the input Vector transformed from world to client space.",
+      "funcName": "TransformPointWorldToClient",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot"
+        },
+        {
+          "name": "point",
+          "type": "vec3",
+          "ref": false,
+          "description": "Point in world space to transform"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "The point transformed to client local space coordinates"
+      }
+    },
+    {
+      "name": "GetClientEyePosition",
+      "group": "Clients",
+      "description": "Get vector to eye position - absolute coords.",
+      "funcName": "GetClientEyePosition",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Eye position in absolute/world coordinates"
+      }
+    },
+    {
       "name": "GetClientEyeAngles",
       "group": "Clients",
-      "description": "Retrieves the client's eye angle.",
+      "description": "Get the qangles that this client is looking at.",
       "funcName": "GetClientEyeAngles",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot"
         }
       ],
       "retType": {
         "type": "vec3",
-        "description": "A QAngle where the client's eye angle will be stored."
+        "description": "Eye angles as a vector (pitch, yaw, roll)"
       }
     },
     {
-      "name": "SetClientEyeAngles",
+      "name": "SetClientForwardVector",
       "group": "Clients",
-      "description": "Sets the client's eye angles.",
-      "funcName": "SetClientEyeAngles",
+      "description": "Sets the forward velocity of an client.",
+      "funcName": "SetClientForwardVector",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot."
+          "description": "The index of the player's slot whose forward velocity is to be set."
         },
         {
-          "name": "angles",
+          "name": "forward",
           "type": "vec3",
-          "ref": false,
-          "description": "The new eye angles to set."
+          "ref": false
         }
       ],
       "retType": {
         "type": "void"
+      }
+    },
+    {
+      "name": "GetClientForwardVector",
+      "group": "Clients",
+      "description": "Get the forward vector of the client.",
+      "funcName": "GetClientForwardVector",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Forward-facing direction vector of the client"
+      }
+    },
+    {
+      "name": "GetClientLeftVector",
+      "group": "Clients",
+      "description": "Get the left vector of the client.",
+      "funcName": "GetClientLeftVector",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Left-facing direction vector of the client (aligned with the y axis)"
+      }
+    },
+    {
+      "name": "GetClientRightVector",
+      "group": "Clients",
+      "description": "Get the right vector of the client.",
+      "funcName": "GetClientRightVector",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Right-facing direction vector of the client"
+      }
+    },
+    {
+      "name": "GetClientUpVector",
+      "group": "Clients",
+      "description": "Get the up vector of the client.",
+      "funcName": "GetClientUpVector",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Up-facing direction vector of the client"
+      }
+    },
+    {
+      "name": "GetClientTransform",
+      "group": "Clients",
+      "description": "Get the client-to-world transformation matrix.",
+      "funcName": "GetClientTransform",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to query"
+        }
+      ],
+      "retType": {
+        "type": "mat4x4",
+        "description": "4x4 transformation matrix representing client's position, rotation, and scale in world space"
+      }
+    },
+    {
+      "name": "GetClientModel",
+      "group": "Clients",
+      "description": "Retrieves the model name of an client.",
+      "funcName": "GetClientModel",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose model name is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "A string where the model name will be stored."
+      }
+    },
+    {
+      "name": "SetClientModel",
+      "group": "Clients",
+      "description": "Sets the model name of an client.",
+      "funcName": "SetClientModel",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose model name is to be set."
+        },
+        {
+          "name": "model",
+          "type": "string",
+          "ref": false,
+          "description": "The new model name to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientWaterLevel",
+      "group": "Clients",
+      "description": "Retrieves the water level of an client.",
+      "funcName": "GetClientWaterLevel",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose water level is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The water level of the client, or 0.0f if the client is invalid."
+      }
+    },
+    {
+      "name": "GetClientGroundEntity",
+      "group": "Clients",
+      "description": "Retrieves the ground client of an client.",
+      "funcName": "GetClientGroundEntity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose ground client is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The handle of the ground client, or INVALID_EHANDLE_INDEX if the client is invalid."
+      }
+    },
+    {
+      "name": "GetClientEffects",
+      "group": "Clients",
+      "description": "Retrieves the effects of an client.",
+      "funcName": "GetClientEffects",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose effects are to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The effect flags of the client, or 0 if the client is invalid."
+      }
+    },
+    {
+      "name": "AddClientEffects",
+      "group": "Clients",
+      "description": "Adds the render effect flag to an client.",
+      "funcName": "AddClientEffects",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to modify"
+        },
+        {
+          "name": "effects",
+          "type": "int32",
+          "ref": false,
+          "description": "Render effect flags to add"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "RemoveClientEffects",
+      "group": "Clients",
+      "description": "Removes the render effect flag from an client.",
+      "funcName": "RemoveClientEffects",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to modify"
+        },
+        {
+          "name": "effects",
+          "type": "int32",
+          "ref": false,
+          "description": "Render effect flags to remove"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientBoundingMaxs",
+      "group": "Clients",
+      "description": "Get a vector containing max bounds, centered on object.",
+      "funcName": "GetClientBoundingMaxs",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Vector containing the maximum bounds of the client's bounding box"
+      }
+    },
+    {
+      "name": "GetClientBoundingMins",
+      "group": "Clients",
+      "description": "Get a vector containing min bounds, centered on object.",
+      "funcName": "GetClientBoundingMins",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Vector containing the minimum bounds of the client's bounding box"
+      }
+    },
+    {
+      "name": "GetClientCenter",
+      "group": "Clients",
+      "description": "Get vector to center of object - absolute coords.",
+      "funcName": "GetClientCenter",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Vector pointing to the center of the client in absolute/world coordinates"
+      }
+    },
+    {
+      "name": "TeleportClient",
+      "group": "Clients",
+      "description": "Teleports an client to a specified location and orientation.",
+      "funcName": "TeleportClient",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to teleport."
+        },
+        {
+          "name": "origin",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to a Vector representing the new absolute position. Can be nullptr."
+        },
+        {
+          "name": "angles",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to a QAngle representing the new orientation. Can be nullptr."
+        },
+        {
+          "name": "velocity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to a Vector representing the new velocity. Can be nullptr."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ApplyAbsVelocityImpulseToClient",
+      "group": "Clients",
+      "description": "Apply an absolute velocity impulse to an client.",
+      "funcName": "ApplyAbsVelocityImpulseToClient",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to apply impulse to"
+        },
+        {
+          "name": "vecImpulse",
+          "type": "vec3",
+          "ref": false,
+          "description": "Velocity impulse vector to apply"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ApplyLocalAngularVelocityImpulseToClient",
+      "group": "Clients",
+      "description": "Apply a local angular velocity impulse to an client.",
+      "funcName": "ApplyLocalAngularVelocityImpulseToClient",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to apply impulse to"
+        },
+        {
+          "name": "angImpulse",
+          "type": "vec3",
+          "ref": false,
+          "description": "Angular velocity impulse vector to apply"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "AcceptClientInput",
+      "group": "Clients",
+      "description": "Invokes a named input method on a specified client.",
+      "funcName": "AcceptClientInput",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the target client that will receive the input."
+        },
+        {
+          "name": "inputName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the input action to invoke."
+        },
+        {
+          "name": "activatorHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot that initiated the sequence of actions."
+        },
+        {
+          "name": "callerHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot sending this event. Use -1 to specify"
+        },
+        {
+          "name": "value",
+          "type": "any",
+          "ref": false,
+          "description": "The value associated with the input action."
+        },
+        {
+          "name": "type",
+          "type": "int32",
+          "ref": false,
+          "description": "The type or classification of the value.",
+          "enum": {
+            "name": "FieldType",
+            "description": "Represents the possible types of data that can be passed as a value in input actions.",
+            "values": [
+              {
+                "value": 0,
+                "name": "Auto",
+                "description": "Automatically detect the type of the value."
+              },
+              {
+                "value": 1,
+                "name": "Float32",
+                "description": "A 32-bit floating-point number."
+              },
+              {
+                "value": 2,
+                "name": "Float64",
+                "description": "A 64-bit floating-point number."
+              },
+              {
+                "value": 3,
+                "name": "Int32",
+                "description": "A 32-bit signed integer."
+              },
+              {
+                "value": 4,
+                "name": "UInt32",
+                "description": "A 32-bit unsigned integer."
+              },
+              {
+                "value": 5,
+                "name": "Int64",
+                "description": "A 64-bit signed integer."
+              },
+              {
+                "value": 6,
+                "name": "UInt64",
+                "description": "A 64-bit unsigned integer."
+              },
+              {
+                "value": 7,
+                "name": "Boolean",
+                "description": "A boolean value (true or false)."
+              },
+              {
+                "value": 8,
+                "name": "Character",
+                "description": "A single character."
+              },
+              {
+                "value": 9,
+                "name": "String",
+                "description": "A managed string object."
+              },
+              {
+                "value": 10,
+                "name": "CString",
+                "description": "A null-terminated C-style string."
+              },
+              {
+                "value": 11,
+                "name": "HScript",
+                "description": "A script handle, typically for scripting integration."
+              },
+              {
+                "value": 12,
+                "name": "EHandle",
+                "description": "An entity handle, used to reference an entity within the system."
+              },
+              {
+                "value": 13,
+                "name": "Resource",
+                "description": "A resource handle, such as a file or asset reference."
+              },
+              {
+                "value": 14,
+                "name": "Vector3d",
+                "description": "A 3D vector, typically representing position or direction."
+              },
+              {
+                "value": 15,
+                "name": "Vector2d",
+                "description": "A 2D vector, for planar data or coordinates."
+              },
+              {
+                "value": 16,
+                "name": "Vector4d",
+                "description": "A 4D vector, often used for advanced mathematical representations."
+              },
+              {
+                "value": 17,
+                "name": "Color32",
+                "description": "A 32-bit color value (RGBA)."
+              },
+              {
+                "value": 18,
+                "name": "QAngle",
+                "description": "A quaternion-based angle representation."
+              },
+              {
+                "value": 19,
+                "name": "Quaternion",
+                "description": "A quaternion, used for rotation and orientation calculations."
+              }
+            ]
+          }
+        },
+        {
+          "name": "outputId",
+          "type": "int32",
+          "ref": false,
+          "description": "An identifier for tracking the output of this operation."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ConnectClientOutput",
+      "group": "Clients",
+      "description": "Connects a script function to an player output.",
+      "funcName": "ConnectClientOutput",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the player."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output to connect to."
+        },
+        {
+          "name": "functionName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the script function to call."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DisconnectClientOutput",
+      "group": "Clients",
+      "description": "Disconnects a script function from an player output.",
+      "funcName": "DisconnectClientOutput",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the player."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output."
+        },
+        {
+          "name": "functionName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the script function to disconnect."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DisconnectClientRedirectedOutput",
+      "group": "Clients",
+      "description": "Disconnects a script function from an I/O event on a different player.",
+      "funcName": "DisconnectClientRedirectedOutput",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the calling player."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output."
+        },
+        {
+          "name": "functionName",
+          "type": "string",
+          "ref": false,
+          "description": "The function name to disconnect."
+        },
+        {
+          "name": "targetHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose output is being disconnected."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "FireClientOutput",
+      "group": "Clients",
+      "description": "Fires an player output.",
+      "funcName": "FireClientOutput",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the player firing the output."
+        },
+        {
+          "name": "outputName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output to fire."
+        },
+        {
+          "name": "activatorHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The entity activating the output."
+        },
+        {
+          "name": "callerHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The entity that called the output."
+        },
+        {
+          "name": "value",
+          "type": "any",
+          "ref": false,
+          "description": "The value associated with the input action."
+        },
+        {
+          "name": "type",
+          "type": "int32",
+          "ref": false,
+          "description": "The type or classification of the value.",
+          "enum": {
+            "name": "FieldType",
+            "description": "Represents the possible types of data that can be passed as a value in input actions.",
+            "values": [
+              {
+                "value": 0,
+                "name": "Auto",
+                "description": "Automatically detect the type of the value."
+              },
+              {
+                "value": 1,
+                "name": "Float32",
+                "description": "A 32-bit floating-point number."
+              },
+              {
+                "value": 2,
+                "name": "Float64",
+                "description": "A 64-bit floating-point number."
+              },
+              {
+                "value": 3,
+                "name": "Int32",
+                "description": "A 32-bit signed integer."
+              },
+              {
+                "value": 4,
+                "name": "UInt32",
+                "description": "A 32-bit unsigned integer."
+              },
+              {
+                "value": 5,
+                "name": "Int64",
+                "description": "A 64-bit signed integer."
+              },
+              {
+                "value": 6,
+                "name": "UInt64",
+                "description": "A 64-bit unsigned integer."
+              },
+              {
+                "value": 7,
+                "name": "Boolean",
+                "description": "A boolean value (true or false)."
+              },
+              {
+                "value": 8,
+                "name": "Character",
+                "description": "A single character."
+              },
+              {
+                "value": 9,
+                "name": "String",
+                "description": "A managed string object."
+              },
+              {
+                "value": 10,
+                "name": "CString",
+                "description": "A null-terminated C-style string."
+              },
+              {
+                "value": 11,
+                "name": "HScript",
+                "description": "A script handle, typically for scripting integration."
+              },
+              {
+                "value": 12,
+                "name": "EHandle",
+                "description": "An entity handle, used to reference an entity within the system."
+              },
+              {
+                "value": 13,
+                "name": "Resource",
+                "description": "A resource handle, such as a file or asset reference."
+              },
+              {
+                "value": 14,
+                "name": "Vector3d",
+                "description": "A 3D vector, typically representing position or direction."
+              },
+              {
+                "value": 15,
+                "name": "Vector2d",
+                "description": "A 2D vector, for planar data or coordinates."
+              },
+              {
+                "value": 16,
+                "name": "Vector4d",
+                "description": "A 4D vector, often used for advanced mathematical representations."
+              },
+              {
+                "value": 17,
+                "name": "Color32",
+                "description": "A 32-bit color value (RGBA)."
+              },
+              {
+                "value": 18,
+                "name": "QAngle",
+                "description": "A quaternion-based angle representation."
+              },
+              {
+                "value": 19,
+                "name": "Quaternion",
+                "description": "A quaternion, used for rotation and orientation calculations."
+              }
+            ]
+          }
+        },
+        {
+          "name": "delay",
+          "type": "float",
+          "ref": false,
+          "description": "Delay in seconds before firing the output."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "RedirectClientOutput",
+      "group": "Clients",
+      "description": "Redirects an player output to call a function on another player.",
+      "funcName": "RedirectClientOutput",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the player whose output is being redirected."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output to redirect."
+        },
+        {
+          "name": "functionName",
+          "type": "string",
+          "ref": false,
+          "description": "The function name to call on the target player."
+        },
+        {
+          "name": "targetHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity that will receive the output call."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "FollowClient",
+      "group": "Clients",
+      "description": "Makes an client follow another client with optional bone merging.",
+      "funcName": "FollowClient",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot that will follow"
+        },
+        {
+          "name": "attachmentHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to follow"
+        },
+        {
+          "name": "boneMerge",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, bones will be merged between entities"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "FollowClientMerge",
+      "group": "Clients",
+      "description": "Makes an client follow another client and merge with a specific bone or attachment.",
+      "funcName": "FollowClientMerge",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot that will follow"
+        },
+        {
+          "name": "attachmentHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot to follow"
+        },
+        {
+          "name": "boneOrAttachName",
+          "type": "string",
+          "ref": false,
+          "description": "Name of the bone or attachment point to merge with"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "TakeClientDamage",
+      "group": "Clients",
+      "description": "Apply damage to an client.",
+      "funcName": "TakeClientDamage",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot receiving damage"
+        },
+        {
+          "name": "inflictorSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot inflicting damage (e.g., projectile)"
+        },
+        {
+          "name": "attackerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the attacking client"
+        },
+        {
+          "name": "force",
+          "type": "vec3",
+          "ref": false,
+          "description": "Direction and magnitude of force to apply"
+        },
+        {
+          "name": "hitPos",
+          "type": "vec3",
+          "ref": false,
+          "description": "Position where the damage hit occurred"
+        },
+        {
+          "name": "damage",
+          "type": "float",
+          "ref": false,
+          "description": "Amount of damage to apply"
+        },
+        {
+          "name": "damageTypes",
+          "type": "int32",
+          "ref": false,
+          "description": "Bitfield of damage type flags"
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "Amount of damage actually applied to the client"
       }
     },
     {
@@ -987,33 +2777,7 @@
           "name": "team",
           "type": "int32",
           "ref": false,
-          "description": "The team index to switch the client to.",
-          "enum": {
-            "name": "CSTeam",
-            "description": "Enum representing the possible teams in Counter-Strike.",
-            "values": [
-              {
-                "value": 0,
-                "name": "None",
-                "description": "No team."
-              },
-              {
-                "value": 1,
-                "name": "Spectator",
-                "description": "Spectator team."
-              },
-              {
-                "value": 2,
-                "name": "T",
-                "description": "Terrorist team."
-              },
-              {
-                "value": 3,
-                "name": "CT",
-                "description": "Counter-Terrorist team."
-              }
-            ]
-          }
+          "description": "The team index to switch the client to."
         }
       ],
       "retType": {
@@ -1142,27 +2906,46 @@
       }
     },
     {
-      "name": "GetClientModel",
+      "name": "GetClientActiveWeapon",
       "group": "Clients",
-      "description": "Retrieves the model name of a client.",
-      "funcName": "GetClientModel",
+      "description": "Retrieves the handle of the client's currently active weapon.",
+      "funcName": "GetClientActiveWeapon",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
-          "ref": false
+          "ref": false,
+          "description": "The index of the player's slot."
         }
       ],
       "retType": {
-        "type": "string",
-        "description": "A string where the model name will be stored."
+        "type": "int32",
+        "description": "The entity handle of the active weapon, or INVALID_EHANDLE_INDEX if the client is invalid or has no active weapon."
       }
     },
     {
-      "name": "SetClientModel",
+      "name": "GetClientWeapons",
       "group": "Clients",
-      "description": "Sets the model name of a client.",
-      "funcName": "SetClientModel",
+      "description": "Retrieves a list of weapon handles owned by the client.",
+      "funcName": "GetClientWeapons",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32[]",
+        "description": "A vector of entity handles for the client's weapons, or an empty vector if the client is invalid or has no weapons."
+      }
+    },
+    {
+      "name": "RemoveWeapons",
+      "group": "Clients",
+      "description": "Removes all weapons from a client, with an option to remove the suit as well.",
+      "funcName": "RemoveWeapons",
       "paramTypes": [
         {
           "name": "playerSlot",
@@ -1171,10 +2954,10 @@
           "description": "The index of the player's slot."
         },
         {
-          "name": "model",
-          "type": "string",
+          "name": "removeSuit",
+          "type": "bool",
           "ref": false,
-          "description": "The new model name to set for the client."
+          "description": "A boolean indicating whether to also remove the client's suit."
         }
       ],
       "retType": {
@@ -1182,457 +2965,404 @@
       }
     },
     {
-        "name": "GetClientActiveWeapon",
-        "group": "Clients",
-        "description": "Retrieves the handle of the client's currently active weapon.",
-        "funcName": "GetClientActiveWeapon",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            }
-        ],
-        "retType": {
-            "type": "int32",
-            "description": "The entity handle of the active weapon, or INVALID_EHANDLE_INDEX if the client is invalid or has no active weapon."
-        }
-    },
-    {
-        "name": "GetClientWeapons",
-        "group": "Clients",
-        "description": "Retrieves a list of weapon handles owned by the client.",
-        "funcName": "GetClientWeapons",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            }
-        ],
-        "retType": {
-            "type": "int32[]",
-            "description": "A vector of entity handles for the client's weapons, or an empty vector if the client is invalid or has no weapons."
-        }
-    },
-    {
-        "name": "DropWeapon",
-        "group": "Clients",
-        "description": "Forces a player to drop their weapon.",
-        "funcName": "DropWeapon",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the player's slot."
-            },
-            {
-                "name": "weaponHandle",
-                "type": "int32",
-                "ref": false,
-                "description": "The handle of weapon to drop."
-            },
-            {
-                "name": "target",
-                "type": "vec3",
-                "ref": false,
-                "description": "Target direction."
-            },
-            {
-                "name": "velocity",
-                "type": "vec3",
-                "ref": false,
-                "description": "Velocity to toss weapon or zero to just drop weapon."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-    {
-        "name": "RemoveWeapons",
-        "group": "Clients",
-        "description": "Removes all weapons from a client, with an option to remove the suit as well.",
-        "funcName": "RemoveWeapons",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "removeSuit",
-                "type": "bool",
-                "ref": false,
-                "description": "A boolean indicating whether to also remove the client's suit."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-    {
-        "name": "SelectWeapon",
-        "group": "Clients",
-        "description": "Selects a player's weapon.",
-        "funcName": "SelectWeapon",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "weaponHandle",
-                "type": "int32",
-                "ref": false,
-                "description": "The handle of weapon to bump."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-    {
-        "name": "SwitchWeapon",
-        "group": "Clients",
-        "description": "Switches a player's weapon.",
-        "funcName": "SwitchWeapon",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "weaponHandle",
-                "type": "int32",
-                "ref": false,
-                "description": "The handle of weapon to switch."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-    {
-        "name": "RemoveWeapon",
-        "group": "Clients",
-        "description": "Removes a player's weapon.",
-        "funcName": "RemoveWeapon",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "weaponHandle",
-                "type": "int32",
-                "ref": false,
-                "description": "The handle of weapon to remove."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-    {
-        "name": "GiveNamedItem",
-        "group": "Clients",
-        "description": "Gives a named item (e.g., weapon) to a client.",
-        "funcName": "GiveNamedItem",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "itemName",
-                "type": "string",
-                "ref": false,
-                "description": "The name of the item to give."
-            }
-        ],
-        "retType": {
-            "type": "int32",
-            "description": "The entity handle of the created item, or INVALID_EHANDLE_INDEX if the client or item is invalid."
-        }
-    },
-    {
-        "name": "GetClientButtons",
-        "group": "Clients",
-        "description": "Retrieves the state of a specific button for a client.",
-        "funcName": "GetClientButtons",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "buttonIndex",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the button (0-2)."
-            }
-        ],
-        "retType": {
-            "type": "uint64",
-            "description": "The state of the specified button, or 0 if the client or button index is invalid."
-        }
-    },
-    {
-        "name": "GetClientMoney",
-        "group": "Clients",
-        "description": "Retrieves the amount of money a client has.",
-        "funcName": "GetClientMoney",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            }
-        ],
-        "retType": {
-            "type": "int32",
-            "description": "The amount of money the client has, or 0 if The player slot is invalid."
-        }
-    },
-    {
-        "name": "SetClientMoney",
-        "group": "Clients",
-        "description": "Sets the amount of money for a client.",
-        "funcName": "SetClientMoney",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "money",
-                "type": "int32",
-                "ref": false,
-                "description": "The amount of money to set."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-    {
-        "name": "GetClientKills",
-        "group": "Clients",
-        "description": "Retrieves the number of kills for a client.",
-        "funcName": "GetClientKills",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            }
-        ],
-        "retType": {
-            "type": "int32",
-            "description": "The number of kills the client has, or 0 if The player slot is invalid."
-        }
-    },
-    {
-        "name": "SetClientKills",
-        "group": "Clients",
-        "description": "Sets the number of kills for a client.",
-        "funcName": "SetClientKills",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "kills",
-                "type": "int32",
-                "ref": false,
-                "description": "The number of kills to set."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-    {
-        "name": "GetClientDeaths",
-        "group": "Clients",
-        "description": "Retrieves the number of deaths for a client.",
-        "funcName": "GetClientDeaths",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            }
-        ],
-        "retType": {
-            "type": "int32",
-            "description": "The number of deaths the client has, or 0 if The player slot is invalid."
-        }
-    },
-    {
-        "name": "SetClientDeaths",
-        "group": "Clients",
-        "description": "Sets the number of deaths for a client.",
-        "funcName": "SetClientDeaths",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "deaths",
-                "type": "int32",
-                "ref": false,
-                "description": "The number of deaths to set."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-    {
-        "name": "GetClientAssists",
-        "group": "Clients",
-        "description": "Retrieves the number of assists for a client.",
-        "funcName": "GetClientAssists",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            }
-        ],
-        "retType": {
-            "type": "int32",
-            "description": "The number of assists the client has, or 0 if The player slot is invalid."
-        }
-    },
-    {
-        "name": "SetClientAssists",
-        "group": "Clients",
-        "description": "Sets the number of assists for a client.",
-        "funcName": "SetClientAssists",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "assists",
-                "type": "int32",
-                "ref": false,
-                "description": "The number of assists to set."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-    {
-        "name": "GetClientDamage",
-        "group": "Clients",
-        "description": "Retrieves the total damage dealt by a client.",
-        "funcName": "GetClientDamage",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            }
-        ],
-        "retType": {
-            "type": "int32",
-            "description": "The total damage dealt by the client, or 0 if The player slot is invalid."
-        }
-    },
-    {
-        "name": "SetClientDamage",
-        "group": "Clients",
-        "description": "Sets the total damage dealt by a client.",
-        "funcName": "SetClientDamage",
-        "paramTypes": [
-            {
-                "name": "playerSlot",
-                "type": "int32",
-                "ref": false,
-                "description": "The index of the client."
-            },
-            {
-                "name": "damage",
-                "type": "int32",
-                "ref": false,
-                "description": "The amount of damage to set."
-            }
-        ],
-        "retType": {
-            "type": "void"
-        }
-    },
-
-    {
-      "name": "TeleportClient",
+      "name": "DropWeapon",
       "group": "Clients",
-      "description": "Teleports a client to a specified location and orientation.",
-      "funcName": "TeleportClient",
+      "description": "Forces a player to drop their weapon.",
+      "funcName": "DropWeapon",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The index of the client."
+          "description": "The index of the player's slot."
         },
         {
-          "name": "origin",
-          "type": "vec3",
+          "name": "weaponHandle",
+          "type": "int32",
           "ref": false,
-          "description": "Vector representing the new absolute position."
+          "description": "The handle of weapon to drop."
         },
         {
-          "name": "angles",
+          "name": "target",
           "type": "vec3",
           "ref": false,
-          "description": "QAngle representing the new orientation."
+          "description": "Target direction."
         },
         {
           "name": "velocity",
           "type": "vec3",
           "ref": false,
-          "description": "Vector representing the new velocity."
+          "description": "Velocity to toss weapon or zero to just drop weapon."
         }
       ],
       "retType": {
         "type": "void"
       }
     },
+    {
+      "name": "SelectWeapon",
+      "group": "Clients",
+      "description": "Selects a player's weapon.",
+      "funcName": "SelectWeapon",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "weaponHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of weapon to bump."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SwitchWeapon",
+      "group": "Clients",
+      "description": "Switches a player's weapon.",
+      "funcName": "SwitchWeapon",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "weaponHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of weapon to switch."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "RemoveWeapon",
+      "group": "Clients",
+      "description": "Removes a player's weapon.",
+      "funcName": "RemoveWeapon",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "weaponHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of weapon to remove."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GiveNamedItem",
+      "group": "Clients",
+      "description": "Gives a named item (e.g., weapon) to a client.",
+      "funcName": "GiveNamedItem",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the item to give."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The entity handle of the created item, or INVALID_EHANDLE_INDEX if the client or item is invalid."
+      }
+    },
+    {
+      "name": "GetClientButtons",
+      "group": "Clients",
+      "description": "Retrieves the state of a specific button for a client.",
+      "funcName": "GetClientButtons",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "buttonIndex",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the button (0-2)."
+        }
+      ],
+      "retType": {
+        "type": "uint64",
+        "description": "uint64_t The state of the specified button, or 0 if the client or button index is invalid."
+      }
+    },
+    {
+      "name": "GetClientArmor",
+      "group": "Clients",
+      "description": "Returns the client's armor value.",
+      "funcName": "GetClientArmor",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The armor value of the client."
+      }
+    },
+    {
+      "name": "SetClientArmor",
+      "group": "Clients",
+      "description": "Sets the client's armor value.",
+      "funcName": "SetClientArmor",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "armor",
+          "type": "int32",
+          "ref": false,
+          "description": "The armor value to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientMoney",
+      "group": "Clients",
+      "description": "Retrieves the amount of money a client has.",
+      "funcName": "GetClientMoney",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The amount of money the client has, or 0 if the player slot is invalid."
+      }
+    },
+    {
+      "name": "SetClientMoney",
+      "group": "Clients",
+      "description": "Sets the amount of money for a client.",
+      "funcName": "SetClientMoney",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "money",
+          "type": "int32",
+          "ref": false,
+          "description": "The amount of money to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientKills",
+      "group": "Clients",
+      "description": "Retrieves the number of kills for a client.",
+      "funcName": "GetClientKills",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The number of kills the client has, or 0 if the player slot is invalid."
+      }
+    },
+    {
+      "name": "SetClientKills",
+      "group": "Clients",
+      "description": "Sets the number of kills for a client.",
+      "funcName": "SetClientKills",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "kills",
+          "type": "int32",
+          "ref": false,
+          "description": "The number of kills to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientDeaths",
+      "group": "Clients",
+      "description": "Retrieves the number of deaths for a client.",
+      "funcName": "GetClientDeaths",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The number of deaths the client has, or 0 if the player slot is invalid."
+      }
+    },
+    {
+      "name": "SetClientDeaths",
+      "group": "Clients",
+      "description": "Sets the number of deaths for a client.",
+      "funcName": "SetClientDeaths",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "deaths",
+          "type": "int32",
+          "ref": false,
+          "description": "The number of deaths to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientAssists",
+      "group": "Clients",
+      "description": "Retrieves the number of assists for a client.",
+      "funcName": "GetClientAssists",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The number of assists the client has, or 0 if the player slot is invalid."
+      }
+    },
+    {
+      "name": "SetClientAssists",
+      "group": "Clients",
+      "description": "Sets the number of assists for a client.",
+      "funcName": "SetClientAssists",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "assists",
+          "type": "int32",
+          "ref": false,
+          "description": "The number of assists to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientDamage",
+      "group": "Clients",
+      "description": "Retrieves the total damage dealt by a client.",
+      "funcName": "GetClientDamage",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The total damage dealt by the client, or 0 if the player slot is invalid."
+      }
+    },
+    {
+      "name": "SetClientDamage",
+      "group": "Clients",
+      "description": "Sets the total damage dealt by a client.",
+      "funcName": "SetClientDamage",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "damage",
+          "type": "int32",
+          "ref": false,
+          "description": "The amount of damage to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+
     {
       "name": "AddAdminCommand",
       "group": "Commands",
@@ -8762,6 +10492,29 @@
       }
     },
     {
+      "name": "StopSound",
+      "group": "Engine",
+      "description": "Stops a sound from a specified entity.",
+      "funcName": "StopSound",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity that will stop the sound."
+        },
+        {
+          "name": "sound",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the sound to stop."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "EmitSoundToClient",
       "group": "Engine",
       "description": "Emits a sound to a specific client.",
@@ -8913,7 +10666,7 @@
       ],
       "retType": {
         "type": "int32",
-        "description": "The entity handle as an integer, or INVALID_EHANDLE_INDEX if the entity index is invalid."
+        "description": "The entity handle as an integer, or -1 if the entity index is invalid."
       }
     },
     {
@@ -8999,13 +10752,13 @@
       "funcName": "HookEntityOutput",
       "paramTypes": [
         {
-          "name": "szClassname",
+          "name": "classname",
           "type": "string",
           "ref": false,
           "description": "The class name of the entity to hook the output for."
         },
         {
-          "name": "szOutput",
+          "name": "output",
           "type": "string",
           "ref": false,
           "description": "The output event name to hook."
@@ -9102,13 +10855,13 @@
       "funcName": "UnhookEntityOutput",
       "paramTypes": [
         {
-          "name": "szClassname",
+          "name": "classname",
           "type": "string",
           "ref": false,
           "description": "The class name of the entity from which to unhook the output."
         },
         {
-          "name": "szOutput",
+          "name": "output",
           "type": "string",
           "ref": false,
           "description": "The output event name to unhook."
@@ -9199,51 +10952,201 @@
       }
     },
     {
-      "name": "FindEntityByClassname",
+      "name": "FindEntityByClassnameWithin",
       "group": "Entities",
-      "description": "Searches for an entity by classname.",
-      "funcName": "FindEntityByClassname",
+      "description": "Finds an entity by classname within a radius with iteration.",
+      "funcName": "FindEntityByClassnameWithin",
       "paramTypes": [
         {
-          "name": "startEntity",
+          "name": "startFrom",
           "type": "int32",
           "ref": false,
-          "description": "The entity handle from which to start the search."
+          "description": "The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh."
         },
         {
           "name": "classname",
           "type": "string",
           "ref": false,
-          "description": "The class name of the entity to search for."
+          "description": "The class name to search for."
+        },
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The center of the search sphere."
+        },
+        {
+          "name": "radius",
+          "type": "float",
+          "ref": false,
+          "description": "The search radius."
         }
       ],
       "retType": {
         "type": "int32",
-        "description": "The entity handle of the found entity, or INVALID_EHANDLE_INDEX if no entity is found."
+        "description": "The handle of the found entity, or INVALID_EHANDLE_INDEX if none found."
       }
     },
     {
       "name": "FindEntityByName",
       "group": "Entities",
-      "description": "Searches for an entity by name.",
+      "description": "Finds an entity by name with iteration.",
       "funcName": "FindEntityByName",
       "paramTypes": [
         {
-          "name": "startEntity",
+          "name": "startFrom",
           "type": "int32",
           "ref": false,
-          "description": "The entity handle from which to start the search."
+          "description": "The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh."
         },
         {
           "name": "name",
           "type": "string",
           "ref": false,
-          "description": "The name of the entity to search for."
+          "description": "The targetname to search for."
         }
       ],
       "retType": {
         "type": "int32",
-        "description": "The entity handle of the found entity, or INVALID_EHANDLE_INDEX if no entity is found."
+        "description": "The handle of the found entity, or INVALID_EHANDLE_INDEX if none found."
+      }
+    },
+    {
+      "name": "FindEntityByNameNearest",
+      "group": "Entities",
+      "description": "Finds the nearest entity by name to a point.",
+      "funcName": "FindEntityByNameNearest",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The targetname to search for."
+        },
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The point to search around."
+        },
+        {
+          "name": "maxRadius",
+          "type": "float",
+          "ref": false,
+          "description": "Maximum search radius."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The handle of the nearest entity, or INVALID_EHANDLE_INDEX if none found."
+      }
+    },
+    {
+      "name": "FindEntityByNameWithin",
+      "group": "Entities",
+      "description": "Finds an entity by name within a radius with iteration.",
+      "funcName": "FindEntityByNameWithin",
+      "paramTypes": [
+        {
+          "name": "startFrom",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The targetname to search for."
+        },
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The center of the search sphere."
+        },
+        {
+          "name": "radius",
+          "type": "float",
+          "ref": false,
+          "description": "The search radius."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The handle of the found entity, or INVALID_EHANDLE_INDEX if none found."
+      }
+    },
+    {
+      "name": "FindEntityByTarget",
+      "group": "Entities",
+      "description": "Finds an entity by targetname with iteration.",
+      "funcName": "FindEntityByTarget",
+      "paramTypes": [
+        {
+          "name": "startFrom",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The targetname to search for."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The handle of the found entity, or INVALID_EHANDLE_INDEX if none found."
+      }
+    },
+    {
+      "name": "FindEntityInSphere",
+      "group": "Entities",
+      "description": "Finds an entity within a sphere with iteration.",
+      "funcName": "FindEntityInSphere",
+      "paramTypes": [
+        {
+          "name": "startFrom",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh."
+        },
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The center of the search sphere."
+        },
+        {
+          "name": "radius",
+          "type": "float",
+          "ref": false,
+          "description": "The search radius."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The handle of the found entity, or INVALID_EHANDLE_INDEX if none found."
+      }
+    },
+    {
+      "name": "SpawnEntityByName",
+      "group": "Entities",
+      "description": "Creates an entity by classname.",
+      "funcName": "SpawnEntityByName",
+      "paramTypes": [
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The class name of the entity to create."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The handle of the created entity, or INVALID_EHANDLE_INDEX if creation failed."
       }
     },
     {
@@ -9325,6 +11228,42 @@
       ],
       "retType": {
         "type": "void"
+      }
+    },
+    {
+      "name": "IsEntityPlayerController",
+      "group": "Entities",
+      "description": "Checks if an entity is a player controller.",
+      "funcName": "IsEntityPlayerController",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the entity is a player controller, false otherwise."
+      }
+    },
+    {
+      "name": "IsEntityPlayerPawn",
+      "group": "Entities",
+      "description": "Checks if an entity is a player pawn.",
+      "funcName": "IsEntityPlayerPawn",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the entity is a player pawn, false otherwise."
       }
     },
     {
@@ -9686,73 +11625,7 @@
       ],
       "retType": {
         "type": "uint8",
-        "description": "The render mode of the entity, or 0 if the entity is invalid.",
-        "enum": {
-          "name": "RenderMode",
-          "description": "Enum representing rendering modes for materials.",
-          "values": [
-            {
-              "value": 0,
-              "name": "Normal",
-              "description": "Standard rendering mode (src)."
-            },
-            {
-              "value": 1,
-              "name": "TransColor",
-              "description": "Composite: c*a + dest*(1-a)."
-            },
-            {
-              "value": 2,
-              "name": "TransTexture",
-              "description": "Composite: src*a + dest*(1-a)."
-            },
-            {
-              "value": 3,
-              "name": "Glow",
-              "description": "Composite: src*a + dest -- No Z buffer checks -- Fixed size in screen space."
-            },
-            {
-              "value": 4,
-              "name": "TransAlpha",
-              "description": "Composite: src*srca + dest*(1-srca)."
-            },
-            {
-              "value": 5,
-              "name": "TransAdd",
-              "description": "Composite: src*a + dest."
-            },
-            {
-              "value": 6,
-              "name": "Environmental",
-              "description": "Not drawn, used for environmental effects."
-            },
-            {
-              "value": 7,
-              "name": "TransAddFrameBlend",
-              "description": "Uses a fractional frame value to blend between animation frames."
-            },
-            {
-              "value": 8,
-              "name": "TransAlphaAdd",
-              "description": "Composite: src + dest*(1-a)."
-            },
-            {
-              "value": 9,
-              "name": "WorldGlow",
-              "description": "Same as Glow but not fixed size in screen space."
-            },
-            {
-              "value": 10,
-              "name": "None",
-              "description": "No rendering."
-            },
-            {
-              "value": 11,
-              "name": "DevVisualizer",
-              "description": "Developer visualizer rendering mode."
-            }
-          ]
-        }
+        "description": "The render mode of the entity, or 0 if the entity is invalid."
       }
     },
     {
@@ -9769,75 +11642,120 @@
         },
         {
           "name": "renderMode",
-          "type": "uint8",
+          "type": "int32",
           "ref": false,
-          "description": "The new render mode to set for the entity.",
-          "enum": {
-            "name": "RenderMode",
-            "description": "Enum representing rendering modes for materials.",
-            "values": [
-              {
-                "value": 0,
-                "name": "Normal",
-                "description": "Standard rendering mode (src)."
-              },
-              {
-                "value": 1,
-                "name": "TransColor",
-                "description": "Composite: c*a + dest*(1-a)."
-              },
-              {
-                "value": 2,
-                "name": "TransTexture",
-                "description": "Composite: src*a + dest*(1-a)."
-              },
-              {
-                "value": 3,
-                "name": "Glow",
-                "description": "Composite: src*a + dest -- No Z buffer checks -- Fixed size in screen space."
-              },
-              {
-                "value": 4,
-                "name": "TransAlpha",
-                "description": "Composite: src*srca + dest*(1-srca)."
-              },
-              {
-                "value": 5,
-                "name": "TransAdd",
-                "description": "Composite: src*a + dest."
-              },
-              {
-                "value": 6,
-                "name": "Environmental",
-                "description": "Not drawn, used for environmental effects."
-              },
-              {
-                "value": 7,
-                "name": "TransAddFrameBlend",
-                "description": "Uses a fractional frame value to blend between animation frames."
-              },
-              {
-                "value": 8,
-                "name": "TransAlphaAdd",
-                "description": "Composite: src + dest*(1-a)."
-              },
-              {
-                "value": 9,
-                "name": "WorldGlow",
-                "description": "Same as Glow but not fixed size in screen space."
-              },
-              {
-                "value": 10,
-                "name": "None",
-                "description": "No rendering."
-              },
-              {
-                "value": 11,
-                "name": "DevVisualizer",
-                "description": "Developer visualizer rendering mode."
-              }
-            ]
-          }
+          "description": "The new render mode to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityMass",
+      "group": "Entities",
+      "description": "Retrieves the mass of an entity.",
+      "funcName": "GetEntityMass",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose mass is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The mass of the entity, or 0 if the entity is invalid."
+      }
+    },
+    {
+      "name": "SetEntityMass",
+      "group": "Entities",
+      "description": "Sets the mass of an entity.",
+      "funcName": "SetEntityMass",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose mass is to be set."
+        },
+        {
+          "name": "mass",
+          "type": "int32",
+          "ref": false,
+          "description": "The new mass value to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityFriction",
+      "group": "Entities",
+      "description": "Retrieves the friction of an entity.",
+      "funcName": "GetEntityFriction",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose friction is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The friction of the entity, or 0 if the entity is invalid."
+      }
+    },
+    {
+      "name": "SetEntityFriction",
+      "group": "Entities",
+      "description": "Sets the friction of an entity.",
+      "funcName": "SetEntityFriction",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose friction is to be set."
+        },
+        {
+          "name": "friction",
+          "type": "float",
+          "ref": false,
+          "description": "The new friction value to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OverrideEntityFriction",
+      "group": "Entities",
+      "description": "Sets the friction of an entity.",
+      "funcName": "OverrideEntityFriction",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose friction is to be set."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Takes duration, value for a temporary override."
+        },
+        {
+          "name": "friction",
+          "type": "float",
+          "ref": false,
+          "description": "The new friction value to set for the entity."
         }
       ],
       "retType": {
@@ -9941,33 +11859,7 @@
       ],
       "retType": {
         "type": "int32",
-        "description": "The team number of the entity, or 0 if the entity is invalid.",
-        "enum": {
-          "name": "CSTeam",
-          "description": "Enum representing the possible teams in Counter-Strike.",
-          "values": [
-            {
-              "value": 0,
-              "name": "None",
-              "description": "No team."
-            },
-            {
-              "value": 1,
-              "name": "Spectator",
-              "description": "Spectator team."
-            },
-            {
-              "value": 2,
-              "name": "T",
-              "description": "Terrorist team."
-            },
-            {
-              "value": 3,
-              "name": "CT",
-              "description": "Counter-Terrorist team."
-            }
-          ]
-        }
+        "description": "The team number of the entity, or 0 if the entity is invalid."
       }
     },
     {
@@ -9986,33 +11878,7 @@
           "name": "team",
           "type": "int32",
           "ref": false,
-          "description": "The new team number to set for the entity.",
-          "enum": {
-            "name": "CSTeam",
-            "description": "Enum representing the possible teams in Counter-Strike.",
-            "values": [
-              {
-                "value": 0,
-                "name": "None",
-                "description": "No team."
-              },
-              {
-                "value": 1,
-                "name": "Spectator",
-                "description": "Spectator team."
-              },
-              {
-                "value": 2,
-                "name": "T",
-                "description": "Terrorist team."
-              },
-              {
-                "value": 3,
-                "name": "CT",
-                "description": "Counter-Terrorist team."
-              }
-            ]
-          }
+          "description": "The new team number to set for the entity."
         }
       ],
       "retType": {
@@ -10149,10 +12015,51 @@
       }
     },
     {
-      "name": "GetEntityAngRotation",
+      "name": "GetEntityAbsScale",
+      "group": "Entities",
+      "description": "Retrieves the absolute scale of an entity.",
+      "funcName": "GetEntityAbsScale",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose absolute scale is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "A vector where the absolute scale will be stored."
+      }
+    },
+    {
+      "name": "SetEntityAbsScale",
+      "group": "Entities",
+      "description": "Sets the absolute scale of an entity.",
+      "funcName": "SetEntityAbsScale",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose absolute scale is to be set."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "ref": false,
+          "description": "The new absolute scale to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityAbsAngles",
       "group": "Entities",
       "description": "Retrieves the angular rotation of an entity.",
-      "funcName": "GetEntityAngRotation",
+      "funcName": "GetEntityAbsAngles",
       "paramTypes": [
         {
           "name": "entityHandle",
@@ -10167,10 +12074,133 @@
       }
     },
     {
-      "name": "SetEntityAngRotation",
+      "name": "SetEntityAbsAngles",
       "group": "Entities",
       "description": "Sets the angular rotation of an entity.",
-      "funcName": "SetEntityAngRotation",
+      "funcName": "SetEntityAbsAngles",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose angular rotation is to be set."
+        },
+        {
+          "name": "angle",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new angular rotation to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityLocalOrigin",
+      "group": "Entities",
+      "description": "Retrieves the local origin of an entity.",
+      "funcName": "GetEntityLocalOrigin",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose local origin is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the local origin will be stored."
+      }
+    },
+    {
+      "name": "SetEntityLocalOrigin",
+      "group": "Entities",
+      "description": "Sets the local origin of an entity.",
+      "funcName": "SetEntityLocalOrigin",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose local origin is to be set."
+        },
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new local origin to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityLocalScale",
+      "group": "Entities",
+      "description": "Retrieves the local scale of an entity.",
+      "funcName": "GetEntityLocalScale",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose local scale is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "A vector where the local scale will be stored."
+      }
+    },
+    {
+      "name": "SetEntityLocalScale",
+      "group": "Entities",
+      "description": "Sets the local scale of an entity.",
+      "funcName": "SetEntityLocalScale",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose local scale is to be set."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "ref": false,
+          "description": "The new local scale to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityLocalAngles",
+      "group": "Entities",
+      "description": "Retrieves the angular rotation of an entity.",
+      "funcName": "GetEntityLocalAngles",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose angular rotation is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A QAngle where the angular rotation will be stored."
+      }
+    },
+    {
+      "name": "SetEntityLocalAngles",
+      "group": "Entities",
+      "description": "Sets the angular rotation of an entity.",
+      "funcName": "SetEntityLocalAngles",
       "paramTypes": [
         {
           "name": "entityHandle",
@@ -10228,6 +12258,297 @@
       ],
       "retType": {
         "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityBaseVelocity",
+      "group": "Entities",
+      "description": "Retrieves the base velocity of an entity.",
+      "funcName": "GetEntityBaseVelocity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose base velocity is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the base velocity will be stored."
+      }
+    },
+    {
+      "name": "GetEntityLocalAngVelocity",
+      "group": "Entities",
+      "description": "Retrieves the local angular velocity of an entity.",
+      "funcName": "GetEntityLocalAngVelocity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose local angular velocity is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the local angular velocity will be stored."
+      }
+    },
+    {
+      "name": "GetEntityAngVelocity",
+      "group": "Entities",
+      "description": "Retrieves the angular velocity of an entity.",
+      "funcName": "GetEntityAngVelocity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose angular velocity is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the angular velocity will be stored."
+      }
+    },
+    {
+      "name": "SetEntityAngVelocity",
+      "group": "Entities",
+      "description": "Sets the angular velocity of an entity.",
+      "funcName": "SetEntityAngVelocity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose angular velocity is to be set."
+        },
+        {
+          "name": "velocity",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new angular velocity to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityLocalVelocity",
+      "group": "Entities",
+      "description": "Retrieves the local velocity of an entity.",
+      "funcName": "GetEntityLocalVelocity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose local velocity is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the local velocity will be stored."
+      }
+    },
+    {
+      "name": "TransformPointEntityToWorld",
+      "group": "Entities",
+      "description": "Returns the input Vector transformed from entity to world space.",
+      "funcName": "TransformPointEntityToWorld",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity"
+        },
+        {
+          "name": "point",
+          "type": "vec3",
+          "ref": false,
+          "description": "Point in entity local space to transform"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "The point transformed to world space coordinates"
+      }
+    },
+    {
+      "name": "TransformPointWorldToEntity",
+      "group": "Entities",
+      "description": "Returns the input Vector transformed from world to entity space.",
+      "funcName": "TransformPointWorldToEntity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity"
+        },
+        {
+          "name": "point",
+          "type": "vec3",
+          "ref": false,
+          "description": "Point in world space to transform"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "The point transformed to entity local space coordinates"
+      }
+    },
+    {
+      "name": "GetEntityEyePosition",
+      "group": "Entities",
+      "description": "Get vector to eye position - absolute coords.",
+      "funcName": "GetEntityEyePosition",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Eye position in absolute/world coordinates"
+      }
+    },
+    {
+      "name": "GetEntityEyeAngles",
+      "group": "Entities",
+      "description": "Get the qangles that this entity is looking at.",
+      "funcName": "GetEntityEyeAngles",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Eye angles as a vector (pitch, yaw, roll)"
+      }
+    },
+    {
+      "name": "SetEntityForwardVector",
+      "group": "Entities",
+      "description": "Sets the forward velocity of an entity.",
+      "funcName": "SetEntityForwardVector",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose forward velocity is to be set."
+        },
+        {
+          "name": "forward",
+          "type": "vec3",
+          "ref": false
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityForwardVector",
+      "group": "Entities",
+      "description": "Get the forward vector of the entity.",
+      "funcName": "GetEntityForwardVector",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Forward-facing direction vector of the entity"
+      }
+    },
+    {
+      "name": "GetEntityLeftVector",
+      "group": "Entities",
+      "description": "Get the left vector of the entity.",
+      "funcName": "GetEntityLeftVector",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Left-facing direction vector of the entity (aligned with the y axis)"
+      }
+    },
+    {
+      "name": "GetEntityRightVector",
+      "group": "Entities",
+      "description": "Get the right vector of the entity.",
+      "funcName": "GetEntityRightVector",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Right-facing direction vector of the entity"
+      }
+    },
+    {
+      "name": "GetEntityUpVector",
+      "group": "Entities",
+      "description": "Get the up vector of the entity.",
+      "funcName": "GetEntityUpVector",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Up-facing direction vector of the entity"
+      }
+    },
+    {
+      "name": "GetEntityTransform",
+      "group": "Entities",
+      "description": "Get the entity-to-world transformation matrix.",
+      "funcName": "GetEntityTransform",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to query"
+        }
+      ],
+      "retType": {
+        "type": "mat4x4",
+        "description": "4x4 transformation matrix representing entity's position, rotation, and scale in world space"
       }
     },
     {
@@ -10326,6 +12647,106 @@
       }
     },
     {
+      "name": "AddEntityEffects",
+      "group": "Entities",
+      "description": "Adds the render effect flag to an entity.",
+      "funcName": "AddEntityEffects",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to modify"
+        },
+        {
+          "name": "effects",
+          "type": "int32",
+          "ref": false,
+          "description": "Render effect flags to add"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "RemoveEntityEffects",
+      "group": "Entities",
+      "description": "Removes the render effect flag from an entity.",
+      "funcName": "RemoveEntityEffects",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to modify"
+        },
+        {
+          "name": "effects",
+          "type": "int32",
+          "ref": false,
+          "description": "Render effect flags to remove"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntityBoundingMaxs",
+      "group": "Entities",
+      "description": "Get a vector containing max bounds, centered on object.",
+      "funcName": "GetEntityBoundingMaxs",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Vector containing the maximum bounds of the entity's bounding box"
+      }
+    },
+    {
+      "name": "GetEntityBoundingMins",
+      "group": "Entities",
+      "description": "Get a vector containing min bounds, centered on object.",
+      "funcName": "GetEntityBoundingMins",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Vector containing the minimum bounds of the entity's bounding box"
+      }
+    },
+    {
+      "name": "GetEntityCenter",
+      "group": "Entities",
+      "description": "Get vector to center of object - absolute coords.",
+      "funcName": "GetEntityCenter",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to query"
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "Vector pointing to the center of the entity in absolute/world coordinates"
+      }
+    },
+    {
       "name": "TeleportEntity",
       "group": "Entities",
       "description": "Teleports an entity to a specified location and orientation.",
@@ -10339,21 +12760,21 @@
         },
         {
           "name": "origin",
-          "type": "vec3",
+          "type": "ptr64",
           "ref": false,
-          "description": "Vector representing the new absolute position."
+          "description": "A pointer to a Vector representing the new absolute position. Can be nullptr."
         },
         {
           "name": "angles",
-          "type": "vec3",
+          "type": "ptr64",
           "ref": false,
-          "description": "QAngle representing the new orientation."
+          "description": "A pointer to a QAngle representing the new orientation. Can be nullptr."
         },
         {
           "name": "velocity",
-          "type": "vec3",
+          "type": "ptr64",
           "ref": false,
-          "description": "Vector representing the new velocity."
+          "description": "A pointer to a Vector representing the new velocity. Can be nullptr."
         }
       ],
       "retType": {
@@ -10361,10 +12782,56 @@
       }
     },
     {
-      "name": "AcceptInput",
+      "name": "ApplyAbsVelocityImpulseToEntity",
+      "group": "Entities",
+      "description": "Apply an absolute velocity impulse to an entity.",
+      "funcName": "ApplyAbsVelocityImpulseToEntity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to apply impulse to"
+        },
+        {
+          "name": "vecImpulse",
+          "type": "vec3",
+          "ref": false,
+          "description": "Velocity impulse vector to apply"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ApplyLocalAngularVelocityImpulseToEntity",
+      "group": "Entities",
+      "description": "Apply a local angular velocity impulse to an entity.",
+      "funcName": "ApplyLocalAngularVelocityImpulseToEntity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to apply impulse to"
+        },
+        {
+          "name": "angImpulse",
+          "type": "vec3",
+          "ref": false,
+          "description": "Angular velocity impulse vector to apply"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "AcceptEntityInput",
       "group": "Entities",
       "description": "Invokes a named input method on a specified entity.",
-      "funcName": "AcceptInput",
+      "funcName": "AcceptEntityInput",
       "paramTypes": [
         {
           "name": "entityHandle",
@@ -10517,6 +12984,570 @@
       ],
       "retType": {
         "type": "void"
+      }
+    },
+    {
+      "name": "ConnectEntityOutput",
+      "group": "Entities",
+      "description": "Connects a script function to an entity output.",
+      "funcName": "ConnectEntityOutput",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output to connect to."
+        },
+        {
+          "name": "functionName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the script function to call."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DisconnectEntityOutput",
+      "group": "Entities",
+      "description": "Disconnects a script function from an entity output.",
+      "funcName": "DisconnectEntityOutput",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output."
+        },
+        {
+          "name": "functionName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the script function to disconnect."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DisconnectEntityRedirectedOutput",
+      "group": "Entities",
+      "description": "Disconnects a script function from an I/O event on a different entity.",
+      "funcName": "DisconnectEntityRedirectedOutput",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the calling entity."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output."
+        },
+        {
+          "name": "functionName",
+          "type": "string",
+          "ref": false,
+          "description": "The function name to disconnect."
+        },
+        {
+          "name": "targetHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose output is being disconnected."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "FireEntityOutput",
+      "group": "Entities",
+      "description": "Fires an entity output.",
+      "funcName": "FireEntityOutput",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity firing the output."
+        },
+        {
+          "name": "outputName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output to fire."
+        },
+        {
+          "name": "activatorHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The entity activating the output."
+        },
+        {
+          "name": "callerHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The entity that called the output."
+        },
+        {
+          "name": "value",
+          "type": "any",
+          "ref": false,
+          "description": "The value associated with the input action."
+        },
+        {
+          "name": "type",
+          "type": "int32",
+          "ref": false,
+          "description": "The type or classification of the value.",
+          "enum": {
+            "name": "FieldType",
+            "description": "Represents the possible types of data that can be passed as a value in input actions.",
+            "values": [
+              {
+                "value": 0,
+                "name": "Auto",
+                "description": "Automatically detect the type of the value."
+              },
+              {
+                "value": 1,
+                "name": "Float32",
+                "description": "A 32-bit floating-point number."
+              },
+              {
+                "value": 2,
+                "name": "Float64",
+                "description": "A 64-bit floating-point number."
+              },
+              {
+                "value": 3,
+                "name": "Int32",
+                "description": "A 32-bit signed integer."
+              },
+              {
+                "value": 4,
+                "name": "UInt32",
+                "description": "A 32-bit unsigned integer."
+              },
+              {
+                "value": 5,
+                "name": "Int64",
+                "description": "A 64-bit signed integer."
+              },
+              {
+                "value": 6,
+                "name": "UInt64",
+                "description": "A 64-bit unsigned integer."
+              },
+              {
+                "value": 7,
+                "name": "Boolean",
+                "description": "A boolean value (true or false)."
+              },
+              {
+                "value": 8,
+                "name": "Character",
+                "description": "A single character."
+              },
+              {
+                "value": 9,
+                "name": "String",
+                "description": "A managed string object."
+              },
+              {
+                "value": 10,
+                "name": "CString",
+                "description": "A null-terminated C-style string."
+              },
+              {
+                "value": 11,
+                "name": "HScript",
+                "description": "A script handle, typically for scripting integration."
+              },
+              {
+                "value": 12,
+                "name": "EHandle",
+                "description": "An entity handle, used to reference an entity within the system."
+              },
+              {
+                "value": 13,
+                "name": "Resource",
+                "description": "A resource handle, such as a file or asset reference."
+              },
+              {
+                "value": 14,
+                "name": "Vector3d",
+                "description": "A 3D vector, typically representing position or direction."
+              },
+              {
+                "value": 15,
+                "name": "Vector2d",
+                "description": "A 2D vector, for planar data or coordinates."
+              },
+              {
+                "value": 16,
+                "name": "Vector4d",
+                "description": "A 4D vector, often used for advanced mathematical representations."
+              },
+              {
+                "value": 17,
+                "name": "Color32",
+                "description": "A 32-bit color value (RGBA)."
+              },
+              {
+                "value": 18,
+                "name": "QAngle",
+                "description": "A quaternion-based angle representation."
+              },
+              {
+                "value": 19,
+                "name": "Quaternion",
+                "description": "A quaternion, used for rotation and orientation calculations."
+              }
+            ]
+          }
+        },
+        {
+          "name": "delay",
+          "type": "float",
+          "ref": false,
+          "description": "Delay in seconds before firing the output."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "RedirectEntityOutput",
+      "group": "Entities",
+      "description": "Redirects an entity output to call a function on another entity.",
+      "funcName": "RedirectEntityOutput",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose output is being redirected."
+        },
+        {
+          "name": "output",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the output to redirect."
+        },
+        {
+          "name": "functionName",
+          "type": "string",
+          "ref": false,
+          "description": "The function name to call on the target entity."
+        },
+        {
+          "name": "targetHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity that will receive the output call."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "FollowEntity",
+      "group": "Entities",
+      "description": "Makes an entity follow another entity with optional bone merging.",
+      "funcName": "FollowEntity",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity that will follow"
+        },
+        {
+          "name": "attachmentHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to follow"
+        },
+        {
+          "name": "boneMerge",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, bones will be merged between entities"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "FollowEntityMerge",
+      "group": "Entities",
+      "description": "Makes an entity follow another entity and merge with a specific bone or attachment.",
+      "funcName": "FollowEntityMerge",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity that will follow"
+        },
+        {
+          "name": "attachmentHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to follow"
+        },
+        {
+          "name": "boneOrAttachName",
+          "type": "string",
+          "ref": false,
+          "description": "Name of the bone or attachment point to merge with"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "TakeEntityDamage",
+      "group": "Entities",
+      "description": "Apply damage to an entity.",
+      "funcName": "TakeEntityDamage",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity receiving damage"
+        },
+        {
+          "name": "inflictorHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity inflicting damage (e.g., projectile)"
+        },
+        {
+          "name": "attackerHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the attacking entity"
+        },
+        {
+          "name": "force",
+          "type": "vec3",
+          "ref": false,
+          "description": "Direction and magnitude of force to apply"
+        },
+        {
+          "name": "hitPos",
+          "type": "vec3",
+          "ref": false,
+          "description": "Position where the damage hit occurred"
+        },
+        {
+          "name": "damage",
+          "type": "float",
+          "ref": false,
+          "description": "Amount of damage to apply"
+        },
+        {
+          "name": "damageTypes",
+          "type": "int32",
+          "ref": false,
+          "description": "Bitfield of damage type flags"
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "Amount of damage actually applied to the entity"
+      }
+    },
+    {
+      "name": "GetEntityAttributeFloatValue",
+      "group": "Entities",
+      "description": "Retrieves a float attribute value from an entity.",
+      "funcName": "GetEntityAttributeFloatValue",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the attribute."
+        },
+        {
+          "name": "defaultValue",
+          "type": "float",
+          "ref": false,
+          "description": "The default value to return if the attribute does not exist."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The float value of the attribute, or the default value if missing or invalid."
+      }
+    },
+    {
+      "name": "GetEntityAttributeIntValue",
+      "group": "Entities",
+      "description": "Retrieves an integer attribute value from an entity.",
+      "funcName": "GetEntityAttributeIntValue",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the attribute."
+        },
+        {
+          "name": "defaultValue",
+          "type": "int32",
+          "ref": false,
+          "description": "The default value to return if the attribute does not exist."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The integer value of the attribute, or the default value if missing or invalid."
+      }
+    },
+    {
+      "name": "SetEntityAttributeFloatValue",
+      "group": "Entities",
+      "description": "Sets a float attribute value on an entity.",
+      "funcName": "SetEntityAttributeFloatValue",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the attribute."
+        },
+        {
+          "name": "value",
+          "type": "float",
+          "ref": false,
+          "description": "The float value to assign to the attribute."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityAttributeIntValue",
+      "group": "Entities",
+      "description": "Sets an integer attribute value on an entity.",
+      "funcName": "SetEntityAttributeIntValue",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the attribute."
+        },
+        {
+          "name": "value",
+          "type": "int32",
+          "ref": false,
+          "description": "The integer value to assign to the attribute."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DeleteEntityAttribute",
+      "group": "Entities",
+      "description": "Deletes an attribute from an entity.",
+      "funcName": "DeleteEntityAttribute",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the attribute to delete."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "HasEntityAttribute",
+      "group": "Entities",
+      "description": "Checks if an entity has a specific attribute.",
+      "funcName": "HasEntityAttribute",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the attribute to check."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the attribute exists, false otherwise."
       }
     },
     {
@@ -12508,6 +15539,521 @@
       "retType": {
         "type": "int32",
         "description": "An integer indicating the result of the logging operation."
+      }
+    },
+    {
+      "name": "GetEntityAttachmentAngles",
+      "group": "Models",
+      "description": "Retrieves the attachment angles of an entity.",
+      "funcName": "GetEntityAttachmentAngles",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose attachment angles are to be retrieved."
+        },
+        {
+          "name": "attachmentIndex",
+          "type": "int32",
+          "ref": false,
+          "description": "The attachment index."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector representing the attachment angles (pitch, yaw, roll)."
+      }
+    },
+    {
+      "name": "GetEntityAttachmentForward",
+      "group": "Models",
+      "description": "Retrieves the forward vector of an entity's attachment.",
+      "funcName": "GetEntityAttachmentForward",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose attachment forward vector is to be retrieved."
+        },
+        {
+          "name": "attachmentIndex",
+          "type": "int32",
+          "ref": false,
+          "description": "The attachment index."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector representing the forward direction of the attachment."
+      }
+    },
+    {
+      "name": "GetEntityAttachmentOrigin",
+      "group": "Models",
+      "description": "Retrieves the origin vector of an entity's attachment.",
+      "funcName": "GetEntityAttachmentOrigin",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose attachment origin is to be retrieved."
+        },
+        {
+          "name": "attachmentIndex",
+          "type": "int32",
+          "ref": false,
+          "description": "The attachment index."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector representing the origin of the attachment."
+      }
+    },
+    {
+      "name": "GetEntityMaterialGroupHash",
+      "group": "Models",
+      "description": "Retrieves the material group hash of an entity.",
+      "funcName": "GetEntityMaterialGroupHash",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "uint32",
+        "description": "The material group hash."
+      }
+    },
+    {
+      "name": "GetEntityMaterialGroupMask",
+      "group": "Models",
+      "description": "Retrieves the material group mask of an entity.",
+      "funcName": "GetEntityMaterialGroupMask",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "uint64",
+        "description": "The mesh group mask."
+      }
+    },
+    {
+      "name": "GetEntityModelScale",
+      "group": "Models",
+      "description": "Retrieves the model scale of an entity.",
+      "funcName": "GetEntityModelScale",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The model scale factor."
+      }
+    },
+    {
+      "name": "GetEntityRenderAlpha",
+      "group": "Models",
+      "description": "Retrieves the render alpha of an entity.",
+      "funcName": "GetEntityRenderAlpha",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The alpha modulation value."
+      }
+    },
+    {
+      "name": "GetEntityRenderColor2",
+      "group": "Models",
+      "description": "Retrieves the render color of an entity.",
+      "funcName": "GetEntityRenderColor2",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector representing the render color (R, G, B)."
+      }
+    },
+    {
+      "name": "ScriptLookupAttachment",
+      "group": "Models",
+      "description": "Retrieves an attachment index by name.",
+      "funcName": "ScriptLookupAttachment",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "attachmentName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the attachment."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The attachment index, or -1 if not found."
+      }
+    },
+    {
+      "name": "SetEntityBodygroup",
+      "group": "Models",
+      "description": "Sets a bodygroup value by index.",
+      "funcName": "SetEntityBodygroup",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "group",
+          "type": "int32",
+          "ref": false,
+          "description": "The bodygroup index."
+        },
+        {
+          "name": "value",
+          "type": "int32",
+          "ref": false,
+          "description": "The new value to set for the bodygroup."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityBodygroupByName",
+      "group": "Models",
+      "description": "Sets a bodygroup value by name.",
+      "funcName": "SetEntityBodygroupByName",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The bodygroup name."
+        },
+        {
+          "name": "value",
+          "type": "int32",
+          "ref": false,
+          "description": "The new value to set for the bodygroup."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityLightGroup",
+      "group": "Models",
+      "description": "Sets the light group of an entity.",
+      "funcName": "SetEntityLightGroup",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "lightGroup",
+          "type": "string",
+          "ref": false,
+          "description": "The light group name."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityMaterialGroup",
+      "group": "Models",
+      "description": "Sets the material group of an entity.",
+      "funcName": "SetEntityMaterialGroup",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "materialGroup",
+          "type": "string",
+          "ref": false,
+          "description": "The material group name."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityMaterialGroupHash",
+      "group": "Models",
+      "description": "Sets the material group hash of an entity.",
+      "funcName": "SetEntityMaterialGroupHash",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "hash",
+          "type": "uint32",
+          "ref": false,
+          "description": "The new material group hash to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityMaterialGroupMask",
+      "group": "Models",
+      "description": "Sets the material group mask of an entity.",
+      "funcName": "SetEntityMaterialGroupMask",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "mask",
+          "type": "uint64",
+          "ref": false,
+          "description": "The new mesh group mask to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityModelScale",
+      "group": "Models",
+      "description": "Sets the model scale of an entity.",
+      "funcName": "SetEntityModelScale",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "ref": false,
+          "description": "The new scale factor."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityRenderAlpha",
+      "group": "Models",
+      "description": "Sets the render alpha of an entity.",
+      "funcName": "SetEntityRenderAlpha",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "alpha",
+          "type": "int32",
+          "ref": false,
+          "description": "The new alpha value (0\u00e2\u20ac\u201c255)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityRenderColor2",
+      "group": "Models",
+      "description": "Sets the render color of an entity.",
+      "funcName": "SetEntityRenderColor2",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "The red component (0\u00e2\u20ac\u201c255)."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "The green component (0\u00e2\u20ac\u201c255)."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "The blue component (0\u00e2\u20ac\u201c255)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityRenderMode2",
+      "group": "Models",
+      "description": "Sets the render mode of an entity.",
+      "funcName": "SetEntityRenderMode2",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "mode",
+          "type": "int32",
+          "ref": false,
+          "description": "The new render mode value."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntitySingleMeshGroup",
+      "group": "Models",
+      "description": "Sets a single mesh group for an entity.",
+      "funcName": "SetEntitySingleMeshGroup",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "meshGroupName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the mesh group."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntitySize",
+      "group": "Models",
+      "description": "Sets the size (bounding box) of an entity.",
+      "funcName": "SetEntitySize",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "mins",
+          "type": "vec3",
+          "ref": false,
+          "description": "The minimum bounding box vector."
+        },
+        {
+          "name": "maxs",
+          "type": "vec3",
+          "ref": false,
+          "description": "The maximum bounding box vector."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntitySkin",
+      "group": "Models",
+      "description": "Sets the skin of an entity.",
+      "funcName": "SetEntitySkin",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        },
+        {
+          "name": "skin",
+          "type": "int32",
+          "ref": false,
+          "description": "The new skin index."
+        }
+      ],
+      "retType": {
+        "type": "void"
       }
     },
     {

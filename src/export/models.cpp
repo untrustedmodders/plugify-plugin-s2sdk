@@ -73,7 +73,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAttachmentOrigin(int entityHandle, int 
  * @param entityHandle The handle of the entity.
  * @return The material group hash.
  */
-extern "C" PLUGIN_API unsigned GetEntityMaterialGroupHash(int entityHandle) {
+extern "C" PLUGIN_API uint32_t GetEntityMaterialGroupHash(int entityHandle) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return {};
 	return entity->GetMaterialGroupHash();
@@ -224,7 +224,7 @@ extern "C" PLUGIN_API void SetEntityMaterialGroup(int entityHandle, const plg::s
  * @param entityHandle The handle of the entity.
  * @param hash The new material group hash to set.
  */
-extern "C" PLUGIN_API void SetEntityMaterialGroupHash(int entityHandle, unsigned hash) {
+extern "C" PLUGIN_API void SetEntityMaterialGroupHash(int entityHandle, uint32_t hash) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return;
 	entity->SetMaterialGroupHash(hash);
