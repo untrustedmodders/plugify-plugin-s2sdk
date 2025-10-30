@@ -50,8 +50,41 @@ namespace utils {
 	bool IsSpawnValid(const Vector& origin);
 	bool FindValidSpawn(Vector& origin, QAngle& angles);
 
-	inline GameEventKeySymbol_t MakeEventKeySymbol(std::string_view key) {
-		return GameEventKeySymbol_t::Make(key.data(), static_cast<int>(key.size()));
+	// Helper to convert GameEventKeySymbol_t from string
+	inline GameEventKeySymbol_t MakeEventKeySymbol(std::string_view name) {
+		return GameEventKeySymbol_t::Make(name.data(), static_cast<int>(name.size()));
+	}
+	// Helper to convert CKV3MemberName from string
+	inline CKV3MemberName MakeMemberName(std::string_view name) {
+		return CKV3MemberName(name.data(), static_cast<int>(name.size()));
+	}
+
+	// Helper to convert plg::vector<uint8_t> to CUtlBuffer
+	inline CUtlBuffer CreateUtlBufferFromVector(const plg::vector<uint8_t>& data) {
+		CUtlBuffer buffer;
+		if (!data.empty()) {
+			buffer.Put(data.data(), static_cast<int>(data.size()));
+			buffer.SeekGet(CUtlBuffer::SEEK_HEAD, 0); // Reset read position
+		}
+		return buffer;
+	}
+
+	// Helper to convert CUtlBuffer to plg::vector<uint8_t>
+	inline void ConvertUtlBufferToVector(const CUtlBuffer* buffer, plg::vector<uint8_t>& output) {
+		output.clear();
+		if (buffer && buffer->TellPut() > 0) {
+			output.assign(static_cast<const uint8_t*>(buffer->Base()),
+				     static_cast<const uint8_t*>(buffer->Base()) + buffer->TellPut());
+		}
+	}
+
+	// Helper to convert plg::string to CUtlString and back
+	inline void ConvertUtlStringToPlgString(const CUtlString* utl_str, plg::string& plg_str) {
+		if (utl_str && utl_str->Get()) {
+			plg_str = plg::string(utl_str->Get(), static_cast<size_t>(utl_str->Length()));
+		} else {
+			plg_str.clear();
+		}
 	}
 
 	const fs::path& GameDirectory();

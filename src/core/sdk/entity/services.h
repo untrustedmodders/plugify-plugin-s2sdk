@@ -133,9 +133,9 @@ public:
 		return CALL_VIRTUAL(bool, *offset, this, weapon);
 	}
 
-	void DropWeapon(CBasePlayerWeapon* weapon, Vector* vecTarget = nullptr, Vector* velocity = nullptr) {
+	void DropWeapon(CBasePlayerWeapon* weapon, const Vector* target = nullptr, const Vector* velocity = nullptr) {
 		TRY_GET_OFFSET(g_pGameConfig, "CCSPlayer_WeaponServices::DropWeapon", offset);
-		CALL_VIRTUAL(void, *offset, this, weapon, vecTarget, velocity);
+		CALL_VIRTUAL(void, *offset, this, weapon, target, velocity);
 	}
 
 	int SelectItem(CBasePlayerWeapon* weapon) {

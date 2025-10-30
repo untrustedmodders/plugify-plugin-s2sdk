@@ -204,7 +204,7 @@ extern "C" PLUGIN_API void SetEntDataString2(CEntityInstance* entity, int offset
 		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
 	}
 
-	*reinterpret_cast<CUtlString*>(reinterpret_cast<intptr_t>(entity) + offset) = value.c_str();
+	*reinterpret_cast<CUtlString*>(reinterpret_cast<intptr_t>(entity) + offset) = value;
 }
 
 //
@@ -917,13 +917,13 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 
 	switch (schema::IsPlainType(type, sizeof(CUtlString))) {
 		case schema::ElementType::Array:
-			reinterpret_cast<CUtlString*>(reinterpret_cast<intptr_t>(entity) + offset)[element] = value.c_str();
+			reinterpret_cast<CUtlString*>(reinterpret_cast<intptr_t>(entity) + offset)[element] = value;
 			break;
 		case schema::ElementType::Collection:
-			reinterpret_cast<CUtlVector<CUtlString>*>(reinterpret_cast<intptr_t>(entity) + offset)->Element(element) = value.c_str();
+			reinterpret_cast<CUtlVector<CUtlString>*>(reinterpret_cast<intptr_t>(entity) + offset)->Element(element) = value;
 			break;
 		case schema::ElementType::Single:
-			*reinterpret_cast<CUtlString*>(reinterpret_cast<intptr_t>(entity) + offset) = value.c_str();
+			*reinterpret_cast<CUtlString*>(reinterpret_cast<intptr_t>(entity) + offset) = value;
 			break;
 		default:
 			const auto [elementType, elementSize] = schema::IsIntType(type);

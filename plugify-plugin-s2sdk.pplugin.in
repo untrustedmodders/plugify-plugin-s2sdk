@@ -1047,7 +1047,73 @@
       ],
       "retType": {
         "type": "uint8",
-        "description": "The render mode of the client, or 0 if the client is invalid."
+        "description": "The render mode of the client, or 0 if the client is invalid.",
+        "enum": {
+          "name": "RenderMode",
+          "description": "Enum representing rendering modes for materials.",
+          "values": [
+            {
+              "value": 0,
+              "name": "Normal",
+              "description": "Standard rendering mode (src)."
+            },
+            {
+              "value": 1,
+              "name": "TransColor",
+              "description": "Composite: c*a + dest*(1-a)."
+            },
+            {
+              "value": 2,
+              "name": "TransTexture",
+              "description": "Composite: src*a + dest*(1-a)."
+            },
+            {
+              "value": 3,
+              "name": "Glow",
+              "description": "Composite: src*a + dest -- No Z buffer checks -- Fixed size in screen space."
+            },
+            {
+              "value": 4,
+              "name": "TransAlpha",
+              "description": "Composite: src*srca + dest*(1-srca)."
+            },
+            {
+              "value": 5,
+              "name": "TransAdd",
+              "description": "Composite: src*a + dest."
+            },
+            {
+              "value": 6,
+              "name": "Environmental",
+              "description": "Not drawn, used for environmental effects."
+            },
+            {
+              "value": 7,
+              "name": "TransAddFrameBlend",
+              "description": "Uses a fractional frame value to blend between animation frames."
+            },
+            {
+              "value": 8,
+              "name": "TransAlphaAdd",
+              "description": "Composite: src + dest*(1-a)."
+            },
+            {
+              "value": 9,
+              "name": "WorldGlow",
+              "description": "Same as Glow but not fixed size in screen space."
+            },
+            {
+              "value": 10,
+              "name": "None",
+              "description": "No rendering."
+            },
+            {
+              "value": 11,
+              "name": "DevVisualizer",
+              "description": "Developer visualizer rendering mode."
+            }
+          ]
+        }
       }
     },
     {
@@ -1066,7 +1132,73 @@
           "name": "renderMode",
           "type": "uint8",
           "ref": false,
-          "description": "The new render mode to set for the client."
+          "description": "The new render mode to set for the client.",
+          "enum": {
+            "name": "RenderMode",
+            "description": "Enum representing rendering modes for materials.",
+            "values": [
+              {
+                "value": 0,
+                "name": "Normal",
+                "description": "Standard rendering mode (src)."
+              },
+              {
+                "value": 1,
+                "name": "TransColor",
+                "description": "Composite: c*a + dest*(1-a)."
+              },
+              {
+                "value": 2,
+                "name": "TransTexture",
+                "description": "Composite: src*a + dest*(1-a)."
+              },
+              {
+                "value": 3,
+                "name": "Glow",
+                "description": "Composite: src*a + dest -- No Z buffer checks -- Fixed size in screen space."
+              },
+              {
+                "value": 4,
+                "name": "TransAlpha",
+                "description": "Composite: src*srca + dest*(1-srca)."
+              },
+              {
+                "value": 5,
+                "name": "TransAdd",
+                "description": "Composite: src*a + dest."
+              },
+              {
+                "value": 6,
+                "name": "Environmental",
+                "description": "Not drawn, used for environmental effects."
+              },
+              {
+                "value": 7,
+                "name": "TransAddFrameBlend",
+                "description": "Uses a fractional frame value to blend between animation frames."
+              },
+              {
+                "value": 8,
+                "name": "TransAlphaAdd",
+                "description": "Composite: src + dest*(1-a)."
+              },
+              {
+                "value": 9,
+                "name": "WorldGlow",
+                "description": "Same as Glow but not fixed size in screen space."
+              },
+              {
+                "value": 10,
+                "name": "None",
+                "description": "No rendering."
+              },
+              {
+                "value": 11,
+                "name": "DevVisualizer",
+                "description": "Developer visualizer rendering mode."
+              }
+            ]
+          }
         }
       ],
       "retType": {
@@ -1281,7 +1413,33 @@
       ],
       "retType": {
         "type": "int32",
-        "description": "The team number of the client, or 0 if the client is invalid."
+        "description": "The team number of the client, or 0 if the client is invalid.",
+        "enum": {
+          "name": "CSTeam",
+          "description": "Enum representing the possible teams in Counter-Strike.",
+          "values": [
+            {
+              "value": 0,
+              "name": "None",
+              "description": "No team."
+            },
+            {
+              "value": 1,
+              "name": "Spectator",
+              "description": "Spectator team."
+            },
+            {
+              "value": 2,
+              "name": "T",
+              "description": "Terrorist team."
+            },
+            {
+              "value": 3,
+              "name": "CT",
+              "description": "Counter-Terrorist team."
+            }
+          ]
+        }
       }
     },
     {
@@ -1300,7 +1458,33 @@
           "name": "team",
           "type": "int32",
           "ref": false,
-          "description": "The new team number to set for the client."
+          "description": "The new team number to set for the client.",
+          "enum": {
+            "name": "CSTeam",
+            "description": "Enum representing the possible teams in Counter-Strike.",
+            "values": [
+              {
+                "value": 0,
+                "name": "None",
+                "description": "No team."
+              },
+              {
+                "value": 1,
+                "name": "Spectator",
+                "description": "Spectator team."
+              },
+              {
+                "value": 2,
+                "name": "T",
+                "description": "Terrorist team."
+              },
+              {
+                "value": 3,
+                "name": "CT",
+                "description": "Counter-Terrorist team."
+              }
+            ]
+          }
         }
       ],
       "retType": {
@@ -1687,6 +1871,47 @@
       "retType": {
         "type": "vec3",
         "description": "A vector where the local velocity will be stored."
+      }
+    },
+    {
+      "name": "GetClientAngRotation",
+      "group": "Clients",
+      "description": "Retrieves the angular rotation of an client.",
+      "funcName": "GetClientAngRotation",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose angular rotation is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the angular rotation will be stored."
+      }
+    },
+    {
+      "name": "SetClientAngRotation",
+      "group": "Clients",
+      "description": "Sets the angular rotation of an client.",
+      "funcName": "SetClientAngRotation",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot whose angular rotation is to be set."
+        },
+        {
+          "name": "rotation",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new angular rotation to set for the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
       }
     },
     {
@@ -2777,7 +3002,33 @@
           "name": "team",
           "type": "int32",
           "ref": false,
-          "description": "The team index to switch the client to."
+          "description": "The team index to switch the client to.",
+          "enum": {
+            "name": "CSTeam",
+            "description": "Enum representing the possible teams in Counter-Strike.",
+            "values": [
+              {
+                "value": 0,
+                "name": "None",
+                "description": "No team."
+              },
+              {
+                "value": 1,
+                "name": "Spectator",
+                "description": "Spectator team."
+              },
+              {
+                "value": 2,
+                "name": "T",
+                "description": "Terrorist team."
+              },
+              {
+                "value": 3,
+                "name": "CT",
+                "description": "Counter-Terrorist team."
+              }
+            ]
+          }
         }
       ],
       "retType": {
@@ -3151,6 +3402,47 @@
           "type": "int32",
           "ref": false,
           "description": "The armor value to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientSpeed",
+      "group": "Clients",
+      "description": "Returns the client's speed value.",
+      "funcName": "GetClientSpeed",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The speed value of the client."
+      }
+    },
+    {
+      "name": "SetClientSpeed",
+      "group": "Clients",
+      "description": "Sets the client's speed value.",
+      "funcName": "SetClientSpeed",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "speed",
+          "type": "float",
+          "ref": false,
+          "description": "The speed value to set."
         }
       ],
       "retType": {
@@ -11625,7 +11917,73 @@
       ],
       "retType": {
         "type": "uint8",
-        "description": "The render mode of the entity, or 0 if the entity is invalid."
+        "description": "The render mode of the entity, or 0 if the entity is invalid.",
+        "enum": {
+          "name": "RenderMode",
+          "description": "Enum representing rendering modes for materials.",
+          "values": [
+            {
+              "value": 0,
+              "name": "Normal",
+              "description": "Standard rendering mode (src)."
+            },
+            {
+              "value": 1,
+              "name": "TransColor",
+              "description": "Composite: c*a + dest*(1-a)."
+            },
+            {
+              "value": 2,
+              "name": "TransTexture",
+              "description": "Composite: src*a + dest*(1-a)."
+            },
+            {
+              "value": 3,
+              "name": "Glow",
+              "description": "Composite: src*a + dest -- No Z buffer checks -- Fixed size in screen space."
+            },
+            {
+              "value": 4,
+              "name": "TransAlpha",
+              "description": "Composite: src*srca + dest*(1-srca)."
+            },
+            {
+              "value": 5,
+              "name": "TransAdd",
+              "description": "Composite: src*a + dest."
+            },
+            {
+              "value": 6,
+              "name": "Environmental",
+              "description": "Not drawn, used for environmental effects."
+            },
+            {
+              "value": 7,
+              "name": "TransAddFrameBlend",
+              "description": "Uses a fractional frame value to blend between animation frames."
+            },
+            {
+              "value": 8,
+              "name": "TransAlphaAdd",
+              "description": "Composite: src + dest*(1-a)."
+            },
+            {
+              "value": 9,
+              "name": "WorldGlow",
+              "description": "Same as Glow but not fixed size in screen space."
+            },
+            {
+              "value": 10,
+              "name": "None",
+              "description": "No rendering."
+            },
+            {
+              "value": 11,
+              "name": "DevVisualizer",
+              "description": "Developer visualizer rendering mode."
+            }
+          ]
+        }
       }
     },
     {
@@ -11642,9 +12000,75 @@
         },
         {
           "name": "renderMode",
-          "type": "int32",
+          "type": "uint8",
           "ref": false,
-          "description": "The new render mode to set for the entity."
+          "description": "The new render mode to set for the entity.",
+          "enum": {
+            "name": "RenderMode",
+            "description": "Enum representing rendering modes for materials.",
+            "values": [
+              {
+                "value": 0,
+                "name": "Normal",
+                "description": "Standard rendering mode (src)."
+              },
+              {
+                "value": 1,
+                "name": "TransColor",
+                "description": "Composite: c*a + dest*(1-a)."
+              },
+              {
+                "value": 2,
+                "name": "TransTexture",
+                "description": "Composite: src*a + dest*(1-a)."
+              },
+              {
+                "value": 3,
+                "name": "Glow",
+                "description": "Composite: src*a + dest -- No Z buffer checks -- Fixed size in screen space."
+              },
+              {
+                "value": 4,
+                "name": "TransAlpha",
+                "description": "Composite: src*srca + dest*(1-srca)."
+              },
+              {
+                "value": 5,
+                "name": "TransAdd",
+                "description": "Composite: src*a + dest."
+              },
+              {
+                "value": 6,
+                "name": "Environmental",
+                "description": "Not drawn, used for environmental effects."
+              },
+              {
+                "value": 7,
+                "name": "TransAddFrameBlend",
+                "description": "Uses a fractional frame value to blend between animation frames."
+              },
+              {
+                "value": 8,
+                "name": "TransAlphaAdd",
+                "description": "Composite: src + dest*(1-a)."
+              },
+              {
+                "value": 9,
+                "name": "WorldGlow",
+                "description": "Same as Glow but not fixed size in screen space."
+              },
+              {
+                "value": 10,
+                "name": "None",
+                "description": "No rendering."
+              },
+              {
+                "value": 11,
+                "name": "DevVisualizer",
+                "description": "Developer visualizer rendering mode."
+              }
+            ]
+          }
         }
       ],
       "retType": {
@@ -11859,7 +12283,33 @@
       ],
       "retType": {
         "type": "int32",
-        "description": "The team number of the entity, or 0 if the entity is invalid."
+        "description": "The team number of the entity, or 0 if the entity is invalid.",
+        "enum": {
+          "name": "CSTeam",
+          "description": "Enum representing the possible teams in Counter-Strike.",
+          "values": [
+            {
+              "value": 0,
+              "name": "None",
+              "description": "No team."
+            },
+            {
+              "value": 1,
+              "name": "Spectator",
+              "description": "Spectator team."
+            },
+            {
+              "value": 2,
+              "name": "T",
+              "description": "Terrorist team."
+            },
+            {
+              "value": 3,
+              "name": "CT",
+              "description": "Counter-Terrorist team."
+            }
+          ]
+        }
       }
     },
     {
@@ -11878,7 +12328,33 @@
           "name": "team",
           "type": "int32",
           "ref": false,
-          "description": "The new team number to set for the entity."
+          "description": "The new team number to set for the entity.",
+          "enum": {
+            "name": "CSTeam",
+            "description": "Enum representing the possible teams in Counter-Strike.",
+            "values": [
+              {
+                "value": 0,
+                "name": "None",
+                "description": "No team."
+              },
+              {
+                "value": 1,
+                "name": "Spectator",
+                "description": "Spectator team."
+              },
+              {
+                "value": 2,
+                "name": "T",
+                "description": "Terrorist team."
+              },
+              {
+                "value": 3,
+                "name": "CT",
+                "description": "Counter-Terrorist team."
+              }
+            ]
+          }
         }
       ],
       "retType": {
@@ -12353,6 +12829,47 @@
       "retType": {
         "type": "vec3",
         "description": "A vector where the local velocity will be stored."
+      }
+    },
+    {
+      "name": "GetEntityAngRotation",
+      "group": "Entities",
+      "description": "Retrieves the angular rotation of an entity.",
+      "funcName": "GetEntityAngRotation",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose angular rotation is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "vec3",
+        "description": "A vector where the angular rotation will be stored."
+      }
+    },
+    {
+      "name": "SetEntityAngRotation",
+      "group": "Entities",
+      "description": "Sets the angular rotation of an entity.",
+      "funcName": "SetEntityAngRotation",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose angular rotation is to be set."
+        },
+        {
+          "name": "rotation",
+          "type": "vec3",
+          "ref": false,
+          "description": "The new angular rotation to set for the entity."
+        }
+      ],
+      "retType": {
+        "type": "void"
       }
     },
     {

@@ -573,7 +573,8 @@ extern "C" PLUGIN_API void SetEntityFlags(int entityHandle, int flags) {
 extern "C" PLUGIN_API int GetEntityRenderColor(int entityHandle) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return {};
-	return entity->m_clrRender->GetRawColor();
+	Color color = entity->m_clrRender;
+	return *reinterpret_cast<const int*>(&color);
 }
 
 /**
@@ -1147,6 +1148,36 @@ extern "C" PLUGIN_API plg::vec3 GetEntityLocalVelocity(int entityHandle) {
 	if (!entity) return {};
 	const Vector& vec = entity->GetLocalVelocity();
 	return *reinterpret_cast<const plg::vec3*>(&vec);
+}
+
+/**
+* @brief Retrieves the angular rotation of an entity.
+ *
+ * This function gets the angular rotation of the specified entity.
+ * If the entity is invalid, the function does nothing.
+ *
+ * @param entityHandle The handle of the entity whose angular rotation is to be retrieved.
+ * @return A vector where the angular rotation will be stored.
+ */
+extern "C" PLUGIN_API plg::vec3 GetEntityAngRotation(int entityHandle) {
+	auto* entity = helpers::GetEntity(entityHandle);
+	if (!entity) return {};
+	const QAngle& ang = entity->m_CBodyComponent->m_pSceneNode->m_angRotation;
+	return *reinterpret_cast<const plg::vec3*>(&ang);
+}
+/**
+ * @brief Sets the angular rotation of an entity.
+ *
+ * This function updates the angular rotation of the specified entity.
+ * If the entity is invalid, the function does nothing.
+ *
+ * @param entityHandle The handle of the entity whose angular rotation is to be set.
+ * @param rotation The new angular rotation to set for the entity.
+ */
+extern "C" PLUGIN_API void SetEntityAngRotation(int entityHandle, const plg::vec3& rotation) {
+	auto* entity = helpers::GetEntity(entityHandle);
+	if (!entity) return;
+	entity->m_CBodyComponent->m_pSceneNode->m_angRotation = *reinterpret_cast<const QAngle*>(&rotation);
 }
 
 /**

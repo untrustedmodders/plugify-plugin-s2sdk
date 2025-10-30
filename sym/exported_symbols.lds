@@ -79,6 +79,8 @@ GetClientLocalAngVelocity
 GetClientAngVelocity
 SetClientAngVelocity
 GetClientLocalVelocity
+GetClientAngRotation
+SetClientAngRotation
 TransformPointClientToWorld
 TransformPointWorldToClient
 GetClientEyePosition
@@ -130,6 +132,8 @@ GiveNamedItem
 GetClientButtons
 GetClientArmor
 SetClientArmor
+GetClientSpeed
+SetClientSpeed
 GetClientMoney
 SetClientMoney
 GetClientKills
@@ -330,6 +334,8 @@ GetEntityLocalAngVelocity
 GetEntityAngVelocity
 SetEntityAngVelocity
 GetEntityLocalVelocity
+GetEntityAngRotation
+SetEntityAngRotation
 TransformPointEntityToWorld
 TransformPointWorldToEntity
 GetEntityEyePosition

@@ -81,6 +81,8 @@
         GetClientAngVelocity;
         SetClientAngVelocity;
         GetClientLocalVelocity;
+        GetClientAngRotation;
+        SetClientAngRotation;
         TransformPointClientToWorld;
         TransformPointWorldToClient;
         GetClientEyePosition;
@@ -132,6 +134,8 @@
         GetClientButtons;
         GetClientArmor;
         SetClientArmor;
+        GetClientSpeed;
+        SetClientSpeed;
         GetClientMoney;
         SetClientMoney;
         GetClientKills;
@@ -332,6 +336,8 @@
         GetEntityAngVelocity;
         SetEntityAngVelocity;
         GetEntityLocalVelocity;
+        GetEntityAngRotation;
+        SetEntityAngRotation;
         TransformPointEntityToWorld;
         TransformPointWorldToEntity;
         GetEntityEyePosition;

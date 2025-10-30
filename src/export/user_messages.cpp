@@ -501,7 +501,7 @@ extern "C" PLUGIN_API int PbReadColor(UserMessage* userMessage, const plg::strin
 			return {};
 		}
 	}
-	return returnValue.GetRawColor();
+	return *reinterpret_cast<const int*>(&returnValue);
 }
 
 /**
