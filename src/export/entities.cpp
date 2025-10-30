@@ -1219,7 +1219,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityEyeAngles(int entityHandle) {
  * If the entity is invalid, the function does nothing.
  *
  * @param entityHandle The handle of the entity whose forward velocity is to be set.
- * @param velocity The new forward velocity to set for the entity.
+ * @param forward The new forward velocity to set for the entity.
  */
 extern "C" PLUGIN_API void SetEntityForwardVector(int entityHandle, const plg::vec3& forward) {
 	auto* entity = helpers::GetEntity(entityHandle);

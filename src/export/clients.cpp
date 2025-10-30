@@ -1139,7 +1139,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientEyeAngles(int playerSlot) {
  * If the client is invalid, the function does nothing.
  *
  * @param playerSlot The index of the player's slot whose forward velocity is to be set.
- * @param velocity The new forward velocity to set for the client.
+ * @param forward The new forward velocity to set for the client.
  */
 extern "C" PLUGIN_API void SetClientForwardVector(int playerSlot, const plg::vec3& forward) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
