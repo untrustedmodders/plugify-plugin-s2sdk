@@ -1,5 +1,5 @@
 /**
-  * =============================================================================
+ * =============================================================================
  * s2sdk
  * Copyright (C) 2023-2025 untrustedmodders
  * =============================================================================
@@ -68,7 +68,7 @@ enum TakeDamageFlags_t : uint32_t {
 
 // No idea what this is meant to have, but OnTakeDamage_Alive expects this and we only care about pInfo
 struct CTakeDamageInfoContainer {
-	//CTakeDamageInfo* info;
+	CTakeDamageInfo* info;
 };
 
 class CTakeDamage {
@@ -83,7 +83,7 @@ public:
 
 class CTakeDamageInfo {
 private:
-	[[maybe_unused]] uint8_t __pad0000[0x8];
+	[[maybe_unused]] int (**_vptr_CTakeDamageInfo)(...);
 
 public:
 	Vector m_vecDamageForce;
@@ -113,7 +113,7 @@ private:
 public:
 	TakeDamageFlags_t m_nDamageFlags;
 	int32_t m_nNumObjectsPenetrated;
-	uint64_t m_hScriptInstance;
+	HSCRIPT m_hScriptInstance;
 
 private:
 	[[maybe_unused]] uint8_t __pad0080[0x14];

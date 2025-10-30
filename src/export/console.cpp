@@ -143,3 +143,48 @@ extern "C" PLUGIN_API void ReplyToCommand(CommandCallingContext context, int pla
 			return;
 	}
 }
+#if  0
+/**
+ * @brief Sends a colored text message to one specific client.
+ *
+ * @param userID Target player's user ID.
+ * @param message Message text.
+ * @param r Red value.
+ * @param g Green value.
+ * @param b Blue value.
+ * @param a Alpha transparency.
+ */
+extern "C" PLUGIN_API void UTIL_MessageText(int playerSlot, const plg::string& message, int r, int g, int b, int a) {
+	Printing{}.UTIL_MessageText(userID, message, r, g, b, a);
+}
+
+/**
+ * @brief Sends a colored text message to all clients.
+ *
+ * @param message Message text.
+ * @param r Red value.
+ * @param g Green value.
+ * @param b Blue value.
+ * @param a Alpha transparency.
+ */
+extern "C" PLUGIN_API void UTIL_MessageTextAll(const plg::string& message, int r, int g, int b, int a) {
+	Printing{}.UTIL_MessageTextAll(message, r, g, b, a);
+}
+
+/**
+ * @brief Clears all message text for one client.
+ *
+ * @param userID Target player's user ID.
+ */
+extern "C" PLUGIN_API void UTIL_ResetMessageText(int playerSlot) {
+	Printing{}.UTIL_ResetMessageText(userID);
+}
+
+/**
+ * @brief Clears all message text for all clients.
+ */
+extern "C" PLUGIN_API void UTIL_ResetMessageTextAll() {
+	Printing{}.UTIL_ResetMessageTextAll();
+}
+
+#endif

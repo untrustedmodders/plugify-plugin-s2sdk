@@ -1607,7 +1607,7 @@ extern "C" PLUGIN_API void FireEntityOutput(int entityHandle, const plg::string&
 	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) activatorHandle)) : nullptr;
 	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
-	entity->FireOutput(outputName.c_str(), activator ? activator->GetScriptInstance() : nullptr, activator ? caller->GetScriptInstance() : nullptr, variant, delay);
+	entity->FireOutput(outputName.c_str(), activator ? activator->GetScriptInstance() : nullptr, caller ? caller->GetScriptInstance() : nullptr, variant, delay);
 }
 
 /**
@@ -1670,7 +1670,7 @@ extern "C" PLUGIN_API void FollowEntityMerge(int entityHandle, int attachmentHan
  * @param damageTypes Bitfield of damage type flags
  * @return Amount of damage actually applied to the entity
  */
-extern "C" PLUGIN_API int TakeEntityDamage(int entityHandle, int inflictorHandle, int attackerHandle, const plg::vec3& force, const plg::vec3& hitPos, float damage, int damageTypes) {
+extern "C" PLUGIN_API int TakeEntityDamage(int entityHandle, int inflictorHandle, int attackerHandle, const plg::vec3& force, const plg::vec3& hitPos, float damage, DamageTypes_t damageTypes) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
 	auto* inflictor = helpers::GetEntity(inflictorHandle);

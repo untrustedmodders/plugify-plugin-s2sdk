@@ -1,5 +1,5 @@
 /**
-  * =============================================================================
+ * =============================================================================
  * s2sdk
  * Copyright (C) 2023-2025 untrustedmodders
  * =============================================================================
@@ -311,7 +311,7 @@ public:
 		g_pGameEntitySystem->AddRefKeyValues(ESKeyValues);
 
 		for (size_t i = 0; i < values.size(); ++i) {
-			auto key = EntityKeyId_t::Make(keys[i].c_str());
+			auto key = EntityKeyId_t::Make(keys[i]);
 			plg::visit([&](const auto& v) {
 				using T = std::decay_t<decltype(v)>;
 				if constexpr (std::is_same_v<T, plg::string>) {
@@ -358,7 +358,7 @@ public:
 		g_pGameEntitySystem->AddRefKeyValues(ESKeyValues);
 
 		for (const auto& [k, v] : kv) {
-			auto key = EntityKeyId_t::Make(k.c_str());
+			auto key = EntityKeyId_t::Make(k);
 			ESKeyValues->SetString(key, v.c_str());
 		}
 
@@ -402,45 +402,6 @@ public:
 	VSCRIPT_MEMBER_FUNCTION(FindByModelWithin, HSCRIPT, HSCRIPT, const char*, Vector, float)
 	VSCRIPT_MEMBER_FUNCTION(FindByTarget, HSCRIPT, HSCRIPT, const char*)
 	VSCRIPT_MEMBER_FUNCTION(FindInSphere, HSCRIPT, HSCRIPT, const char*, Vector, float)
-};
-
-class CDebugOverlayScriptHelper {
-public:
-    DECLARE_SCHEMA_CLASS(CDebugOverlayScriptHelper);
-
-    VSCRIPT_MEMBER_FUNCTION(Axis, void, Vector, Quaternion, float, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Box, void, Vector, Vector, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(BoxAngles, void, Vector, Vector, Vector, Quaternion, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Capsule, void, Vector, Quaternion, float, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Circle, void, Vector, Quaternion, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(CircleScreenOriented, void, Vector, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Cone, void, Vector, Vector, float, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Cross, void, Vector, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Cross3D, void, Vector, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Cross3DOriented, void, Vector, Quaternion, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(DrawTickMarkedLine, void, Vector, Vector, float, int, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(EntityAttachments, void, HSCRIPT, float, float)
-    VSCRIPT_MEMBER_FUNCTION(EntityAxis, void, HSCRIPT, float, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(EntityBounds, void, HSCRIPT, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(EntitySkeleton, void, HSCRIPT, float)
-    VSCRIPT_MEMBER_FUNCTION(EntityText, void, HSCRIPT, int, const char*, int, int, int, int, float)
-    VSCRIPT_MEMBER_FUNCTION(FilledRect2D, void, Vector2D, Vector2D, int, int, int, int, float)
-    VSCRIPT_MEMBER_FUNCTION(HorzArrow, void, Vector, Vector, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Line, void, Vector, Vector, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Line2D, void, Vector2D, Vector2D, int, int, int, int, float)
-    VSCRIPT_MEMBER_FUNCTION(PopDebugOverlayScope, void)
-    VSCRIPT_MEMBER_FUNCTION(PushAndClearDebugOverlayScope, void, CUtlStringToken)
-    VSCRIPT_MEMBER_FUNCTION(PushDebugOverlayScope, void, CUtlStringToken)
-    VSCRIPT_MEMBER_FUNCTION(RemoveAllInScope, void, CUtlStringToken)
-    VSCRIPT_MEMBER_FUNCTION(SolidCone, void, Vector, Vector, float, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(Sphere, void, Vector, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(SweptBox, void, Vector, Vector, Vector, Vector, Quaternion, int, int, int, int, float)
-    VSCRIPT_MEMBER_FUNCTION(Text, void, Vector, int, const char*, float, int, int, int, int, float)
-    VSCRIPT_MEMBER_FUNCTION(Texture, void, const char*, Vector2D, Vector2D, int, int, int, int, Vector2D, Vector2D, float)
-    VSCRIPT_MEMBER_FUNCTION(Triangle, void, Vector, Vector, Vector, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(VectorText3D, void, Vector, Quaternion, const char*, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(VertArrow, void, Vector, Vector, float, int, int, int, int, bool, float)
-    VSCRIPT_MEMBER_FUNCTION(YawArrow, void, Vector, float, float, float, int, int, int, int, bool, float)
 };
 
 class SpawnPoint : public CBaseEntity {

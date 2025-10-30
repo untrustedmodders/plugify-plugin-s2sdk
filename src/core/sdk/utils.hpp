@@ -50,15 +50,6 @@ namespace utils {
 	bool IsSpawnValid(const Vector& origin);
 	bool FindValidSpawn(Vector& origin, QAngle& angles);
 
-	// Helper to convert GameEventKeySymbol_t from string
-	inline GameEventKeySymbol_t MakeEventKeySymbol(std::string_view name) {
-		return GameEventKeySymbol_t::Make(name.data(), static_cast<int>(name.size()));
-	}
-	// Helper to convert CKV3MemberName from string
-	inline CKV3MemberName MakeMemberName(std::string_view name) {
-		return CKV3MemberName(name.data(), static_cast<int>(name.size()));
-	}
-
 	// Helper to convert plg::vector<uint8_t> to CUtlBuffer
 	inline CUtlBuffer CreateUtlBufferFromVector(const plg::vector<uint8_t>& data) {
 		CUtlBuffer buffer;

@@ -1496,7 +1496,7 @@ extern "C" PLUGIN_API void FireClientOutput(int playerSlot, const plg::string& o
 	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) activatorHandle)) : nullptr;
 	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
-	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), activator ? activator->GetScriptInstance() : nullptr, activator ? caller->GetScriptInstance() : nullptr, variant, delay);
+	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), activator ? activator->GetScriptInstance() : nullptr, caller ? caller->GetScriptInstance() : nullptr, variant, delay);
 }
 
 /**
@@ -1559,7 +1559,7 @@ extern "C" PLUGIN_API void FollowClientMerge(int playerSlot, int attachmentHandl
  * @param damageTypes Bitfield of damage type flags
  * @return Amount of damage actually applied to the client
  */
-extern "C" PLUGIN_API int TakeClientDamage(int playerSlot, int inflictorSlot, int attackerSlot, const plg::vec3& force, const plg::vec3& hitPos, float damage, int damageTypes) {
+extern "C" PLUGIN_API int TakeClientDamage(int playerSlot, int inflictorSlot, int attackerSlot, const plg::vec3& force, const plg::vec3& hitPos, float damage, DamageTypes_t damageTypes) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
 	auto [controller2, inflictor] = helpers::GetController2(inflictorSlot);

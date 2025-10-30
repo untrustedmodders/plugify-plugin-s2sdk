@@ -1,7 +1,5 @@
-#include <core/sdk/entity/cbaseentity.h>
+#include <core/sdk/entity/debug.h>
 #include <core/sdk/helpers.hpp>
-
-#if 0
 
 PLUGIFY_WARN_PUSH()
 
@@ -11,6 +9,193 @@ PLUGIFY_WARN_IGNORE("-Wreturn-type-c-linkage")
 PLUGIFY_WARN_IGNORE(4190)
 #endif
 
+/**
+ * @brief Triggers a breakpoint in the debugger.
+ */
+extern "C" PLUGIN_API void DebugBreak() {
+	Debug{}.DebugBreak();
+}
+
+/**
+ * @brief Draws a debug overlay box.
+ *
+ * @param center Center of the box in world space.
+ * @param mins Minimum bounds relative to the center.
+ * @param maxs Maximum bounds relative to the center.
+ * @param r Red color value.
+ * @param g Green color value.
+ * @param b Blue color value.
+ * @param a Alpha (transparency) value.
+ * @param duration Duration (in seconds) to display the box.
+ */
+extern "C" PLUGIN_API void DebugDrawBox(const plg::vec3& center, const plg::vec3& mins, const plg::vec3& maxs,
+			 int r, int g, int b, int a, float duration) {
+	Debug{}.DebugDrawBox(*reinterpret_cast<const Vector*>(&center),
+						 *reinterpret_cast<const Vector*>(&mins),
+						 *reinterpret_cast<const Vector*>(&maxs),
+						 r, g, b, a, duration);
+}
+
+/**
+ * @brief Draws a debug box oriented in the direction of a forward vector.
+ *
+ * @param center Center of the box.
+ * @param mins Minimum bounds.
+ * @param maxs Maximum bounds.
+ * @param forward Forward direction vector.
+ * @param color RGB color vector.
+ * @param alpha Alpha transparency.
+ * @param duration Duration (in seconds) to display the box.
+ */
+extern "C" PLUGIN_API void DebugDrawBoxDirection(const plg::vec3& center, const plg::vec3& mins, const plg::vec3& maxs,
+					  const plg::vec3& forward, const plg::vec3& color, float alpha, float duration) {
+	Debug{}.DebugDrawBoxDirection(*reinterpret_cast<const Vector*>(&center),
+								  *reinterpret_cast<const Vector*>(&mins),
+								  *reinterpret_cast<const Vector*>(&maxs),
+								  *reinterpret_cast<const Vector*>(&forward),
+								  *reinterpret_cast<const Vector*>(&color),
+								  alpha, duration);
+}
+
+/**
+ * @brief Draws a debug circle.
+ *
+ * @param center Center of the circle.
+ * @param color RGB color vector.
+ * @param alpha Alpha transparency.
+ * @param radius Circle radius.
+ * @param zTest Whether to perform depth testing.
+ * @param duration Duration (in seconds) to display the circle.
+ */
+extern "C" PLUGIN_API void DebugDrawCircle(const plg::vec3& center, const plg::vec3& color,
+				float alpha, float radius, bool zTest, float duration) {
+	Debug{}.DebugDrawCircle(*reinterpret_cast<const Vector*>(&center),
+							*reinterpret_cast<const Vector*>(&color),
+							alpha, radius, zTest, duration);
+}
+
+/**
+ * @brief Clears all debug overlays.
+ */
+extern "C" PLUGIN_API void DebugDrawClear() {
+	Debug{}.DebugDrawClear();
+}
+
+/**
+ * @brief Draws a debug overlay line.
+ *
+ * @param origin Start point of the line.
+ * @param target End point of the line.
+ * @param r Red color value.
+ * @param g Green color value.
+ * @param b Blue color value.
+ * @param zTest Whether to perform depth testing.
+ * @param duration Duration (in seconds) to display the line.
+ */
+extern "C" PLUGIN_API void DebugDrawLine(const plg::vec3& origin, const plg::vec3& target,
+			  int r, int g, int b, bool zTest, float duration) {
+	Debug{}.DebugDrawLine(*reinterpret_cast<const Vector*>(&origin),
+						  *reinterpret_cast<const Vector*>(&target),
+						  r, g, b, zTest, duration);
+}
+
+/**
+ * @brief Draws a debug line using a color vector.
+ *
+ * @param start Start point of the line.
+ * @param end End point of the line.
+ * @param color RGB color vector.
+ * @param zTest Whether to perform depth testing.
+ * @param duration Duration (in seconds) to display the line.
+ */
+extern "C" PLUGIN_API void DebugDrawLine_vCol(const plg::vec3& start, const plg::vec3& end,
+				   const plg::vec3& color, bool zTest, float duration) {
+	Debug{}.DebugDrawLine_vCol(*reinterpret_cast<const Vector*>(&start),
+							   *reinterpret_cast<const Vector*>(&end),
+							   *reinterpret_cast<const Vector*>(&color),
+							   zTest, duration);
+}
+
+/**
+ * @brief Draws text at a specified screen position with line offset.
+ *
+ * @param x X coordinate in screen space.
+ * @param y Y coordinate in screen space.
+ * @param lineOffset Line offset value.
+ * @param text The text string to display.
+ * @param r Red color value.
+ * @param g Green color value.
+ * @param b Blue color value.
+ * @param a Alpha transparency value.
+ * @param duration Duration (in seconds) to display the text.
+ */
+extern "C" PLUGIN_API void DebugDrawScreenTextLine(float x, float y, int lineOffset, const plg::string& text,
+						int r, int g, int b, int a, float duration) {
+	Debug{}.DebugDrawScreenTextLine(x, y, lineOffset, text.c_str(), r, g, b, a, duration);
+}
+
+/**
+ * @brief Draws a debug sphere.
+ *
+ * @param center Center of the sphere.
+ * @param color RGB color vector.
+ * @param alpha Alpha transparency.
+ * @param radius Radius of the sphere.
+ * @param zTest Whether to perform depth testing.
+ * @param duration Duration (in seconds) to display the sphere.
+ */
+extern "C" PLUGIN_API void DebugDrawSphere(const plg::vec3& center, const plg::vec3& color,
+				float alpha, float radius, bool zTest, float duration) {
+	Debug{}.DebugDrawSphere(*reinterpret_cast<const Vector*>(&center),
+							*reinterpret_cast<const Vector*>(&color),
+							alpha, radius, zTest, duration);
+}
+
+/**
+ * @brief Draws text in 3D space.
+ *
+ * @param origin World-space position to draw the text at.
+ * @param text The text string to display.
+ * @param viewCheck If true, only draws when visible to camera.
+ * @param duration Duration (in seconds) to display the text.
+ */
+extern "C" PLUGIN_API void DebugDrawText(const plg::vec3& origin, const plg::string& text,
+			  bool viewCheck, float duration) {
+	Debug{}.DebugDrawText(*reinterpret_cast<const Vector*>(&origin), text.c_str(), viewCheck, duration);
+}
+
+/**
+ * @brief Draws styled debug text on screen.
+ *
+ * @param x X coordinate.
+ * @param y Y coordinate.
+ * @param lineOffset Line offset value.
+ * @param text Text string.
+ * @param r Red color value.
+ * @param g Green color value.
+ * @param b Blue color value.
+ * @param a Alpha transparency.
+ * @param duration Duration (in seconds) to display the text.
+ * @param font Font name.
+ * @param size Font size.
+ * @param bold Whether text should be bold.
+ */
+extern "C" PLUGIN_API void DebugScreenTextPretty(float x, float y, int lineOffset, const plg::string& text,
+					  int r, int g, int b, int a, float duration, const plg::string& font, int size, bool bold) {
+	Debug{}.DebugScreenTextPretty(x, y, lineOffset, text.c_str(), r, g, b, a, duration, font.c_str(), size, bold);
+}
+
+/**
+ * @brief Performs an assertion and logs a message if the assertion fails.
+ *
+ * @param assertion Boolean value to test.
+ * @param message Message to display if the assertion fails.
+ */
+extern "C" PLUGIN_API void DebugScriptAssert(bool assertion, const plg::string& message) {
+	Debug{}.DoScriptAssert(assertion, message.c_str());
+}
+
+#if 0 //  to work require CDebugOverlayScriptHelper
 /**
  * @brief Draws an axis at a specified world-space origin.
  *
@@ -277,7 +462,7 @@ extern "C" PLUGIN_API void DebugEntitySkeleton(int entityHandle, float duration)
  * @param a Alpha (transparency) value.
  * @param duration Duration (in seconds) to display.
  */
-extern "C" PLUGIN_API void DebugEntityText(int entityHandle, int textOffset, const char* text,
+extern "C" PLUGIN_API void DebugEntityText(int entityHandle, int textOffset, const plg::string& text,
 	int r, int g, int b, int a, float duration) {
 	CDebugOverlayScriptHelper{}.EntityText(entity, textOffset, text, r, g, b, a, duration);
 }
@@ -468,7 +653,7 @@ extern "C" PLUGIN_API void DebugSweptBox(const plg::vec3& start, const plg::vec3
  * @param a Alpha (transparency) value.
  * @param duration Duration (in seconds) to display.
  */
-extern "C" PLUGIN_API void DebugText(const plg::vec3& origin, int lineOffset, const char* text,
+extern "C" PLUGIN_API void DebugText(const plg::vec3& origin, int lineOffset, const plg::string& text,
 	float scale, int r, int g, int b, int a, float duration) {
 	CDebugOverlayScriptHelper{}.Text(*reinterpret_cast<const Vector*>(&origin),
 		lineOffset, text, scale, r, g, b, a, duration);
@@ -488,7 +673,7 @@ extern "C" PLUGIN_API void DebugText(const plg::vec3& origin, int lineOffset, co
  * @param uvMax Maximum UV coordinate.
  * @param duration Duration (in seconds) to display the texture.
  */
-extern "C" PLUGIN_API void DebugTexture(const char* textureName, const plg::vec2& min, const plg::vec2& max,
+extern "C" PLUGIN_API void DebugTexture(const plg::string& textureName, const plg::vec2& min, const plg::vec2& max,
 	int r, int g, int b, int a, const plg::vec2& uvMin, const plg::vec2& uvMax, float duration) {
 	CDebugOverlayScriptHelper{}.Texture(textureName,
 		*reinterpret_cast<const Vector2D*>(&min),
@@ -533,7 +718,7 @@ extern "C" PLUGIN_API void DebugTriangle(const plg::vec3& v1, const plg::vec3& v
  * @param zTest Whether to perform depth testing.
  * @param duration Duration (in seconds) to display the text.
  */
-extern "C" PLUGIN_API void DebugVectorText3D(const plg::vec3& origin, const plg::quat& orientation, const char* text,
+extern "C" PLUGIN_API void DebugVectorText3D(const plg::vec3& origin, const plg::quat& orientation, const plg::string& text,
 	int r, int g, int b, int a, bool zTest, float duration) {
 	CDebugOverlayScriptHelper{}.VectorText3D(*reinterpret_cast<const Vector*>(&origin),
 		*reinterpret_cast<const Quaternion*>(&orientation),
@@ -580,6 +765,6 @@ extern "C" PLUGIN_API void DebugYawArrow(const plg::vec3& origin, float yaw, flo
 		yaw, length, width, r, g, b, a, zTest, duration);
 }
 
-PLUGIFY_WARN_POP()
-
 #endif
+
+PLUGIFY_WARN_POP()
