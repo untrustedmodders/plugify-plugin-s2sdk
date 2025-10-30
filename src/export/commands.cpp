@@ -86,9 +86,8 @@ extern "C" PLUGIN_API bool RemoveCommandListener(const plg::string& name, Comman
  * @param command The command to execute on the server.
  */
 extern "C" PLUGIN_API void ServerCommand(const plg::string& command) {
-	auto cleanCommand = command;
-	cleanCommand.append("\n\0");
-	g_pEngineServer->ServerCommand(command.c_str());
+	auto cleanCommand = std::format("{}\n", command);
+	g_pEngineServer->ServerCommand(cleanCommand.c_str());
 }
 /**
  * @brief Executes a server command as if it were on the server console (or RCON) and stores the printed text into buffer.
@@ -97,8 +96,7 @@ extern "C" PLUGIN_API void ServerCommand(const plg::string& command) {
  * @return String to store command result into.
  */
 extern "C" PLUGIN_API plg::string ServerCommandEx(const plg::string& command) {
-	auto cleanCommand = command;
-	cleanCommand.append("\n\0");
+	auto cleanCommand = std::format("{}\n", command);
 
 	if (!g_ShouldCatchSpew) {
 		g_ShouldCatchSpew = true;
@@ -109,7 +107,18 @@ extern "C" PLUGIN_API plg::string ServerCommandEx(const plg::string& command) {
 		g_pEngineServer->ServerCommand(cleanCommand.c_str());
 	}
 
-	return g_ServerCommandBuffer;
+	switch (g_ServerCommandBuffer.size()) {
+		case 0:
+			return "";
+
+		case 1:
+			return g_ServerCommandBuffer[0];
+
+		default:
+			plg::string result = plg::join(g_ServerCommandBuffer, "");
+			g_ServerCommandBuffer.clear();
+			return result;
+	}
 }
 
 /**
@@ -120,8 +129,7 @@ extern "C" PLUGIN_API plg::string ServerCommandEx(const plg::string& command) {
  * @param command The command to execute on the client.
  */
 extern "C" PLUGIN_API void ClientCommand(int playerSlot, const plg::string& command) {
-	auto cleanCommand = command;
-	cleanCommand.append("\n\0");
+	auto cleanCommand = std::format("{}\n", command);
 	g_pEngineServer->ClientCommand(playerSlot, "%s", cleanCommand.c_str());
 }
 
