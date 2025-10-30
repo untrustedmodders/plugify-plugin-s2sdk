@@ -88,6 +88,17 @@ public:
 	DECLARE_SCHEMA_CLASS(CBodyComponent)
 
 	SCHEMA_FIELD(CGameSceneNode*, m_pSceneNode)
+
+	VSCRIPT_MEMBER_FUNCTION(AddImpulseAtPosition, void, Vector, Vector)
+	VSCRIPT_MEMBER_FUNCTION(AddVelocity, void, Vector, Vector)
+	VSCRIPT_MEMBER_FUNCTION(DetachFromParent, void)
+	VSCRIPT_MEMBER_FUNCTION(GetSequence, int)
+	VSCRIPT_MEMBER_FUNCTION(IsAttachedToParent, bool)
+	VSCRIPT_MEMBER_FUNCTION(LookupSequence, int, const char*)
+	VSCRIPT_MEMBER_FUNCTION(SequenceDuration, float, const char*)
+	VSCRIPT_MEMBER_FUNCTION(SetAngularVelocity, void, Vector)
+	VSCRIPT_MEMBER_FUNCTION(SetMaterialGroup, void, CUtlStringToken)
+	VSCRIPT_MEMBER_FUNCTION(SetVelocity, void, Vector)
 };
 
 class CModelState {
@@ -107,6 +118,21 @@ public:
 class CEntitySubclassVDataBase {
 public:
 	DECLARE_SCHEMA_CLASS(CEntitySubclassVDataBase)
+};
+
+// only for functions
+class CEntityInstance2 : public CEntityInstance {
+public:
+	using ThisClass = CEntityInstance2;
+	static constexpr const char m_className[] = "CEntityInstance";
+
+	using string = const char*;
+	using handle = HSCRIPT;
+	VSCRIPT_MEMBER_FUNCTION(ConnectOutput, void, string, string)
+	VSCRIPT_MEMBER_FUNCTION(DisconnectOutput, void, string, string)
+	VSCRIPT_MEMBER_FUNCTION(DisconnectRedirectedOutput, void, string, string, handle)
+	VSCRIPT_MEMBER_FUNCTION(FireOutput, void, string, handle, handle, handle, float)
+	VSCRIPT_MEMBER_FUNCTION(RedirectOutput, void, string, string, handle)
 };
 
 class CBaseEntity : public CEntityInstance {
@@ -367,15 +393,54 @@ public:
 
 	VSCRIPT_MEMBER_FUNCTION(CreateByClassname, HSCRIPT, const char*)
 	VSCRIPT_MEMBER_FUNCTION(FindByName, HSCRIPT, HSCRIPT, const char*)
-	VSCRIPT_MEMBER_FUNCTION(FindByNameNearest, HSCRIPT, const char*, const Vector&, float)
-	VSCRIPT_MEMBER_FUNCTION(FindByNameWithin, HSCRIPT, HSCRIPT, const char*, const Vector&, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByNameNearest, HSCRIPT, const char*, Vector, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByNameWithin, HSCRIPT, HSCRIPT, const char*, Vector, float)
 	VSCRIPT_MEMBER_FUNCTION(FindByClassname, HSCRIPT, HSCRIPT, const char*)
-	VSCRIPT_MEMBER_FUNCTION(FindByClassnameNearest, HSCRIPT, const char*, const Vector&, float)
-	VSCRIPT_MEMBER_FUNCTION(FindByClassnameWithin, HSCRIPT, HSCRIPT, const char*, const Vector&, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByClassnameNearest, HSCRIPT, const char*, Vector, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByClassnameWithin, HSCRIPT, HSCRIPT, const char*, Vector, float)
 	VSCRIPT_MEMBER_FUNCTION(FindByModel, HSCRIPT, HSCRIPT, const char*)
-	VSCRIPT_MEMBER_FUNCTION(FindByModelWithin, HSCRIPT, HSCRIPT, const char*, const Vector&, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByModelWithin, HSCRIPT, HSCRIPT, const char*, Vector, float)
 	VSCRIPT_MEMBER_FUNCTION(FindByTarget, HSCRIPT, HSCRIPT, const char*)
-	VSCRIPT_MEMBER_FUNCTION(FindInSphere, HSCRIPT, HSCRIPT, const char*, const Vector&, float)
+	VSCRIPT_MEMBER_FUNCTION(FindInSphere, HSCRIPT, HSCRIPT, const char*, Vector, float)
+};
+
+class CDebugOverlayScriptHelper {
+public:
+    DECLARE_SCHEMA_CLASS(CDebugOverlayScriptHelper);
+
+    VSCRIPT_MEMBER_FUNCTION(Axis, void, Vector, Quaternion, float, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Box, void, Vector, Vector, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(BoxAngles, void, Vector, Vector, Vector, Quaternion, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Capsule, void, Vector, Quaternion, float, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Circle, void, Vector, Quaternion, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(CircleScreenOriented, void, Vector, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Cone, void, Vector, Vector, float, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Cross, void, Vector, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Cross3D, void, Vector, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Cross3DOriented, void, Vector, Quaternion, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(DrawTickMarkedLine, void, Vector, Vector, float, int, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(EntityAttachments, void, HSCRIPT, float, float)
+    VSCRIPT_MEMBER_FUNCTION(EntityAxis, void, HSCRIPT, float, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(EntityBounds, void, HSCRIPT, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(EntitySkeleton, void, HSCRIPT, float)
+    VSCRIPT_MEMBER_FUNCTION(EntityText, void, HSCRIPT, int, const char*, int, int, int, int, float)
+    VSCRIPT_MEMBER_FUNCTION(FilledRect2D, void, Vector2D, Vector2D, int, int, int, int, float)
+    VSCRIPT_MEMBER_FUNCTION(HorzArrow, void, Vector, Vector, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Line, void, Vector, Vector, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Line2D, void, Vector2D, Vector2D, int, int, int, int, float)
+    VSCRIPT_MEMBER_FUNCTION(PopDebugOverlayScope, void)
+    VSCRIPT_MEMBER_FUNCTION(PushAndClearDebugOverlayScope, void, CUtlStringToken)
+    VSCRIPT_MEMBER_FUNCTION(PushDebugOverlayScope, void, CUtlStringToken)
+    VSCRIPT_MEMBER_FUNCTION(RemoveAllInScope, void, CUtlStringToken)
+    VSCRIPT_MEMBER_FUNCTION(SolidCone, void, Vector, Vector, float, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(Sphere, void, Vector, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(SweptBox, void, Vector, Vector, Vector, Vector, Quaternion, int, int, int, int, float)
+    VSCRIPT_MEMBER_FUNCTION(Text, void, Vector, int, const char*, float, int, int, int, int, float)
+    VSCRIPT_MEMBER_FUNCTION(Texture, void, const char*, Vector2D, Vector2D, int, int, int, int, Vector2D, Vector2D, float)
+    VSCRIPT_MEMBER_FUNCTION(Triangle, void, Vector, Vector, Vector, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(VectorText3D, void, Vector, Quaternion, const char*, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(VertArrow, void, Vector, Vector, float, int, int, int, int, bool, float)
+    VSCRIPT_MEMBER_FUNCTION(YawArrow, void, Vector, float, float, float, int, int, int, int, bool, float)
 };
 
 class SpawnPoint : public CBaseEntity {

@@ -2,7 +2,7 @@
 #include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/entity/cbaseplayercontroller.h>
 #include <core/sdk/entity/cplayercontroller.h>
-#include <core/sdk/utils.hpp>
+#include <core/sdk/helpers.hpp>
 
 #include <core/sdk/entity/cplayerpawn.h>
 
@@ -461,524 +461,1118 @@ extern "C" PLUGIN_API bool IsFakeClient(int playerSlot) {
 /////
 
 /**
- * @brief Retrieves a client's team index.
+ * @brief Retrieves the movement type of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @return The team index of the client.
+ * This function returns the movement type of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose movement type is to be retrieved.
+ * @return The movement type of the client, or 0 if the client is invalid.
  */
-extern "C" PLUGIN_API int GetClientTeam(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetEntityHealth' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientTeam' on invalid player pawn: {}\n", playerSlot);
-		return 0;
-	}
-
-	return pawn->m_iTeamNum;
+extern "C" PLUGIN_API MoveType_t GetClientMoveType(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->m_MoveType;
 }
 
 /**
- * @brief Sets a client's team index.
+ * @brief Sets the movement type of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @param team The team index to set.
+ * This function updates the movement type of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose movement type is to be set.
+ * @param moveType The new movement type to set for the client.
  */
-extern "C" PLUGIN_API void SetClientTeam(int playerSlot, int team) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientTeam' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientTeam' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	pawn->m_iTeamNum = team;
-	controller->m_iTeamNum = team;
+extern "C" PLUGIN_API void SetClientMoveType(int playerSlot, MoveType_t moveType) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetMoveType(moveType);
 }
 
 /**
- * @brief Returns the client's health.
+ * @brief Retrieves the gravity scale of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @return The health value of the client.
- */
-extern "C" PLUGIN_API int GetClientHealth(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientHealth' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientHealth' on invalid player pawn: {}\n", playerSlot);
-		return 0;
-	}
-
-	return pawn->m_iHealth;
-}
-
-/**
- * @brief Sets the client's health.
+ * This function returns the gravity scale of the specified client.
+ * If the client is invalid, it returns 0.0f.
  *
- * @param playerSlot The index of the player's slot.
- * @param health The health value to set.
- */
-extern "C" PLUGIN_API void SetClientHealth(int playerSlot, int health) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientHealth' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientHealth' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	pawn->m_iHealth = health;
-	controller->m_iHealth = health;
-}
-
-/**
- * @brief Returns the client's max health.
- *
- * @param playerSlot The index of the player's slot.
- * @return The max health value of the client.
- */
-extern "C" PLUGIN_API int GetClientMaxHealth(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientMaxHealth' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientMaxHealth' on invalid player pawn: {}\n", playerSlot);
-		return 0;
-	}
-
-	return pawn->m_iMaxHealth;
-}
-
-/**
- * @brief Sets the client's max health.
- *
- * @param playerSlot The index of the player's slot.
- * @param maxHealth The max health value to set.
- */
-extern "C" PLUGIN_API void SetClientMaxHealth(int playerSlot, int maxHealth) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientMaxHealth' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientMaxHealth' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	pawn->m_iMaxHealth = maxHealth;
-	controller->m_iMaxHealth = maxHealth;
-}
-
-/**
- * @brief Returns the client's speed value.
- *
- * @param playerSlot The index of the player's slot.
- * @return The speed value of the client.
- */
-extern "C" PLUGIN_API float GetClientSpeed(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientSpeed' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientSpeed' on invalid player pawn: {}\n", playerSlot);
-		return 0;
-	}
-
-	return pawn->m_flVelocityModifier;
-}
-
-/**
- * @brief Sets the client's speed value.
- *
- * @param playerSlot The index of the player's slot.
- * @param speed The speed value to set.
- */
-extern "C" PLUGIN_API void SetClientSpeed(int playerSlot, float speed) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientSpeed' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientSpeed' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	pawn->m_flVelocityModifier = speed;
-}
-
-/**
- * @brief Returns the client's gravity value.
- *
- * @param playerSlot The index of the player's slot.
- * @return The friction value of the client.
- */
-extern "C" PLUGIN_API float GetClientFriction(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientFriction' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientFriction' on invalid player pawn: {}\n", playerSlot);
-		return 0;
-	}
-
-	return pawn->m_flFriction;
-}
-
-/**
- * @brief Sets the client's gravity value.
- *
- * @param playerSlot The index of the player's slot.
- * @param friction The friction value to set.
- */
-extern "C" PLUGIN_API void SetClientFriction(int playerSlot, float friction) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientFriction' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientFriction' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	pawn->SetFriction(friction);
-}
-/**
- * @brief Returns the client's gravity value.
- *
- * @param playerSlot The index of the player's slot.
- * @return The gravity value of the client.
+ * @param playerSlot The index of the player's slot whose gravity scale is to be retrieved.
+ * @return The gravity scale of the client, or 0.0f if the client is invalid.
  */
 extern "C" PLUGIN_API float GetClientGravity(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientGravity' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientGravity' on invalid player pawn: {}\n", playerSlot);
-		return 0;
-	}
-
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
 	return pawn->m_flGravityScale;
 }
 
 /**
- * @brief Sets the client's gravity value.
+ * @brief Sets the gravity scale of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @param gravity The gravity value to set.
+ * This function updates the gravity scale of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose gravity scale is to be set.
+ * @param gravity The new gravity scale to set for the client.
  */
 extern "C" PLUGIN_API void SetClientGravity(int playerSlot, float gravity) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientGravity' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientGravity' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
 	pawn->SetGravity(gravity);
 }
 
 /**
- * @brief Returns the client's armor value.
+ * @brief Retrieves the flags of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @return The armor value of the client.
+ * This function returns the flags of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose flags are to be retrieved.
+ * @return The flags of the client, or 0 if the client is invalid.
  */
-extern "C" PLUGIN_API int GetClientArmor(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientArmor' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientArmor' on invalid player pawn: {}\n", playerSlot);
-		return 0;
-	}
-
-	return pawn->m_ArmorValue;
+extern "C" PLUGIN_API int GetClientFlags(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return *pawn->m_fFlags;
 }
 
 /**
- * @brief Sets the client's armor value.
+ * @brief Sets the flags of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @param armor The armor value to set.
+ * This function updates the flags of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose flags are to be set.
+ * @param flags The new flags to set for the client.
  */
-extern "C" PLUGIN_API void SetClientArmor(int playerSlot, int armor) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientArmor' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientArmor' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	pawn->m_ArmorValue = armor;
+extern "C" PLUGIN_API void SetClientFlags(int playerSlot, int flags) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->m_fFlags = static_cast<uint32>(flags);
 }
 
 /**
- * @brief Retrieves the client's origin vector.
+ * @brief Retrieves the render color of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @return A Vector where the client's origin will be stored.
+ * This function gets the render color of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose render color is to be retrieved.
+ * @return The raw color value of the client's render color, or 0 if the client is invalid.
+ */
+extern "C" PLUGIN_API int GetClientRenderColor(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->m_clrRender->GetRawColor();
+}
+
+/**
+ * @brief Sets the render color of an client.
+ *
+ * This function updates the render color of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose render color is to be set.
+ * @param color The new raw color value to set for the client's render color.
+ */
+extern "C" PLUGIN_API void SetClientRenderColor(int playerSlot, int color) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->m_clrRender = *reinterpret_cast<Color*>(&color);
+}
+
+/**
+ * @brief Retrieves the render mode of an client.
+ *
+ * This function gets the render mode of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose render mode is to be retrieved.
+ * @return The render mode of the client, or 0 if the client is invalid.
+ */
+extern "C" PLUGIN_API uint8_t GetClientRenderMode(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->m_nRenderMode;
+}
+
+/**
+ * @brief Sets the render mode of an client.
+ *
+ * This function updates the render mode of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose render mode is to be set.
+ * @param renderMode The new render mode to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientRenderMode(int playerSlot, uint8_t renderMode) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->m_nRenderMode = renderMode;
+}
+
+/**
+ * @brief Retrieves the mass of an client.
+ *
+ * This function returns the current mass of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose mass is to be retrieved.
+ * @return The mass of the client, or 0 if the client is invalid.
+ */
+extern "C" PLUGIN_API int GetClientMass(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->GetMass();
+}
+
+/**
+ * @brief Sets the mass of an client.
+ *
+ * This function updates the mass of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose mass is to be set.
+ * @param mass The new mass value to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientMass(int playerSlot, int mass) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetMass(mass);
+}
+
+/**
+ * @brief Retrieves the friction of an client.
+ *
+ * This function returns the current friction of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose friction is to be retrieved.
+ * @return The friction of the client, or 0 if the client is invalid.
+ */
+extern "C" PLUGIN_API float GetClientFriction(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->m_flFriction;
+}
+
+/**
+ * @brief Sets the friction of an client.
+ *
+ * This function updates the friction of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose friction is to be set.
+ * @param friction The new friction value to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientFriction(int playerSlot, float friction) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetFriction(friction);
+}
+
+/**
+ * @brief Sets the friction of an client.
+ *
+ * This function updates the friction of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose friction is to be set.
+ * @param duration Takes duration, value for a temporary override.
+ * @param friction The new friction value to set for the client.
+ */
+extern "C" PLUGIN_API void OverrideClientFriction(int playerSlot, float duration, float friction) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->OverrideFriction(duration, friction);
+}
+
+/**
+ * @brief Retrieves the health of an client.
+ *
+ * This function returns the current health of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose health is to be retrieved.
+ * @return The health of the client, or 0 if the client is invalid.
+ */
+extern "C" PLUGIN_API int GetClientHealth(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->GetHealth();
+}
+
+/**
+ * @brief Sets the health of an client.
+ *
+ * This function updates the health of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose health is to be set.
+ * @param health The new health value to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientHealth(int playerSlot, int health) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetHealth(health);
+}
+
+/**
+ * @brief Retrieves the max health of an client.
+ *
+ * This function returns the current max health of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose max health is to be retrieved.
+ * @return The max health of the client, or 0 if the client is invalid.
+ */
+extern "C" PLUGIN_API int GetClientMaxHealth(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->GetMaxHealth();
+}
+
+/**
+ * @brief Sets the max health of an client.
+ *
+ * This function updates the max health of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose max health is to be set.
+ * @param maxHealth The new max health value to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientMaxHealth(int playerSlot, int maxHealth) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetMaxHealth(maxHealth);
+}
+
+/**
+ * @brief Retrieves the team number of an client.
+ *
+ * This function returns the team number of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose team number is to be retrieved.
+ * @return The team number of the client, or 0 if the client is invalid.
+ */
+extern "C" PLUGIN_API int GetClientTeam(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!controller) return {};
+	return controller->GetTeam();
+}
+
+/**
+ * @brief Sets the team number of an client.
+ *
+ * This function updates the team number of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose team number is to be set.
+ * @param team The new team number to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientTeam(int playerSlot, int team) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!controller) return;
+	controller->SetTeam(team);
+}
+
+/**
+ * @brief Retrieves the absolute origin of an client.
+ *
+ * This function gets the absolute position of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose absolute origin is to be retrieved.
+ * @return A vector where the absolute origin will be stored.
  */
 extern "C" PLUGIN_API plg::vec3 GetClientAbsOrigin(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsOrigin' on invalid player slot: {}\n", playerSlot);
-		return {};
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsOrigin' on invalid player pawn: {}\n", playerSlot);
-		return {};
-	}
-
-	CGameSceneNode* pNode = pawn->m_CBodyComponent->m_pSceneNode;
-	if (!pNode) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsOrigin' on invalid player node: {}\n", playerSlot);
-		return {};
-	}
-
-	const Vector& vec = pNode->m_vecAbsOrigin;
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const Vector& vec = pawn->GetAbsOrigin();
 	return *reinterpret_cast<const plg::vec3*>(&vec);
 }
 
 /**
- * @brief Sets the client's origin vector.
+ * @brief Sets the absolute origin of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @param origin The new origin vector to set.
+ * This function updates the absolute position of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose absolute origin is to be set.
+ * @param origin The new absolute origin to set for the client.
  */
 extern "C" PLUGIN_API void SetClientAbsOrigin(int playerSlot, const plg::vec3& origin) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsOrigin' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsOrigin' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	CGameSceneNode* pNode = pawn->m_CBodyComponent->m_pSceneNode;
-	if (!pNode) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player node: {}\n", playerSlot);
-		return;
-	}
-
-	pNode->m_vecAbsOrigin = *reinterpret_cast<const Vector*>(&origin);
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetAbsOrigin(*reinterpret_cast<const Vector*>(&origin));
 }
 
 /**
- * @brief Retrieves the client's position angle.
+ * @brief Retrieves the absolute scale of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @return A QAngle where the client's position angle will be stored.
+ * This function gets the absolute position of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose absolute scale is to be retrieved.
+ * @return A vector where the absolute scale will be stored.
+ */
+extern "C" PLUGIN_API float GetClientAbsScale(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->GetAbsScale();
+}
+
+/**
+ * @brief Sets the absolute scale of an client.
+ *
+ * This function updates the absolute position of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose absolute scale is to be set.
+ * @param scale The new absolute scale to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientAbsScale(int playerSlot, float scale) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetAbsScale(scale);
+}
+
+/**
+ * @brief Retrieves the angular rotation of an client.
+ *
+ * This function gets the angular rotation of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose angular rotation is to be retrieved.
+ * @return A QAngle where the angular rotation will be stored.
  */
 extern "C" PLUGIN_API plg::vec3 GetClientAbsAngles(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsAngles' on invalid player slot: {}\n", playerSlot);
-		return {};
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsAngles' on invalid player pawn: {}\n", playerSlot);
-		return {};
-	}
-
-	CGameSceneNode* pNode = pawn->m_CBodyComponent->m_pSceneNode;
-	if (!pNode) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsAngles' on invalid player node: {}\n", playerSlot);
-		return {};
-	}
-
-	const QAngle& ang = pNode->m_angRotation;
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const QAngle& ang = pawn->GetAngles();
 	return *reinterpret_cast<const plg::vec3*>(&ang);
 }
 
 /**
- * @brief Sets the client's absolute rotation angles.
+ * @brief Sets the angular rotation of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @param angles The new rotation angles to set.
+ * This function updates the angular rotation of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose angular rotation is to be set.
+ * @param angle The new angular rotation to set for the client.
  */
-extern "C" PLUGIN_API void SetClientAbsAngles(int playerSlot, const plg::vec3& angles) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	CGameSceneNode* pNode = pawn->m_CBodyComponent->m_pSceneNode;
-	if (!pNode) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsAngles' on invalid player node: {}\n", playerSlot);
-		return;
-	}
-
-	pNode->m_angRotation = *reinterpret_cast<const QAngle*>(&angles);
+extern "C" PLUGIN_API void SetClientAbsAngles(int playerSlot, const QAngle& angle) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetAbsAngles(angle.x, angle.y, angle.z);
 }
 
 /**
- * @brief Retrieves the absolute velocity of a client.
+ * @brief Retrieves the local origin of an client.
+ *
+ * This function gets the local position of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose local origin is to be retrieved.
+ * @return A vector where the local origin will be stored.
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientLocalOrigin(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const Vector& vec = pawn->GetLocalOrigin();
+	return *reinterpret_cast<const plg::vec3*>(&vec);
+}
+
+/**
+ * @brief Sets the local origin of an client.
+ *
+ * This function updates the local position of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose local origin is to be set.
+ * @param origin The new local origin to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientLocalOrigin(int playerSlot, const plg::vec3& origin) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetLocalOrigin(*reinterpret_cast<const Vector*>(&origin));
+}
+
+/**
+ * @brief Retrieves the local scale of an client.
+ *
+ * This function gets the local position of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose local scale is to be retrieved.
+ * @return A vector where the local scale will be stored.
+ */
+extern "C" PLUGIN_API float GetClientLocalScale(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->GetLocalScale();
+}
+
+/**
+ * @brief Sets the local scale of an client.
+ *
+ * This function updates the local position of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose local scale is to be set.
+ * @param scale The new local scale to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientLocalScale(int playerSlot, float scale) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetLocalScale(scale);
+}
+
+/**
+ * @brief Retrieves the angular rotation of an client.
+ *
+ * This function gets the angular rotation of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose angular rotation is to be retrieved.
+ * @return A QAngle where the angular rotation will be stored.
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientLocalAngles(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const QAngle& ang = pawn->GetAngles();
+	return *reinterpret_cast<const plg::vec3*>(&ang);
+}
+
+/**
+ * @brief Sets the angular rotation of an client.
+ *
+ * This function updates the angular rotation of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose angular rotation is to be set.
+ * @param angle The new angular rotation to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientLocalAngles(int playerSlot, const QAngle& angle) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetLocalAngles(angle.x, angle.y, angle.z);
+}
+
+/**
+ * @brief Retrieves the absolute velocity of an client.
  *
  * This function gets the absolute velocity of the specified client.
  * If the client is invalid, the function does nothing.
  *
- * @param playerSlot The handle of the client whose absolute velocity is to be retrieved.
+ * @param playerSlot The index of the player's slot whose absolute velocity is to be retrieved.
  * @return A vector where the absolute velocity will be stored.
  */
 extern "C" PLUGIN_API plg::vec3 GetClientAbsVelocity(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsVelocity' on invalid player slot: {}\n", playerSlot);
-		return {};
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAbsVelocity' on invalid player pawn: {}\n", playerSlot);
-		return {};
-	}
-
-	const Vector& vec = pawn->m_vecAbsVelocity;
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const Vector& vec = pawn->GetVelocity();
 	return *reinterpret_cast<const plg::vec3*>(&vec);
 }
 
 /**
- * @brief Sets the absolute velocity of a client.
+ * @brief Sets the absolute velocity of an client.
  *
  * This function updates the absolute velocity of the specified client.
  * If the client is invalid, the function does nothing.
  *
- * @param playerSlot The handle of the client whose absolute velocity is to be set.
+ * @param playerSlot The index of the player's slot whose absolute velocity is to be set.
  * @param velocity The new absolute velocity to set for the client.
  */
-extern "C" PLUGIN_API void SetClientAbsVelocity(int playerSlot, const Vector& velocity) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsVelocity' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAbsVelocity' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	pawn->m_vecAbsVelocity = velocity;
+extern "C" PLUGIN_API void SetClientAbsVelocity(int playerSlot, const plg::vec3& velocity) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetVelocity(*reinterpret_cast<const Vector*>(&velocity));
 }
 
 /**
- * @brief Retrieves the client's eye angle.
+ * @brief Retrieves the base velocity of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @return A QAngle where the client's eye angle will be stored.
+ * This function gets the base velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose base velocity is to be retrieved.
+ * @return A vector where the base velocity will be stored.
  */
-extern "C" PLUGIN_API plg::vec3 GetClientEyeAngles(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientEyeAngles' on invalid player slot: {}\n", playerSlot);
-		return {};
-	}
+extern "C" PLUGIN_API plg::vec3 GetClientBaseVelocity(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const Vector& vec = pawn->GetBaseVelocity();
+	return *reinterpret_cast<const plg::vec3*>(&vec);
+}
 
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientEyeAngles' on invalid player pawn: {}\n", playerSlot);
-		return {};
-	}
-
-	const QAngle& ang = pawn->m_angEyeAngles;
+/**
+ * @brief Retrieves the local angular velocity of an client.
+ *
+ * This function gets the local angular velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose local angular velocity is to be retrieved.
+ * @return A vector where the local angular velocity will be stored.
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientLocalAngVelocity(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const QAngle& ang = pawn->GetLocalAngularVelocity();
 	return *reinterpret_cast<const plg::vec3*>(&ang);
 }
 
 /**
- * @brief Sets the client's eye angles.
+ * @brief Retrieves the angular velocity of an client.
  *
- * @param playerSlot The index of the player's slot.
- * @param angles The new eye angles to set.
+ * This function gets the angular velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose angular velocity is to be retrieved.
+ * @return A vector where the angular velocity will be stored.
  */
-extern "C" PLUGIN_API void SetClientEyeAngles(int playerSlot, const plg::vec3& angles) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientEyeAngles' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientEyeAngles' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	pawn->m_angEyeAngles = *reinterpret_cast<const QAngle*>(&angles);
+extern "C" PLUGIN_API plg::vec3 GetClientAngVelocity(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const Vector& vec = pawn->GetAngularVelocity();
+	return *reinterpret_cast<const plg::vec3*>(&vec);
 }
+/**
+ * @brief Sets the angular velocity of an client.
+ *
+ * This function updates the angular velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose angular velocity is to be set.
+ * @param velocity The new angular velocity to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientAngVelocity(int playerSlot, const plg::vec3& velocity) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetAngularVelocity(velocity.x, velocity.y, velocity.z);
+}
+
+/**
+ * @brief Retrieves the local velocity of an client.
+ *
+ * This function gets the local velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose local velocity is to be retrieved.
+ * @return A vector where the local velocity will be stored.
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientLocalVelocity(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const Vector& vec = pawn->GetLocalVelocity();
+	return *reinterpret_cast<const plg::vec3*>(&vec);
+}
+
+/**
+ * @brief Returns the input Vector transformed from client to world space.
+ *
+ * Transforms a point from the client's local coordinate space to world coordinate space.
+ *
+ * @param playerSlot The index of the player's slot
+ * @param point Point in client local space to transform
+ * @return The point transformed to world space coordinates
+ */
+extern "C" PLUGIN_API plg::vec3 TransformPointClientToWorld(int playerSlot, const plg::vec3& point) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& pos = pawn->TransformPointEntityToWorld(*reinterpret_cast<const Vector*>(&point));
+    return *reinterpret_cast<const plg::vec3*>(&pos);
+}
+
+/**
+ * @brief Returns the input Vector transformed from world to client space.
+ *
+ * Transforms a point from world coordinate space to the client's local coordinate space.
+ *
+ * @param playerSlot The index of the player's slot
+ * @param point Point in world space to transform
+ * @return The point transformed to client local space coordinates
+ */
+extern "C" PLUGIN_API plg::vec3 TransformPointWorldToClient(int playerSlot, const plg::vec3& point) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& pos = pawn->TransformPointWorldToEntity(*reinterpret_cast<const Vector*>(&point));
+    return *reinterpret_cast<const plg::vec3*>(&pos);
+}
+
+/**
+ * @brief Get vector to eye position - absolute coords.
+ *
+ * Returns the position of the client's eyes in world space coordinates.
+ *
+ * @param playerSlot The index of the player's slot
+ * @return Eye position in absolute/world coordinates
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientEyePosition(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& pos = pawn->EyePosition();
+    return *reinterpret_cast<const plg::vec3*>(&pos);
+}
+
+/**
+ * @brief Get the qangles that this client is looking at.
+ *
+ * Returns the eye angles (pitch, yaw, roll) representing the direction
+ * the client is looking.
+ *
+ * @param playerSlot The index of the player's slot
+ * @return Eye angles as a vector (pitch, yaw, roll)
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientEyeAngles(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const QAngle& ang = pawn->EyeAngles();
+    return *reinterpret_cast<const plg::vec3*>(&ang);
+}
+
+/**
+ * @brief Sets the forward velocity of an client.
+ *
+ * This function updates the forward velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose forward velocity is to be set.
+ * @param velocity The new forward velocity to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientForwardVector(int playerSlot, const plg::vec3& forward) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetForwardVector(*reinterpret_cast<const Vector*>(&forward));
+}
+
+/**
+ * @brief Get the forward vector of the client.
+ *
+ * @param playerSlot The index of the player's slot to query
+ * @return Forward-facing direction vector of the client
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientForwardVector(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& pos = pawn->GetForwardVector();
+    return *reinterpret_cast<const plg::vec3*>(&pos);
+}
+
+/**
+ * @brief Get the left vector of the client.
+ *
+ * @param playerSlot The index of the player's slot to query
+ * @return Left-facing direction vector of the client (aligned with the y axis)
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientLeftVector(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& pos = pawn->GetLeftVector();
+    return *reinterpret_cast<const plg::vec3*>(&pos);
+}
+
+/**
+ * @brief Get the right vector of the client.
+ *
+ * @warning This produces a left-handed coordinate system. Use GetLeftVector instead
+ *          (which is aligned with the y axis of the client).
+ *
+ * @param playerSlot The index of the player's slot to query
+ * @return Right-facing direction vector of the client
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientRightVector(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& pos = pawn->GetRightVector();
+    return *reinterpret_cast<const plg::vec3*>(&pos);
+}
+
+/**
+ * @brief Get the up vector of the client.
+ *
+ * @param playerSlot The index of the player's slot to query
+ * @return Up-facing direction vector of the client
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientUpVector(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& pos = pawn->GetUpVector();
+    return *reinterpret_cast<const plg::vec3*>(&pos);
+}
+
+/**
+ * @brief Get the client-to-world transformation matrix.
+ *
+ * Returns the complete transformation matrix that converts coordinates from
+ * client local space to world space.
+ *
+ * @param playerSlot The index of the player's slot to query
+ * @return 4x4 transformation matrix representing client's position, rotation, and scale in world space
+ */
+extern "C" PLUGIN_API plg::mat4x4 GetClientTransform(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const matrix3x4_t& mat = pawn->m_CBodyComponent->m_pSceneNode->EntityToWorldTransform();
+    return *reinterpret_cast<const plg::mat4x4*>(&mat);
+}
+
+/**
+ * @brief Retrieves the model name of an client.
+ *
+ * This function gets the model name of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose model name is to be retrieved.
+ * @return A string where the model name will be stored.
+ */
+extern "C" PLUGIN_API plg::string GetClientModel(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->GetModelName();
+}
+
+/**
+ * @brief Sets the model name of an client.
+ *
+ * This function updates the model name of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose model name is to be set.
+ * @param model The new model name to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientModel(int playerSlot, const plg::string& model) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->SetModel(model.c_str());
+}
+
+/**
+ * @brief Retrieves the water level of an client.
+ *
+ * This function returns the water level of the specified client.
+ * If the client is invalid, it returns 0.0f.
+ *
+ * @param playerSlot The index of the player's slot whose water level is to be retrieved.
+ * @return The water level of the client, or 0.0f if the client is invalid.
+ */
+extern "C" PLUGIN_API float GetClientWaterLevel(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->m_flWaterLevel;
+}
+
+/**
+ * @brief Retrieves the ground client of an client.
+ *
+ * This function returns the handle of the ground client for the specified client.
+ * If the client is invalid, it returns -1.
+ *
+ * @param playerSlot The index of the player's slot whose ground client is to be retrieved.
+ * @return The handle of the ground client, or INVALID_EHANDLE_INDEX if the client is invalid.
+ */
+extern "C" PLUGIN_API int GetClientGroundEntity(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+
+	CBaseEntity* ground = *pawn->m_hGroundEntity;
+	if (!ground) {
+		return INVALID_EHANDLE_INDEX;
+	}
+
+	return ground->GetRefEHandle().ToInt();
+}
+
+/**
+ * @brief Retrieves the effects of an client.
+ *
+ * This function returns the effect flags of the specified client.
+ * If the client is invalid, it returns 0.
+ *
+ * @param playerSlot The index of the player's slot whose effects are to be retrieved.
+ * @return The effect flags of the client, or 0 if the client is invalid.
+ */
+extern "C" PLUGIN_API int GetClientEffects(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->m_fEffects;
+}
+
+/**
+ * @brief Adds the render effect flag to an client.
+ *
+ * @param playerSlot The index of the player's slot to modify
+ * @param effects Render effect flags to add
+ */
+extern "C" PLUGIN_API void AddClientEffects(int playerSlot, int effects) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return;
+    pawn->AddEffects(effects);
+}
+
+/**
+ * @brief Removes the render effect flag from an client.
+ *
+ * @param playerSlot The index of the player's slot to modify
+ * @param effects Render effect flags to remove
+ */
+extern "C" PLUGIN_API void RemoveClientEffects(int playerSlot, int effects) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return;
+    pawn->RemoveEffects(effects);
+}
+
+/**
+ * @brief Get a vector containing max bounds, centered on object.
+ *
+ * @param playerSlot The index of the player's slot to query
+ * @return Vector containing the maximum bounds of the client's bounding box
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientBoundingMaxs(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& vec = pawn->GetBoundingMaxs();
+    return *reinterpret_cast<const plg::vec3*>(&vec);
+}
+
+/**
+ * @brief Get a vector containing min bounds, centered on object.
+ *
+ * @param playerSlot The index of the player's slot to query
+ * @return Vector containing the minimum bounds of the client's bounding box
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientBoundingMins(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& vec = pawn->GetBoundingMins();
+    return *reinterpret_cast<const plg::vec3*>(&vec);
+}
+
+/**
+ * @brief Get vector to center of object - absolute coords.
+ *
+ * @param playerSlot The index of the player's slot to query
+ * @return Vector pointing to the center of the client in absolute/world coordinates
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientCenter(int playerSlot) {
+    auto [controller, pawn] = helpers::GetController2(playerSlot);
+    if (!pawn) return {};
+    const Vector& vec = pawn->GetCenter();
+    return *reinterpret_cast<const plg::vec3*>(&vec);
+}
+
+/**
+ * @brief Teleports an client to a specified location and orientation.
+ *
+ * This function teleports the specified client to the given absolute position,
+ * with an optional new orientation and velocity. If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot to teleport.
+ * @param origin A pointer to a Vector representing the new absolute position. Can be nullptr.
+ * @param angles A pointer to a QAngle representing the new orientation. Can be nullptr.
+ * @param velocity A pointer to a Vector representing the new velocity. Can be nullptr.
+ */
+extern "C" PLUGIN_API void TeleportClient(int playerSlot, const Vector* origin, const QAngle* angles, const Vector* velocity) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->Teleport(origin, angles, velocity);
+}
+
+/**
+ * @brief Apply an absolute velocity impulse to an client.
+ *
+ * Applies an instantaneous change to the client's velocity in world space.
+ *
+ * @param playerSlot The index of the player's slot to apply impulse to
+ * @param vecImpulse Velocity impulse vector to apply
+ */
+extern "C" PLUGIN_API void ApplyAbsVelocityImpulseToClient(int playerSlot, const plg::vec3& vecImpulse) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->ApplyAbsVelocityImpulse(*reinterpret_cast<const Vector*>(&vecImpulse));
+}
+
+/**
+ * @brief Apply a local angular velocity impulse to an client.
+ *
+ * Applies an instantaneous change to the client's rotational velocity in local space.
+ *
+ * @param playerSlot The index of the player's slot to apply impulse to
+ * @param angImpulse Angular velocity impulse vector to apply
+ */
+extern "C" PLUGIN_API void ApplyLocalAngularVelocityImpulseToClient(int playerSlot, const plg::vec3& angImpulse) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->ApplyLocalAngularVelocityImpulse(*reinterpret_cast<const Vector*>(&angImpulse));
+}
+
+/**
+ * @brief Invokes a named input method on a specified client.
+ *
+ * This function triggers an input action on an client, allowing dynamic interaction
+ * between game objects or entities within the system. The input can be initiated
+ * by another client (activator) or by a specific caller client.
+ *
+ * @param playerSlot The handle of the target client that will receive the input.
+ * @param inputName    The name of the input action to invoke.
+ * @param activatorHandle The index of the player's slot that initiated the sequence of actions.
+ * @param callerHandle The index of the player's slot sending this event. Use -1 to specify
+ * @param value        The value associated with the input action.
+ * @param type         The type or classification of the value.
+* @param outputId      An identifier for tracking the output of this operation.
+ */
+extern "C" PLUGIN_API void AcceptClientInput(int playerSlot, const plg::string& inputName, int activatorHandle, int callerHandle, const plg::any& value, FieldType type, int outputId) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	variant_t variant = helpers::GetVariant(value, type);
+	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) activatorHandle)) : nullptr;
+	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) callerHandle)) : nullptr;
+	pawn->AcceptInput(inputName.c_str(), variant, activator, caller, outputId);
+}
+
+/**
+ * @brief Connects a script function to an player output.
+ *
+ * This function will call the specified function on this player when the output fires.
+ *
+ * @param playerSlot The handle of the player.
+ * @param output The name of the output to connect to.
+ * @param functionName The name of the script function to call.
+ */
+extern "C" PLUGIN_API void ConnectClientOutput(int playerSlot, const plg::string& output, const plg::string& functionName) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	reinterpret_cast<CEntityInstance2*>(pawn)->ConnectOutput(output.c_str(), functionName.c_str());
+}
+
+/**
+ * @brief Disconnects a script function from an player output.
+ *
+ * This removes the function from being called when the output fires.
+ *
+ * @param playerSlot The handle of the player.
+ * @param output The name of the output.
+ * @param functionName The name of the script function to disconnect.
+ */
+extern "C" PLUGIN_API void DisconnectClientOutput(int playerSlot, const plg::string& output, const plg::string& functionName) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	reinterpret_cast<CEntityInstance2*>(pawn)->DisconnectOutput(output.c_str(), functionName.c_str());
+}
+
+/**
+ * @brief Disconnects a script function from an I/O event on a different player.
+ *
+ * @param playerSlot The handle of the calling player.
+ * @param output The name of the output.
+ * @param functionName The function name to disconnect.
+ * @param targetHandle The handle of the entity whose output is being disconnected.
+ */
+extern "C" PLUGIN_API void DisconnectClientRedirectedOutput(int playerSlot, const plg::string& output, const plg::string& functionName, int targetHandle) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	auto* target = helpers::GetEntity(targetHandle);
+	if (!target) return;
+	reinterpret_cast<CEntityInstance2*>(pawn)->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), target->GetScriptInstance());
+}
+
+/**
+ * @brief Fires an player output.
+ *
+ * Calls all connected functions for the given output.
+ *
+ * @param playerSlot The handle of the player firing the output.
+ * @param outputName The name of the output to fire.
+ * @param activatorHandle The entity activating the output.
+ * @param callerHandle The entity that called the output.
+ * @param value The value associated with the input action.
+ * @param type The type or classification of the value.
+ * @param delay Delay in seconds before firing the output.
+ */
+extern "C" PLUGIN_API void FireClientOutput(int playerSlot, const plg::string& outputName, int activatorHandle, int callerHandle, const plg::any& value, FieldType type, float delay) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) activatorHandle)) : nullptr;
+	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) callerHandle)) : nullptr;
+	variant_t variant = helpers::GetVariant(value, type);
+	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), activator ? activator->GetScriptInstance() : nullptr, activator ? caller->GetScriptInstance() : nullptr, variant, delay);
+}
+
+/**
+ * @brief Redirects an player output to call a function on another player.
+ *
+ * @param playerSlot The handle of the player whose output is being redirected.
+ * @param output The name of the output to redirect.
+ * @param functionName The function name to call on the target player.
+ * @param targetHandle The handle of the entity that will receive the output call.
+ */
+extern "C" PLUGIN_API void RedirectClientOutput(int playerSlot, const plg::string& output, const plg::string& functionName, int targetHandle) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	auto* target = helpers::GetEntity(targetHandle);
+	if (!target) return;
+	reinterpret_cast<CEntityInstance2*>(pawn)->RedirectOutput(output.c_str(), functionName.c_str(), target->GetScriptInstance());
+}
+
+/**
+ * @brief Makes an client follow another client with optional bone merging.
+ *
+ * @param playerSlot The index of the player's slot that will follow
+ * @param attachmentHandle The index of the player's slot to follow
+ * @param boneMerge If true, bones will be merged between entities
+ */
+extern "C" PLUGIN_API void FollowClient(int playerSlot, int attachmentHandle, bool boneMerge) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	auto* attach = helpers::GetEntity(attachmentHandle);
+	if (!attach) return;
+	pawn->FollowEntity(attach->GetScriptInstance(), boneMerge);
+}
+
+/**
+ * @brief Makes an client follow another client and merge with a specific bone or attachment.
+ *
+ * @param playerSlot The index of the player's slot that will follow
+ * @param attachmentHandle The index of the player's slot to follow
+ * @param boneOrAttachName Name of the bone or attachment point to merge with
+ */
+extern "C" PLUGIN_API void FollowClientMerge(int playerSlot, int attachmentHandle, const plg::string& boneOrAttachName) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	auto* attach = helpers::GetEntity(attachmentHandle);
+	if (!attach) return;
+	pawn->FollowEntity(attach->GetScriptInstance(), boneOrAttachName.c_str());
+}
+
+/**
+ * @brief Apply damage to an client.
+ *
+ * Creates a damage info object and applies damage to the specified client.
+ *
+ * @param playerSlot The index of the player's slot receiving damage
+ * @param inflictorSlot The index of the player's slot inflicting damage (e.g., projectile)
+ * @param attackerSlot The index of the attacking client
+ * @param force Direction and magnitude of force to apply
+ * @param hitPos Position where the damage hit occurred
+ * @param damage Amount of damage to apply
+ * @param damageTypes Bitfield of damage type flags
+ * @return Amount of damage actually applied to the client
+ */
+extern "C" PLUGIN_API int TakeClientDamage(int playerSlot, int inflictorSlot, int attackerSlot, const plg::vec3& force, const plg::vec3& hitPos, float damage, int damageTypes) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	auto [controller2, inflictor] = helpers::GetController2(inflictorSlot);
+	if (!inflictor) return {};
+	auto [controller3, attacker] = helpers::GetController2(attackerSlot);
+	if (!attacker) return {};
+	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(inflictor->GetScriptInstance(), attacker->GetScriptInstance(), *reinterpret_cast<const Vector*>(&force), *reinterpret_cast<const Vector*>(&hitPos), damage, damageTypes);
+	int applied = pawn->TakeDamage(takeDamageInfo);
+	CTakeDamage{}.DestroyDamageInfo(takeDamageInfo);
+	return applied;
+}
+
+/////
 
 /**
  * @brief Retrieves the pawn entity pointer associated with a client.
@@ -987,12 +1581,8 @@ extern "C" PLUGIN_API void SetClientEyeAngles(int playerSlot, const plg::vec3& a
  * @return A pointer to the client's pawn entity, or nullptr if the client or controller is invalid.
  */
 extern "C" PLUGIN_API void* GetClientPawn(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientPawn' on invalid player slot: {}\n", playerSlot);
-		return nullptr;
-	}
-
+	auto controller = helpers::GetController(playerSlot);
+	if (!controller) return {};
 	return controller->GetCurrentPawn();
 }
 
@@ -1016,12 +1606,8 @@ extern "C" PLUGIN_API plg::vector<int> ProcessTargetString(int caller, const plg
  * @param team The team index to switch the client to.
  */
 extern "C" PLUGIN_API void SwitchClientTeam(int playerSlot, int team) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SwitchClientTeam' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
+	auto controller = helpers::GetController(playerSlot);
+	if (!controller) return;
 	controller->SwitchTeam(team);
 }
 
@@ -1031,23 +1617,12 @@ extern "C" PLUGIN_API void SwitchClientTeam(int playerSlot, int team) {
  * @param playerSlot The index of the player's slot to respawn.
  */
 extern "C" PLUGIN_API void RespawnClient(int playerSlot) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'RespawnClient' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'RespawnClient' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
 	if (pawn->IsAlive()) {
-		// TODO: Fix players spawning under spawn positions
 		pawn->Respawn();
 	} else {
-		static_cast<CPlayerController*>(controller)->Respawn();
+		controller->Respawn();
 	}
 }
 
@@ -1059,18 +1634,8 @@ extern "C" PLUGIN_API void RespawnClient(int playerSlot) {
  * @param force If true, the suicide will be forced.
  */
 extern "C" PLUGIN_API void ForcePlayerSuicide(int playerSlot, bool explode, bool force) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'ForcePlayerSuicide' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'ForcePlayerSuicide' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
 	pawn->CommitSuicide(explode, force);
 }
 
@@ -1106,81 +1671,15 @@ extern "C" PLUGIN_API void BanIdentity(uint64_t steamId, float duration, bool ki
 }
 
 /**
- * @brief Retrieves the model name of a client.
- *
- * This function gets the model name of the specified client.
- * If the client is invalid, the function does nothing.
- *
- * @param pplayerSlot The index of the player's slot.
- * @return A string where the model name will be stored.
- */
-extern "C" PLUGIN_API plg::string GetClientModel(int playerSlot) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientModel' on invalid player slot: {}\n", playerSlot);
-		return {};
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientModel' on invalid player pawn: {}\n", playerSlot);
-		return {};
-	}
-
-	return pawn->GetModelName();
-}
-
-/**
- * @brief Sets the model name of a client.
- *
- * This function updates the model name of the specified client.
- * If the client is invalid, the function does nothing.
- *
- * @param playerSlot The index of the player's slot.
- * @param model The new model name to set for the client.
- */
-extern "C" PLUGIN_API void SetClientModel(int playerSlot, const plg::string& model) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientModel' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientModel' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	pawn->SetModel(model.c_str());
-}
-
-/**
  * @brief Retrieves the handle of the client's currently active weapon.
  *
  * @param playerSlot The index of the player's slot.
  * @return The entity handle of the active weapon, or INVALID_EHANDLE_INDEX if the client is invalid or has no active weapon.
  */
 extern "C" PLUGIN_API int GetClientActiveWeapon(int playerSlot) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientActiveWeapon' on invalid player slot: {}\n", playerSlot);
-		return INVALID_EHANDLE_INDEX;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientActiveWeapon' on invalid player pawn: {}\n", playerSlot);
-		return INVALID_EHANDLE_INDEX;
-	}
-
-	CCSPlayer_WeaponServices* weaponServices = pawn->m_pWeaponServices;
-	if (!weaponServices) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientActiveWeapon' on m_pWeaponServices: {}\n", playerSlot);
-		return INVALID_EHANDLE_INDEX;
-	}
-
-	return weaponServices->m_hActiveWeapon->ToInt();
+	auto service = helpers::GetService2<CCSPlayer_WeaponServices>(playerSlot, &CPlayerPawn::m_pWeaponServices);
+	if (!service) return {};
+	return service->m_hActiveWeapon->ToInt();
 }
 
 /**
@@ -1190,29 +1689,11 @@ extern "C" PLUGIN_API int GetClientActiveWeapon(int playerSlot) {
  * @return A vector of entity handles for the client's weapons, or an empty vector if the client is invalid or has no weapons.
  */
 extern "C" PLUGIN_API plg::vector<int> GetClientWeapons(int playerSlot) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientWeapons' on invalid player slot: {}\n", playerSlot);
-		return {};
-	}
+	auto service = helpers::GetService2<CCSPlayer_WeaponServices>(playerSlot, &CPlayerPawn::m_pWeaponServices);
+	if (!service) return {};
 
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientActiveWeapon' on invalid player pawn: {}\n", playerSlot);
-		return {};
-	}
-
-	CCSPlayer_WeaponServices* weaponServices = pawn->m_pWeaponServices;
-	if (!weaponServices) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientWeapons' on m_pWeaponServices: {}\n", playerSlot);
-		return {};
-	}
-
-	CUtlVector<CHandle<CBasePlayerWeapon>>* weapons = weaponServices->m_hMyWeapons;
-	if (!weapons) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientWeapons' on m_hMyWeapons: {}\n", playerSlot);
-		return {};
-	}
+	CUtlVector<CHandle<CBasePlayerWeapon>>* weapons = service->m_hMyWeapons;
+	if (!weapons) return {};
 
 	plg::vector<int> handles;
 	handles.reserve(static_cast<size_t>(weapons->Count()));
@@ -1231,25 +1712,9 @@ extern "C" PLUGIN_API plg::vector<int> GetClientWeapons(int playerSlot) {
  * @param removeSuit A boolean indicating whether to also remove the client's suit.
  */
 extern "C" PLUGIN_API void RemoveWeapons(int playerSlot, bool removeSuit) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'RemoveWeapons' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'RemoveWeapons' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayer_ItemServices* itemServices = pawn->m_pItemServices;
-	if (!itemServices) {
-		plg::print(LS_WARNING, "Cannot execute 'RemoveWeapons' on m_pItemServices: {}\n", playerSlot);
-		return;
-	}
-
-	itemServices->RemoveWeapons(removeSuit);
+	auto service = helpers::GetService2<CCSPlayer_ItemServices>(playerSlot, &CPlayerPawn::m_pItemServices);
+	if (!service) return;
+	service->RemoveWeapons(removeSuit);
 }
 
 /**
@@ -1261,31 +1726,11 @@ extern "C" PLUGIN_API void RemoveWeapons(int playerSlot, bool removeSuit) {
  * @param velocity Velocity to toss weapon or zero to just drop weapon.
  */
 extern "C" PLUGIN_API void DropWeapon(int playerSlot, int weaponHandle, const plg::vec3& target, const plg::vec3& velocity) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'DropWeapon' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
-	if (!pWeapon) {
-		plg::print(LS_WARNING, "Cannot execute 'DropWeapon' on invalid weapon handle: {}\n", weaponHandle);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'DropWeapon' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayer_WeaponServices* weaponServices = pawn->m_pWeaponServices;
-	if (!weaponServices) {
-		plg::print(LS_WARNING, "Cannot execute 'DropWeapon' on m_pWeaponServices: {}\n", playerSlot);
-		return;
-	}
-
-	weaponServices->DropWeapon(pWeapon, reinterpret_cast<Vector*>(const_cast<plg::vec3*>(&target)), reinterpret_cast<Vector*>(const_cast<plg::vec3*>(&velocity)));
+	auto service = helpers::GetService2<CCSPlayer_WeaponServices>(playerSlot, &CPlayerPawn::m_pWeaponServices);
+	if (!service) return;
+	auto weapon = helpers::GetEntity<CBasePlayerWeapon>(weaponHandle);
+	if (!weapon) return;
+	service->DropWeapon(weapon, reinterpret_cast<Vector*>(const_cast<plg::vec3*>(&target)), reinterpret_cast<Vector*>(const_cast<plg::vec3*>(&velocity)));
 }
 
 /**
@@ -1295,31 +1740,11 @@ extern "C" PLUGIN_API void DropWeapon(int playerSlot, int weaponHandle, const pl
  * @param weaponHandle The handle of weapon to bump.
  */
 extern "C" PLUGIN_API void SelectWeapon(int playerSlot, int weaponHandle) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SelectItem' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
-	if (!pWeapon) {
-		plg::print(LS_WARNING, "Cannot execute 'SelectItem' on invalid weapon handle: {}\n", weaponHandle);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SelectItem' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayer_WeaponServices* weaponServices = pawn->m_pWeaponServices;
-	if (!weaponServices) {
-		plg::print(LS_WARNING, "Cannot execute 'SelectItem' on m_pWeaponServices: {}\n", playerSlot);
-		return;
-	}
-
-	weaponServices->SelectItem(pWeapon);
+	auto service = helpers::GetService2<CCSPlayer_WeaponServices>(playerSlot, &CPlayerPawn::m_pWeaponServices);
+	if (!service) return;
+	auto weapon = helpers::GetEntity<CBasePlayerWeapon>(weaponHandle);
+	if (!weapon) return;
+	service->SelectItem(weapon);
 }
 
 /**
@@ -1329,31 +1754,11 @@ extern "C" PLUGIN_API void SelectWeapon(int playerSlot, int weaponHandle) {
  * @param weaponHandle The handle of weapon to switch.
  */
 extern "C" PLUGIN_API void SwitchWeapon(int playerSlot, int weaponHandle) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SwitchWeapon' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
-	if (!pWeapon) {
-		plg::print(LS_WARNING, "Cannot execute 'SwitchWeapon' on invalid weapon handle: {}\n", weaponHandle);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'SwitchWeapon' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayer_WeaponServices* weaponServices = pawn->m_pWeaponServices;
-	if (!weaponServices) {
-		plg::print(LS_WARNING, "Cannot execute 'SwitchWeapon' on m_pWeaponServices: {}\n", playerSlot);
-		return;
-	}
-
-	weaponServices->SwitchWeapon(pWeapon);
+	auto service = helpers::GetService2<CCSPlayer_WeaponServices>(playerSlot, &CPlayerPawn::m_pWeaponServices);
+	if (!service) return;
+	auto weapon = helpers::GetEntity<CBasePlayerWeapon>(weaponHandle);
+	if (!weapon) return;
+	service->SwitchWeapon(weapon);
 }
 
 /**
@@ -1363,31 +1768,11 @@ extern "C" PLUGIN_API void SwitchWeapon(int playerSlot, int weaponHandle) {
  * @param weaponHandle The handle of weapon to remove.
  */
 extern "C" PLUGIN_API void RemoveWeapon(int playerSlot, int weaponHandle) {
-	auto controller = utils::GetController(playerSlot);
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'RemovePlayerItem' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	auto pWeapon = static_cast<CBasePlayerWeapon*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) weaponHandle)));
-	if (!pWeapon) {
-		plg::print(LS_WARNING, "Cannot execute 'RemovePlayerItem' on invalid weapon handle: {}\n", weaponHandle);
-		return;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'RemovePlayerItem' on invalid player pawn: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayer_WeaponServices* weaponServices = pawn->m_pWeaponServices;
-	if (!weaponServices) {
-		plg::print(LS_WARNING, "Cannot execute 'RemoveWeapon' on m_pWeaponServices: {}\n", playerSlot);
-		return;
-	}
-
-	weaponServices->RemoveItem(pWeapon);
+	auto service = helpers::GetService2<CCSPlayer_WeaponServices>(playerSlot, &CPlayerPawn::m_pWeaponServices);
+	if (!service) return;
+	auto weapon = helpers::GetEntity<CBasePlayerWeapon>(weaponHandle);
+	if (!weapon) return;
+	service->RemoveItem(weapon);
 }
 
 /**
@@ -1398,31 +1783,11 @@ extern "C" PLUGIN_API void RemoveWeapon(int playerSlot, int weaponHandle) {
  * @return The entity handle of the created item, or INVALID_EHANDLE_INDEX if the client or item is invalid.
  */
 extern "C" PLUGIN_API int GiveNamedItem(int playerSlot, const plg::string& itemName) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GiveNamedItem' on invalid player slot: {}\n", playerSlot);
-		return INVALID_EHANDLE_INDEX;
-	}
-
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GiveNamedItem' on invalid player pawn: {}\n", playerSlot);
-		return INVALID_EHANDLE_INDEX;
-	}
-
-	CCSPlayer_ItemServices* itemServices = controller->GetCurrentPawn()->m_pItemServices;
-	if (!itemServices) {
-		plg::print(LS_WARNING, "Cannot execute 'GiveNamedItem' on m_pItemServices: {}\n", playerSlot);
-		return INVALID_EHANDLE_INDEX;
-	}
-
-	CBaseEntity* pWeapon = itemServices->GiveNamedItem(itemName.c_str());
-	if (!pWeapon) {
-		plg::print(LS_WARNING, "Cannot execute 'GiveNamedItem' on m_pItemServices: {}\n", itemName);
-		return INVALID_EHANDLE_INDEX;
-	}
-
-	return pWeapon->GetRefEHandle().ToInt();
+	auto service = helpers::GetService2<CCSPlayer_ItemServices>(playerSlot, &CPlayerPawn::m_pItemServices);
+	if (!service) return {};
+	CBaseEntity* weapon = service->GiveNamedItem(itemName.c_str());
+	if (!weapon) return INVALID_EHANDLE_INDEX;
+	return weapon->GetRefEHandle().ToInt();
 }
 
 /**
@@ -1433,30 +1798,33 @@ extern "C" PLUGIN_API int GiveNamedItem(int playerSlot, const plg::string& itemN
  * @return uint64_t The state of the specified button, or 0 if the client or button index is invalid.
  */
 extern "C" PLUGIN_API uint64_t GetClientButtons(int playerSlot, int buttonIndex) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientButtons' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
+	auto service = helpers::GetService2<CPlayer_MovementServices>(playerSlot, &CPlayerPawn::m_pMovementServices);
+	if (!service) return {};
+	return service->m_nButtons->m_pButtonStates[buttonIndex];
+}
 
-	if (buttonIndex > 2 || buttonIndex < 0) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientButtons' on invalid button index: {}\n", buttonIndex);
-		return 0;
-	}
+/**
+ * @brief Returns the client's armor value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The armor value of the client.
+ */
+extern "C" PLUGIN_API int GetClientArmor(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->m_ArmorValue;
+}
 
-	auto pawn = static_cast<CPlayerPawn*>(controller->GetCurrentPawn());
-	if (!pawn) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientButtons' on invalid player pawn: {}\n", playerSlot);
-		return INVALID_EHANDLE_INDEX;
-	}
-
-	CPlayer_MovementServices* movementServices = pawn->m_pMovementServices;
-	if (!movementServices) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientButtons' on m_pMovementServices: {}\n", playerSlot);
-		return 0;
-	}
-
-	return movementServices->m_nButtons->m_pButtonStates[buttonIndex];
+/**
+ * @brief Sets the client's armor value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param armor The armor value to set.
+ */
+extern "C" PLUGIN_API void SetClientArmor(int playerSlot, int armor) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->m_ArmorValue = armor;
 }
 
 /**
@@ -1466,19 +1834,9 @@ extern "C" PLUGIN_API uint64_t GetClientButtons(int playerSlot, int buttonIndex)
  * @return The amount of money the client has, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientMoney(int playerSlot) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientMoney' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	CCSPlayerController_InGameMoneyServices* inGameMoneyServices = controller->m_pInGameMoneyServices;
-	if (!inGameMoneyServices) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientMoney' on m_pInGameMoneyServices: {}\n", playerSlot);
-		return 0;
-	}
-
-	return inGameMoneyServices->m_iAccount;
+	auto service = helpers::GetService<CCSPlayerController_InGameMoneyServices>(playerSlot, &CPlayerController::m_pInGameMoneyServices);
+	if (!service) return {};
+	return service->m_iAccount;
 }
 
 /**
@@ -1488,19 +1846,9 @@ extern "C" PLUGIN_API int GetClientMoney(int playerSlot) {
  * @param money The amount of money to set.
  */
 extern "C" PLUGIN_API void SetClientMoney(int playerSlot, int money) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientMoney' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayerController_InGameMoneyServices* inGameMoneyServices = controller->m_pInGameMoneyServices;
-	if (!inGameMoneyServices) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientMoney' on m_pInGameMoneyServices: {}\n", playerSlot);
-		return;
-	}
-
-	inGameMoneyServices->m_iAccount = money;
+	auto service = helpers::GetService<CCSPlayerController_InGameMoneyServices>(playerSlot, &CPlayerController::m_pInGameMoneyServices);
+	if (!service) return;
+	service->m_iAccount = money;
 }
 
 /**
@@ -1510,19 +1858,9 @@ extern "C" PLUGIN_API void SetClientMoney(int playerSlot, int money) {
  * @return The number of kills the client has, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientKills(int playerSlot) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientKills' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	CCSPlayerController_ActionTrackingServices* actionTrackingServices = controller->m_pActionTrackingServices;
-	if (!actionTrackingServices) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientKills' on m_pActionTrackingServices: {}\n", playerSlot);
-		return 0;
-	}
-
-	return actionTrackingServices->m_matchStats->m_iKills;
+	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
+	if (!service) return {};
+	return service->m_matchStats->m_iKills;
 }
 
 /**
@@ -1532,19 +1870,9 @@ extern "C" PLUGIN_API int GetClientKills(int playerSlot) {
  * @param kills The number of kills to set.
  */
 extern "C" PLUGIN_API void SetClientKills(int playerSlot, int kills) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientKills' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayerController_ActionTrackingServices* actionTrackingServices = controller->m_pActionTrackingServices;
-	if (!actionTrackingServices) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientKills' on m_pActionTrackingServices: {}\n", playerSlot);
-		return;
-	}
-
-	actionTrackingServices->m_matchStats->m_iKills = kills;
+	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
+	if (!service) return;
+	service->m_matchStats->m_iKills = kills;
 }
 
 /**
@@ -1554,19 +1882,9 @@ extern "C" PLUGIN_API void SetClientKills(int playerSlot, int kills) {
  * @return The number of deaths the client has, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientDeaths(int playerSlot) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientDeaths' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	CCSPlayerController_ActionTrackingServices* actionTrackingServices = controller->m_pActionTrackingServices;
-	if (!actionTrackingServices) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientDeaths' on m_pActionTrackingServices: {}\n", playerSlot);
-		return 0;
-	}
-
-	return actionTrackingServices->m_matchStats->m_iDeaths;
+	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
+	if (!service) return {};
+	return service->m_matchStats->m_iDeaths;
 }
 
 /**
@@ -1576,19 +1894,9 @@ extern "C" PLUGIN_API int GetClientDeaths(int playerSlot) {
  * @param deaths The number of deaths to set.
  */
 extern "C" PLUGIN_API void SetClientDeaths(int playerSlot, int deaths) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientDeaths' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayerController_ActionTrackingServices* actionTrackingServices = controller->m_pActionTrackingServices;
-	if (!actionTrackingServices) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientDeaths' on m_pActionTrackingServices: {}\n", playerSlot);
-		return;
-	}
-
-	actionTrackingServices->m_matchStats->m_iDeaths = deaths;
+	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
+	if (!service) return;
+	service->m_matchStats->m_iDeaths = deaths;
 }
 
 /**
@@ -1598,19 +1906,9 @@ extern "C" PLUGIN_API void SetClientDeaths(int playerSlot, int deaths) {
  * @return The number of assists the client has, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientAssists(int playerSlot) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAssists' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	CCSPlayerController_ActionTrackingServices* actionTrackingServices = controller->m_pActionTrackingServices;
-	if (!actionTrackingServices) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientAssists' on m_pActionTrackingServices: {}\n", playerSlot);
-		return 0;
-	}
-
-	return actionTrackingServices->m_matchStats->m_iAssists;
+	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
+	if (!service) return {};
+	return service->m_matchStats->m_iAssists;
 }
 
 /**
@@ -1620,19 +1918,9 @@ extern "C" PLUGIN_API int GetClientAssists(int playerSlot) {
  * @param assists The number of assists to set.
  */
 extern "C" PLUGIN_API void SetClientAssists(int playerSlot, int assists) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAssists' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayerController_ActionTrackingServices* actionTrackingServices = controller->m_pActionTrackingServices;
-	if (!actionTrackingServices) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientAssists' on m_pActionTrackingServices: {}\n", playerSlot);
-		return;
-	}
-
-	actionTrackingServices->m_matchStats->m_iAssists = assists;
+	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
+	if (!service) return;
+	service->m_matchStats->m_iAssists = assists;
 }
 
 /**
@@ -1642,19 +1930,9 @@ extern "C" PLUGIN_API void SetClientAssists(int playerSlot, int assists) {
  * @return The total damage dealt by the client, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientDamage(int playerSlot) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientDamage' on invalid player slot: {}\n", playerSlot);
-		return 0;
-	}
-
-	CCSPlayerController_ActionTrackingServices* actionTrackingServices = controller->m_pActionTrackingServices;
-	if (!actionTrackingServices) {
-		plg::print(LS_WARNING, "Cannot execute 'GetClientDamage' on m_pActionTrackingServices: {}\n", playerSlot);
-		return 0;
-	}
-
-	return actionTrackingServices->m_matchStats->m_iDamage;
+	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
+	if (!service) return {};
+	return service->m_matchStats->m_iDamage;
 }
 
 /**
@@ -1664,38 +1942,7 @@ extern "C" PLUGIN_API int GetClientDamage(int playerSlot) {
  * @param damage The amount of damage to set.
  */
 extern "C" PLUGIN_API void SetClientDamage(int playerSlot, int damage) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientDamage' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	CCSPlayerController_ActionTrackingServices* actionTrackingServices = controller->m_pActionTrackingServices;
-	if (!actionTrackingServices) {
-		plg::print(LS_WARNING, "Cannot execute 'SetClientDamage' on m_pActionTrackingServices: {}\n", playerSlot);
-		return;
-	}
-
-	actionTrackingServices->m_matchStats->m_iDamage = damage;
-}
-
-/**
- * @brief Teleports a client to a specified location and orientation.
- *
- * This function teleports the specified client to the given absolute position,
- * with an optional new orientation and velocity. If the client is invalid, the function does nothing.
- *
- * @param playerSlot The index of the player's slot.
- * @param origin A pointer to a Vector representing the new absolute position. Can be nullptr.
- * @param angles A pointer to a QAngle representing the new orientation. Can be nullptr.
- * @param velocity A pointer to a Vector representing the new velocity. Can be nullptr.
- */
-extern "C" PLUGIN_API void TeleportClient(int playerSlot, const Vector* origin, const QAngle* angles, const Vector* velocity) {
-	auto controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
-	if (!controller) {
-		plg::print(LS_WARNING, "Cannot execute 'TeleportClient' on invalid player slot: {}\n", playerSlot);
-		return;
-	}
-
-	controller->GetPlayerPawn()->Teleport(origin, angles, velocity);
+	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
+	if (!service) return;
+	service->m_matchStats->m_iDamage = damage;
 }

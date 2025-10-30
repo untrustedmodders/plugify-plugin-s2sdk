@@ -1,5 +1,6 @@
 #include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/utils.hpp>
+#include <core/sdk/helpers.hpp>
 #include <core/server_manager.hpp>
 #include <core/timer_system.hpp>
 #include <engine/IEngineSound.h>
@@ -201,11 +202,13 @@ extern "C" PLUGIN_API void QueueTaskForNextWorldUpdate(TaskCallback callback, co
 /**
  * @brief Returns the duration of a specified sound.
  *
- * @param name The name of the sound to check.
+ * @param sound The name of the sound to check.
  * @return The duration of the sound in seconds.
  */
-extern "C" PLUGIN_API float GetSoundDuration(const plg::string& name) {
-	return false;//g_pEngineSound->GetSoundDuration(name.c_str());
+extern "C" PLUGIN_API float GetSoundDuration(const plg::string& soundName, const plg::string& actorModel) {
+	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityIndex(0)));
+	if (!entity) return {};
+	return entity->GetSoundDuration(soundName.c_str(), actorModel.c_str());
 }
 
 /**
@@ -218,12 +221,20 @@ extern "C" PLUGIN_API float GetSoundDuration(const plg::string& name) {
  * @param delay The delay before the sound is played.
  */
 extern "C" PLUGIN_API void EmitSound(int entityHandle, const plg::string& sound, int pitch, float volume, float delay) {
-	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) entityHandle)));
-	if (!entity) {
-		return;
-	}
-
+	auto* entity = helpers::GetEntity<CBaseEntity>(entityHandle);
+	if (!entity) return;
 	entity->EmitSoundParams(sound.c_str(), pitch, volume, delay);
+}
+/**
+ * @brief Stops a sound from a specified entity.
+ *
+ * @param entityHandle The handle of the entity that will stop the sound.
+ * @param sound The name of the sound to stop.
+ */
+extern "C" PLUGIN_API void StopSound(int entityHandle, const plg::string& sound) {
+	auto* entity = helpers::GetEntity<CBaseEntity>(entityHandle);
+	if (!entity) return;
+	entity->StopSound(sound.c_str());
 }
 
 /**

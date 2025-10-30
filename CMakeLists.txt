@@ -163,7 +163,11 @@ endif()
 
 file(GLOB_RECURSE SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES}
+        src/core/sdk/helpers.hpp
+        src/export/bodies.cpp
+        src/export/models.cpp
+        src/export/debug.cpp)
 target_precompile_headers(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/pch.hpp")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

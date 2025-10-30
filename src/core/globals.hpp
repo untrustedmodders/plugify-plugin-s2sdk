@@ -133,11 +133,17 @@ namespace addresses {
 }// namespace addresses
 
 namespace entities {
-
-	//CEntityInstance* CreateEntityByName(const char* className);
-
+	CEntityInstance* CreateEntityByName(const char* className);
 	CEntityInstance* FindEntityByName(CEntityInstance* startEntity, const char* name);
-
 	CEntityInstance* FindEntityByClassName(CEntityInstance* startEntity, const char* name);
-
-}
+	CEntityInstance* FindEntityByName(CEntityInstance* startEntity, const char* name);
+	CEntityInstance* FindByNameNearest(const char* name, const Vector& origin, float maxRadius);
+	CEntityInstance* FindByNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius);
+	CEntityInstance* FindEntityByClassName(CEntityInstance* startEntity, const char* name);
+	CEntityInstance* FindEntityByClassNameNearest(const char* name, const Vector& origin, float maxRadius);
+	CEntityInstance* FindEntityByClassNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius);
+	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name);
+	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius);
+	CEntityInstance* FindByTarget(CEntityInstance* startEntity, const char* name);
+	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius);
+}// namespace entities

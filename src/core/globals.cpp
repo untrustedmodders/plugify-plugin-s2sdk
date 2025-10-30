@@ -134,18 +134,58 @@ namespace globals {
 }// namespace globals
 
 namespace entities {
-	/*CEntityInstance* CreateEntityByName(const char* className) {
+	CEntityInstance* CreateEntityByName(const char* className) {
 		auto handle = CEntities{}.CreateByClassname(className);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
-	}*/
+	}
 
 	CEntityInstance* FindEntityByName(CEntityInstance* startEntity, const char* name) {
 		auto handle = CEntities{}.FindByName(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
+	CEntityInstance* FindByNameNearest(const char* name, const Vector& origin, float maxRadius) {
+		auto handle = CEntities{}.FindByNameNearest(name, origin, maxRadius);
+		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+	}
+
+	CEntityInstance* FindByNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
+		auto handle = CEntities{}.FindByNameWithin(startEntity ? startEntity->GetScriptInstance() : nullptr, name, origin, maxRadius);
+		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+	}
+
 	CEntityInstance* FindEntityByClassName(CEntityInstance* startEntity, const char* name) {
 		auto handle = CEntities{}.FindByClassname(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
+		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+	}
+
+	CEntityInstance* FindEntityByClassNameNearest(const char* name, const Vector& origin, float maxRadius) {
+		auto handle = CEntities{}.FindByClassnameNearest(name, origin, maxRadius);
+		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+	}
+
+	CEntityInstance* FindEntityByClassNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
+		auto handle = CEntities{}.FindByClassnameWithin(startEntity ? startEntity->GetScriptInstance() : nullptr, name, origin, maxRadius);
+		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+	}
+
+	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name) {
+		auto handle = CEntities{}.FindByModel(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
+		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+	}
+
+	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
+		auto handle = CEntities{}.FindByModelWithin(startEntity ? startEntity->GetScriptInstance() : nullptr, name, origin, maxRadius);
+		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+	}
+
+	CEntityInstance* FindByTarget(CEntityInstance* startEntity, const char* name) {
+		auto handle = CEntities{}.FindByTarget(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
+		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+	}
+
+	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
+		auto handle = CEntities{}.FindInSphere(startEntity ? startEntity->GetScriptInstance() : nullptr, name, origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 }// namespace entities

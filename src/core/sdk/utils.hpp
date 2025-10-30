@@ -1,7 +1,7 @@
 #pragma once
 
-#include "schema.hpp"
 #include <eiface.h>
+#include <entitysystem.h>
 #include <igameevents.h>
 #include <iserver.h>
 
