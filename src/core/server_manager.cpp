@@ -13,7 +13,7 @@ void ServerManager::OnGameFrame() {
 		tasksToExecute.swap(m_nextTasks);
 	}
 
-	plg::print(LS_DETAILED, "Executing queued tasks of size: {} on tick number {}\n", tasksToExecute.size(), gpGlobals->tickcount);
+	//plg::print(LS_DETAILED, "Executing queued tasks of size: {} on tick number {}\n", tasksToExecute.size(), gpGlobals->tickcount);
 
 	for (const auto& [callback, userData] : tasksToExecute) {
 		callback(userData);
@@ -31,7 +31,7 @@ void ServerManager::OnPreWorldUpdate() {
 		tasksToExecute.swap(m_nextWorldUpdateTasks);
 	}
 
-	plg::print(LS_DETAILED, "Executing queued tasks of size: {} at time {}\n", tasksToExecute.size(), gpGlobals->curtime);
+	//plg::print(LS_DETAILED, "Executing queued tasks of size: {} at time {}\n", tasksToExecute.size(), gpGlobals->curtime);
 
 	for (const auto& [callback, userData] : tasksToExecute) {
 		callback(userData);

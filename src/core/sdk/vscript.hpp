@@ -100,3 +100,14 @@ private: \
 	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
     PLUGIFY_NO_UNIQUE_ADDRESS VScriptMemberFunction<ThisClass, name##_str, name##_offset, ret __VA_OPT__(,) __VA_ARGS__> name;
+
+#define DECLARE_VSCRIPT_CLASS(ClassName) \
+	public: \
+		using ThisClass = ClassName; \
+		static constexpr const char m_className[] = #ClassName; \
+
+#define DECLARE_VSCRIPT_CLASS2(ClassName) \
+	public: \
+		using ThisClass = ClassName; \
+		static constexpr const char m_className[] = ""; \
+

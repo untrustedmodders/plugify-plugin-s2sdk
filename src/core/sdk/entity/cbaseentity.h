@@ -89,16 +89,19 @@ public:
 
 	SCHEMA_FIELD(CGameSceneNode*, m_pSceneNode)
 
-	VSCRIPT_MEMBER_FUNCTION(AddImpulseAtPosition, void, Vector, Vector)
-	VSCRIPT_MEMBER_FUNCTION(AddVelocity, void, Vector, Vector)
+	using string = const char*;
+	using vector = const Vector&;
+	using qangle = const QAngle&;
+	VSCRIPT_MEMBER_FUNCTION(AddImpulseAtPosition, void, vector, vector)
+	VSCRIPT_MEMBER_FUNCTION(AddVelocity, void, vector, vector)
 	VSCRIPT_MEMBER_FUNCTION(DetachFromParent, void)
 	VSCRIPT_MEMBER_FUNCTION(GetSequence, int)
 	VSCRIPT_MEMBER_FUNCTION(IsAttachedToParent, bool)
-	VSCRIPT_MEMBER_FUNCTION(LookupSequence, int, const char*)
-	VSCRIPT_MEMBER_FUNCTION(SequenceDuration, float, const char*)
-	VSCRIPT_MEMBER_FUNCTION(SetAngularVelocity, void, Vector)
+	VSCRIPT_MEMBER_FUNCTION(LookupSequence, int, string)
+	VSCRIPT_MEMBER_FUNCTION(SequenceDuration, float, string)
+	VSCRIPT_MEMBER_FUNCTION(SetAngularVelocity, void, vector)
 	VSCRIPT_MEMBER_FUNCTION(SetMaterialGroup, void, CUtlStringToken)
-	VSCRIPT_MEMBER_FUNCTION(SetVelocity, void, Vector)
+	VSCRIPT_MEMBER_FUNCTION(SetVelocity, void, vector)
 };
 
 class CModelState {
@@ -176,9 +179,11 @@ public:
 
 	using string = const char*;
 	using handle = HSCRIPT;
+	using vector = const Vector&;
+	using qangle = const QAngle&;
 	VSCRIPT_MEMBER_FUNCTION(AddEffects, void, int)
-    VSCRIPT_MEMBER_FUNCTION(ApplyAbsVelocityImpulse, void, Vector)
-    VSCRIPT_MEMBER_FUNCTION(ApplyLocalAngularVelocityImpulse, void, Vector)
+    VSCRIPT_MEMBER_FUNCTION(ApplyAbsVelocityImpulse, void, vector)
+    VSCRIPT_MEMBER_FUNCTION(ApplyLocalAngularVelocityImpulse, void, vector)
     VSCRIPT_MEMBER_FUNCTION(Attribute_GetFloatValue, float, string, float)
     VSCRIPT_MEMBER_FUNCTION(Attribute_GetIntValue, int, string, int)
     VSCRIPT_MEMBER_FUNCTION(Attribute_SetFloatValue, void, string, float)
@@ -192,7 +197,7 @@ public:
     VSCRIPT_MEMBER_FUNCTION(FollowEntity, void, handle, bool)
     VSCRIPT_MEMBER_FUNCTION(FollowEntityMerge, void, handle, string)
     VSCRIPT_MEMBER_FUNCTION(GatherCriteria, void, handle)
-    VSCRIPT_MEMBER_FUNCTION(GetAbsOrigin, Vector)
+    VSCRIPT_MEMBER_FUNCTION(GetAbsOrigin, vector)
     VSCRIPT_MEMBER_FUNCTION(GetAbsScale, float)
     VSCRIPT_MEMBER_FUNCTION(GetAngles, QAngle)
     VSCRIPT_MEMBER_FUNCTION(GetAnglesAsVector, Vector)
@@ -238,39 +243,39 @@ public:
     VSCRIPT_MEMBER_FUNCTION(PrecacheScriptSound, void, string)
     VSCRIPT_MEMBER_FUNCTION(RemoveEffects, void, int)
     VSCRIPT_MEMBER_FUNCTION(SetAbsAngles, void, float, float, float)
-    VSCRIPT_MEMBER_FUNCTION(SetAbsOrigin, void, Vector)
+    VSCRIPT_MEMBER_FUNCTION(SetAbsOrigin, void, vector)
     VSCRIPT_MEMBER_FUNCTION(SetAbsScale, void, float)
     VSCRIPT_MEMBER_FUNCTION(SetAngles, void, float, float, float)
     VSCRIPT_MEMBER_FUNCTION(SetAngularVelocity, void, float, float, float)
-    VSCRIPT_MEMBER_FUNCTION(SetConstraint, void, Vector)
+    VSCRIPT_MEMBER_FUNCTION(SetConstraint, void, vector)
     VSCRIPT_MEMBER_FUNCTION(SetContext, void, string, string, float)
     VSCRIPT_MEMBER_FUNCTION(SetContextNum, void, string, float, float)
     VSCRIPT_MEMBER_FUNCTION(SetContextThink, void, string, handle, float)
     VSCRIPT_MEMBER_FUNCTION(SetEntityName, void, string)
-    VSCRIPT_MEMBER_FUNCTION(SetForwardVector, void, Vector)
+    VSCRIPT_MEMBER_FUNCTION(SetForwardVector, void, vector)
     VSCRIPT_MEMBER_FUNCTION(SetFriction, void, float)
     VSCRIPT_MEMBER_FUNCTION(SetGravity, void, float)
     VSCRIPT_MEMBER_FUNCTION(SetHealth, void, int)
     VSCRIPT_MEMBER_FUNCTION(SetLocalAngles, void, float, float, float)
-    VSCRIPT_MEMBER_FUNCTION(SetLocalOrigin, void, Vector)
+    VSCRIPT_MEMBER_FUNCTION(SetLocalOrigin, void, vector)
     VSCRIPT_MEMBER_FUNCTION(SetLocalScale, void, float)
     VSCRIPT_MEMBER_FUNCTION(SetMass, void, float)
     VSCRIPT_MEMBER_FUNCTION(SetMaxHealth, void, int)
-    VSCRIPT_MEMBER_FUNCTION(SetOrigin, void, Vector)
+    VSCRIPT_MEMBER_FUNCTION(SetOrigin, void, vector)
     VSCRIPT_MEMBER_FUNCTION(SetOwner, void, handle)
     VSCRIPT_MEMBER_FUNCTION(SetParent, void, handle, string)
     VSCRIPT_MEMBER_FUNCTION(SetTeam, void, int)
-    VSCRIPT_MEMBER_FUNCTION(SetVelocity, void, Vector)
+    VSCRIPT_MEMBER_FUNCTION(SetVelocity, void, vector)
     VSCRIPT_MEMBER_FUNCTION(StopSound, void, string)
     VSCRIPT_MEMBER_FUNCTION(TakeDamage, int, handle)
-    VSCRIPT_MEMBER_FUNCTION(TransformPointEntityToWorld, Vector, Vector)
-    VSCRIPT_MEMBER_FUNCTION(TransformPointWorldToEntity, Vector, Vector)
+    VSCRIPT_MEMBER_FUNCTION(TransformPointEntityToWorld, Vector, vector)
+    VSCRIPT_MEMBER_FUNCTION(TransformPointWorldToEntity, Vector, vector)
     VSCRIPT_MEMBER_FUNCTION(Trigger, void)
     VSCRIPT_MEMBER_FUNCTION(ValidatePrivateScriptScope, void)
 
 	int entindex() { return m_pEntity->m_EHandle.GetEntryIndex(); }
 
-	const char* GetName() {
+	string GetName() {
 		return m_iGlobalname->String();
 	}
 
@@ -376,7 +381,7 @@ public:
 		Kill();
 	}
 
-	void AcceptInput(const char* inputName, const variant_t& value = variant_t(), CEntityInstance* activator = nullptr, CEntityInstance* caller = nullptr, int outputId = 0) {
+	void AcceptInput(string inputName, const variant_t& value = variant_t(), CEntityInstance* activator = nullptr, CEntityInstance* caller = nullptr, int outputId = 0) {
 		addresses::CEntityInstance_AcceptInput(this, inputName, activator, caller, const_cast<variant_t*>(&value), outputId);
 	}
 
@@ -384,24 +389,27 @@ public:
 		addresses::CBaseEntity_SetMoveType(this, nMoveType, m_MoveCollide);
 	}
 
-	const char* GetName() const { return m_pEntity->m_name.String(); }
+	string GetName() const { return m_pEntity->m_name.String(); }
 };
 
 class CEntities {
 public:
 	DECLARE_SCHEMA_CLASS(CEntities);
 
-	VSCRIPT_MEMBER_FUNCTION(CreateByClassname, HSCRIPT, const char*)
-	VSCRIPT_MEMBER_FUNCTION(FindByName, HSCRIPT, HSCRIPT, const char*)
-	VSCRIPT_MEMBER_FUNCTION(FindByNameNearest, HSCRIPT, const char*, Vector, float)
-	VSCRIPT_MEMBER_FUNCTION(FindByNameWithin, HSCRIPT, HSCRIPT, const char*, Vector, float)
-	VSCRIPT_MEMBER_FUNCTION(FindByClassname, HSCRIPT, HSCRIPT, const char*)
-	VSCRIPT_MEMBER_FUNCTION(FindByClassnameNearest, HSCRIPT, const char*, Vector, float)
-	VSCRIPT_MEMBER_FUNCTION(FindByClassnameWithin, HSCRIPT, HSCRIPT, const char*, Vector, float)
-	VSCRIPT_MEMBER_FUNCTION(FindByModel, HSCRIPT, HSCRIPT, const char*)
-	VSCRIPT_MEMBER_FUNCTION(FindByModelWithin, HSCRIPT, HSCRIPT, const char*, Vector, float)
-	VSCRIPT_MEMBER_FUNCTION(FindByTarget, HSCRIPT, HSCRIPT, const char*)
-	VSCRIPT_MEMBER_FUNCTION(FindInSphere, HSCRIPT, HSCRIPT, const char*, Vector, float)
+	using string = const char*;
+	using handle = HSCRIPT;
+	using vector = const Vector&;
+	VSCRIPT_MEMBER_FUNCTION(CreateByClassname, handle, string)
+	VSCRIPT_MEMBER_FUNCTION(FindByName, handle, handle, string)
+	VSCRIPT_MEMBER_FUNCTION(FindByNameNearest, handle, string, vector, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByNameWithin, handle, handle, string, vector, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByClassname, handle, handle, string)
+	VSCRIPT_MEMBER_FUNCTION(FindByClassnameNearest, handle, string, vector, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByClassnameWithin, handle, handle, string, vector, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByModel, handle, handle, string)
+	VSCRIPT_MEMBER_FUNCTION(FindByModelWithin, handle, handle, string, vector, float)
+	VSCRIPT_MEMBER_FUNCTION(FindByTarget, handle, handle, string)
+	VSCRIPT_MEMBER_FUNCTION(FindInSphere, handle, handle, string, vector, float)
 };
 
 class SpawnPoint : public CBaseEntity {

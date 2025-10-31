@@ -10,7 +10,7 @@ namespace helpers {
 		int entityHandle,
 		std::source_location location = std::source_location::current()
 	) {
-		auto* entity = static_cast<T*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle(static_cast<uint32>(entityHandle))));
+		auto* entity = static_cast<T*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle)));
 		if (!entity) {
 			plg::print(LS_WARNING, "Cannot execute '{}' on invalid entity handle: {}\n",
 				location.function_name(), entityHandle);
@@ -181,7 +181,7 @@ namespace helpers {
 			case FieldType::EHandle:
 				plg::visit([&variant](const auto& v) {
 					using T = std::decay_t<decltype(v)>;
-					if constexpr (std::is_arithmetic_v<T>) variant = CEntityHandle((uint32) v);
+					if constexpr (std::is_arithmetic_v<T>) variant = CEntityHandle(v);
 				}, value);
 				break;
 			case FieldType::Resource:

@@ -131,7 +131,7 @@ struct formatter<ConVal> {
 			case EConVarType_Float64:
 				return std::format_to(ctx.out(), "{}", value->m_fl64Value);
 			case EConVarType_String:
-				return std::format_to(ctx.out(), "{}", std::string_view(value->m_StringValue.Get(), static_cast<size_t>(value->m_StringValue.Length())));
+				return std::format_to(ctx.out(), "{}", std::string_view(value->m_StringValue));
 			case EConVarType_Color:
 				return std::format_to(ctx.out(), "{} {} {} {}", value->m_clrValue.r(), value->m_clrValue.g(), value->m_clrValue.b(), value->m_clrValue.a());
 			case EConVarType_Vector2:
@@ -173,7 +173,7 @@ public:
 			std::print(os, "// Maximum: {}\n", ConVal{conVarData->MaxValue(), conVarData->GetType()});
         }
 
-        std::print(os, "{} {}\n\n", conVarData->GetName(), ConVal{conVarData->ValueOrDefault(-1), conVarData->GetType()});
+        std::print(os, "{} \"{}\"\n\n", conVarData->GetName(), ConVal{conVarData->ValueOrDefault(-1), conVarData->GetType()});
     }
 };
 

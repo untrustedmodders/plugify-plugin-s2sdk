@@ -303,12 +303,14 @@ void MultiAddonManager::OnSteamAPIActivated() {
 	if (m_callbackRegistered)
 		return;
 
-	std::array<uint64, 5> conVarHandles = {
+	std::array<uint64, 7> conVarHandles = {
 		s2_addon_mount_download,
 		s2_block_disconnect_messages,
 		s2_cache_clients_with_addons,
 		s2_cache_clients_duration,
 		s2_extra_addons_timeout,
+		s2_extra_addons,
+		s2_client_extra_addons,
 	};
 	g_ConVarManager.AutoExecConfig(conVarHandles, true, "multi_addon_manager", "");
 

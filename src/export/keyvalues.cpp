@@ -42,7 +42,7 @@ extern "C" PLUGIN_API void Kv1Destroy(KeyValues* kv) {
  * @return The name of the KeyValues section
  */
 extern "C" PLUGIN_API plg::string Kv1GetName(KeyValues* kv) {
-	return kv->GetName();
+	return kv ? kv->GetName() : "";
 }
 
 /**
@@ -52,7 +52,7 @@ extern "C" PLUGIN_API plg::string Kv1GetName(KeyValues* kv) {
  * @param name The new name to assign to this KeyValues section
  */
 extern "C" PLUGIN_API void Kv1SetName(KeyValues* kv, const plg::string& name) {
-	kv->SetName(name.c_str());
+	if (kv) kv->SetName(name.c_str());
 }
 
 /**
@@ -65,7 +65,7 @@ extern "C" PLUGIN_API void Kv1SetName(KeyValues* kv, const plg::string& name) {
  * @return Pointer to the found KeyValues subkey, or NULL if not found
  */
 extern "C" PLUGIN_API KeyValues* Kv1FindKey(KeyValues* kv, const plg::string& keyName) {
-	return kv->FindKey(keyName.c_str());
+	return kv ? kv->FindKey(keyName.c_str()) : nullptr;
 }
 
 /**
@@ -79,7 +79,7 @@ extern "C" PLUGIN_API KeyValues* Kv1FindKey(KeyValues* kv, const plg::string& ke
  * @return Pointer to the found or newly created KeyValues subkey (never NULL)
  */
 extern "C" PLUGIN_API KeyValues* Kv1FindKeyOrCreate(KeyValues* kv, const plg::string& keyName) {
-	return kv->FindKey(keyName.c_str(), true);
+	return kv ? kv->FindKey(keyName.c_str(), true) : nullptr;
 }
 
 /**
@@ -92,7 +92,7 @@ extern "C" PLUGIN_API KeyValues* Kv1FindKeyOrCreate(KeyValues* kv, const plg::st
  * @return Pointer to the newly created KeyValues subkey
  */
 extern "C" PLUGIN_API KeyValues* Kv1CreateKey(KeyValues* kv, const plg::string& keyName) {
-	return kv->CreatePeerKey(keyName.c_str());
+	return kv ? kv->CreatePeerKey(keyName.c_str()) : nullptr;;
 }
 
 /**
@@ -106,7 +106,7 @@ extern "C" PLUGIN_API KeyValues* Kv1CreateKey(KeyValues* kv, const plg::string& 
  * @return Pointer to the newly created KeyValues subkey
  */
 extern "C" PLUGIN_API KeyValues* Kv1CreateNewKey(KeyValues* kv) {
-	return kv->CreateNewKey();
+	return kv ? kv->CreateNewKey() : nullptr;;
 }
 
 /**
@@ -121,7 +121,7 @@ extern "C" PLUGIN_API KeyValues* Kv1CreateNewKey(KeyValues* kv) {
  *          KeyValues object to avoid corruption of the tree structure.
  */
 extern "C" PLUGIN_API void Kv1AddSubKey(KeyValues* kv, KeyValues* subKey) {
-	kv->AddSubKey(subKey);
+	if (kv) kv->AddSubKey(subKey);
 }
 
 /**
@@ -137,7 +137,7 @@ extern "C" PLUGIN_API void Kv1AddSubKey(KeyValues* kv, KeyValues* subKey) {
  *       in the C++ API if you need to iterate only over keys that have children.
  */
 extern "C" PLUGIN_API KeyValues* Kv1GetFirstSubKey(KeyValues* kv) {
-	return kv->GetFirstSubKey();
+	return kv ? kv->GetFirstSubKey() : nullptr;
 }
 
 /**
@@ -152,7 +152,7 @@ extern "C" PLUGIN_API KeyValues* Kv1GetFirstSubKey(KeyValues* kv) {
  *       all children of a parent key.
  */
 extern "C" PLUGIN_API KeyValues* Kv1GetNextKey(KeyValues* kv) {
-	return kv->GetNextKey();
+	return kv ? kv->GetNextKey() : nullptr;
 }
 
 /**
@@ -166,6 +166,7 @@ extern "C" PLUGIN_API KeyValues* Kv1GetNextKey(KeyValues* kv) {
  * @return The color value as a 32-bit integer (RGBA)
  */
 extern "C" PLUGIN_API int Kv1GetColor(KeyValues* kv, const plg::string& keyName, int defaultValue) {
+	if (!kv) return defaultValue;
 	Color color = kv->GetColor(keyName.c_str(), *reinterpret_cast<Color*>(&defaultValue));
 	return *reinterpret_cast<const int*>(&color);
 }
@@ -180,7 +181,7 @@ extern "C" PLUGIN_API int Kv1GetColor(KeyValues* kv, const plg::string& keyName,
  * @param value The color value as a 32-bit integer (RGBA)
  */
 extern "C" PLUGIN_API void Kv1SetColor(KeyValues* kv, const plg::string& keyName, int value) {
-	kv->SetColor(keyName.c_str(), *reinterpret_cast<Color*>(&value));
+	if (kv) kv->SetColor(keyName.c_str(), *reinterpret_cast<Color*>(&value));
 }
 
 /**
@@ -194,6 +195,7 @@ extern "C" PLUGIN_API void Kv1SetColor(KeyValues* kv, const plg::string& keyName
  * @return The integer value associated with the key, or defaultValue if not found
  */
 extern "C" PLUGIN_API int Kv1GetInt(KeyValues* kv, const plg::string& keyName, int defaultValue) {
+	if (!kv) return defaultValue;
 	return kv->GetInt(keyName.c_str(), defaultValue);
 }
 
@@ -207,7 +209,7 @@ extern "C" PLUGIN_API int Kv1GetInt(KeyValues* kv, const plg::string& keyName, i
  * @param value The integer value to set
  */
 extern "C" PLUGIN_API void Kv1SetInt(KeyValues* kv, const plg::string& keyName, int value) {
-	kv->SetInt(keyName.c_str(), value);
+	if (kv) kv->SetInt(keyName.c_str(), value);
 }
 
 /**
@@ -221,6 +223,7 @@ extern "C" PLUGIN_API void Kv1SetInt(KeyValues* kv, const plg::string& keyName, 
  * @return The float value associated with the key, or defaultValue if not found
  */
 extern "C" PLUGIN_API float Kv1GetFloat(KeyValues* kv, const plg::string& keyName, float defaultValue) {
+	if (!kv) return defaultValue;
 	return kv->GetFloat(keyName.c_str(), defaultValue);
 }
 
@@ -234,7 +237,7 @@ extern "C" PLUGIN_API float Kv1GetFloat(KeyValues* kv, const plg::string& keyNam
  * @param value The float value to set
  */
 extern "C" PLUGIN_API void Kv1SetFloat(KeyValues* kv, const plg::string& keyName, float value) {
-	kv->SetFloat(keyName.c_str(), value);
+	if (kv) kv->SetFloat(keyName.c_str(), value);
 }
 
 /**
@@ -248,6 +251,7 @@ extern "C" PLUGIN_API void Kv1SetFloat(KeyValues* kv, const plg::string& keyName
  * @return The string value associated with the key, or defaultValue if not found
  */
 extern "C" PLUGIN_API plg::string Kv1GetString(KeyValues* kv, const plg::string& keyName, const plg::string& defaultValue) {
+	if (!kv) return defaultValue;
 	return kv->GetString(keyName.c_str(), defaultValue.c_str());
 }
 
@@ -261,7 +265,7 @@ extern "C" PLUGIN_API plg::string Kv1GetString(KeyValues* kv, const plg::string&
  * @param value The string value to set
  */
 extern "C" PLUGIN_API void Kv1SetString(KeyValues* kv, const plg::string& keyName, const plg::string& value) {
-	kv->SetString(keyName.c_str(), value.c_str());
+	if (kv) kv->SetString(keyName.c_str(), value.c_str());
 }
 
 /**
@@ -275,6 +279,7 @@ extern "C" PLUGIN_API void Kv1SetString(KeyValues* kv, const plg::string& keyNam
  * @return The pointer value associated with the key, or defaultValue if not found
  */
 extern "C" PLUGIN_API void* Kv1GetPtr(KeyValues* kv, const plg::string& keyName, void* defaultValue) {
+	if (!kv) return defaultValue;
 	return kv->GetPtr(keyName.c_str(), defaultValue);
 }
 
@@ -288,7 +293,7 @@ extern "C" PLUGIN_API void* Kv1GetPtr(KeyValues* kv, const plg::string& keyName,
  * @param value The pointer value to set
  */
 extern "C" PLUGIN_API void Kv1SetPtr(KeyValues* kv, const plg::string& keyName, void* value) {
-	kv->SetPtr(keyName.c_str(), value);
+	if (kv) kv->SetPtr(keyName.c_str(), value);
 }
 
 /**
@@ -302,6 +307,7 @@ extern "C" PLUGIN_API void Kv1SetPtr(KeyValues* kv, const plg::string& keyName, 
  * @return The boolean value associated with the key, or defaultValue if not found
  */
 extern "C" PLUGIN_API bool Kv1GetBool(KeyValues* kv, const plg::string& keyName, bool defaultValue) {
+	if (!kv) return defaultValue;
 	return kv->GetBool(keyName.c_str(), defaultValue);
 }
 
@@ -315,7 +321,7 @@ extern "C" PLUGIN_API bool Kv1GetBool(KeyValues* kv, const plg::string& keyName,
  * @param value The boolean value to set
  */
 extern "C" PLUGIN_API void Kv1SetBool(KeyValues* kv, const plg::string& keyName, bool value) {
-	kv->SetBool(keyName.c_str(), value);
+	if (kv) kv->SetBool(keyName.c_str(), value);
 }
 
 /**
@@ -331,7 +337,7 @@ extern "C" PLUGIN_API void Kv1SetBool(KeyValues* kv, const plg::string& keyName,
  *       using Kv1Destroy() to prevent memory leaks.
  */
 extern "C" PLUGIN_API KeyValues* Kv1MakeCopy(KeyValues* kv) {
-	return kv->MakeCopy();
+	return kv ? kv->MakeCopy() : nullptr;
 }
 
 /**
@@ -343,7 +349,7 @@ extern "C" PLUGIN_API KeyValues* Kv1MakeCopy(KeyValues* kv) {
  * @param kv Pointer to the KeyValues object to clear
  */
 extern "C" PLUGIN_API void Kv1Clear(KeyValues* kv) {
-	kv->Clear();
+	if (kv) kv->Clear();
 }
 
 /**
@@ -357,8 +363,7 @@ extern "C" PLUGIN_API void Kv1Clear(KeyValues* kv) {
  * @return true if the key exists and is empty, false otherwise
  */
 extern "C" PLUGIN_API bool Kv1IsEmpty(KeyValues* kv, const plg::string& keyName) {
-	return kv->IsEmpty(keyName.c_str());
+	return kv ? kv->IsEmpty(keyName.c_str()) : true;
 }
-
 
 PLUGIFY_WARN_POP()

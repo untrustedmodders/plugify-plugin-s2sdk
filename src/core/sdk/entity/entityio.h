@@ -54,16 +54,16 @@ public:
 
 class EntityIO {
 public:
-	using ThisClass = EntityIO;
-	static constexpr const char m_className[] = "";
+	DECLARE_VSCRIPT_CLASS2(EntityIO)
 
 	using handle = HSCRIPT;
 	using string = const char*;
+	using vector = const Vector&;
 	VSCRIPT_GLOBAL_FUNCTION(DoEntFire, void, string, string, string, float, handle, handle)
 	VSCRIPT_GLOBAL_FUNCTION(DoEntFireByInstanceHandle, void, handle, string, string, float, handle, handle)
 	VSCRIPT_GLOBAL_FUNCTION(FireEntityIOInputNameOnly, void, handle, string)
 	VSCRIPT_GLOBAL_FUNCTION(FireEntityIOInputString, void, handle, string, string)
-	VSCRIPT_GLOBAL_FUNCTION(FireEntityIOInputVec, void, handle, string, Vector)
+	VSCRIPT_GLOBAL_FUNCTION(FireEntityIOInputVec, void, handle, string, vector)
 	VSCRIPT_GLOBAL_FUNCTION(CancelEntityIOEvents, void, handle)
 	//VSCRIPT_GLOBAL_FUNCTION(SetRenderingEnabled, void, handle, bool)
 	//VSCRIPT_GLOBAL_FUNCTION(CreateEffect, bool, table)

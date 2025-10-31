@@ -29,14 +29,14 @@ public:
 	SCHEMA_FIELD(Color, m_clrRender)
 	SCHEMA_FIELD(uint8, m_nRenderMode)
 
-	VSCRIPT_MEMBER_FUNCTION(GetAttachmentAngles, Vector, int)
-    VSCRIPT_MEMBER_FUNCTION(GetAttachmentForward, Vector, int)
-    VSCRIPT_MEMBER_FUNCTION(GetAttachmentOrigin, Vector, int)
+	VSCRIPT_MEMBER_FUNCTION(GetAttachmentAngles, vector, int)
+    VSCRIPT_MEMBER_FUNCTION(GetAttachmentForward, vector, int)
+    VSCRIPT_MEMBER_FUNCTION(GetAttachmentOrigin, vector, int)
     VSCRIPT_MEMBER_FUNCTION(GetMaterialGroupHash, unsigned)
     VSCRIPT_MEMBER_FUNCTION(GetMaterialGroupMask, uint64)
     VSCRIPT_MEMBER_FUNCTION(GetModelScale, float)
     VSCRIPT_MEMBER_FUNCTION(GetRenderAlpha, int)
-    VSCRIPT_MEMBER_FUNCTION(GetRenderColor, Vector)
+    VSCRIPT_MEMBER_FUNCTION(GetRenderColor, vector)
     VSCRIPT_MEMBER_FUNCTION(ScriptLookupAttachment, int, string)
     VSCRIPT_MEMBER_FUNCTION(SetBodygroup, void, int, int)
     VSCRIPT_MEMBER_FUNCTION(SetBodygroupByName, void, string, int)
@@ -50,7 +50,7 @@ public:
     VSCRIPT_MEMBER_FUNCTION(SetRenderColor, void, int, int, int)
     VSCRIPT_MEMBER_FUNCTION(SetRenderMode, void, int)
     VSCRIPT_MEMBER_FUNCTION(SetSingleMeshGroup, void, string)
-    VSCRIPT_MEMBER_FUNCTION(SetSize, void, Vector, Vector)
+    VSCRIPT_MEMBER_FUNCTION(SetSize, void, vector, vector)
     VSCRIPT_MEMBER_FUNCTION(SetSkin, void, int)
 
 	const char* GetModelName() {

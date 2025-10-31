@@ -264,7 +264,7 @@ extern "C" PLUGIN_API void SetEventPtr(EventInfo* info, const plg::string& key, 
  * @param value A handle to the player controller to set.
  */
 extern "C" PLUGIN_API void SetEventPlayerController(EventInfo* info, const plg::string& key, int value) {
-	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) value));
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(value));
 	if (!entity) {
 		return;
 	}
@@ -289,7 +289,7 @@ extern "C" PLUGIN_API void SetEventPlayerIndex(EventInfo* info, const plg::strin
  * @param value A handle to the entity to set.
  */
 extern "C" PLUGIN_API void SetEventEntity(EventInfo* info, const plg::string& key, int value) {
-	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) value));
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(value));
 	if (!entity) {
 		return;
 	}
@@ -314,7 +314,7 @@ extern "C" PLUGIN_API void SetEventEntityIndex(EventInfo* info, const plg::strin
  * @param value The entity handle value to set.
  */
 extern "C" PLUGIN_API void SetEventEntityHandle(EventInfo* info, const plg::string& key, int value) {
-	info->event->SetEntity(GameEventKeySymbol_t::Make(key), CEntityHandle((uint32) value).Get());
+	info->event->SetEntity(GameEventKeySymbol_t::Make(key), CEntityHandle(value).Get());
 }
 
 /**

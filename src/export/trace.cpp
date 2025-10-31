@@ -29,7 +29,7 @@ extern "C" PLUGIN_API bool TraceCollideable(
 	const Vector& end,
 	int entityHandle,
 	Vector& outPos,
-	float& outFraction,
+	double& outFraction,
 	bool& outHit,
 	bool& outStartSolid,
 	Vector& outNormal
@@ -61,7 +61,7 @@ extern "C" PLUGIN_API bool TraceCollideable2(
 	const Vector* mins,
 	const Vector* maxs,
 	Vector& outPos,
-	float& outFraction,
+	double& outFraction,
 	bool& outHit,
 	bool& outStartSolid,
 	Vector& outNormal
@@ -95,7 +95,7 @@ extern "C" PLUGIN_API bool TraceHull(
 	int mask,
 	int ignoreHandle,
 	Vector& outPos,
-	float& outFraction,
+	double& outFraction,
 	bool& outHit,
 	int& outEntHit,
 	bool& outStartSolid
@@ -128,7 +128,7 @@ extern "C" PLUGIN_API bool TraceLine(
 	int mask,
 	int ignoreHandle,
 	Vector& outPos,
-	float& outFraction,
+	double& outFraction,
 	bool& outHit,
 	int& outEntHit,
 	bool& outStartSolid

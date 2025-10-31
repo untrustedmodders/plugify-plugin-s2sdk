@@ -23,8 +23,7 @@
 
 class Trace {
 public:
-	using ThisClass = Trace;
-	static constexpr const char m_className[] = "";
+	DECLARE_VSCRIPT_CLASS2(Trace)
 
 	using table = HSCRIPT;
 	VSCRIPT_GLOBAL_FUNCTION(TraceCollideable, bool, table)
@@ -40,7 +39,7 @@ public:
 		const Vector* maxs,
 
 		Vector& outPos,
-		float& outFraction,
+		double& outFraction,
 		bool& outHit,
 		bool& outStartSolid,
 		Vector& outNormal
@@ -107,7 +106,7 @@ public:
 		CEntityInstance* ignore,
 
 		Vector& outPos,
-		float& outFraction,
+		double& outFraction,
 		bool& outHit,
 		CEntityInstance*& outEntHit,
 		bool& outStartSolid
@@ -169,7 +168,7 @@ public:
 		CEntityInstance* ignore,
 
 		Vector& outPos,
-		float& outFraction,
+		double& outFraction,
 		bool& outHit,
 		CEntityInstance*& outEntHit,
 		bool& outStartSolid

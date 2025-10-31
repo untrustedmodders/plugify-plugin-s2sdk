@@ -226,7 +226,13 @@ endif()
 
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/plugify-plugin-s2sdk.pplugin.in
-        ${CMAKE_CURRENT_BINARY_DIR}/plugify-plugin-s2sdk.pplugin
+        ${CMAKE_CURRENT_BINARY_DIR}/plugify-plugin-s2sdk.pplugin.json
+)
+
+execute_process(
+        COMMAND python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin), separators=(',',':')))"
+        INPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/plugify-plugin-s2sdk.pplugin.json
+        OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/plugify-plugin-s2sdk.pplugin
 )
 
 configure_file(

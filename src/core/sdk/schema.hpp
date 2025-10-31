@@ -323,11 +323,11 @@ public: \
     SCHEMA_FIELD_POINTER_OFFSET(type, name, 0)
 
 // If the class needs a specific offset for its NetworkStateChanged (like CEconItemView), use this and provide the offset
-#define DECLARE_SCHEMA_CLASS_BASE(ClassName, offset)								\
-	public:																		    \
-		using ThisClass = ClassName;												\
-		static constexpr const char m_className[] = #ClassName;						\
-		static constexpr int m_networkStateChangedOffset = offset;                  \
+#define DECLARE_SCHEMA_CLASS_BASE(className, offset) \
+	public: \
+		using ThisClass = className; \
+		static constexpr const char m_className[] = #className; \
+		static constexpr int m_networkStateChangedOffset = offset; \
 
 #define DECLARE_SCHEMA_CLASS(className) DECLARE_SCHEMA_CLASS_BASE(className, 0)
 

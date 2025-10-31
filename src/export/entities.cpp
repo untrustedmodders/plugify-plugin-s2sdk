@@ -70,7 +70,7 @@ extern "C" PLUGIN_API int EntPointerToEntHandle(CEntityInstance* entity) {
  * @return A pointer to the entity instance, or nullptr if the handle is invalid.
  */
 extern "C" PLUGIN_API void* EntHandleToEntPointer(int entityHandle) {
-	CEntityHandle handle((uint32) entityHandle);
+	CEntityHandle handle(entityHandle);
 	if (!handle.IsValid()) {
 		return nullptr;
 	}
@@ -106,7 +106,7 @@ extern "C" PLUGIN_API int EntIndexToEntHandle(int entityIndex) {
  * @return The index of the entity, or -1 if the handle is invalid.
  */
 extern "C" PLUGIN_API int EntHandleToEntIndex(int entityHandle) {
-	CEntityHandle handle((uint32) entityHandle);
+	CEntityHandle handle(entityHandle);
 	if (!handle.IsValid()) {
 		return -1;
 	}
@@ -129,7 +129,7 @@ extern "C" PLUGIN_API int EntHandleToEntIndex(int entityHandle) {
  * @return True if the entity handle is valid, false otherwise.
  */
 extern "C" PLUGIN_API bool IsValidEntHandle(int entityHandle) {
-	CEntityHandle handle((uint32) entityHandle);
+	CEntityHandle handle(entityHandle);
 	if (!handle.IsValid()) {
 		return false;
 	}
@@ -215,7 +215,7 @@ extern "C" PLUGIN_API bool UnhookEntityOutput(const plg::string& classname, cons
  * @return The handle of the found entity, or INVALID_EHANDLE_INDEX if none found.
  */
 extern "C" PLUGIN_API int FindEntityByClassname(int startFrom, const plg::string& classname) {
-	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(static_cast<uint32>(startFrom)));
+	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
 	CEntityInstance* found = entities::FindEntityByClassName(startEnt, classname.c_str());
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
@@ -243,7 +243,7 @@ extern "C" PLUGIN_API int FindEntityByClassnameNearest(const plg::string& classn
  * @return The handle of the found entity, or INVALID_EHANDLE_INDEX if none found.
  */
 extern "C" PLUGIN_API int FindEntityByClassnameWithin(int startFrom, const plg::string& classname, const plg::vec3& origin, float radius) {
-	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(static_cast<uint32>(startFrom)));
+	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
 	CEntityInstance* found = entities::FindEntityByClassNameWithin(startEnt, classname.c_str(), *reinterpret_cast<const Vector*>(&origin), radius);
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
@@ -256,7 +256,7 @@ extern "C" PLUGIN_API int FindEntityByClassnameWithin(int startFrom, const plg::
  * @return The handle of the found entity, or INVALID_EHANDLE_INDEX if none found.
  */
 extern "C" PLUGIN_API int FindEntityByName(int startFrom, const plg::string& name) {
-	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(static_cast<uint32>(startFrom)));
+	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
 	CEntityInstance* found = entities::FindEntityByName(startEnt, name.c_str());
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
@@ -284,7 +284,7 @@ extern "C" PLUGIN_API int FindEntityByNameNearest(const plg::string& name, const
  * @return The handle of the found entity, or INVALID_EHANDLE_INDEX if none found.
  */
 extern "C" PLUGIN_API int FindEntityByNameWithin(int startFrom, const plg::string& name, const plg::vec3& origin, float radius) {
-	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(static_cast<uint32>(startFrom)));
+	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
 	CEntityInstance* found = entities::FindByNameWithin(startEnt, name.c_str(), *reinterpret_cast<const Vector*>(&origin), radius);
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
@@ -297,7 +297,7 @@ extern "C" PLUGIN_API int FindEntityByNameWithin(int startFrom, const plg::strin
  * @return The handle of the found entity, or INVALID_EHANDLE_INDEX if none found.
  */
 extern "C" PLUGIN_API int FindEntityByTarget(int startFrom, const plg::string& name) {
-	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(static_cast<uint32>(startFrom)));
+	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
 	CEntityInstance* found = entities::FindByTarget(startEnt, name.c_str());
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
@@ -311,7 +311,7 @@ extern "C" PLUGIN_API int FindEntityByTarget(int startFrom, const plg::string& n
  * @return The handle of the found entity, or INVALID_EHANDLE_INDEX if none found.
  */
 extern "C" PLUGIN_API int FindEntityInSphere(int startFrom, const plg::vec3& origin, float radius) {
-	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(static_cast<uint32>(startFrom)));
+	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
 	CEntityInstance* found = entities::FindInSphere(startEnt, nullptr, *reinterpret_cast<const Vector*>(&origin), radius);
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
@@ -1536,8 +1536,8 @@ extern "C" PLUGIN_API void ApplyLocalAngularVelocityImpulseToEntity(int entityHa
 extern "C" PLUGIN_API void AcceptEntityInput(int entityHandle, const plg::string& inputName, int activatorHandle, int callerHandle, const plg::any& value, FieldType type, int outputId) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) activatorHandle)) : nullptr;
-	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) callerHandle)) : nullptr;
+	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
+	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
 	entity->AcceptInput(inputName.c_str(), variant, activator, caller, outputId);
 }
@@ -1604,8 +1604,8 @@ extern "C" PLUGIN_API void DisconnectEntityRedirectedOutput(int entityHandle, co
 extern "C" PLUGIN_API void FireEntityOutput(int entityHandle, const plg::string& outputName, int activatorHandle, int callerHandle, const plg::any& value, FieldType type, float delay) {
 	auto* entity = helpers::GetEntity<CEntityInstance2>(entityHandle);
 	if (!entity) return;
-	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) activatorHandle)) : nullptr;
-	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) callerHandle)) : nullptr;
+	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
+	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
 	entity->FireOutput(outputName.c_str(), activator ? activator->GetScriptInstance() : nullptr, caller ? caller->GetScriptInstance() : nullptr, variant, delay);
 }

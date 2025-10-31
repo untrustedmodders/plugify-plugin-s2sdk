@@ -1038,6 +1038,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientAngVelocity(int playerSlot) {
 	const Vector& vec = pawn->GetAngularVelocity();
 	return *reinterpret_cast<const plg::vec3*>(&vec);
 }
+
 /**
  * @brief Sets the angular velocity of an client.
  *
@@ -1067,6 +1068,37 @@ extern "C" PLUGIN_API plg::vec3 GetClientLocalVelocity(int playerSlot) {
 	if (!pawn) return {};
 	const Vector& vec = pawn->GetLocalVelocity();
 	return *reinterpret_cast<const plg::vec3*>(&vec);
+}
+
+/**
+ * @brief Retrieves the angular velocity of an client.
+ *
+ * This function gets the angular velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose angular velocity is to be retrieved.
+ * @return A vector where the angular velocity will be stored.
+ */
+extern "C" PLUGIN_API plg::vec3 GetClientAngRotation(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	const QAngle& ang = pawn->m_CBodyComponent->m_pSceneNode->m_angRotation;
+	return *reinterpret_cast<const plg::vec3*>(&ang);
+}
+
+/**
+ * @brief Sets the angular velocity of an client.
+ *
+ * This function updates the angular velocity of the specified client.
+ * If the client is invalid, the function does nothing.
+ *
+ * @param playerSlot The index of the player's slot whose angular velocity is to be set.
+ * @param rotation The new angular velocity to set for the client.
+ */
+extern "C" PLUGIN_API void SetClientAngRotation(int playerSlot, const plg::vec3& rotation) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->m_CBodyComponent->m_pSceneNode->m_angRotation = *reinterpret_cast<const QAngle*>(&rotation);
 }
 
 /**
@@ -1426,8 +1458,8 @@ extern "C" PLUGIN_API void AcceptClientInput(int playerSlot, const plg::string& 
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
 	variant_t variant = helpers::GetVariant(value, type);
-	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) activatorHandle)) : nullptr;
-	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) callerHandle)) : nullptr;
+	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
+	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	pawn->AcceptInput(inputName.c_str(), variant, activator, caller, outputId);
 }
 
@@ -1493,8 +1525,8 @@ extern "C" PLUGIN_API void DisconnectClientRedirectedOutput(int playerSlot, cons
 extern "C" PLUGIN_API void FireClientOutput(int playerSlot, const plg::string& outputName, int activatorHandle, int callerHandle, const plg::any& value, FieldType type, float delay) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) activatorHandle)) : nullptr;
-	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle((uint32) callerHandle)) : nullptr;
+	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
+	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
 	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), activator ? activator->GetScriptInstance() : nullptr, caller ? caller->GetScriptInstance() : nullptr, variant, delay);
 }
@@ -1825,6 +1857,31 @@ extern "C" PLUGIN_API void SetClientArmor(int playerSlot, int armor) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
 	pawn->m_ArmorValue = armor;
+}
+
+
+/**
+ * @brief Returns the client's speed value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The speed value of the client.
+ */
+extern "C" PLUGIN_API float GetClientSpeed(int playerSlot) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return {};
+	return pawn->m_flVelocityModifier;
+}
+
+/**
+ * @brief Sets the client's speed value.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param speed The speed value to set.
+ */
+extern "C" PLUGIN_API void SetClientSpeed(int playerSlot, float speed) {
+	auto [controller, pawn] = helpers::GetController2(playerSlot);
+	if (!pawn) return;
+	pawn->m_flVelocityModifier = speed;
 }
 
 /**

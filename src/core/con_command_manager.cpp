@@ -197,43 +197,47 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, con
 
 ResultType ConCommandManager::DispatchConCommand(const CCommandContext* ctx, const CCommand* args, HookMode mode) {
 	if (ctx == nullptr || args == nullptr) {
-		return ResultType::Continue;
-	}
+        return ResultType::Continue;
+    }
 
-	const char* arg0 = args->Arg(0);
+    std::string_view arg0 = args->Arg(0);
 
-	plg::print(LS_DETAILED, "[ConCommandManager::Hook_DispatchConCommand]: {}\n", arg0);
+    plg::print(LS_DETAILED, "[ConCommandManager::Hook_DispatchConCommand]: {}\n", arg0);
 
-	static const char sayCommand[] = "say";
-	constexpr size_t sayNullTerminated = sizeof(sayCommand) - 1;
-	if (!std::strncmp(arg0, sayCommand, sayNullTerminated)) {
-		if (!arg0[sayNullTerminated] || !std::strcmp(&arg0[sayNullTerminated], "_team")) {
-			const char* arg1 = args->Arg(1);
-			while (*arg1 == ' ') {
-				arg1++;
-			}
-
-			bool silent = g_pCoreConfig->IsSilentChatTrigger(arg1);
-			if (silent || g_pCoreConfig->IsPublicChatTrigger(arg1)) {
-				char* message = (char*) (args->ArgS() + 1);
-				++message;
-
-				// Trailing slashes are only removed if Host_Say has been called.
-				bool hostSay = silent && mode == HookMode::Pre;
-				if (hostSay) message[std::strlen(message) - 1] = 0;
-
-				CCommand nargs;
-				nargs.Tokenize(message);
-
-				auto result = ExecuteCommandCallbacks(nargs[0], *ctx, nargs, mode, CommandCallingContext::Chat);
-				if (result >= ResultType::Handled || hostSay) {
-					return ResultType::Stop;
-				}
-			}
+	auto trim_left = [](std::string_view& str, char ch) {
+		while (!str.empty() && str.front() == ch) {
+			str.remove_prefix(1);
 		}
-	}
+	};
 
-	return ExecuteCommandCallbacks(arg0, *ctx, *args, mode, CommandCallingContext::Console);
+	auto trim_right = [](std::string_view& str, char ch) {
+		while (!str.empty() && str.back() == ch) {
+			str.remove_suffix(1);
+		}
+	};
+
+    if (arg0.starts_with("say") || arg0.starts_with("say_team")) {
+    	std::string_view arg1 = args->Arg(1);
+    	trim_left(arg1, ' ');
+    	bool silentChat = g_pCoreConfig->IsSilentChatTrigger(arg1);
+    	bool publicChat = g_pCoreConfig->IsPublicChatTrigger(arg1);
+    	if (silentChat || publicChat) {
+    		std::string_view message_sv = args->ArgS();
+    		trim_left(message_sv, '"');
+    		trim_right(message_sv, '"');
+    		message_sv.remove_prefix(1);
+
+    		CCommand nargs;
+    		nargs.Tokenize(CUtlString(message_sv));
+
+    		auto result = ExecuteCommandCallbacks(nargs[0], *ctx, nargs, mode, CommandCallingContext::Chat);
+    		if (result >= ResultType::Handled || silentChat) {
+    			return ResultType::Stop;
+    		}
+    	}
+    }
+
+    return ExecuteCommandCallbacks(arg0, *ctx, *args, mode, CommandCallingContext::Console);
 }
 
 ConCommandManager g_CommandManager;

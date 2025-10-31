@@ -162,7 +162,7 @@ poly::ReturnAction Hook_PostEvent(poly::PHook& hook, poly::Params& params, int c
 	auto message = poly::GetArgument<INetworkMessageInternal*>(params, 5);
 	auto pData = poly::GetArgument<CNetMessage*>(params, 6);
 
-	plg::print(LS_DETAILED, "[PostEvent] = {}, {}, {}, {}\n", slot, localOnly, clientCount, static_cast<void*>(clients) );
+	//plg::print(LS_DETAILED, "[PostEvent] = {}, {}, {}, {}\n", slot, localOnly, clientCount, static_cast<void*>(clients) );
 
 	if (type == poly::CallbackType::Pre) {
 		g_MultiAddonManager.OnPostEvent(message, pData, clients);
