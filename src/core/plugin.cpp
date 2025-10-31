@@ -155,9 +155,9 @@ poly::ReturnAction Hook_FireEvent(poly::PHook& hook, poly::Params& params, int c
 }
 
 poly::ReturnAction Hook_PostEvent(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto slot = poly::GetArgument<int>(params, 1);
-	auto localOnly = poly::GetArgument<bool>(params, 2);
-	auto clientCount = poly::GetArgument<int>(params, 3);
+	//auto slot = poly::GetArgument<int>(params, 1);
+	//auto localOnly = poly::GetArgument<bool>(params, 2);
+	//auto clientCount = poly::GetArgument<int>(params, 3);
 	auto clients = poly::GetArgument<uint64_t*>(params, 4);
 	auto message = poly::GetArgument<INetworkMessageInternal*>(params, 5);
 	auto pData = poly::GetArgument<CNetMessage*>(params, 6);
