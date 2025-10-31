@@ -879,7 +879,7 @@ extern "C" PLUGIN_API void SetConVarDouble(uint64 conVarHandle, double value, bo
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
 extern "C" PLUGIN_API void SetConVarString(uint64 conVarHandle, const plg::string& value, bool replicate, bool notify) {
-	cvars::SetConVarByHandle(conVarHandle, CUtlString(value.c_str(), static_cast<int>(value.size())), replicate, notify);
+	cvars::SetConVarByHandle(conVarHandle, CUtlString(value), replicate, notify);
 }
 
 /**

@@ -1,4 +1,5 @@
 #include "multi_addon_manager.hpp"
+#include "con_var_manager.hpp"
 
 #include <netmessages.h>
 #include <networkbasetypes.pb.h>
@@ -36,14 +37,14 @@ plg::parallel_node_hash_map_m<uint64, ClientAddonInfo> g_ClientAddons;
 CConVar<CUtlString> s2_extra_addons("s2_extra_addons", FCVAR_NONE, "The workshop IDs of extra addons separated by commas, addons will be downloaded (if not present) and mounted", CUtlString(""),
 	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
 	{
-		g_MultiAddonManager.m_extraAddons = plg::parse<PublishedFileId_t>(new_val->Get(), " ");
+		g_MultiAddonManager.m_extraAddons = plg::parse<PublishedFileId_t>(*new_val, " ");
 		g_MultiAddonManager.RefreshAddons();
 	});
 
 CConVar<CUtlString> s2_client_extra_addons("s2_client_extra_addons", FCVAR_NONE, "The workshop IDs of extra client addons that will be applied to all clients, separated by commas", CUtlString(""),
 	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
 	{
-		g_MultiAddonManager.m_globalClientAddons = plg::parse<PublishedFileId_t>(new_val->Get(), " ");
+		g_MultiAddonManager.m_globalClientAddons = plg::parse<PublishedFileId_t>(*new_val, " ");
 	});
 
 std::string MultiAddonManager::BuildAddonPath(PublishedFileId_t addon) {
@@ -51,7 +52,7 @@ std::string MultiAddonManager::BuildAddonPath(PublishedFileId_t addon) {
     static CBufferStringGrowable<MAX_PATH> s_sWorkingDir;
     ExecuteOnce(g_pFullFileSystem->GetSearchPath("EXECUTABLE_PATH", GET_SEARCH_PATH_ALL, s_sWorkingDir, 1));
 
-    return std::format("{}steamapps/workshop/content/730/{}/{}_dir.vpk", s_sWorkingDir.Get(), addon, addon);
+    return std::format("{}steamapps/workshop/content/730/{}/{}_dir.vpk", *s_sWorkingDir, addon, addon);
 }
 
 bool MultiAddonManager::MountAddon(PublishedFileId_t addon, bool addToTail) {
@@ -268,7 +269,7 @@ bool MultiAddonManager::AddAddon(PublishedFileId_t addon, bool refresh) {
 	m_extraAddons.push_back(addon);
 
 	// Update the convar to reflect the new addon list, but don't trigger the callback
-	s2_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_extraAddons, " ").c_str();
+	s2_extra_addons.Set(CUtlString(plg::join(m_extraAddons, " ")));
 	plg::print(LS_MESSAGE, "Clearing client cache due to addons changing");
 
 	if (refresh) {
@@ -287,7 +288,7 @@ bool MultiAddonManager::RemoveAddon(PublishedFileId_t addon, bool refresh) {
 	}
 
 	// Update the convar to reflect the new addon list, but don't trigger the callback
-	s2_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_extraAddons, " ").c_str();
+	s2_extra_addons.Set(CUtlString(plg::join(m_extraAddons, " ")));
 
 	plg::print(LS_MESSAGE, "Clearing client cache due to addons changing");
 
@@ -301,6 +302,15 @@ bool MultiAddonManager::RemoveAddon(PublishedFileId_t addon, bool refresh) {
 void MultiAddonManager::OnSteamAPIActivated() {
 	if (m_callbackRegistered)
 		return;
+
+	std::array<uint64, 5> conVarHandles = {
+		s2_addon_mount_download,
+		s2_block_disconnect_messages,
+		s2_cache_clients_with_addons,
+		s2_cache_clients_duration,
+		s2_extra_addons_timeout,
+	};
+	g_ConVarManager.AutoExecConfig(conVarHandles, true, "multi_addon_manager", "");
 
 	m_callbackRegistered = true;
 	m_CallbackDownloadItemResult.Register(this, &MultiAddonManager::OnAddonDownloaded);
@@ -352,7 +362,7 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 		}
 
 		m_globalClientAddons.push_back(addon);
-		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_globalClientAddons, " ").c_str();
+		s2_client_extra_addons.Set(CUtlString(plg::join(m_globalClientAddons, " ")));
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 
@@ -409,7 +419,7 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 void MultiAddonManager::RemoveClientAddon(PublishedFileId_t addon, uint64 steamID64) {
 	if (!steamID64) {
 		plg::erase(m_globalClientAddons, addon);
-		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_globalClientAddons, " ").c_str();
+		s2_client_extra_addons.Set(CUtlString(plg::join(m_globalClientAddons, " ")));
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 		plg::erase(clientInfo.addonsToLoad, addon);
@@ -419,7 +429,7 @@ void MultiAddonManager::RemoveClientAddon(PublishedFileId_t addon, uint64 steamI
 void MultiAddonManager::ClearClientAddons(uint64 steamID64) {
 	if (!steamID64) {
 		m_globalClientAddons.clear();
-		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_globalClientAddons, " ").c_str();
+		s2_client_extra_addons.Set(CUtlString(plg::join(m_globalClientAddons, " ")));
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 		clientInfo.addonsToLoad.clear();
@@ -525,7 +535,7 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 	// We can use this information to always be aware of what the original addon is.
 
 	if (!request->m_pKV) {
-		std::string_view level(request->m_LevelName.Get(), static_cast<size_t>(request->m_LevelName.Length()));
+		std::string_view level = request->m_LevelName;
 		// g_pEngineServer->IsMapValid takes into account mounted addons so we have to do this instead
 		auto name = std::format("maps/{}.vpk", level);
 		bool valveMap = g_pFullFileSystem->FileExists(name.c_str(), "MOD");
@@ -533,7 +543,7 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 		// Workshop map changes from end of match votes have null keyvalues
 		// ...and when such votes lead to reloading the CURRENT map, m_Addons will also be null, in which case we want to keep the workshop map unchanged
 		if (!request->m_Addons.IsEmpty()) {
-			std::string_view addons(request->m_Addons.Get(), static_cast<size_t>(request->m_Addons.Length()));
+			std::string_view addons = request->m_Addons;
 			if (auto addon = plg::cast_to<PublishedFileId_t>(addons)) {
 				m_currentWorkshopMap = *addon;
 			}
@@ -560,7 +570,7 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 	// So check if the addon is indeed one of the community maps and keep it, otherwise clients would error out due to missing assets
 	// Each map has its own folder under game/csgo_community_addons which is mounted as "OFFICIAL_ADDONS"
 	if (!request->m_Addons.IsEmpty() && g_pFullFileSystem->IsDirectory(request->m_Addons.String(), "OFFICIAL_ADDONS")) {
-		std::string_view addons(request->m_Addons.Get(), static_cast<size_t>(request->m_Addons.Length()));
+		std::string_view addons = request->m_Addons;
 		if (auto addon = plg::cast_to<PublishedFileId_t>(addons)) {
 			m_currentWorkshopMap = *addon;
 		}
@@ -572,7 +582,7 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 
 	// Rebuild the addon list. We always start with the original addon.
 	if (m_currentWorkshopMap == 0) {
-		request->m_Addons = plg::join(g_MultiAddonManager.m_extraAddons, " ").c_str();
+		request->m_Addons = plg::join(g_MultiAddonManager.m_extraAddons, " ");
 	} else {
 		// Don't add the same addon twice. Hopefully no server owner is diabolical enough to do things like `map de_dust2 customgamemode=1234,5678`.
 		plg::vector<PublishedFileId_t> newAddons = g_MultiAddonManager.m_extraAddons;
@@ -584,7 +594,7 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 			std::rotate(it, it + 1, newAddons.end());
 		}
 
-		request->m_Addons = plg::join(newAddons, " ").c_str();
+		request->m_Addons = plg::join(newAddons, " ");
 	}
 }
 
@@ -621,9 +631,9 @@ void MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServe
 		clientInfo.currentPendingAddon = clientAddons[0];
 	}
 
-	addon = plg::join(clientAddons, " ").c_str();
+	addon = plg::join(clientAddons, " ");
 
-	plg::print(LS_MESSAGE, "{}: Sending addons {} to steamID64 {}\n", __func__, addon.Get(), steamID64);
+	plg::print(LS_MESSAGE, "{}: Sending addons {} to steamID64 {}\n", __func__, *addon, steamID64);
 }
 
 void MultiAddonManager::OnReplyConnection_Post(CNetworkGameServerBase* server, CServerSideClient* client) {
