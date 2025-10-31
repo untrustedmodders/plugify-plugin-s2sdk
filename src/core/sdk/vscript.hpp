@@ -72,7 +72,7 @@ template<
 >
 class VScriptGlobalFunction {
 public:
-	static Ret operator()(Args... args) {
+	Ret operator()(Args... args) {
 		static VScriptBinding binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
 #if defined(_MSC_VER)
 		using Func = Ret(__cdecl*)(Args...);
