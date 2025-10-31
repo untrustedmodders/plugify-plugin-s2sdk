@@ -1,5 +1,48 @@
 # Changelog
 
+## [2.3.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.2.1...v2.3.0) (2025-10-31)
+
+
+### Features
+
+* add Vscript raw functions support ([c762f17](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c762f1732bf8b3e07dce3edc6639819847120618))
+* massive game config rework ([926c6e2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/926c6e2ec2e21fda9a61bb5b4bc1af7e1ccc66e6))
+
+
+### Bug Fixes
+
+* `TeleportClient` param types and desc ([d1a6964](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d1a69642f130f519324366f5a221d320938c9f1b))
+* `TeleportEntity` type and desc ([57959a6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/57959a664b210b5e6ec67be2f3d8ff59bfcb8b82))
+* add `ReplyToCommand` in manifest ([31e1b95](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/31e1b95292a6b0bc57b8951b84383b99e179c37c))
+* add exported symbols ([b3e4031](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b3e4031be8c02bd86ec18e3640d1739a5479cd47))
+* add GetWeaponItemDefinitionByName ([3d3b7ac](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3d3b7ac02dd8394c1ac86480fee44cf797acea14))
+* add kv3 ([17aa4d9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/17aa4d9092e433083d7ea46812b9093283b701cf))
+* add more vscript methods and refactor ([91fe3ff](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/91fe3ff675626d39b8be9002eefce662b6bcb730))
+* add trace, debug & math functions from vscript ([f949293](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f9492934af88f7213a5539951e57513e22a7916f))
+* cvar callbacks ([1d9a7bb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1d9a7bb4c9eaa95183233416086c261b86b716c7))
+* HookConVarChange ([25ea762](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/25ea76258b0fcafbea63245d288b4b28abea7bc4))
+* improve clients and entities ([b99d253](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b99d253038e39601992c096a4bd3f5f85103686e))
+* initial changes related to new spawn system ([d50e889](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d50e8894b0aa35612c4d4c4f5a84b76ff38e8f93))
+* replace some functions by VScript equivalents ([0a7cb13](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0a7cb13087e09d77b1f65edbac53bc0c85b669a1))
+* replace some functions by VScript equivalents (2) ([65efeee](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/65efeeed2b83d9cddd2d2168d1fbb6c6b8b7baff))
+* revert CreateEntityByName ([4264c58](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4264c582c8ebcb286963506436d28ccf16042d4e))
+* rework cvar callbacks ([00c491a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/00c491a79d7786ab687f82ed4bebe55a76bb8cc0))
+* rework ServerCommandEx ([d187235](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d1872353830abfc4ae19dccd0d9b278639a062bd))
+* signature `CCSPlayer_WeaponServices::RemoveItem` ([2fe7e9e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2fe7e9ecbe446bae2161be13a942c4593c6e26c2))
+* small fixes ([d7722f6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d7722f6382434ca0ab6f0986ccf4af4626be3f48))
+* small fixes (2) ([23fc5fe](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/23fc5fe2426d7c46a0d421cfab816b1ef1bf8ee6))
+* some fixes on linux ([f70f4fa](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f70f4fae96981c2d0fbfe4ba268b6f2caa59d49c))
+* some improvements ([ee27fab](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ee27fabbc13cb91c6838fa8c51fcc64e15a0595c))
+* update `GetCSWeaponDataFromKey` signature ([e1cc3f5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e1cc3f5c23ed59d2aeed5da8e9ec07369fcf3fff))
+* update client methods ([a905a06](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a905a069b6bc18b7622b398769bd37ce53f3229d))
+* update client methods (2) ([c0d4a98](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c0d4a98061170f6165107179454569892d34d5dc))
+* update deps ([1bf4f1e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1bf4f1e143993fd29c3633e4f9d594b1b466be72))
+* update deps ([2598ec4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2598ec44df15d867420366e7907d1ec44e3998a1))
+* update gamedata ([bb80121](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bb80121cd33d8ae400c8417695df7b05930ed875))
+* update manifest ([7e19572](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7e19572e18d4a0f26ece936bc0b59286006a9049))
+* update some code to string_view ([c97f497](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c97f4979d21b3ad28611dd10f5d77d312da3a5f6))
+* windows build ([15e2339](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/15e23393577614deb2634fdbfe02093b6f4ae9d2))
+
 ## [2.2.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.2.0...v2.2.1) (2025-10-21)
 
 
