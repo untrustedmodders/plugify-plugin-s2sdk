@@ -27,7 +27,7 @@ class CUtlVector:
         self.alloc_obj = self.mem.GetChildMemberWithName('m_nAllocationCount')
         self.data_ptr = self.mem.GetChildMemberWithName('m_pMemory')
 
-        self.data_type = valobj.GetType().GetTemplateArgumentType(0)
+        self.data_type = self.mem.GetType().GetTemplateArgumentType(0)
         self.type_size = self.data_type.GetByteSize()
 
         self.size = self.size_obj.GetValueAsUnsigned(0)
