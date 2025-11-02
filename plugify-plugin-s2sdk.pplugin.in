@@ -27237,8 +27237,8 @@
                 "description": "The player slot"
               },
               {
-                "name": "accountID",
-                "type": "uint32",
+                "name": "steamID",
+                "type": "uint64",
                 "description": "Steam account ID or 0 if not available."
               }
             ],
@@ -27280,136 +27280,6 @@
                 "description": "Steam account ID or 0 if not available."
               }
             ],
-            "retType": {
-              "type": "void",
-              "description": ""
-            }
-          }
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "OnLevelInit_Register",
-      "group": "Listeners",
-      "description": "Register callback to event.",
-      "funcName": "OnLevelInit_Register",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": {
-            "name": "OnLevelInitCallback",
-            "funcName": "OnLevelInitCallback",
-            "description": "Called when the map starts loading.",
-            "paramTypes": [
-              {
-                "name": "mapName",
-                "type": "string",
-                "description": "The name of the map"
-              },
-              {
-                "name": "mapEntities",
-                "type": "string",
-                "description": "The entities of the map"
-              }
-            ],
-            "retType": {
-              "type": "void",
-              "description": ""
-            }
-          }
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "OnLevelInit_Unregister",
-      "group": "Listeners",
-      "description": "Unregister callback to event.",
-      "funcName": "OnLevelInit_Unregister",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": {
-            "name": "OnLevelInitCallback",
-            "funcName": "OnLevelInitCallback",
-            "description": "Called when the map starts loading.",
-            "paramTypes": [
-              {
-                "name": "mapName",
-                "type": "string",
-                "description": "The name of the map"
-              },
-              {
-                "name": "mapEntities",
-                "type": "string",
-                "description": "The entities of the map"
-              }
-            ],
-            "retType": {
-              "type": "void",
-              "description": ""
-            }
-          }
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "OnLevelShutdown_Register",
-      "group": "Listeners",
-      "description": "Register callback to event.",
-      "funcName": "OnLevelShutdown_Register",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": {
-            "name": "OnLevelShutdownCallback",
-            "funcName": "OnLevelShutdownCallback",
-            "description": "Called right before a map ends.",
-            "paramTypes": [],
-            "retType": {
-              "type": "void",
-              "description": ""
-            }
-          }
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "OnLevelShutdown_Unregister",
-      "group": "Listeners",
-      "description": "Unregister callback to event.",
-      "funcName": "OnLevelShutdown_Unregister",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": {
-            "name": "OnLevelShutdownCallback",
-            "funcName": "OnLevelShutdownCallback",
-            "description": "Called right before a map ends.",
-            "paramTypes": [],
             "retType": {
               "type": "void",
               "description": ""
@@ -27720,72 +27590,6 @@
                     }
                   ]
                 }
-              }
-            ],
-            "retType": {
-              "type": "void",
-              "description": ""
-            }
-          }
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "OnEntitySpawned_Register",
-      "group": "Listeners",
-      "description": "Register callback to event.",
-      "funcName": "OnEntitySpawned_Register",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": {
-            "name": "OnEntitySpawnedCallback",
-            "funcName": "OnEntitySpawnedCallback",
-            "description": "Called when an entity is spawned.",
-            "paramTypes": [
-              {
-                "name": "entityHandle",
-                "type": "int32",
-                "description": "The spawned entity handle"
-              }
-            ],
-            "retType": {
-              "type": "void",
-              "description": ""
-            }
-          }
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "OnEntitySpawned_Unregister",
-      "group": "Listeners",
-      "description": "Unregister callback to event.",
-      "funcName": "OnEntitySpawned_Unregister",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": {
-            "name": "OnEntitySpawnedCallback",
-            "funcName": "OnEntitySpawnedCallback",
-            "description": "Called when an entity is spawned.",
-            "paramTypes": [
-              {
-                "name": "entityHandle",
-                "type": "int32",
-                "description": "The spawned entity handle"
               }
             ],
             "retType": {
@@ -28211,6 +28015,60 @@
             "name": "OnServerStartedCallback",
             "funcName": "OnServerStartedCallback",
             "description": "Called on every server started only once.",
+            "paramTypes": [],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnMapStart_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnMapStart_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnMapStartCallback",
+            "funcName": "OnMapStartCallback",
+            "description": "Called on every map start.",
+            "paramTypes": [],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnMapStart_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnMapStart_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnMapStartCallback",
+            "funcName": "OnMapEStartCallback",
+            "description": "Called on every map start.",
             "paramTypes": [],
             "retType": {
               "type": "void",

@@ -1,22 +1,28 @@
 #pragma once
 
-enum class HookMode : uint8 {
-	Pre,
-	Post,
+/**
+ * Whether to hook the message in the post mode (after processing) or pre mode (before processing).
+ */
+enum class HookMode : uint8_t {
+	Pre, // Callback will be executed before the original function
+	Post, // Callback will be executed after the original function
 	Count,
 };
 
+/**
+ * Enum representing the possible results of an operation.
+ */
 enum class ResultType {
-	Continue = 0,
-	Changed = 1,
-	Handled = 2,
-	Stop = 3,
+	Continue = 0, // The action continues to be processed without interruption.
+	Changed = 1, // Indicates that the action has altered the state or behavior during execution.
+	Handled = 2, // The action has been successfully handled, and no further action is required.
+	Stop = 3, // The action processing is halted, and no further steps will be executed.
 };
 
 struct NullMutex {
-	void lock() const {}
-	void unlock() const {}
-	bool try_lock() const { return true; }
+	void lock() const noexcept {}
+	void unlock() const noexcept {}
+	bool try_lock() const noexcept { return true; }
 
 	void lock_shared() const noexcept {}
 	void unlock_shared() const noexcept {}
@@ -29,12 +35,16 @@ class ListenerManager;
 template<class Ret, class... Args, class Mutex>
 class ListenerManager<Ret(*)(Args...), Mutex> {
 public:
+	ListenerManager() = default;
+	~ListenerManager() = default;
+	NONCOPYABLE(ListenerManager)
+
     static constexpr size_t N = 62;
 	using Func = Ret(*)(Args...);
 	using UniqueLock = std::unique_lock<Mutex>;
 	using SharedLock = std::shared_lock<Mutex>;
 
-	bool Register(const Func& handler, ptrdiff_t priority = 0) {
+	bool Register(const Func& handler, int priority = 0) {
 		UniqueLock lock(m_mutex);
 		auto it = std::upper_bound(m_priorities.begin(), m_priorities.end(), priority,
 								   [](int p, int cur){ return p > cur; });

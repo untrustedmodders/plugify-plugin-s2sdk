@@ -459,5 +459,3 @@ void ConVarManager::UpdateConVarValue(
 			break;
 	}
 }
-
-ConVarManager g_ConVarManager;

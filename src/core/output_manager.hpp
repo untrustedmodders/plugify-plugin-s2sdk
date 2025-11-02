@@ -14,9 +14,15 @@ struct EntityOutputHook {
 };
 
 class EntityOutputManager {
-public:
 	EntityOutputManager() = default;
 	~EntityOutputManager() = default;
+	NONCOPYABLE(EntityOutputManager)
+
+public:
+	static auto& Instance() {
+		static EntityOutputManager instance;
+		return instance;
+	}
 
 	bool HookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode);
 	bool UnhookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode);
@@ -29,5 +35,5 @@ private:
 	std::recursive_mutex m_mutex;
 	std::inplace_vector<std::shared_ptr<EntityOutputHook>, 4> m_callbackHooks;
 };
+inline EntityOutputManager& g_EntityOutputManager = EntityOutputManager::Instance();
 
-extern EntityOutputManager g_OutputManager;

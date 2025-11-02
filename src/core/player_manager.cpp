@@ -11,8 +11,6 @@
 #include "player_manager.hpp"
 #include "listeners.hpp"
 
-PlayerManager g_PlayerManager;
-
 constexpr int CLIENT_LANGUAGE_ID = INT_MAX;
 constexpr int CLIENT_OPERATING_SYSTEMID = INT_MAX - 1;
 
@@ -182,7 +180,7 @@ void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* response)
 	for (const Player& player : m_players) {
 		CSteamID steamID = player.GetSteamId();
 		if (steamID == response->m_SteamID) {
-			GetOnClientAuthenticatedListenerManager()(player.GetPlayerSlot(), steamID.GetAccountID());
+			g_OnClientAuthenticatedListenerManager(player.GetPlayerSlot(), steamID.ConvertToUint64());
 			return;
 		}
 	}
@@ -197,7 +195,7 @@ bool PlayerManager::OnClientConnect(CPlayerSlot slot, char const* name, uint64 s
 		s_refuseConnection = false;
 
 		plg::string playerName(name);
-		auto funcs = GetOnClientConnectListenerManager().Get();
+		auto funcs = g_OnClientConnectListenerManager.Get();
 		for (const auto& func : funcs) {
 			auto res = func(slot, playerName, networkID);
 			s_refuseConnection |= !res;
@@ -216,7 +214,7 @@ bool PlayerManager::OnClientConnect_Post(CPlayerSlot slot, bool origRet) {
 		}
 
 		if (origRet) {
-			GetOnClientConnect_PostListenerManager()(slot);
+			g_OnClientConnect_PostListenerManager(slot);
 		} else {
 			player->Reset();
 		}
@@ -230,7 +228,7 @@ void PlayerManager::OnClientConnected(CPlayerSlot slot, bool fakePlayer) {
 		cvars::SendConVarValueQueryToClient(slot, "cl_language", CLIENT_LANGUAGE_ID);
 		cvars::SendConVarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
 	}
-	GetOnClientConnectedListenerManager()(slot);
+	g_OnClientConnectedListenerManager(slot);
 }
 
 void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name) {
@@ -240,16 +238,16 @@ void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name) {
 			player->Init(slot, 0);
 		}
 
-		GetOnClientPutInServerListenerManager()(slot);
+		g_OnClientPutInServerListenerManager(slot);
 	}
 }
 
 void PlayerManager::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
-	GetOnClientDisconnectListenerManager()(slot, reason);
+	g_OnClientDisconnectListenerManager(slot, reason);
 }
 
 void PlayerManager::OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
-	GetOnClientDisconnect_PostListenerManager()(slot, reason);
+	g_OnClientDisconnect_PostListenerManager(slot, reason);
 
 	if (Player* player = ToPlayer(slot)) {
 		player->Reset();
@@ -257,7 +255,7 @@ void PlayerManager::OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnect
 }
 
 void PlayerManager::OnClientActive(CPlayerSlot slot, bool loadGame) const {
-	GetOnClientActiveListenerManager()(slot, loadGame);
+	g_OnClientActiveListenerManager(slot, loadGame);
 }
 
 bool PlayerManager::QueryCvarValue(CPlayerSlot slot, std::string_view convarName, CvarValueCallback callback, const plg::vector<plg::any>& data) {
@@ -358,8 +356,8 @@ Player* PlayerManager::ToPlayer(CSteamID steamid, bool validate) const {
 	return nullptr;
 }
 
-std::inplace_vector<Player*, MAXPLAYERS> PlayerManager::GetOnlinePlayers() const {
-	std::inplace_vector<Player*, MAXPLAYERS> players;
+std::inplace_vector<Player*, MaxPlayers> PlayerManager::GetOnlinePlayers() const {
+	std::inplace_vector<Player*, MaxPlayers> players;
 	for (const auto& player : m_players) {
 		if (utils::IsPlayerSlot(player.GetPlayerSlot())) {
 			players.emplace_back(const_cast<Player*>(&player));
@@ -415,7 +413,7 @@ TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target
 			if (!player || !player->IsPlayerController() || !player->IsConnected())
 				continue;
 
-			if (player->m_iTeamNum != (targetType == TargetType::T ? CS_TEAM_T : targetType == TargetType::CT ? CS_TEAM_CT : CS_TEAM_SPECTATOR))
+			if (player->m_iTeamNum != (targetType == TargetType::T ? CSTeam::T : targetType == TargetType::CT ? CSTeam::CT : CSTeam::Spectator))
 				continue;
 
 			clients.emplace_back(i);
@@ -437,7 +435,7 @@ TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target
 			if (!player || !player->IsPlayerController() || !player->IsConnected())
 				continue;
 
-			if (targetType >= TargetType::RANDOM_T && (player->m_iTeamNum != (targetType == TargetType::RANDOM_T ? CS_TEAM_T : CS_TEAM_CT)))
+			if (targetType >= TargetType::RANDOM_T && (player->m_iTeamNum != (targetType == TargetType::RANDOM_T ? CSTeam::T : CSTeam::CT)))
 				continue;
 
 			clients.emplace_back(i);

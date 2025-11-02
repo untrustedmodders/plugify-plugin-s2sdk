@@ -23,9 +23,15 @@ struct ConCommandInfo {
 };
 
 class ConCommandManager {
-public:
 	ConCommandManager() = default;
 	~ConCommandManager() = default;
+	NONCOPYABLE(ConCommandManager)
+
+public:
+	static auto& Instance() {
+		static ConCommandManager instance;
+		return instance;
+	}
 
 	bool AddCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode);
 	bool RemoveCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode);
@@ -41,5 +47,4 @@ private:
 	std::recursive_mutex m_mutex;
 	plg::enum_map<ListenerManager<CommandListenerCallback>, HookMode> m_globalCallbacks;
 };
-
-extern ConCommandManager g_CommandManager;
+inline ConCommandManager& g_ConCommandManager = ConCommandManager::Instance();

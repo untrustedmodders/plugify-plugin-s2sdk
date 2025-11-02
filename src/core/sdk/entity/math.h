@@ -28,6 +28,7 @@ public:
 	using vector = const Vector&;
 	using qangle = const QAngle&;
 	using quaternion = const Quaternion&;
+
 	VSCRIPT_GLOBAL_FUNCTION(AngleDiff, float, float, float)
 	VSCRIPT_GLOBAL_FUNCTION(AnglesToVector, Vector, qangle)
 	VSCRIPT_GLOBAL_FUNCTION(AxisAngleToQuaternion, Quaternion, vector, float)

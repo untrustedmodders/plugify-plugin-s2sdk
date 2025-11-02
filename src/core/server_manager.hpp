@@ -1,9 +1,18 @@
 #pragma once
 
-using TaskCallback = void (*)(const plg::vector<plg::any>&);
+using TaskCallback = void (*)(const plg::vector<plg::any>& userData);
 
 class ServerManager {
+	ServerManager() = default;
+	~ServerManager() = default;
+	NONCOPYABLE(ServerManager)
+
 public:
+	static auto& Instance() {
+		static ServerManager instance;
+		return instance;
+	}
+
 	void AddTaskForNextWorldUpdate(TaskCallback task, const plg::vector<plg::any>& userData = {});
 	void AddTaskForNextFrame(TaskCallback task, const plg::vector<plg::any>& userData = {});
 
@@ -22,5 +31,4 @@ private:
 	std::mutex m_worldUpdateMutex;
 	std::mutex m_frameTasksMutex;
 };
-
-extern ServerManager g_ServerManager;
+inline ServerManager& g_ServerManager = ServerManager::Instance();

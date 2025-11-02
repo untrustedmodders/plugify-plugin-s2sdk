@@ -59,6 +59,7 @@ void cvars::SendMultipleConVarValues(CPlayerSlot slot, std::span<const std::stri
 			data->set_name(std::string(names[i]));
 			data->set_value(std::string(values[i]));
 		}
+
 		msg->Send(slot);
 		delete msg;
 	}

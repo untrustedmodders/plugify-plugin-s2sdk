@@ -75,7 +75,7 @@ extern "C" PLUGIN_API gear_slot_t GetWeaponGearSlot(int entityHandle) {
  * @param entityHandle The handle of the entity from which to retrieve the weapon def index.
  * @return The weapon definition index as a `uint16_t`, or 0 if the entity handle is invalid.
  */
-extern "C" PLUGIN_API uint16_t GetWeaponItemDefinition(int entityHandle) {
+extern "C" PLUGIN_API CSWeaponDefIndex GetWeaponItemDefinition(int entityHandle) {
 	auto* weapon = helpers::GetEntity<CBasePlayerWeapon>(entityHandle);
 	if (!weapon) return {};
 	return weapon->m_AttributeManager->m_Item->m_iItemDefinitionIndex;
@@ -87,10 +87,10 @@ extern "C" PLUGIN_API uint16_t GetWeaponItemDefinition(int entityHandle) {
  * @param name The name of the item.
  * @return The item definition index if found; otherwise, 0 or an invalid value.
  */
-extern "C" PLUGIN_API int16_t GetWeaponItemDefinitionByName(const plg::string& name) {
+extern "C" PLUGIN_API CSWeaponDefIndex GetWeaponItemDefinitionByName(const plg::string& name) {
 	auto itemSchema = reinterpret_cast<CEconItemSchema*>(g_pSource2Server->GetEconItemSystem());
 	if (!itemSchema) return {};
-	return addresses::GetItemDefinitionByName(itemSchema, name.c_str());
+	return static_cast<CSWeaponDefIndex>(addresses::GetItemDefinitionByName(itemSchema, name.c_str()));
 }
 
 PLUGIFY_WARN_POP()

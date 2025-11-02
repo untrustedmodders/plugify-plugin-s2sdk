@@ -7,20 +7,7 @@
 #include <v8.h>
 #include <variant.h>
 
-#define CS_TEAM_NONE 0
-#define CS_TEAM_SPECTATOR 1
-#define CS_TEAM_T 2
-#define CS_TEAM_CT 3
-
-enum class HudDest : uint32_t {
-	Notify = 1,
-	Console = 2,
-	Chat = 3,
-	Center = 4,
-	Alert = 6,
-};
-
-#define MAXPLAYERS 64
+constexpr auto MaxPlayers = 64;
 
 class CAppSystemDict;
 class IAppSystem;
@@ -40,6 +27,7 @@ class CHostStateMgr;
 struct CHostStateRequest;
 class CGameRules;
 class CTeam;
+enum class CSTeam;
 #if defined(CS2)
 class CCSGameRules;
 class CCSGameRulesProxy;
@@ -63,7 +51,7 @@ inline CBaseGameRules* g_pGameRules = nullptr;
 inline CBaseGameRulesProxy* g_pGameRulesProxy = nullptr;
 inline CBaseEntity* g_pPointScript = nullptr;
 inline IScriptVM* g_pScriptVM = nullptr;
-inline plg::flat_map<int, CTeam*> g_pTeamManagers;
+inline plg::flat_map<CSTeam, CTeam*> g_pTeamManagers;
 //inline ISteamHTTP* g_http = nullptr;
 inline CSteamGameServerAPIContext g_SteamAPI = {};
 inline plg::flat_hash_set<plg::string> g_Precached;
@@ -120,7 +108,7 @@ namespace addresses {
 
 	inline void (*CCSPlayer_WeaponServices_RemoveItem)(CPlayer_WeaponServices* player, CBasePlayerWeapon* weapon);
 
-	inline void (*CCSPlayerController_SwitchTeam)(CBasePlayerController* controller, int team);
+	inline void (*CCSPlayerController_SwitchTeam)(CBasePlayerController* controller, CSTeam team);
 
 	inline void (*CGameRules_TerminateRound)(CGameRules* gameRules, float delay, unsigned int reason, int64 a4, unsigned int a5);
 

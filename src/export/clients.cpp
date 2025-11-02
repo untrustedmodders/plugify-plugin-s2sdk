@@ -589,10 +589,10 @@ extern "C" PLUGIN_API void SetClientRenderColor(int playerSlot, int color) {
  * @param playerSlot The index of the player's slot whose render mode is to be retrieved.
  * @return The render mode of the client, or 0 if the client is invalid.
  */
-extern "C" PLUGIN_API uint8_t GetClientRenderMode(int playerSlot) {
+extern "C" PLUGIN_API RenderMode_t GetClientRenderMode(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	return pawn->m_nRenderMode;
+	return static_cast<RenderMode_t>(*pawn->m_nRenderMode);
 }
 
 /**
@@ -604,10 +604,10 @@ extern "C" PLUGIN_API uint8_t GetClientRenderMode(int playerSlot) {
  * @param playerSlot The index of the player's slot whose render mode is to be set.
  * @param renderMode The new render mode to set for the client.
  */
-extern "C" PLUGIN_API void SetClientRenderMode(int playerSlot, uint8_t renderMode) {
+extern "C" PLUGIN_API void SetClientRenderMode(int playerSlot, RenderMode_t renderMode) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->m_nRenderMode = renderMode;
+	pawn->SetRenderMode(renderMode);
 }
 
 /**
@@ -755,7 +755,7 @@ extern "C" PLUGIN_API void SetClientMaxHealth(int playerSlot, int maxHealth) {
  * @param playerSlot The index of the player's slot whose team number is to be retrieved.
  * @return The team number of the client, or 0 if the client is invalid.
  */
-extern "C" PLUGIN_API int GetClientTeam(int playerSlot) {
+extern "C" PLUGIN_API CSTeam GetClientTeam(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!controller) return {};
 	return controller->GetTeam();
@@ -770,7 +770,7 @@ extern "C" PLUGIN_API int GetClientTeam(int playerSlot) {
  * @param playerSlot The index of the player's slot whose team number is to be set.
  * @param team The new team number to set for the client.
  */
-extern "C" PLUGIN_API void SetClientTeam(int playerSlot, int team) {
+extern "C" PLUGIN_API void SetClientTeam(int playerSlot, CSTeam team) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!controller) return;
 	controller->SetTeam(team);
@@ -1637,7 +1637,7 @@ extern "C" PLUGIN_API plg::vector<int> ProcessTargetString(int caller, const plg
  * @param playerSlot The index of the player's slot.
  * @param team The team index to switch the client to.
  */
-extern "C" PLUGIN_API void SwitchClientTeam(int playerSlot, int team) {
+extern "C" PLUGIN_API void SwitchClientTeam(int playerSlot, CSTeam team) {
 	auto controller = helpers::GetController(playerSlot);
 	if (!controller) return;
 	controller->SwitchTeam(team);

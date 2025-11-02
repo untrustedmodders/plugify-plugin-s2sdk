@@ -12,9 +12,15 @@ struct UserMessageHook {
 };
 
 class UserMessageManager {
-public:
 	UserMessageManager() = default;
 	~UserMessageManager() = default;
+	NONCOPYABLE(UserMessageManager)
+
+public:
+	static auto& Instance() {
+		static UserMessageManager instance;
+		return instance;
+	}
 
 	bool HookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode);
 	bool UnhookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode);
@@ -26,5 +32,4 @@ private:
 	std::recursive_mutex m_mutex;
 	UserMessageHook m_global;
 };
-
-extern UserMessageManager g_UserMessageManager;
+inline UserMessageManager& g_UserMessageManager = UserMessageManager::Instance();

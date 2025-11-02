@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include "cbaseentity.h"
+#include "cteam.h"
 
-class CTeam : public CBaseEntity {
-public:
-	DECLARE_SCHEMA_CLASS(CTeam);
-
-	SCHEMA_FIELD(int, m_iScore);
+enum class CSTeam : int32_t {
+	None,
+	Spectator,
+	T,
+	CT
 };
 
 class CCSTeam : public CTeam {

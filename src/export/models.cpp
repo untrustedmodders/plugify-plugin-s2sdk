@@ -290,7 +290,7 @@ extern "C" PLUGIN_API void SetEntityRenderColor2(int entityHandle, int r, int g,
  * @param entityHandle The handle of the entity.
  * @param mode The new render mode value.
  */
-extern "C" PLUGIN_API void SetEntityRenderMode2(int entityHandle, int mode) {
+extern "C" PLUGIN_API void SetEntityRenderMode2(int entityHandle, RenderMode_t mode) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return;
 	entity->SetRenderMode(mode);

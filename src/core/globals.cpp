@@ -12,7 +12,7 @@
 #include "con_var_manager.hpp"
 #include "core_config.hpp"
 #include "game_config.hpp"
-#include "hook_holder.hpp"
+#include "hook_manager.hpp"
 
 CoreConfig* g_pCoreConfig = nullptr;
 GameConfig* g_pGameConfig = nullptr;
@@ -31,7 +31,7 @@ namespace globals {
 			}
 		}
 		{
-			auto result = GameConfigManager::Instance().LoadConfig({ plg::vector{
+			auto result = g_GameConfigManager.LoadConfig({ plg::vector{
 				   paths["base"] + "/gamedata.jsonc",
 				   paths["configs"] + "/gamedata.jsonc",
 				   paths["data"] + "/gamedata.jsonc"
@@ -41,7 +41,7 @@ namespace globals {
 				plg::print(LS_WARNING, "Failed to load gamedata configuration: {}\n", result.error());
 			}
 
-			g_pGameConfig = GameConfigManager::Instance().GetConfig(*result);
+			g_pGameConfig = g_GameConfigManager.GetConfig(*result);
 			if (!g_pGameConfig) {
 				plg::print(LS_ERROR, "Failed to load gamedata configuration!\n");
 				return;

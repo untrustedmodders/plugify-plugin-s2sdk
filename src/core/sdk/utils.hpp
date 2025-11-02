@@ -82,6 +82,14 @@ namespace utils {
 
 }// namespace utils
 
+enum class HudDest {
+	Notify = 1,
+	Console = 2,
+	Chat = 3,
+	Center = 4,
+	Alert = 6,
+};
+
 enum class FieldType {
 	Auto,
 	Float32,

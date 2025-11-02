@@ -48,7 +48,7 @@ public:
     VSCRIPT_MEMBER_FUNCTION(SetModelScale, void, float)
     VSCRIPT_MEMBER_FUNCTION(SetRenderAlpha, void, int)
     VSCRIPT_MEMBER_FUNCTION(SetRenderColor, void, int, int, int)
-    VSCRIPT_MEMBER_FUNCTION(SetRenderMode, void, int)
+    VSCRIPT_MEMBER_FUNCTION(SetRenderMode, void, RenderMode_t)
     VSCRIPT_MEMBER_FUNCTION(SetSingleMeshGroup, void, string)
     VSCRIPT_MEMBER_FUNCTION(SetSize, void, vector, vector)
     VSCRIPT_MEMBER_FUNCTION(SetSkin, void, int)

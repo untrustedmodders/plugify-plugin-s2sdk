@@ -654,7 +654,7 @@ Result<void> GameConfig::ApplyAllPatches(const PatchOptions& options) {
 }
 
 Result<void> GameConfig::RestorePatch(std::string_view name) {
-	auto& patchManager = GameConfigManager::Instance().GetPatchManager();
+	auto& patchManager = g_GameConfigManager.GetPatchManager();
 	return patchManager.RestorePatch(name);
 }
 
@@ -677,12 +677,12 @@ Result<void> GameConfig::RestoreAllPatches() {
 }
 
 bool GameConfig::IsPatchApplied(std::string_view name) const {
-	auto& patchManager = GameConfigManager::Instance().GetPatchManager();
+	auto& patchManager = g_GameConfigManager.GetPatchManager();
 	return patchManager.IsPatchApplied(name);
 }
 
 PatchManager::Stats GameConfig::GetPatchStats() const {
-	auto& patchManager = GameConfigManager::Instance().GetPatchManager();
+	auto& patchManager = g_GameConfigManager.GetPatchManager();
 	return patchManager.GetStats();
 }
 
@@ -777,7 +777,7 @@ Result<void> GameConfig::ApplyPatch(
 	}
 
 	// Apply the patch
-	auto& patchManager = GameConfigManager::Instance().GetPatchManager();
+	auto& patchManager = g_GameConfigManager.GetPatchManager();
 	return patchManager.ApplyPatch(name, *addrResult, *patchResult, options);
 }
 
@@ -859,7 +859,7 @@ Result<plg::string> GameConfig::GetPatch(std::string_view name) {
 Result<std::shared_ptr<Module>> GameConfig::GetModule(std::string_view name) {
 	std::shared_lock lock(m_mutex);
 
-	auto& provider = GameConfigManager::Instance().GetModuleProvider();
+	auto& provider = g_GameConfigManager.GetModuleProvider();
 	auto module = provider.GetModule(name);
 	if (!module) {
 		return MakeError("Module not found: {}", name);
@@ -996,7 +996,7 @@ void GameConfig::PrintDiagnostics() const {
 }
 
 Result<ResolvedSignature> SignatureResolver::Resolve(const SignatureData& signature) const {
-	auto& provider = GameConfigManager::Instance().GetModuleProvider();
+	auto& provider = g_GameConfigManager.GetModuleProvider();
 	auto module = provider.GetModule(signature.library);
 	if (!module) {
 		return MakeError("Module not found: {}", signature.library);
@@ -1125,7 +1125,7 @@ Result<Memory> AddressResolver::ApplyStep(Memory current, const IndirectionStep&
 }
 
 Result<ResolvedVTable> VTableResolver::Resolve(const VTableData& vtable) const {
-	auto& provider = GameConfigManager::Instance().GetModuleProvider();
+	auto& provider = g_GameConfigManager.GetModuleProvider();
 	auto module = provider.GetModule(vtable.library);
 	if (!module) {
 		return MakeError("Module not found: {}", vtable.library);
@@ -1158,11 +1158,6 @@ Result<Memory> VTableResolver::ResolveTable(const std::shared_ptr<Module>& modul
 		return MakeError("VTable not found: {}", table);
 	}
 	return address;
-}
-
-GameConfigManager& GameConfigManager::Instance() {
-	static GameConfigManager instance;
-	return instance;
 }
 
 GameConfigManager::GameConfigManager() {

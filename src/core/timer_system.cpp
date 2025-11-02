@@ -125,5 +125,3 @@ double TimerSystem::GetTickedTime() {
 double TimerSystem::GetTickedInterval() {
 	return engineFixedTickInterval;
 }
-
-TimerSystem g_TimerSystem;

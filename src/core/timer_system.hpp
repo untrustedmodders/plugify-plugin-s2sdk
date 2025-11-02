@@ -7,7 +7,7 @@ enum class TimerFlag {
 	NoMapChange = (1 << 1)
 };
 
-using TimerCallback = void (*)(uint32_t, const plg::vector<plg::any>&);
+using TimerCallback = void (*)(uint32_t, const plg::vector<plg::any>& userData);
 
 struct Timer {
 	uint32_t id;
@@ -28,7 +28,16 @@ struct Timer {
 };
 
 class TimerSystem {
+	TimerSystem() = default;
+	~TimerSystem() = default;
+	NONCOPYABLE(TimerSystem)
+
 public:
+	static auto& Instance() {
+		static TimerSystem instance;
+		return instance;
+	}
+
 	void OnMapEnd();
 	void OnGameFrame(bool simulating);
 
@@ -50,6 +59,7 @@ private:
 	std::recursive_mutex m_mutex;
 	uint32_t m_nextId{};
 };
+inline TimerSystem& g_TimerSystem = TimerSystem::Instance();
 
 inline TimerFlag operator|(TimerFlag lhs, TimerFlag rhs) noexcept {
 	using underlying = std::underlying_type_t<TimerFlag>;
@@ -65,5 +75,3 @@ inline TimerFlag& operator|=(TimerFlag& lhs, TimerFlag rhs) noexcept {
 	lhs = lhs | rhs;
 	return lhs;
 }
-
-extern TimerSystem g_TimerSystem;

@@ -452,8 +452,15 @@ private:
 };
 
 class GameConfigManager {
+	GameConfigManager();
+	~GameConfigManager() = default;
+	NONCOPYABLE(GameConfigManager)
+
 public:
-	static GameConfigManager& Instance();
+	static auto& Instance() {
+		static GameConfigManager instance;
+		return instance;
+	}
 
 	// Config management
 	Result<uint32_t> LoadConfig(LoadOptions options);
@@ -462,14 +469,6 @@ public:
 
 	ModuleProvider& GetModuleProvider();
 	PatchManager& GetPatchManager();
-
-private:
-	GameConfigManager();
-	~GameConfigManager() = default;
-
-	// Non-copyable, non-movable
-	GameConfigManager(const GameConfigManager&) = delete;
-	GameConfigManager& operator=(const GameConfigManager&) = delete;
 
 private:
 	struct ConfigEntry {
@@ -489,6 +488,7 @@ private:
 
 	friend class GameConfig;
 };
+inline GameConfigManager& g_GameConfigManager = GameConfigManager::Instance();
 
 #define TRY_GET_SIGNATURE(gameConfig, name, variable)                                               \
 	{                                                                                               \

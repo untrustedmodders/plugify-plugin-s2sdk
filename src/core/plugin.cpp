@@ -20,7 +20,7 @@
 #include "core_config.hpp"
 #include "event_listener.hpp"
 #include "event_manager.hpp"
-#include "hook_holder.hpp"
+#include "hook_manager.hpp"
 #include "listeners.hpp"
 #include "multi_addon_manager.hpp"
 #include "output_manager.hpp"
@@ -42,7 +42,7 @@ namespace {
 void* string_S_empty_rep_storage = nullptr;
 void* wstring_S_empty_rep_storage = nullptr;
 
-constexpr auto CS_SCRIPT_PATH = "maps/editor/zoo/scripts/hello.vjs";
+constexpr char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
 
 poly::ReturnAction Hook_StartupServer(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	//auto config = poly::GetArgument<const GameSessionConfiguration_t *>(params, 1);
@@ -58,7 +58,7 @@ poly::ReturnAction Hook_StartupServer(poly::PHook& hook, poly::Params& params, i
 		return poly::ReturnAction::Ignored;
 	}
 
-	GetOnServerStartupListenerManager()();
+	g_OnServerStartupListenerManager();
 
 	return poly::ReturnAction::Ignored;
 }
@@ -76,12 +76,12 @@ poly::ReturnAction Hook_DisconnectGameNow(poly::PHook& hook, poly::Params& param
 
 		g_TimerSystem.OnMapEnd();
 
-		GetOnMapEndListenerManager()();
+		g_OnMapEndListenerManager();
 	}
 
 	if (reason == NETWORK_DISCONNECT_REQUEST_HOSTSTATE_IDLE) {
 		ExecuteOnce( {
-			GetOnServerStartedListenerManager()();
+			g_OnServerStartedListenerManager();
 		});
 	}
 
@@ -94,10 +94,11 @@ poly::ReturnAction Hook_Release(poly::PHook& hook, poly::Params& params, int cou
 	if (server->m_nRefCount > 1)
 		return poly::ReturnAction::Ignored;
 
-	// g_PH.RemoveHookMemFunc(&CNetworkGameServerBase::Release, server);
-	// g_PH.RemoveHookMemFunc(&CNetworkGameServerBase::ActivateServer, server);
-	// g_PH.RemoveHookMemFunc(&CNetworkGameServerBase::SpawnServer, server);
-	// g_PH.RemoveHookMemFunc(&CNetworkGameServerBase::FinishChangeLevel, server);
+	// g_HookManager.RemoveHookMemFunc(&CNetworkGameServerBase::Release, server);
+	// g_HookManager.RemoveHookMemFunc(&CNetworkGameServerBase::ActivateServer, server);
+	// g_HookManager.RemoveHookMemFunc(&CNetworkGameServerBase::SpawnServer, server);
+	// g_HookManager.RemoveHookMemFunc(&CNetworkGameServerBase::StartChangeLevel, server);
+	// g_HookManager.RemoveHookMemFunc(&CNetworkGameServerBase::FinishChangeLevel, server);
 
 	return poly::ReturnAction::Ignored;
 }
@@ -120,7 +121,8 @@ poly::ReturnAction Hook_ActivateServer(poly::PHook& hook, poly::Params& params, 
 
 	g_Precached.clear();
 
-	GetOnServerActivateListenerManager()();
+	g_OnServerActivateListenerManager();
+	g_OnMapStartListenerManager();
 
 	return poly::ReturnAction::Ignored;
 }
@@ -128,7 +130,7 @@ poly::ReturnAction Hook_ActivateServer(poly::PHook& hook, poly::Params& params, 
 poly::ReturnAction Hook_SpawnServer(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	plg::print(LS_DETAILED, "[SpawnServer]\n");
 
-	GetOnServerSpawnListenerManager()();
+	g_OnServerSpawnListenerManager();
 
 	return poly::ReturnAction::Ignored;
 }
@@ -186,7 +188,7 @@ poly::ReturnAction Hook_GameFrame(poly::PHook& hook, poly::Params& params, int c
 	g_ServerManager.OnGameFrame();
 	g_TimerSystem.OnGameFrame(simulating);
 
-	GetOnGameFrameListenerManager()(simulating, bFirstTick, bLastTick);
+	g_OnGameFrameListenerManager(simulating, bFirstTick, bLastTick);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -202,7 +204,7 @@ poly::ReturnAction Hook_ClientActive(poly::PHook& hook, poly::Params& params, in
 	g_MultiAddonManager.OnClientActive(slot, bLoadGame, name, steamID64);
 	g_PlayerManager.OnClientActive(slot, bLoadGame);
 
-	GetOnClientActiveListenerManager()(slot, bLoadGame);
+	g_OnClientActiveListenerManager(slot, bLoadGame);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -246,7 +248,7 @@ poly::ReturnAction Hook_ClientSettingsChanged(poly::PHook& hook, poly::Params& p
 
 	plg::print(LS_DETAILED, "[ClientSettingsChanged] = {}\n", slot);
 
-	GetOnClientSettingsChangedListenerManager()(slot);
+	g_OnClientSettingsChangedListenerManager(slot);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -271,7 +273,7 @@ poly::ReturnAction Hook_ClientFullyConnect(poly::PHook& hook, poly::Params& para
 
 	plg::print(LS_DETAILED, "[ClientFullyConnect] = {}\n", slot);
 
-	GetOnClientFullyConnectListenerManager()(slot);
+	g_OnClientFullyConnectListenerManager(slot);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -313,7 +315,7 @@ poly::ReturnAction Hook_ClientCommand(poly::PHook& hook, poly::Params& params, i
 
 	const char* cmd = args->Arg(0);
 
-	auto result = g_CommandManager.ExecuteCommandCallbacks(cmd, CCommandContext(CommandTarget_t::CT_NO_TARGET, slot), *args, HookMode::Pre, CommandCallingContext::Console);
+	auto result = g_ConCommandManager.ExecuteCommandCallbacks(cmd, CCommandContext(CommandTarget_t::CT_NO_TARGET, slot), *args, HookMode::Pre, CommandCallingContext::Console);
 	if (result >= ResultType::Handled) {
 		return poly::ReturnAction::Supercede;
 	}
@@ -330,7 +332,7 @@ poly::ReturnAction Hook_GameServerSteamAPIActivated(poly::PHook& hook, poly::Par
 	g_PlayerManager.OnSteamAPIActivated();
 	g_MultiAddonManager.OnSteamAPIActivated();
 
-	//GetOnGameServerSteamAPIActivatedListenerManager()();
+	//g_OnGameServerSteamAPIActivatedListenerManager();
 	return poly::ReturnAction::Ignored;
 }
 
@@ -339,7 +341,7 @@ poly::ReturnAction Hook_GameServerSteamAPIDeactivated(poly::PHook& hook, poly::P
 
 	//g_http = nullptr;
 
-	//GetOnGameServerSteamAPIDeactivatedListenerManager()();
+	//g_OnGameServerSteamAPIDeactivatedListenerManager();
 	return poly::ReturnAction::Ignored;
 }
 
@@ -347,7 +349,7 @@ poly::ReturnAction Hook_UpdateWhenNotInGame(poly::PHook& hook, poly::Params& par
 	// float flFrameTime
 	auto frameTime = poly::GetArgument<float>(params, 1);
 	//plg::print(LS_DETAILED, "UpdateWhenNotInGame = {}\n", frameTime);
-	GetOnUpdateWhenNotInGameListenerManager()(frameTime);
+	g_OnUpdateWhenNotInGameListenerManager(frameTime);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -358,7 +360,7 @@ poly::ReturnAction Hook_PreWorldUpdate(poly::PHook& hook, poly::Params& params, 
 
 	g_ServerManager.OnPreWorldUpdate();
 
-	GetOnPreWorldUpdateListenerManager()(simulating);
+	g_OnPreWorldUpdateListenerManager(simulating);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -370,7 +372,9 @@ poly::ReturnAction Hook_FireOutputInternal(poly::PHook& hook, poly::Params& para
 	//auto value = poly::GetArgument<const CVariant* const>(params, 3);
 	auto delay = poly::GetArgument<float>(params, 6);
 
-	ResultType result = type == poly::CallbackType::Post ? g_OutputManager.FireOutputInternal_Post(self, activator, caller, delay) : g_OutputManager.FireOutputInternal(self, activator, caller, delay);
+	ResultType result = type == poly::CallbackType::Post ?
+		g_EntityOutputManager.FireOutputInternal_Post(self, activator, caller, delay) :
+		g_EntityOutputManager.FireOutputInternal(self, activator, caller, delay);
 
 	if (result >= ResultType::Handled) {
 		return poly::ReturnAction::Supercede;
@@ -383,11 +387,11 @@ poly::ReturnAction Hook_FireOutputInternal(poly::PHook& hook, poly::Params& para
 poly::ReturnAction Hook_TerminateRound(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	//auto pGameRules = poly::GetArgument<CCSGameRules*>(params, 0);
 	auto delay = poly::GetArgument<float>(params, 1);
-	auto reason = static_cast<int>(poly::GetArgument<uint32_t>(params, 2));
+	auto reason = static_cast<CSRoundEndReason>(poly::GetArgument<uint32_t>(params, 2));
 
 	g_pGameRules->m_bGameRestart = false;
 
-	GetOnRoundTerminatedListenerManager()(delay, reason);
+	g_OnRoundTerminatedListenerManager(delay, reason);
 
 	return poly::ReturnAction::Ignored;
 }
@@ -397,7 +401,7 @@ poly::ReturnAction Hook_DispatchConCommand(poly::PHook& hook, poly::Params& para
 	// auto cmd = poly::GetArgument<ConCommandRef* const>(params, 1);
 	auto ctx = poly::GetArgument<const CCommandContext*>(params, 2);
 	auto args = poly::GetArgument<const CCommand*>(params, 3);
-	auto result = g_CommandManager.DispatchConCommand(ctx, args, static_cast<HookMode>(type));
+	auto result = g_ConCommandManager.DispatchConCommand(ctx, args, static_cast<HookMode>(type));
 	if (result >= ResultType::Handled) {
 		return poly::ReturnAction::Supercede;
 	}
@@ -466,7 +470,7 @@ poly::ReturnAction Hook_OnAddEntity(poly::PHook& hook, poly::Params& params, int
 		auto pPointScript = addresses::CreateEntityByName("point_script", -1);
 		g_pPointScript = static_cast<CBaseEntity*>(pPointScript);
 		g_pPointScript->DispatchSpawn({
-			{"target_name", "script_main" },
+			{"target_name", "script_main"},
 			{"cs_script", CS_SCRIPT_PATH}
 		});
 		TRY_GET_OFFSET(g_pGameConfig, "CCSScript_EntityScript", offset);
@@ -476,7 +480,7 @@ poly::ReturnAction Hook_OnAddEntity(poly::PHook& hook, poly::Params& params, int
 	}
 #endif
 
-	GetOnEntityCreatedListenerManager()(handle.ToInt());
+	g_OnEntityCreatedListenerManager(handle.ToInt());
 	return poly::ReturnAction::Ignored;
 }
 
@@ -493,7 +497,7 @@ poly::ReturnAction Hook_OnRemoveEntity(poly::PHook& hook, poly::Params& params, 
 	}
 #endif
 
-	GetOnEntityDeletedListenerManager()(handle.ToInt());
+	g_OnEntityDeletedListenerManager(handle.ToInt());
 	return poly::ReturnAction::Ignored;
 }
 
@@ -501,7 +505,7 @@ poly::ReturnAction Hook_OnEntityParentChanged(poly::PHook& hook, poly::Params& p
 	auto entity = poly::GetArgument<CBaseEntity*>(params, 1);
 	auto newParent = poly::GetArgument<CBaseEntity*>(params, 2);
 
-	GetOnEntityParentChangedListenerManager()(entity->GetRefEHandle().ToInt(), newParent ? newParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
+	g_OnEntityParentChangedListenerManager(entity->GetRefEHandle().ToInt(), newParent ? newParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
 	return poly::ReturnAction::Ignored;
 }
 
@@ -592,7 +596,7 @@ poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params,
 	if (current == "OnSpawn") {
 		CScriptKeyValues* spawnkeys = reinterpret_cast<CScriptKeyValues*>(g_pScriptVM->GetInstanceValue(pArgs[0]));
 
-		//GetOnEntitySpawnListenerManager()(entity->GetRefEHandle().ToInt(), spawnkeys->m_pKeyValues);
+		//g_OnEntitySpawnListenerManager(entity->GetRefEHandle().ToInt(), spawnkeys->m_pKeyValues);
 
 	} else if (currentlyExecutingScriptFunction == "OnDelete") {
 	} else if (current == "DispatchPrecache") {
@@ -698,59 +702,59 @@ void Source2SDK::OnPluginStart() {
 
 	using enum poly::CallbackType;
 
-	g_PH.AddHookVTableFunc(&IGameEventManager2::FireEvent, g_pGameEventManager, Hook_FireEvent, Pre, Post);
+	g_HookManager.AddHookVTableFunc(&IGameEventManager2::FireEvent, g_pGameEventManager, Hook_FireEvent, Pre, Post);
 	using PostEventAbstract = void(IGameEventSystem::*)( CSplitScreenSlot slot, bool bLocalOnly, int nClientCount, const uint64 *clients, INetworkMessageInternal *pEvent, const CNetMessage *pData, unsigned long nSize, NetChannelBufType_t bufType);
-	g_PH.AddHookVTableFunc<PostEventAbstract>(&IGameEventSystem::PostEventAbstract, g_pGameEventSystem, Hook_PostEvent, Pre, Post);
+	g_HookManager.AddHookVTableFunc<PostEventAbstract>(&IGameEventSystem::PostEventAbstract, g_pGameEventSystem, Hook_PostEvent, Pre, Post);
 
-	g_PH.AddHookVTableFunc(&IServerGameClients::ClientCommand, g_pSource2GameClients, Hook_ClientCommand, Pre);
-	g_PH.AddHookVTableFunc(&IServerGameClients::ClientActive, g_pSource2GameClients, Hook_ClientActive, Post);
-	g_PH.AddHookVTableFunc(&IServerGameClients::ClientDisconnect, g_pSource2GameClients, Hook_ClientDisconnect, Pre, Post);
-	g_PH.AddHookVTableFunc(&IServerGameClients::ClientPutInServer, g_pSource2GameClients, Hook_ClientPutInServer, Post);
-	g_PH.AddHookVTableFunc(&IServerGameClients::ClientSettingsChanged, g_pSource2GameClients, Hook_ClientSettingsChanged, Post);
-	g_PH.AddHookVTableFunc(&IServerGameClients::OnClientConnected, g_pSource2GameClients, Hook_OnClientConnected, Post);
-	g_PH.AddHookVTableFunc(&IServerGameClients::ClientFullyConnect, g_pSource2GameClients, Hook_ClientFullyConnect, Post);
-	g_PH.AddHookVTableFunc(&IServerGameClients::ClientConnect, g_pSource2GameClients, Hook_ClientConnect, Pre, Post);
-	g_PH.AddHookVTableFunc(&INetworkServerService::StartupServer, g_pNetworkServerService, Hook_StartupServer, Post);
-	g_PH.AddHookVTableFunc(&INetworkServerService::DisconnectGameNow, g_pNetworkServerService, Hook_DisconnectGameNow, Post);
-	g_PH.AddHookVTableFunc(&ISource2Server::GameServerSteamAPIActivated, g_pSource2Server, Hook_GameServerSteamAPIActivated, Post);
-	g_PH.AddHookVTableFunc(&ISource2Server::GameServerSteamAPIDeactivated, g_pSource2Server, Hook_GameServerSteamAPIDeactivated, Post);
-	g_PH.AddHookVTableFunc(&ISource2Server::UpdateWhenNotInGame, g_pSource2Server, Hook_UpdateWhenNotInGame, Post);
-	g_PH.AddHookVTableFunc(&ISource2Server::PreWorldUpdate, g_pSource2Server, Hook_PreWorldUpdate, Post);
-	g_PH.AddHookVTableFunc(&IServerGameDLL::GameFrame, g_pSource2Server, Hook_GameFrame, Post);
-	g_PH.AddHookVTableFunc(&ICvar::DispatchConCommand, g_pCVar, Hook_DispatchConCommand, Pre, Post);
-	g_PH.AddHookVTableFunc(&ICvar::CallGlobalChangeCallbacks, g_pCVar, Hook_CallGlobalChangeCallbacks, Post);
+	g_HookManager.AddHookVTableFunc(&IServerGameClients::ClientCommand, g_pSource2GameClients, Hook_ClientCommand, Pre);
+	g_HookManager.AddHookVTableFunc(&IServerGameClients::ClientActive, g_pSource2GameClients, Hook_ClientActive, Post);
+	g_HookManager.AddHookVTableFunc(&IServerGameClients::ClientDisconnect, g_pSource2GameClients, Hook_ClientDisconnect, Pre, Post);
+	g_HookManager.AddHookVTableFunc(&IServerGameClients::ClientPutInServer, g_pSource2GameClients, Hook_ClientPutInServer, Post);
+	g_HookManager.AddHookVTableFunc(&IServerGameClients::ClientSettingsChanged, g_pSource2GameClients, Hook_ClientSettingsChanged, Post);
+	g_HookManager.AddHookVTableFunc(&IServerGameClients::OnClientConnected, g_pSource2GameClients, Hook_OnClientConnected, Post);
+	g_HookManager.AddHookVTableFunc(&IServerGameClients::ClientFullyConnect, g_pSource2GameClients, Hook_ClientFullyConnect, Post);
+	g_HookManager.AddHookVTableFunc(&IServerGameClients::ClientConnect, g_pSource2GameClients, Hook_ClientConnect, Pre, Post);
+	g_HookManager.AddHookVTableFunc(&INetworkServerService::StartupServer, g_pNetworkServerService, Hook_StartupServer, Post);
+	g_HookManager.AddHookVTableFunc(&INetworkServerService::DisconnectGameNow, g_pNetworkServerService, Hook_DisconnectGameNow, Post);
+	g_HookManager.AddHookVTableFunc(&ISource2Server::GameServerSteamAPIActivated, g_pSource2Server, Hook_GameServerSteamAPIActivated, Post);
+	g_HookManager.AddHookVTableFunc(&ISource2Server::GameServerSteamAPIDeactivated, g_pSource2Server, Hook_GameServerSteamAPIDeactivated, Post);
+	g_HookManager.AddHookVTableFunc(&ISource2Server::UpdateWhenNotInGame, g_pSource2Server, Hook_UpdateWhenNotInGame, Post);
+	g_HookManager.AddHookVTableFunc(&ISource2Server::PreWorldUpdate, g_pSource2Server, Hook_PreWorldUpdate, Post);
+	g_HookManager.AddHookVTableFunc(&IServerGameDLL::GameFrame, g_pSource2Server, Hook_GameFrame, Post);
+	g_HookManager.AddHookVTableFunc(&ICvar::DispatchConCommand, g_pCVar, Hook_DispatchConCommand, Pre, Post);
+	g_HookManager.AddHookVTableFunc(&ICvar::CallGlobalChangeCallbacks, g_pCVar, Hook_CallGlobalChangeCallbacks, Post);
 
 	//using LogDirect = LoggingResponse_t (*)(void* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, LeafCodeInfo_t*, LoggingMetaData_t*, Color, char const*, va_list*);
-	//g_PH.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, Pre);
+	//g_HookManager.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, Pre);
 
 	auto table3 = g_pGameConfig->GetVTable("CLuaVM");
-	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &*table3, Hook_RegisterFunction, Pre);
-	g_PH.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
+	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &*table3, Hook_RegisterFunction, Pre);
+	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
 	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
-	g_PH.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &*table3, Hook_RegisterInstance, Pre);
+	g_HookManager.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &*table3, Hook_RegisterInstance, Pre);
 	//using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
-	//g_PH.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);
-	//g_PH.AddHookVFuncFunc(&IScriptVM::LookupFunction, &*table3, Hook_LookupFunction, Post);
-	//g_PH.AddHookVFuncFunc(&IScriptVM::ReleaseFunction, &*table3, Hook_ReleaseFunction, Pre);
-	//g_PH.AddHookVFuncFunc(&IScriptVM::ExecuteFunction, &*table3, Hook_ExecuteFunction, Pre);
+	//g_HookManager.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);
+	//g_HookManager.AddHookVFuncFunc(&IScriptVM::LookupFunction, &*table3, Hook_LookupFunction, Post);
+	//g_HookManager.AddHookVFuncFunc(&IScriptVM::ReleaseFunction, &*table3, Hook_ReleaseFunction, Pre);
+	//g_HookManager.AddHookVFuncFunc(&IScriptVM::ExecuteFunction, &*table3, Hook_ExecuteFunction, Pre);
 
 #if defined (CS2)
 	using HostStateRequestFn = void* (*)(CHostStateMgr *manager, CHostStateRequest* request);
-	g_PH.AddHookDetourFunc<HostStateRequestFn>("CHostStateMgr::StartNewRequest", Hook_HostStateRequest, Pre);
+	g_HookManager.AddHookDetourFunc<HostStateRequestFn>("CHostStateMgr::StartNewRequest", Hook_HostStateRequest, Pre);
 	using ReplyConnectionFn = void (*)(CNetworkGameServerBase *server, CServerSideClient* client);
-	g_PH.AddHookDetourFunc<ReplyConnectionFn>("CNetworkGameServer::ReplyConnection", Hook_ReplyConnection, Pre, Post);
+	g_HookManager.AddHookDetourFunc<ReplyConnectionFn>("CNetworkGameServer::ReplyConnection", Hook_ReplyConnection, Pre, Post);
 	using FireOutputInternalFn = uint64_t(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, int32_t*, int16_t*, float);
-	g_PH.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
+	g_HookManager.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
 	auto table = g_pGameConfig->GetVTable("CServerSideClient");
-	g_PH.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, &*table, Hook_ProcessRespondCvarValue, Pre);
-	g_PH.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, &*table, Hook_SendNetMessage, Pre);
+	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, &*table, Hook_ProcessRespondCvarValue, Pre);
+	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, &*table, Hook_SendNetMessage, Pre);
 
 	auto table2 = g_pGameConfig->GetVTable("CGameRulesGameSystem");
-	g_PH.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &*table2, Hook_BuildGameSessionManifest, Pre);
+	g_HookManager.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &*table2, Hook_BuildGameSessionManifest, Pre);
 
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
-	g_PH.AddHookDetourFunc<TerminateRoundFn>("CGameRules::TerminateRound", Hook_TerminateRound, Pre);
+	g_HookManager.AddHookDetourFunc<TerminateRoundFn>("CGameRules::TerminateRound", Hook_TerminateRound, Pre);
 
 	using v8IsolateFn = void(*)(v8::Isolate*);
 
@@ -766,8 +770,8 @@ void Source2SDK::OnPluginStart() {
 	const uint8_t fix = 6; // skip plt staff
 #endif
 
-	g_PH.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(static_cast<uint8_t*>(v8IsolateEnterPtr) + fix), Hook_IsolateEnter, Pre);
-	g_PH.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(static_cast<uint8_t*>(v8IsolateExitPtr) + fix), Hook_IsolateExit, Post);
+	g_HookManager.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(static_cast<uint8_t*>(v8IsolateEnterPtr) + fix), Hook_IsolateEnter, Pre);
+	g_HookManager.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(static_cast<uint8_t*>(v8IsolateExitPtr) + fix), Hook_IsolateExit, Post);
 
 	if (Module v8("plugify-module-v8"); v8.IsValid()) {
 		using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
@@ -782,7 +786,7 @@ void Source2SDK::OnPluginStart() {
 
 #if _WIN32
 	using PreloadLibrary = void(*)(void*);
-	g_PH.AddHookDetourFunc<PreloadLibrary>("PreloadLibrary", Hook_PreloadLibrary, Pre);
+	g_HookManager.AddHookDetourFunc<PreloadLibrary>("PreloadLibrary", Hook_PreloadLibrary, Pre);
 #endif
 
 	OnServerStartup();// for late load*/
@@ -790,7 +794,7 @@ void Source2SDK::OnPluginStart() {
 
 void Source2SDK::OnPluginEnd() {
 	globals::Terminate();
-	g_PH.UnhookAll();
+	g_HookManager.UnhookAll();
 	UnregisterEventListeners();
 
 	plg::print(LS_DETAILED, "[OnPluginEnd] = Source2SDK!\n");
@@ -801,24 +805,24 @@ void Source2SDK::OnServerStartup() {
 
 	if (g_pNetworkGameServer != nullptr) {
 		gpGlobals = g_pNetworkGameServer->GetGlobals();
-		g_PH.AddHookVTableFunc(&CNetworkGameServerBase::Release, g_pNetworkGameServer, Hook_Release, poly::CallbackType::Pre);
-		g_PH.AddHookVTableFunc(&CNetworkGameServerBase::ActivateServer, g_pNetworkGameServer, Hook_ActivateServer, poly::CallbackType::Post);
-		g_PH.AddHookVTableFunc(&CNetworkGameServerBase::SpawnServer, g_pNetworkGameServer, Hook_SpawnServer, poly::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CNetworkGameServerBase::Release, g_pNetworkGameServer, Hook_Release, poly::CallbackType::Pre);
+		g_HookManager.AddHookVTableFunc(&CNetworkGameServerBase::ActivateServer, g_pNetworkGameServer, Hook_ActivateServer, poly::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CNetworkGameServerBase::SpawnServer, g_pNetworkGameServer, Hook_SpawnServer, poly::CallbackType::Post);
 	}
 
 	if (g_pGameEntitySystem != nullptr) {
-		g_PH.RemoveHookVirtualFunc(&CEntitySystem::OnAddEntity, g_pGameEntitySystem);
-		g_PH.RemoveHookVirtualFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem);
-		g_PH.RemoveHookVirtualFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem);
+		g_HookManager.RemoveHookVirtualFunc(&CEntitySystem::OnAddEntity, g_pGameEntitySystem);
+		g_HookManager.RemoveHookVirtualFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem);
+		g_HookManager.RemoveHookVirtualFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem);
 	}
 
 	g_pGameEntitySystem = GameEntitySystem();
 
 	if (g_pGameEntitySystem != nullptr) {
 		//g_pGameEntitySystem->AddListenerEntity(&g_entityListener);
-		g_PH.AddHookVTableFunc(&CEntitySystem::OnAddEntity, g_pGameEntitySystem, Hook_OnAddEntity, poly::CallbackType::Post);
-		g_PH.AddHookVTableFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem, Hook_OnRemoveEntity, poly::CallbackType::Post);
-		g_PH.AddHookVTableFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem, Hook_OnEntityParentChanged, poly::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnAddEntity, g_pGameEntitySystem, Hook_OnAddEntity, poly::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem, Hook_OnRemoveEntity, poly::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem, Hook_OnEntityParentChanged, poly::CallbackType::Post);
 	}
 
 	g_MultiAddonManager.OnStartupServer();

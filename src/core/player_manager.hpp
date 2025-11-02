@@ -107,9 +107,15 @@ private:
 };
 
 class PlayerManager {
-public:
 	PlayerManager() = default;
 	~PlayerManager() = default;
+	NONCOPYABLE(PlayerManager)
+
+public:
+	static auto& Instance() {
+		static PlayerManager instance;
+		return instance;
+	}
 
 	Player* ToPlayer(CServerSideClientBase* client) const;
 	Player* ToPlayer(CPlayerPawnComponent* component) const;
@@ -134,15 +140,14 @@ public:
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(PlayerManager, OnValidateAuthTicket, ValidateAuthTicketResponse_t, m_CallbackValidateAuthTicketResponse);
 
-	std::inplace_vector<Player*, MAXPLAYERS> GetOnlinePlayers() const;
+	std::inplace_vector<Player*, MaxPlayers> GetOnlinePlayers() const;
 	static int MaxClients();
 
 	TargetType TargetPlayerString(int caller, std::string_view target, plg::vector<int>& clients);
 
 protected:
-	std::array<Player, MAXPLAYERS + 1> m_players{};
+	std::array<Player, MaxPlayers + 1> m_players{};
 	std::mutex m_mutex;
 	bool m_callbackRegistered{};
 };
-
-extern PlayerManager g_PlayerManager;
+inline PlayerManager& g_PlayerManager = PlayerManager::Instance();

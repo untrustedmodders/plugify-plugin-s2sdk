@@ -7,10 +7,17 @@
 #include <tier0/dbg.h>
 #include <tier0/logging.h>
 
-class Logger final {
-public:
-	Logger(const char* name, RegisterTagsFunc registerTagsFunc, int flags = 0, LoggingVerbosity_t verbosity = LV_DEFAULT, const Color& defaultColor = UNSPECIFIED_LOGGING_COLOR);
+class Logger {
+	static void RegisterTags(LoggingChannelID_t) {}
+	explicit Logger(const char* name, RegisterTagsFunc registerTagsFunc = &Logger::RegisterTags, int flags = 0, LoggingVerbosity_t verbosity = LV_DEFAULT, const Color& defaultColor = UNSPECIFIED_LOGGING_COLOR);
 	~Logger() = default;
+	NONCOPYABLE(Logger)
+
+public:
+	static auto& Instance() {
+		static Logger instance{S2SDK_PACKAGE};
+		return instance;
+	}
 
 	void AddTagToChannel(const char* tagName) const;
 	bool HasTag(const char* tag) const;
@@ -27,7 +34,6 @@ public:
 
 	void SetChannelVerbosityByName(const char* name, LoggingVerbosity_t verbosity);
 	void SetChannelVerbosityByTag(const char* tag, LoggingVerbosity_t verbosity);
-	static void RegisterTags(LoggingChannelID_t) {}
 
 	static inline const Color WHITE = Color(255, 255, 255, 255);
 	static inline const Color RED = Color(255, 0, 0, 255);
@@ -49,8 +55,7 @@ private:
 	mutable std::shared_mutex m_mutex;
 	LoggingChannelID_t m_channelID;
 };
-
-extern Logger g_Logger;
+inline Logger& g_Logger = Logger::Instance();
 
 namespace plg {
 	class Severity {

@@ -203,5 +203,3 @@ LoggingResponse_t Logger::LogFormat(LoggingSeverity_t severity, const LoggingRar
 
 	return response;
 }
-
-Logger g_Logger(S2SDK_PACKAGE, &Logger::RegisterTags);

@@ -23,8 +23,8 @@ PLUGIFY_WARN_IGNORE(4190)
  * @return A boolean indicating whether the command was successfully added.
  */
 extern "C" PLUGIN_API bool AddAdminCommand(const plg::string& name, int64_t adminFlags, const plg::string& description, ConVarFlag flags, CommandListenerCallback callback, HookMode mode) {
-	auto result = g_CommandManager.AddValveCommand(name, description, flags, adminFlags);
-	g_CommandManager.AddCommandListener(name, callback, mode);
+	auto result = g_ConCommandManager.AddValveCommand(name, description, flags, adminFlags);
+	g_ConCommandManager.AddCommandListener(name, callback, mode);
 	return result;
 }
 
@@ -39,8 +39,8 @@ extern "C" PLUGIN_API bool AddAdminCommand(const plg::string& name, int64_t admi
  * @return A boolean indicating whether the command was successfully added.
  */
 extern "C" PLUGIN_API bool AddConsoleCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, CommandListenerCallback callback, HookMode mode) {
-	auto result = g_CommandManager.AddValveCommand(name, description, flags);
-	g_CommandManager.AddCommandListener(name, callback, mode);
+	auto result = g_ConCommandManager.AddValveCommand(name, description, flags);
+	g_ConCommandManager.AddCommandListener(name, callback, mode);
 	return result;
 }
 
@@ -51,9 +51,9 @@ extern "C" PLUGIN_API bool AddConsoleCommand(const plg::string& name, const plg:
  * @param callback The callback function associated with the command to be removed.
  */
 extern "C" PLUGIN_API bool RemoveCommand(const plg::string& name, CommandListenerCallback callback) {
-	g_CommandManager.RemoveCommandListener(name, callback, HookMode::Pre);
-	g_CommandManager.RemoveCommandListener(name, callback, HookMode::Post);
-	return g_CommandManager.RemoveValveCommand(name);
+	g_ConCommandManager.RemoveCommandListener(name, callback, HookMode::Pre);
+	g_ConCommandManager.RemoveCommandListener(name, callback, HookMode::Post);
+	return g_ConCommandManager.RemoveValveCommand(name);
 }
 
 /**
@@ -65,7 +65,7 @@ extern "C" PLUGIN_API bool RemoveCommand(const plg::string& name, CommandListene
  * @return A boolean indicating whether the callback was successfully added.
  */
 extern "C" PLUGIN_API bool AddCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
-	return g_CommandManager.AddCommandListener(name, callback, mode);
+	return g_ConCommandManager.AddCommandListener(name, callback, mode);
 }
 
 /**
@@ -77,7 +77,7 @@ extern "C" PLUGIN_API bool AddCommandListener(const plg::string& name, CommandLi
  * @return A boolean indicating whether the callback was successfully removed.
  */
 extern "C" PLUGIN_API bool RemoveCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
-	return g_CommandManager.RemoveCommandListener(name, callback, mode);
+	return g_ConCommandManager.RemoveCommandListener(name, callback, mode);
 }
 
 /**

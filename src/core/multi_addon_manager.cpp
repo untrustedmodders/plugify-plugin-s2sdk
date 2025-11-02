@@ -755,5 +755,3 @@ void MultiAddonManager::OnClientActive(CPlayerSlot slot, bool loadGame, const ch
 		g_ClientAddons[steamID64].downloadedAddons.clear();
 	}
 }
-
-MultiAddonManager g_MultiAddonManager;

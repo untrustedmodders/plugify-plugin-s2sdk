@@ -25,9 +25,15 @@ enum class EventHookError {
 };
 
 class EventManager : public IGameEventListener2 {
-public:
 	EventManager() = default;
 	~EventManager() override;
+	NONCOPYABLE(EventManager)
+
+public:
+	static auto& Instance() {
+		static EventManager instance;
+		return instance;
+	}
 
 	EventHookError HookEvent(std::string_view name, EventListenerCallback callback, HookMode mode = HookMode::Post);
 	EventHookError UnhookEvent(std::string_view name, EventListenerCallback callback, HookMode mode = HookMode::Post);
@@ -50,5 +56,4 @@ private:
 	std::stack<std::shared_ptr<EventHook>> m_eventStack;
 	std::stack<IGameEvent*> m_eventCopies;
 };
-
-extern EventManager g_EventManager;
+inline EventManager& g_EventManager = EventManager::Instance();

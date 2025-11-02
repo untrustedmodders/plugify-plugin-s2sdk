@@ -5,8 +5,17 @@
 
 #include <polyhook/polyhook.hpp>
 
-class HookHolder {
+class HookManager {
+	HookManager() = default;
+	~HookManager() = default;
+	NONCOPYABLE(HookManager)
+
 public:
+	static auto& Instance() {
+		static HookManager instance;
+		return instance;
+	}
+
 	template<typename F, typename C>
 	void* AddHookVTableFunc(F func, void* ptr, const C& callback, int varIndex = -1) {
 		std::pair name{(void*&) func, ptr};
@@ -212,5 +221,4 @@ private:
 	plg::flat_hash_map<plg::string, std::unique_ptr<poly::IHook>, plg::string_hash, std::equal_to<>> m_dhooks;
 	plg::flat_hash_map<std::pair<void*, void*>, std::unique_ptr<poly::IHook>, plg::pair_hash<void*, void*>> m_vhooks;
 };
-
-extern HookHolder g_PH;
+inline HookManager& g_HookManager = HookManager::Instance();

@@ -21,6 +21,7 @@
 
 #include "cbaseplayercontroller.h"
 #include "ccsplayerpawn.h"
+#include "ccsteam.h"
 #include <sharedInterface.h>
 
 class CCSPlayerController : public CBasePlayerController {
@@ -63,16 +64,16 @@ public:
 		return m_fFlags & FL_CONTROLLER_FAKECLIENT;
 	}
 
-	void SwitchTeam(int iTeam) {
+	void SwitchTeam(CSTeam team) {
 		if (!IsPlayerController())
 			return;
 
-		if (iTeam == CS_TEAM_SPECTATOR) {
-			GetCurrentPawn()->m_iTeamNum = iTeam;
-			SetTeam(iTeam);
+		if (team == CSTeam::Spectator) {
+			GetCurrentPawn()->m_iTeamNum = team;
+			SetTeam(team);
 		} else {
-			GetPlayerPawn()->m_iTeamNum = iTeam;
-			addresses::CCSPlayerController_SwitchTeam(this, iTeam);
+			GetPlayerPawn()->m_iTeamNum = team;
+			addresses::CCSPlayerController_SwitchTeam(this, team);
 		}
 	}
 

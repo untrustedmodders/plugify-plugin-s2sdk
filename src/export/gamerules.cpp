@@ -1,3 +1,4 @@
+#include <core/sdk/entity/ccsteam.h>
 #include <core/sdk/entity/cgamerules.h>
 #include <core/sdk/entity/cteam.h>
 
@@ -48,10 +49,10 @@ extern "C" PLUGIN_API void* GetGameRules() {
  * @param team The numeric identifier of the team.
  * @return A pointer to the corresponding CTeam instance, or nullptr if the team was not found.
  */
-extern "C" PLUGIN_API CTeam* GetGameTeamManager(int team) {
+extern "C" PLUGIN_API CTeam* GetGameTeamManager(CSTeam team) {
 	auto it = g_pTeamManagers.find(team);
 	if (it == g_pTeamManagers.end()) {
-		plg::print(LS_WARNING, "Failed to find {} team\n", team);
+		plg::print(LS_WARNING, "Failed to find {} team\n", plg::enum_to_string(team));
 		return nullptr;
 	}
 
@@ -68,10 +69,10 @@ extern "C" PLUGIN_API CTeam* GetGameTeamManager(int team) {
  * @param team The numeric identifier of the team.
  * @return The current score of the team, or -1 if the team could not be found.
  */
-extern "C" PLUGIN_API int GetGameTeamScore(int team) {
+extern "C" PLUGIN_API int GetGameTeamScore(CSTeam team) {
 	auto it = g_pTeamManagers.find(team);
 	if (it == g_pTeamManagers.end()) {
-		plg::print(LS_WARNING, "Failed to find {} team\n", team);
+		plg::print(LS_WARNING, "Failed to find {} team\n", plg::enum_to_string(team));
 		return -1;
 	}
 
@@ -88,18 +89,18 @@ extern "C" PLUGIN_API int GetGameTeamScore(int team) {
  * @param team The numeric identifier of the team (e.g., CS_TEAM_T, CS_TEAM_CT, CS_TEAM_SPECTATOR).
  * @return The number of players on the team, or -1 if game rules are unavailable.
  */
-extern "C" PLUGIN_API int GetGamePlayerCount(int team) {
+extern "C" PLUGIN_API int GetGamePlayerCount(CSTeam team) {
 	if (g_pGameRules == nullptr) {
 		plg::print(LS_WARNING, "cs_gamerules not instantiated yet.\n");
 		return -1;
 	}
 
 	switch (team) {
-		case CS_TEAM_T:
+		case CSTeam::T:
 			return g_pGameRules->m_iNumTerrorist;
-		case CS_TEAM_CT:
+		case CSTeam::CT:
 			return g_pGameRules->m_iNumCT;
-		case CS_TEAM_SPECTATOR:
+		case CSTeam::Spectator:
 			return g_pGameRules->m_iSpectatorSlotCount;
 		default:
 			return 0;

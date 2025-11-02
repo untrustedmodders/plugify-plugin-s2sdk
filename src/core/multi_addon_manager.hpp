@@ -10,7 +10,16 @@
 class CServerSideClient;
 
 class MultiAddonManager {
+	MultiAddonManager() = default;
+	~MultiAddonManager() = default;
+	NONCOPYABLE(MultiAddonManager)
+
 public:
+	static auto& Instance() {
+		static MultiAddonManager instance;
+		return instance;
+	}
+
 	std::string BuildAddonPath(PublishedFileId_t addon);
 	bool MountAddon(PublishedFileId_t addon, bool addToTail = false);
 	bool UnmountAddon(PublishedFileId_t addon, bool remove = true);
@@ -61,5 +70,5 @@ private:
 	PublishedFileId_t m_currentWorkshopMap{k_PublishedFileIdInvalid};
 	bool m_callbackRegistered{};
 };
+inline MultiAddonManager& g_MultiAddonManager = MultiAddonManager::Instance();
 
-extern MultiAddonManager g_MultiAddonManager;

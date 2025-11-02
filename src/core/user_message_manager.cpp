@@ -95,5 +95,3 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 
 	return result;
 }
-
-UserMessageManager g_UserMessageManager;

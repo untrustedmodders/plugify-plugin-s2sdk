@@ -95,5 +95,3 @@ ResultType EntityOutputManager::FireOutputInternal_Post(CEntityIOOutput* self, C
 
 	return ResultType::Continue;
 }
-
-EntityOutputManager g_OutputManager;

@@ -33,9 +33,17 @@ using YesNoVoteHandler = void(*)(VoteAction, int, int);
 // Return true for vote to pass, false to fail
 using YesNoVoteResult = bool(*)(int numVotes, int yesVotes, int noVotes, int numClients, const plg::vector<int>& clientInfoSlot, const plg::vector<int>& clientInfoItem);
 
-class PanoramaVoteHandler
-{
+class PanoramaVoteHandler {
+	PanoramaVoteHandler() = default;
+	~PanoramaVoteHandler() = default;
+	NONCOPYABLE(PanoramaVoteHandler)
+
 public:
+	static auto& Instance() {
+		static PanoramaVoteHandler instance;
+		return instance;
+	}
+
 	void Reset();
 	void Init();
 	void VoteCast(IGameEvent* event);
@@ -93,7 +101,6 @@ private:
 	std::string m_currentVoteDetailStr;
 	std::string m_currentVotePassTitle;
 	std::string m_currentVotePassDetailStr;
-	std::inplace_vector<CPlayerSlot, MAXPLAYERS> m_voters;
+	std::inplace_vector<CPlayerSlot, MaxPlayers> m_voters;
 };
-
-extern PanoramaVoteHandler g_PanoramaVoteHandler;
+inline PanoramaVoteHandler& g_PanoramaVoteHandler = PanoramaVoteHandler::Instance();

@@ -169,5 +169,3 @@ ResultType EventManager::OnFireEvent_Post(IGameEvent* event, bool dontBroadcast)
 
 	return ResultType::Continue;
 }
-
-EventManager g_EventManager;

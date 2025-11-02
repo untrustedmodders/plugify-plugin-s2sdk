@@ -55,14 +55,16 @@ struct ConVarInfo {
 	ListenerManager<ConVarChangeListenerCallback> callbacks;
 };
 
-class ConVarManager;
-extern ConVarManager g_ConVarManager;
-
 class ConVarManager {
-public:
 	ConVarManager() = default;
 	~ConVarManager();
+	NONCOPYABLE(ConVarManager)
 
+public:
+	static auto& Instance() {
+		static ConVarManager instance;
+		return instance;
+	}
 	static void Init();
 
 	uint64 GetFlags(ConVarFlag flags) {
@@ -158,6 +160,7 @@ private:
 	std::recursive_mutex m_mutex;
 	ListenerManager<ConVarChangeListenerCallback> m_globalCallbacks;
 };
+inline ConVarManager& g_ConVarManager = ConVarManager::Instance();
 
 inline ConVarFlag operator|(ConVarFlag lhs, ConVarFlag rhs) noexcept {
 	using underlying = std::underlying_type_t<ConVarFlag>;

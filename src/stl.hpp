@@ -14,6 +14,12 @@
 
 #include <parallel_hashmap/phmap.h>
 
+#define NONCOPYABLE(x) \
+	x(const x&) = delete; \
+	x(x&&) = delete; \
+	x& operator=(const x&) = delete; \
+	x& operator=(x&&) = delete;
+
 template<typename T>
 using Result = std::expected<T, std::string>;
 

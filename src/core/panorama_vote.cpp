@@ -181,7 +181,7 @@ void PanoramaVoteHandler::InitVoters(IRecipientFilter* filter) {
 	// Clear any old info
 	m_voters.clear();
 
-	for (int i = 0; i < MAXPLAYERS; ++i) {
+	for (int i = 0; i < MaxPlayers; ++i) {
 		m_voteController->m_nVotesCast[i] = VOTE_UNCAST;
 	}
 
@@ -320,5 +320,3 @@ GAME_EVENT_F(vote_cast) {
 GAME_EVENT_F(round_start) {
 	g_PanoramaVoteHandler.Init();
 }
-
-PanoramaVoteHandler g_PanoramaVoteHandler;

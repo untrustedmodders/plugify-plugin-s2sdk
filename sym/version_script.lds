@@ -958,6 +958,7 @@
         Kv3SaveToFile;
 
         *_Register;
+        *_Register2;
         *_Unregister;
     local: *;
 };

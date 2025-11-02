@@ -187,7 +187,7 @@ extern "C" PLUGIN_API void* GetConcreteEntityListPointer() {
  * @return True if the hook was successfully added, false otherwise.
  */
 extern "C" PLUGIN_API bool HookEntityOutput(const plg::string& classname, const plg::string& output, EntityListenerCallback callback, HookMode mode) {
-	return g_OutputManager.HookEntityOutput(classname, output, callback, mode);
+	return g_EntityOutputManager.HookEntityOutput(classname, output, callback, mode);
 }
 
 /**
@@ -202,7 +202,7 @@ extern "C" PLUGIN_API bool HookEntityOutput(const plg::string& classname, const 
 * @return True if the hook was successfully removed, false otherwise.
  */
 extern "C" PLUGIN_API bool UnhookEntityOutput(const plg::string& classname, const plg::string& output, EntityListenerCallback callback, HookMode mode) {
-	return g_OutputManager.UnhookEntityOutput(classname, output, callback, mode);
+	return g_EntityOutputManager.UnhookEntityOutput(classname, output, callback, mode);
 }
 
 ////////////////////////
@@ -601,10 +601,10 @@ extern "C" PLUGIN_API void SetEntityRenderColor(int entityHandle, int color) {
  * @param entityHandle The handle of the entity whose render mode is to be retrieved.
  * @return The render mode of the entity, or 0 if the entity is invalid.
  */
-extern "C" PLUGIN_API uint8_t GetEntityRenderMode(int entityHandle) {
+extern "C" PLUGIN_API RenderMode_t GetEntityRenderMode(int entityHandle) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return {};
-	return entity->m_nRenderMode;
+	return static_cast<RenderMode_t>(*entity->m_nRenderMode);
 }
 
 /**
@@ -616,7 +616,7 @@ extern "C" PLUGIN_API uint8_t GetEntityRenderMode(int entityHandle) {
  * @param entityHandle The handle of the entity whose render mode is to be set.
  * @param renderMode The new render mode to set for the entity.
  */
-extern "C" PLUGIN_API void SetEntityRenderMode(int entityHandle, int renderMode) {
+extern "C" PLUGIN_API void SetEntityRenderMode(int entityHandle, RenderMode_t renderMode) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return;
 	entity->SetRenderMode(renderMode);
@@ -767,7 +767,7 @@ extern "C" PLUGIN_API void SetEntityMaxHealth(int entityHandle, int maxHealth) {
  * @param entityHandle The handle of the entity whose team number is to be retrieved.
  * @return The team number of the entity, or 0 if the entity is invalid.
  */
-extern "C" PLUGIN_API int GetEntityTeam(int entityHandle) {
+extern "C" PLUGIN_API CSTeam GetEntityTeam(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
 	return entity->GetTeam();
@@ -782,7 +782,7 @@ extern "C" PLUGIN_API int GetEntityTeam(int entityHandle) {
  * @param entityHandle The handle of the entity whose team number is to be set.
  * @param team The new team number to set for the entity.
  */
-extern "C" PLUGIN_API void SetEntityTeam(int entityHandle, int team) {
+extern "C" PLUGIN_API void SetEntityTeam(int entityHandle, CSTeam team) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
 	entity->SetTeam(team);

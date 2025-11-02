@@ -239,5 +239,3 @@ ResultType ConCommandManager::DispatchConCommand(const CCommandContext* ctx, con
 
     return ExecuteCommandCallbacks(arg0, *ctx, *args, mode, CommandCallingContext::Console);
 }
-
-ConCommandManager g_CommandManager;

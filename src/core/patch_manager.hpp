@@ -57,6 +57,7 @@ struct PatchOptions {
 };
 
 class PatchManager {
+	NONCOPYABLE(PatchManager)
 public:
 	PatchManager() = default;
 	~PatchManager();
