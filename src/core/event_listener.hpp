@@ -9,15 +9,13 @@ class CGameEventListener;
 extern plg::hybrid_vector<CGameEventListener*, 64> g_vecEventListeners;
 
 class CGameEventListener : public IGameEventListener2 {
-	NONCOPYABLE(CGameEventListener)
 public:
 	CGameEventListener(FnEventListenerCallback callback, const char* eventName) :
-		m_callback(callback), m_eventName(eventName)
-	{
+		m_callback(callback), m_eventName(eventName) {
 		g_vecEventListeners.emplace_back(this);
 	}
-
 	~CGameEventListener() override = default;
+	NONCOPYABLE(CGameEventListener)
 
 	// FireEvent is called by EventManager if event just occured
 	// KeyValue memory will be freed by manager if not needed anymore

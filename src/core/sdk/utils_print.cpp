@@ -188,9 +188,9 @@ void ClientPrint(std::optional<CPlayerSlot> playerSlot, HudDest dest, std::strin
 	data->add_param(std::string(message));
 
 	if (playerSlot){
-		data->Send(*playerSlot);
+		UNUSED(data->Send(*playerSlot));
 	} else {
-		data->SendToAllClients();
+		UNUSED(data->SendToAllClients());
 	}
 	delete data;
 }

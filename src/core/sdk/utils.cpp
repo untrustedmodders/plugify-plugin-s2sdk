@@ -119,8 +119,7 @@ CPlayerSlot utils::GetEntityPlayerSlot(CBaseEntity* entity) {
 }
 
 bool utils::IsPlayerSlot(CPlayerSlot slot) {
-	int iSlot = slot;
-	return iSlot >= 0 && iSlot < gpGlobals->maxClients;
+	return slot >= 0 && slot < gpGlobals->maxClients;
 }
 
 CUtlClientVector* utils::GetClientList() {

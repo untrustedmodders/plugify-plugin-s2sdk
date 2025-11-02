@@ -11,14 +11,14 @@ struct VScriptBinding {
 
 struct VScriptFunction {
 	ScriptFunctionBinding_t* binding;
-	void* m_instance;
+	void* instance;
 };
 
 using VScriptBindingMap = plg::flat_hash_map<plg::string, VScriptBinding, plg::string_hash, std::equal_to<>>;
 struct VScriptClass {
-	VScriptBindingMap m_functions;
-	ScriptClassDesc_t* m_descriptor;
-	void* m_instance;
+	VScriptBindingMap functions;
+	ScriptClassDesc_t* descriptor;
+	void* instance;
 };
 
 using VScriptClassMap = plg::flat_hash_map<plg::string, VScriptClass, plg::string_hash, std::equal_to<>>;

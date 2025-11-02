@@ -59,7 +59,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 			auto thisResult = func(&message);
 			if (thisResult >= ResultType::Stop) {
 				if (mode == HookMode::Pre) {
-					*clients = *reinterpret_cast<const uint64_t *>(message.GetRecipientFilter().GetRecipients().Base());
+					*clients = static_cast<uint64_t>(*message.GetRecipientFilter().GetRecipients().Base());
 					return ResultType::Stop;
 				}
 				result = thisResult;
@@ -80,7 +80,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 			auto thisResult = func(&message);
 			if (thisResult >= ResultType::Handled) {
 				if (mode == HookMode::Pre) {
-					*clients = *reinterpret_cast<const uint64_t *>(message.GetRecipientFilter().GetRecipients().Base());
+					*clients = static_cast<uint64_t>(*message.GetRecipientFilter().GetRecipients().Base());
 				}
 				return thisResult;
 			} else if (thisResult > result) {
@@ -90,7 +90,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 	}
 
 	if (mode == HookMode::Pre) {
-		*clients = *reinterpret_cast<const uint64_t *>(message.GetRecipientFilter().GetRecipients().Base());
+		*clients = static_cast<uint64_t>(*message.GetRecipientFilter().GetRecipients().Base());
 	}
 
 	return result;

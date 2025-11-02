@@ -45,7 +45,7 @@ void cvars::SendConVarValue(CPlayerSlot slot, std::string_view name, std::string
 		data->set_name(std::string(name));
 		data->set_value(std::string(value));
 
-		msg->Send(slot);
+		UNUSED(msg->Send(slot));
 		delete msg;
 	}
 }
@@ -60,7 +60,7 @@ void cvars::SendMultipleConVarValues(CPlayerSlot slot, std::span<const std::stri
 			data->set_value(std::string(values[i]));
 		}
 
-		msg->Send(slot);
+		UNUSED(msg->Send(slot));
 		delete msg;
 	}
 }
@@ -75,7 +75,7 @@ int cvars::SendConVarValueQueryToClient(CPlayerSlot slot, std::string_view cvarN
 		msg->set_cookie(queryCvarCookie);
 		msg->set_cvar_name(std::string(cvarName));
 
-		msg->Send(slot);
+		UNUSED(msg->Send(slot));
 		delete msg;
 
 		return queryCvarCookie;

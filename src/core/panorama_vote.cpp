@@ -172,7 +172,7 @@ void PanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
 	data->set_details_str(m_currentVoteDetailStr);
 	data->set_is_yes_no_vote(true);
 
-	data->Send(filter->GetRecipients());
+	UNUSED(data->Send(filter->GetRecipients()));
 
 	delete data;
 }
@@ -287,7 +287,7 @@ void PanoramaVoteHandler::SendVoteFailed() const {
 	} else {
 		filter.SetRecipients(m_recipients);
 	}
-	data->Send(filter.GetRecipients());
+	UNUSED(data->Send(filter.GetRecipients()));
 
 	delete data;
 }
@@ -308,7 +308,7 @@ void PanoramaVoteHandler::SendVotePassed() const {
 	} else {
 		filter.SetRecipients(m_recipients);
 	}
-	data->Send(filter.GetRecipients());
+	UNUSED(data->Send(filter.GetRecipients()));
 
 	delete data;
 }

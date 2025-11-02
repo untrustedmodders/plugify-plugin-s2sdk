@@ -82,7 +82,7 @@ extern "C" PLUGIN_API void UserMessageDestroy(UserMessage* userMessage) {
  * @param userMessage The UserMessage to send.
  */
 extern "C" PLUGIN_API void UserMessageSend(UserMessage* userMessage) {
-	if (userMessage) [[maybe_unused]] auto _ = userMessage->GetNetMessage()->Send(userMessage->GetRecipientFilter().GetRecipients());
+	if (userMessage) UNUSED(userMessage->GetNetMessage()->Send(userMessage->GetRecipientFilter().GetRecipients()));
 }
 
 /**
@@ -157,7 +157,7 @@ extern "C" PLUGIN_API int16_t UserMessageFindMessageIdByName(const plg::string& 
  * @return The recipient mask.
  */
 extern "C" PLUGIN_API uint64_t UserMessageGetRecipientMask(UserMessage* userMessage) {
-	return userMessage && userMessage->GetRecipientFilter().GetRecipientCount() ? *reinterpret_cast<const uint64_t *>(userMessage->GetRecipientFilter().GetRecipients().Base()) : 0;
+	return userMessage && userMessage->GetRecipientFilter().GetRecipientCount() ? static_cast<uint64_t>(*userMessage->GetRecipientFilter().GetRecipients().Base()) : 0;
 }
 
 /**

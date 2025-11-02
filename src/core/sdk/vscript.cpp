@@ -70,7 +70,7 @@ namespace vscript {
 		VScriptClass& globalClass = scriptClassMap[""];
 
 		std::string_view funcName = pScriptFunction->m_desc.m_pszScriptName;
-		if (globalClass.m_functions.contains(funcName)) {
+		if (globalClass.functions.contains(funcName)) {
 			return;
 		}
 
@@ -92,7 +92,7 @@ namespace vscript {
 		plg::print(LS_DETAILED, "└──────────────────────────────────────────────────────\n\n");
 #endif
 
-		globalClass.m_functions.emplace(funcName, binding);
+		globalClass.functions.emplace(funcName, binding);
 	}
 
 	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc, void* pInstance) {
@@ -103,13 +103,13 @@ namespace vscript {
 
 		auto createClass = [&]() {
 			VScriptClass scriptClass;
-			scriptClass.m_descriptor = pClassDesc;
-			scriptClass.m_instance = pInstance;
-			scriptClass.m_functions.reserve(static_cast<size_t>(pClassDesc->m_FunctionBindings.Count()));
+			scriptClass.descriptor = pClassDesc;
+			scriptClass.instance = pInstance;
+			scriptClass.functions.reserve(static_cast<size_t>(pClassDesc->m_FunctionBindings.Count()));
 			for (auto& function : pClassDesc->m_FunctionBindings) {
-				scriptClass.m_functions.emplace(function.m_desc.m_pszScriptName, ScriptConvertFuncPtrToBinding(function));
+				scriptClass.functions.emplace(function.m_desc.m_pszScriptName, ScriptConvertFuncPtrToBinding(function));
 			}
-			return scriptClass.m_functions;
+			return scriptClass.functions;
 		};
 
 #if 0
@@ -157,8 +157,8 @@ namespace vscript {
 
 	VScriptBinding GetBinding(std::string_view functionName) {
 		VScriptClass& globalClass = scriptClassMap[""];
-		auto it = globalClass.m_functions.find(functionName);
-		if (it != globalClass.m_functions.end()) {
+		auto it = globalClass.functions.find(functionName);
+		if (it != globalClass.functions.end()) {
 			return it->second;
 		}
 		plg::print(
@@ -173,8 +173,8 @@ namespace vscript {
 		auto it = scriptClassMap.find(className);
 		if (it != scriptClassMap.end()) {
 			auto& table = it->second;
-			auto it2 = table.m_functions.find(functionName);
-			if (it2 != table.m_functions.end()) {
+			auto it2 = table.functions.find(functionName);
+			if (it2 != table.functions.end()) {
 				return it2->second;
 			}
 		}

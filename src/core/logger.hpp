@@ -52,8 +52,8 @@ public:
 	LoggingResponse_t LogFormat(LoggingSeverity_t severity, const LoggingRareOptions_t& code, const Color& color, const char* format, ...) const;
 
 private:
-	mutable std::shared_mutex m_mutex;
 	LoggingChannelID_t m_channelID;
+	mutable std::shared_mutex m_mutex;
 };
 inline Logger& g_Logger = Logger::Instance();
 

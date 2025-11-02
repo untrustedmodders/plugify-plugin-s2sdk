@@ -14,6 +14,8 @@
 
 #include <parallel_hashmap/phmap.h>
 
+#define UNUSED(x) [[maybe_unused]] x
+
 #define NONCOPYABLE(x) \
 	x(const x&) = delete; \
 	x(x&&) = delete; \
@@ -59,29 +61,29 @@ namespace plg {
 	template <class K, class Hash = HashFn<K>, class Eq = HashEqual<K>, size_t N = 4>
 	using parallel_node_hash_set_s = parallel_node_hash_set<K, Hash, Eq, Allocator<K>, N, std::shared_mutex>;
 
-	template<typename Enum>
-	constexpr size_t enum_size() {
-	    return static_cast<size_t>(Enum::Count);
-	}
-
 	// Enum-indexed array wrapper
 	template<typename T, typename Enum>
 	class enum_map {
 	private:
-	    std::array<T, enum_size<Enum>()> data_;
-
 	    // Convert enum to index
 	    static constexpr size_t to_index(Enum e) {
 	        return static_cast<size_t>(e);
 	    }
+
+		static constexpr size_t enum_size() {
+	    	return static_cast<size_t>(Enum::Count);
+	    }
+
+		using storage = std::array<T, enum_size()>;
+		storage data_;
 
 	public:
 	    using value_type = T;
 	    using size_type = size_t;
 	    using reference = T&;
 	    using const_reference = const T&;
-	    using iterator = typename std::array<T, enum_size<Enum>()>::iterator;
-	    using const_iterator = typename std::array<T, enum_size<Enum>()>::const_iterator;
+	    using iterator = typename storage::iterator;
+	    using const_iterator = typename storage::const_iterator;
 
 	    // Default constructor
 	    enum_map() = default;
@@ -138,8 +140,8 @@ namespace plg {
 	    const_iterator end() const noexcept { return data_.end(); }
 
 	    // Direct access to underlying array
-	    std::array<T, enum_size<Enum>()>& array() { return data_; }
-	    const std::array<T, enum_size<Enum>()>& array() const { return data_; }
+	    storage& array() { return data_; }
+	    const storage& array() const { return data_; }
 
 	    // Fill with value
 	    void fill(const T& value) {
