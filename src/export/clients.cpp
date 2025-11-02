@@ -671,22 +671,6 @@ extern "C" PLUGIN_API void SetClientFriction(int playerSlot, float friction) {
 }
 
 /**
- * @brief Sets the friction of an client.
- *
- * This function updates the friction of the specified client.
- * If the client is invalid, the function does nothing.
- *
- * @param playerSlot The index of the player's slot whose friction is to be set.
- * @param duration Takes duration, value for a temporary override.
- * @param friction The new friction value to set for the client.
- */
-extern "C" PLUGIN_API void OverrideClientFriction(int playerSlot, float duration, float friction) {
-	auto [controller, pawn] = helpers::GetController2(playerSlot);
-	if (!pawn) return;
-	pawn->OverrideFriction(duration, friction);
-}
-
-/**
  * @brief Retrieves the health of an client.
  *
  * This function returns the current health of the specified client.

@@ -239,7 +239,6 @@ public:
     VSCRIPT_MEMBER_FUNCTION(IsPlayerPawn, bool)
     VSCRIPT_MEMBER_FUNCTION(Kill, void)
     VSCRIPT_MEMBER_FUNCTION(NextMovePeer, handle)
-    VSCRIPT_MEMBER_FUNCTION(OverrideFriction, void, float, float)
     VSCRIPT_MEMBER_FUNCTION(PrecacheScriptSound, void, string)
     VSCRIPT_MEMBER_FUNCTION(RemoveEffects, void, int)
     VSCRIPT_MEMBER_FUNCTION(SetAbsAngles, void, float, float, float)

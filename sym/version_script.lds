@@ -82,7 +82,6 @@
         SetClientMass;
         GetClientFriction;
         SetClientFriction;
-        OverrideClientFriction;
         GetClientHealth;
         SetClientHealth;
         GetClientMaxHealth;
@@ -333,7 +332,6 @@
         SetEntityMass;
         GetEntityFriction;
         SetEntityFriction;
-        OverrideEntityFriction;
         GetEntityHealth;
         SetEntityHealth;
         GetEntityMaxHealth;

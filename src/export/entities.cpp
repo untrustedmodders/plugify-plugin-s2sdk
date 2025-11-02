@@ -683,22 +683,6 @@ extern "C" PLUGIN_API void SetEntityFriction(int entityHandle, float friction) {
 }
 
 /**
- * @brief Sets the friction of an entity.
- *
- * This function updates the friction of the specified entity.
- * If the entity is invalid, the function does nothing.
- *
- * @param entityHandle The handle of the entity whose friction is to be set.
- * @param duration Takes duration, value for a temporary override.
- * @param friction The new friction value to set for the entity.
- */
-extern "C" PLUGIN_API void OverrideEntityFriction(int entityHandle, float duration, float friction) {
-	auto* entity = helpers::GetEntity(entityHandle);
-	if (!entity) return;
-	entity->OverrideFriction(duration, friction);
-}
-
-/**
  * @brief Retrieves the health of an entity.
  *
  * This function returns the current health of the specified entity.

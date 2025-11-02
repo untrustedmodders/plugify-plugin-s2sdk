@@ -7997,35 +7997,6 @@
       }
     },
     {
-      "name": "OverrideClientFriction",
-      "group": "Clients",
-      "description": "Sets the friction of an client.",
-      "funcName": "OverrideClientFriction",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot whose friction is to be set."
-        },
-        {
-          "name": "duration",
-          "type": "float",
-          "ref": false,
-          "description": "Takes duration, value for a temporary override."
-        },
-        {
-          "name": "friction",
-          "type": "float",
-          "ref": false,
-          "description": "The new friction value to set for the client."
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
       "name": "GetClientHealth",
       "group": "Clients",
       "description": "Retrieves the health of an client.",
@@ -18978,35 +18949,6 @@
           "type": "int32",
           "ref": false,
           "description": "The handle of the entity whose friction is to be set."
-        },
-        {
-          "name": "friction",
-          "type": "float",
-          "ref": false,
-          "description": "The new friction value to set for the entity."
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "OverrideEntityFriction",
-      "group": "Entities",
-      "description": "Sets the friction of an entity.",
-      "funcName": "OverrideEntityFriction",
-      "paramTypes": [
-        {
-          "name": "entityHandle",
-          "type": "int32",
-          "ref": false,
-          "description": "The handle of the entity whose friction is to be set."
-        },
-        {
-          "name": "duration",
-          "type": "float",
-          "ref": false,
-          "description": "Takes duration, value for a temporary override."
         },
         {
           "name": "friction",
