@@ -17,7 +17,7 @@ enum class TargetType {
 	ALL,
 	SPECTATOR,
 	T,
-	CT,
+	CT
 };
 
 class CPlayerPawnComponent;
@@ -83,10 +83,6 @@ public:
 
 	void Kick(const char* internalReason, ENetworkDisconnectionReason reason) const;
 
-	uint64 GetSteamId64(bool validated = false) const {
-		return GetSteamId(validated).ConvertToUint64();
-	}
-
 	CPlayerSlot GetPlayerSlot() const {
 		return m_slot;
 	}
@@ -140,11 +136,20 @@ public:
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(PlayerManager, OnValidateAuthTicket, ValidateAuthTicketResponse_t, m_CallbackValidateAuthTicketResponse);
 
-	std::inplace_vector<Player*, MaxPlayers> GetOnlinePlayers() const;
 	static int MaxClients();
 
-	TargetType TargetPlayerString(int caller, std::string_view target, plg::vector<int>& clients);
+	plg::vector<int> TargetPlayerString(CPlayerSlot caller, std::string_view target) const;
 
+private:
+	static std::optional<CSTeam> GetTeamForTargetType(TargetType targetType);
+	plg::vector<int> CollectAllPlayers() const;
+	plg::vector<int> CollectTeamPlayers(TargetType targetType) const;
+	plg::vector<int> CollectRandomPlayer(TargetType targetType) const;
+	plg::vector<int> FindPlayerBySlot(std::string_view target) const;
+	plg::vector<int> FindPlayerByAccount(std::string_view target) const;
+	plg::vector<int> FindPlayerBySteam(std::string_view target) const;
+	plg::vector<int> FindPlayerByName(std::string_view target) const;
+	
 protected:
 	std::array<Player, MaxPlayers + 1> m_players{};
 	std::mutex m_mutex;

@@ -1626,9 +1626,7 @@ extern "C" PLUGIN_API void* GetClientPawn(int playerSlot) {
  * @return A vector where the result of the targeting operation will be stored.
  */
 extern "C" PLUGIN_API plg::vector<int> ProcessTargetString(int caller, const plg::string& target) {
-	plg::vector<int> output;
-	g_PlayerManager.TargetPlayerString(caller, target, output);
-	return output;
+	return g_PlayerManager.TargetPlayerString(caller, target);
 }
 
 /**

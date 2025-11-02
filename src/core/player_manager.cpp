@@ -346,125 +346,179 @@ Player* PlayerManager::ToPlayer(CPlayerUserId userID) const {
 }
 
 Player* PlayerManager::ToPlayer(CSteamID steamid, bool validate) const {
-	auto steam64 = steamid.ConvertToUint64();
-	for (auto& player: GetOnlinePlayers()) {
-		if (player->GetSteamId64(validate) == steam64) {
-			return player;
+	for (const auto& player : m_players) {
+		if (utils::IsPlayerSlot(player.GetPlayerSlot()) && player.GetSteamId(validate) == steamid) {
+			return const_cast<Player*>(&player);
 		}
 	}
 
 	return nullptr;
 }
 
-std::inplace_vector<Player*, MaxPlayers> PlayerManager::GetOnlinePlayers() const {
-	std::inplace_vector<Player*, MaxPlayers> players;
-	for (const auto& player : m_players) {
-		if (utils::IsPlayerSlot(player.GetPlayerSlot())) {
-			players.emplace_back(const_cast<Player*>(&player));
-		}
-	}
-
-	return players;
+std::optional<CSTeam> PlayerManager::GetTeamForTargetType(TargetType targetType) {
+    switch (targetType) {
+        case TargetType::T:
+        case TargetType::RANDOM_T:
+            return CSTeam::T;
+        case TargetType::CT:
+        case TargetType::RANDOM_CT:
+            return CSTeam::CT;
+        case TargetType::SPECTATOR:
+            return CSTeam::Spectator;
+        default:
+            return std::nullopt;
+    }
 }
 
-TargetType PlayerManager::TargetPlayerString(int caller, std::string_view target, plg::vector<int>& clients) {
-	TargetType targetType = TargetType::NONE;
+plg::vector<int> PlayerManager::CollectAllPlayers() const {
+	std::inplace_vector<int, MaxPlayers> clients;
+	for (const auto& player : m_players) {
+		if (player.IsValidClient()) {
+            clients.emplace_back(player.GetPlayerSlot());
+        }
+    }
+	return { clients.begin(), clients.end() };
+}
 
-	if (target == "@me")
-		targetType = TargetType::SELF;
-	else if (target == "@all")
-		targetType = TargetType::ALL;
-	else if (target == "@t")
-		targetType = TargetType::T;
-	else if (target == "@ct")
-		targetType = TargetType::CT;
-	else if (target == "@spec")
-		targetType = TargetType::SPECTATOR;
-	else if (target == "@random")
-		targetType = TargetType::RANDOM;
-	else if (target == "@randomt")
-		targetType = TargetType::RANDOM_T;
-	else if (target == "@randomct")
-		targetType = TargetType::RANDOM_CT;
+plg::vector<int> PlayerManager::CollectTeamPlayers(TargetType targetType) const {
+    auto team = GetTeamForTargetType(targetType);
+    if (!team) return {};
 
-	clients.clear();
+	std::inplace_vector<int, MaxPlayers> clients;
+	for (const auto& player : m_players) {
+		if (player.IsValidClient() && player.GetController()->GetTeam() == *team) {
+			clients.emplace_back(player.GetPlayerSlot());
+        }
+    }
+	return { clients.begin(), clients.end() };
+}
 
-	if (targetType == TargetType::SELF && caller != -1) {
-		clients.emplace_back(caller);
-	} else if (targetType == TargetType::ALL) {
-		for (int i = 0; i < MaxClients(); ++i) {
-			if (!m_players[i].IsConnected())
+plg::vector<int> PlayerManager::CollectRandomPlayer(TargetType targetType) const {
+    std::inplace_vector<int, MaxPlayers> eligible;
+    auto team = GetTeamForTargetType(targetType);
+
+	for (const auto& player : m_players) {
+		if (player.IsValidClient()) {
+			if (team && player.GetController()->GetTeam() != *team)
 				continue;
+    		eligible.emplace_back(player.GetPlayerSlot());
+    	}
+    }
 
-			CBasePlayerController* player = utils::GetController(i);
+    if (!eligible.empty()) {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dist(0, eligible.size() - 1);
+        return { eligible[dist(gen)] };
+    }
 
-			if (!player || !player->IsPlayerController() || !player->IsConnected())
-				continue;
+	return {};
+}
 
-			clients.emplace_back(i);
-		}
-	} else if (targetType >= TargetType::SPECTATOR) {
-		for (int i = 0; i < MaxClients(); ++i) {
-			if (!m_players[i].IsConnected())
-				continue;
-
-			CBasePlayerController* player = utils::GetController(i);
-
-			if (!player || !player->IsPlayerController() || !player->IsConnected())
-				continue;
-
-			if (player->m_iTeamNum != (targetType == TargetType::T ? CSTeam::T : targetType == TargetType::CT ? CSTeam::CT : CSTeam::Spectator))
-				continue;
-
-			clients.emplace_back(i);
-		}
-	} else if (targetType >= TargetType::RANDOM && targetType <= TargetType::RANDOM_CT) {
-		int attempts = 0;
-
-		while (clients.empty() == 0 && attempts < 10000) {
-			int i = rand() % (MaxClients() - 1);
-
-			// Prevent infinite loop
-			attempts++;
-
-			if (!m_players[i].IsConnected())
-				continue;
-
-			CBasePlayerController* player = utils::GetController(i);
-
-			if (!player || !player->IsPlayerController() || !player->IsConnected())
-				continue;
-
-			if (targetType >= TargetType::RANDOM_T && (player->m_iTeamNum != (targetType == TargetType::RANDOM_T ? CSTeam::T : CSTeam::CT)))
-				continue;
-
-			clients.emplace_back(i);
-		}
-	} else if (target.starts_with('#')) {
-		if (auto slot = plg::cast_to<int>(target.substr(1))) {
-			targetType = TargetType::PLAYER;
-			CBasePlayerController* player = utils::GetController(*slot);
-			if (player && player->IsPlayerController() && player->IsConnected()) {
-				clients.emplace_back(*slot);
+plg::vector<int> PlayerManager::FindPlayerBySlot(std::string_view target) const {
+    if (auto slot = plg::cast_to<int>(target)) {
+    	if (auto player = ToPlayer(CPlayerSlot(*slot))) {
+			if (player->IsValidClient()) {
+				return { *slot };
 			}
-		}
-	} else {
-		for (int i = 0; i < MaxClients(); ++i) {
-			if (!m_players[i].IsConnected())
-				continue;
+    	}
+    }
+    return {};
+}
 
-			CBasePlayerController* player = utils::GetController(i);
-
-			if (!player || !player->IsPlayerController() || !player->IsConnected())
-				continue;
-
-			if (target.find(player->GetPlayerName()) != std::string_view::npos) {
-				targetType = TargetType::PLAYER;
-				clients.emplace_back(i);
-				break;
+plg::vector<int> PlayerManager::FindPlayerByAccount(std::string_view target) const {
+	if (auto accountId = plg::cast_to<uint32>(target)) {
+		for (const auto& player : m_players) {
+			if (player.IsValidClient() && player.GetSteamId().GetAccountID() == *accountId) {
+				return { player.GetPlayerSlot() };
 			}
 		}
 	}
+    return {};
+}
 
-	return targetType;
+plg::vector<int> PlayerManager::FindPlayerBySteam(std::string_view target) const {
+	if (auto steamId = plg::cast_to<uint64>(target)) {
+		for (const auto& player : m_players) {
+			if (player.IsValidClient() && player.GetSteamId() == *steamId) {
+				return { player.GetPlayerSlot() };
+			}
+		}
+	}
+    return {};
+}
+
+plg::vector<int> PlayerManager::FindPlayerByName(std::string_view target) const {
+	for (const auto& player : m_players) {
+		if (player.IsValidClient() && player.GetName() == target) {
+			return { player.GetPlayerSlot() };
+    	}
+    }
+    return {};
+}
+
+plg::vector<int> PlayerManager::TargetPlayerString(CPlayerSlot caller, std::string_view target) const {
+	using namespace std::string_view_literals;
+	static constexpr auto targetMap = std::array{
+		std::pair{"@me"sv, TargetType::SELF},
+		std::pair{"@all"sv, TargetType::ALL},
+		std::pair{"@t"sv, TargetType::T},
+		std::pair{"@ct"sv, TargetType::CT},
+		std::pair{"@spec"sv, TargetType::SPECTATOR},
+		std::pair{"@random"sv, TargetType::RANDOM},
+		std::pair{"@randomt"sv, TargetType::RANDOM_T},
+		std::pair{"@randomct"sv, TargetType::RANDOM_CT}
+	};
+	auto targetType = TargetType::NONE;
+	for (const auto& [key, value] : targetMap) {
+		if (target == key) {
+			targetType = value;
+			break;
+		}
+	}
+
+	// Early return for SELF target
+	if (targetType == TargetType::SELF) {
+		if (auto player = ToPlayer(caller)) {
+			if (player->IsValidClient()) {
+				return { caller };
+			}
+		}
+		return {};
+	}
+
+	// Handle special cases first
+	if (target.starts_with('#')) {
+		return FindPlayerBySlot(target.substr(1));
+	}
+	if (target.starts_with('&')) {
+		return FindPlayerByAccount(target.substr(1));
+	}
+	if (target.starts_with('$')) {
+		return FindPlayerBySteam(target.substr(1));
+	}
+
+	// For other targets, gather valid players
+	switch (targetType) {
+		case TargetType::ALL:
+			return CollectAllPlayers();
+
+		case TargetType::T:
+		case TargetType::CT:
+		case TargetType::SPECTATOR:
+			return CollectTeamPlayers(targetType);
+
+		case TargetType::RANDOM:
+		case TargetType::RANDOM_T:
+		case TargetType::RANDOM_CT:
+			return CollectRandomPlayer(targetType);
+
+		case TargetType::NONE:
+			return FindPlayerByName(target);
+
+		default:
+			break;
+	}
+
+	return {};
 }
