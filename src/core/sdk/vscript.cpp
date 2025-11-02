@@ -41,21 +41,19 @@ namespace {
 
 	        if (p->vti_plus1 & 1) {
 	            // Virtual function
+	            result.funcaddr = nullptr;
 	            result.vtable_index = (p->vti_plus1 - 1) / sizeof(void*);
-	        	result.delta = p->delta;
-	            result.funcadr = nullptr;
 	        } else {
 	            // Non-virtual
-	            result.funcadr = p->funcadr;
-	            result.vtable_index = -1;
+	            result.funcaddr = p->funcadr;
+	        	result.vtable_index = -1;
 	        }
 	    } else {
-    		result.funcadr = pScriptFunction.m_pFunction;
-    		result.vtable_index = -1;
+    		result.funcaddr = pScriptFunction.m_pFunction;
+	        result.vtable_index = -1;
 	    }
 #endif
 
-		result.binding = &pScriptFunction;
 	    return result;
 	}
 
@@ -155,20 +153,6 @@ namespace vscript {
 		scriptClassMap.emplace(className, createClass());
 	}
 
-	VScriptBinding GetBinding(std::string_view functionName) {
-		VScriptClass& globalClass = scriptClassMap[""];
-		auto it = globalClass.functions.find(functionName);
-		if (it != globalClass.functions.end()) {
-			return it->second;
-		}
-		plg::print(
-			LS_ERROR,
-			"vscript::GetBinding(): '{}' was not found!\n",
-			functionName
-		);
-		return {};
-	}
-
 	VScriptBinding GetBinding(std::string_view className, std::string_view functionName) {
 		auto it = scriptClassMap.find(className);
 		if (it != scriptClassMap.end()) {
@@ -187,4 +171,7 @@ namespace vscript {
 		return {};
 	}
 
+	VScriptBinding GetBinding(const char* className, const char* functionName) {
+		return GetBinding(std::string_view(className), std::string_view(functionName));
+	}
 }

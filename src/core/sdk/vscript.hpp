@@ -3,10 +3,8 @@
 #include <vscript/ivscript.h>
 
 struct VScriptBinding {
-	void* funcadr;
+	void* funcaddr;
 	size_t vtable_index;
-	intptr_t delta;
-	ScriptFunctionBinding_t* binding;
 };
 
 struct VScriptFunction {
@@ -26,8 +24,8 @@ namespace vscript {
 	void RegisterFunction(ScriptFunctionBinding_t* pScriptFunction);
 	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc, void* pInstance = nullptr);
 
-	VScriptBinding GetBinding(std::string_view functionName);
 	VScriptBinding GetBinding(std::string_view className, std::string_view functionName);
+	VScriptBinding GetBinding(const char* className, const char* functionName);
 }// namespace schema
 
 template<
@@ -44,19 +42,19 @@ public:
 #if defined(_MSC_VER)
 		// MSVC: Direct member function pointer call
 		using MemberFunc = Ret(__thiscall*)(void*, Args...);
-		auto func = reinterpret_cast<MemberFunc>(binding.funcadr);
+		auto func = reinterpret_cast<MemberFunc>(binding.funcaddr);
 		return func(instance, std::forward<Args>(args)...);
 #elif defined(__GNUC__) || defined(__clang__)
 		// GCC: Handle member function pointer structure
 		using MemberFunc = Ret(*)(void*, Args...);
-		if (binding.vtable_index != -1) {
+		if (!binding.funcaddr) {
 			// Virtual function - vtable lookup
 			void** vtable = *static_cast<void***>(instance);
 			auto func = reinterpret_cast<MemberFunc>(vtable[binding.vtable_index]);
 			return func(instance/* + binding.delta*/, std::forward<Args>(args)...);
 		} else {
 			// Non-virtual function - direct call
-			auto func = reinterpret_cast<MemberFunc>(binding.funcadr);
+			auto func = reinterpret_cast<MemberFunc>(binding.funcaddr);
 			return func(instance, std::forward<Args>(args)...);
 		}
 #else
@@ -76,11 +74,11 @@ public:
 		static VScriptBinding binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
 #if defined(_MSC_VER)
 		using Func = Ret(__cdecl*)(Args...);
-		auto fn = reinterpret_cast<Func>(binding.funcadr);
+		auto fn = reinterpret_cast<Func>(binding.funcaddr);
 		return fn(std::forward<Args>(args)...);
 #elif defined(__GNUC__) || defined(__clang__)
 		using Func = Ret(*)(Args...);
-		auto fn = reinterpret_cast<Func>(binding.funcadr);
+		auto fn = reinterpret_cast<Func>(binding.funcaddr);
 		return fn(std::forward<Args>(args)...);
 #else
 #   error "Unsupported compiler"
