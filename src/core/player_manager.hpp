@@ -123,6 +123,7 @@ public:
 	Player* ToPlayer(CSteamID steamid, bool validate = false) const;
 
 	void OnSteamAPIActivated();
+	void OnSteamAPIDeactivated();
 	bool OnClientConnect(CPlayerSlot slot, char const* name, uint64 steamID64, char const* networkID);
 	bool OnClientConnect_Post(CPlayerSlot slot, bool origRet);
 	void OnClientConnected(CPlayerSlot slot, bool fakePlayer);

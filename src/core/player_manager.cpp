@@ -173,6 +173,13 @@ void PlayerManager::OnSteamAPIActivated() {
 	m_CallbackValidateAuthTicketResponse.Register(this, &PlayerManager::OnValidateAuthTicket);
 }
 
+void PlayerManager::OnSteamAPIDeactivated() {
+	if (!m_callbackRegistered)
+		return;
+
+	m_CallbackValidateAuthTicketResponse.Unregister();
+}
+
 void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* response) {
 	if (response->m_eAuthSessionResponse != k_EAuthSessionResponseOK)
 		return;

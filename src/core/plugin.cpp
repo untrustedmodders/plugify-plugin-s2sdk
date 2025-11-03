@@ -341,6 +341,9 @@ poly::ReturnAction Hook_GameServerSteamAPIDeactivated(poly::PHook& hook, poly::P
 
 	//g_http = nullptr;
 
+	g_PlayerManager.OnSteamAPIDeactivated();
+	g_MultiAddonManager.OnSteamAPIDeactivated();
+
 	//g_OnGameServerSteamAPIDeactivatedListenerManager();
 	return poly::ReturnAction::Ignored;
 }

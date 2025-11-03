@@ -321,6 +321,13 @@ void MultiAddonManager::OnSteamAPIActivated() {
 	RefreshAddons(true);
 }
 
+void MultiAddonManager::OnSteamAPIDeactivated() {
+	if (!m_callbackRegistered)
+		return;
+
+	m_CallbackDownloadItemResult.Unregister();
+}
+
 void MultiAddonManager::OnStartupServer() {
 	// Remove empty paths added when there are 2+ addons, they screw up file writes
 	g_pFullFileSystem->RemoveSearchPath("", "GAME");

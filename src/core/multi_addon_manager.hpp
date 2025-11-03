@@ -43,6 +43,7 @@ public:
 
 public:
 	void OnSteamAPIActivated();
+	void OnSteamAPIDeactivated();
 	void OnStartupServer();
 	void OnClientConnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID);
 	void OnClientDisconnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID);
