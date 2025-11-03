@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.3.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.2...v2.3.3) (2025-11-03)
+
+
+### Bug Fixes
+
+* add formatter for VScript binding ([da1bf98](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/da1bf9866acc9607f9663bb61411fe95aae75161))
+* crash on quit ([b139c35](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b139c35bcea0732ccb5274d0f706d3fda0a8d936))
+* crash on unload ([39f6ba1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/39f6ba166d8a009676bd58e6052a2e4ac3372531))
+* CUtlVector synt formatting ([e2e3833](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e2e383330071a6b0e6c901bc492bd04d4a98d44d))
+* refactor of globals and more improvements ([2727315](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2727315b16b3d469d68939519b938d0161f29e30))
+* remove OverrideFriction ([1999693](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/19996935c989f2e1e6b34cf8b63c285d72f95ab4))
+* rework ProcessTargetString ([5803f41](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5803f4159521eb817b24d98bdbd296bd163751b6))
+* small refactor ([1d3d25a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1d3d25ac2961eba4df6acd63eb0d484b82ea15e1))
+
 ## [2.3.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.1...v2.3.2) (2025-10-31)
 
 
