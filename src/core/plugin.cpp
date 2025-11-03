@@ -139,9 +139,9 @@ poly::ReturnAction Hook_FireEvent(poly::PHook& hook, poly::Params& params, int c
 	auto event = poly::GetArgument<IGameEvent*>(params, 1);
 	auto dontBroadcast = poly::GetArgument<bool>(params, 2);
 
-	if (event) {
+	/*if (event) {
 		plg::print(LS_DETAILED, "[FireEvent] = {}\n", event->GetName());
-	}
+	}*/
 
 	auto result = type == poly::CallbackType::Post ? g_EventManager.OnFireEvent_Post(event, dontBroadcast) : g_EventManager.OnFireEvent(event, dontBroadcast);
 	if (result >= ResultType::Handled) {
@@ -727,11 +727,11 @@ void Source2SDK::OnPluginStart() {
 	//using LogDirect = LoggingResponse_t (*)(void* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, LeafCodeInfo_t*, LoggingMetaData_t*, Color, char const*, va_list*);
 	//g_HookManager.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, Pre);
 
-	auto table3 = g_pGameConfig->GetVTable("CLuaVM");
-	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &*table3, Hook_RegisterFunction, Pre);
-	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &*table3, Hook_RegisterScriptClass, Pre);
+	TRY_GET_VTABLE(g_pGameConfig, "CLuaVM", CLuaVM);
+	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &CLuaVM, Hook_RegisterFunction, Pre);
+	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &CLuaVM, Hook_RegisterScriptClass, Pre);
 	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
-	g_HookManager.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &*table3, Hook_RegisterInstance, Pre);
+	g_HookManager.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &CLuaVM, Hook_RegisterInstance, Pre);
 	//using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
 	//g_HookManager.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);
 	//g_HookManager.AddHookVFuncFunc(&IScriptVM::LookupFunction, &*table3, Hook_LookupFunction, Post);
@@ -746,12 +746,12 @@ void Source2SDK::OnPluginStart() {
 	using FireOutputInternalFn = uint64_t(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, int32_t*, int16_t*, float);
 	g_HookManager.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
-	auto table = g_pGameConfig->GetVTable("CServerSideClient");
-	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, &*table, Hook_ProcessRespondCvarValue, Pre);
-	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, &*table, Hook_SendNetMessage, Pre);
+	TRY_GET_VTABLE(g_pGameConfig, "CServerSideClient", CServerSideClient);
+	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, &CServerSideClient, Hook_ProcessRespondCvarValue, Pre);
+	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, &CServerSideClient, Hook_SendNetMessage, Pre);
 
-	auto table2 = g_pGameConfig->GetVTable("CGameRulesGameSystem");
-	g_HookManager.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &*table2, Hook_BuildGameSessionManifest, Pre);
+	TRY_GET_VTABLE(g_pGameConfig, "CGameRulesGameSystem", CGameRulesGameSystem);
+	g_HookManager.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &CGameRulesGameSystem, Hook_BuildGameSessionManifest, Pre);
 
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
 	g_HookManager.AddHookDetourFunc<TerminateRoundFn>("CGameRules::TerminateRound", Hook_TerminateRound, Pre);
@@ -819,7 +819,6 @@ void Source2SDK::OnServerStartup() {
 	g_pGameEntitySystem = GameEntitySystem();
 
 	if (g_pGameEntitySystem != nullptr) {
-		//g_pGameEntitySystem->AddListenerEntity(&g_entityListener);
 		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnAddEntity, g_pGameEntitySystem, Hook_OnAddEntity, poly::CallbackType::Post);
 		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem, Hook_OnRemoveEntity, poly::CallbackType::Post);
 		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem, Hook_OnEntityParentChanged, poly::CallbackType::Post);

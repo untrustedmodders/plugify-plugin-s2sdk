@@ -517,3 +517,13 @@ inline GameConfigManager& g_GameConfigManager = GameConfigManager::Instance();
 		}                                                                                          \
 		variable = *_result;                                                                       \
 	}
+
+#define TRY_GET_VTABLE(gameConfig, name, variable)                                                 \
+	static Memory variable;                                                                        \
+	if (!variable) {                                                                               \
+		auto _result = (gameConfig) -> GetVTable(name);                                            \
+		if (!(_result)) {                                                                          \
+			plg::print(LS_ERROR, "Failed to resolve vtable: " #name " - {}\n", _result.error());   \
+		}                                                                                          \
+		variable = *_result;                                                                       \
+	}
