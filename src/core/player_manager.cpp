@@ -178,6 +178,7 @@ void PlayerManager::OnSteamAPIDeactivated() {
 		return;
 
 	m_CallbackValidateAuthTicketResponse.Unregister();
+	m_callbackRegistered = false;
 }
 
 void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* response) {

@@ -326,8 +326,7 @@ poly::ReturnAction Hook_ClientCommand(poly::PHook& hook, poly::Params& params, i
 poly::ReturnAction Hook_GameServerSteamAPIActivated(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	plg::print(LS_DETAILED, "[GameServerSteamAPIActivated]\n");
 
-	g_SteamAPI.Init();
-	//g_http = g_steamAPI.SteamHTTP();
+	g_pSteamUGC = SteamGameServerUGC();
 
 	g_PlayerManager.OnSteamAPIActivated();
 	g_MultiAddonManager.OnSteamAPIActivated();
@@ -338,8 +337,6 @@ poly::ReturnAction Hook_GameServerSteamAPIActivated(poly::PHook& hook, poly::Par
 
 poly::ReturnAction Hook_GameServerSteamAPIDeactivated(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	plg::print(LS_DETAILED, "[GameServerSteamAPIDeactivated]\n");
-
-	//g_http = nullptr;
 
 	g_PlayerManager.OnSteamAPIDeactivated();
 	g_MultiAddonManager.OnSteamAPIDeactivated();
@@ -798,6 +795,8 @@ void Source2SDK::OnPluginStart() {
 void Source2SDK::OnPluginEnd() {
 	globals::Terminate();
 	g_HookManager.UnhookAll();
+	g_PlayerManager.OnSteamAPIDeactivated();
+	g_MultiAddonManager.OnSteamAPIDeactivated();
 	UnregisterEventListeners();
 
 	plg::print(LS_DETAILED, "[OnPluginEnd] = Source2SDK!\n");

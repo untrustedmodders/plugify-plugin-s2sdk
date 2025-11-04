@@ -64,7 +64,7 @@ bool MultiAddonManager::MountAddon(PublishedFileId_t addon, bool addToTail) {
 		return false;
 	}
 
-	uint32 addonState = g_SteamAPI.SteamUGC()->GetItemState(addon);
+	uint32 addonState = g_pSteamUGC->GetItemState(addon);
 
 	if (addonState & k_EItemStateLegacyItem) {
 		plg::print(LS_MESSAGE, "{}: Addon {} is not compatible with Source 2, skipping\n", __func__, addon);
@@ -138,7 +138,7 @@ void MultiAddonManager::PrintDownloadProgress() const {
 	uint64 bytesDownloaded = 0;
 	uint64 totalBytes = 0;
 
-	if (!g_SteamAPI.SteamUGC()->GetItemDownloadInfo(m_downloadQueue.front(), &bytesDownloaded, &totalBytes) || !totalBytes)
+	if (!g_pSteamUGC->GetItemDownloadInfo(m_downloadQueue.front(), &bytesDownloaded, &totalBytes) || !totalBytes)
 		return;
 
 	constexpr int MB = 1024 * 1024;
@@ -155,7 +155,7 @@ void MultiAddonManager::PrintDownloadProgress() const {
 // force will initiate a download even if the addon already exists and is updated
 // Internally, downloads are queued up and processed one at a time
 bool MultiAddonManager::DownloadAddon(PublishedFileId_t addon, bool important, bool force) {
-	if (!g_SteamAPI.SteamUGC()) {
+	if (!g_pSteamUGC) {
 		plg::print(LS_ERROR, "{}: Cannot download addons as the Steam API is not initialized\n", __func__);
 		return false;
 	}
@@ -170,14 +170,14 @@ bool MultiAddonManager::DownloadAddon(PublishedFileId_t addon, bool important, b
 		return false;
 	}
 
-	uint32 itemState = g_SteamAPI.SteamUGC()->GetItemState(addon);
+	uint32 itemState = g_pSteamUGC->GetItemState(addon);
 
 	if (!force && (itemState & k_EItemStateInstalled)) {
 		plg::print(LS_MESSAGE, "Addon {} is already installed\n", addon);
 		return true;
 	}
 
-	if (!g_SteamAPI.SteamUGC()->DownloadItem(addon, false)) {
+	if (!g_pSteamUGC->DownloadItem(addon, false)) {
 		plg::print(LS_WARNING, "{}: Addon download for {} failed to start, addon ID is invalid or server is not logged on Steam\n",
 		      __func__, addon);
 		return false;
@@ -195,7 +195,7 @@ bool MultiAddonManager::DownloadAddon(PublishedFileId_t addon, bool important, b
 }
 
 void MultiAddonManager::RefreshAddons(bool reloadMap) {
-	if (!g_SteamAPI.SteamUGC())
+	if (!g_pSteamUGC)
 		return;
 
 	plg::print(LS_MESSAGE, "Refreshing addons ({})\n", plg::join(m_extraAddons, ", "));
@@ -326,6 +326,7 @@ void MultiAddonManager::OnSteamAPIDeactivated() {
 		return;
 
 	m_CallbackDownloadItemResult.Unregister();
+	m_callbackRegistered = false;
 }
 
 void MultiAddonManager::OnStartupServer() {
@@ -360,7 +361,7 @@ CNETMsg_SignonState_t* GetAddonSignonStateMessage(PublishedFileId_t addon) {
 }
 
 bool MultiAddonManager::HasUGCConnection() {
-	return g_SteamAPI.SteamUGC() != nullptr;
+	return g_pSteamUGC != nullptr;
 }
 
 void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64, bool refresh) {

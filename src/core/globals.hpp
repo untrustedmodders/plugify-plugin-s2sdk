@@ -52,8 +52,7 @@ inline CBaseGameRulesProxy* g_pGameRulesProxy = nullptr;
 inline CBaseEntity* g_pPointScript = nullptr;
 inline IScriptVM* g_pScriptVM = nullptr;
 inline plg::flat_map<CSTeam, CTeam*> g_pTeamManagers;
-//inline ISteamHTTP* g_http = nullptr;
-inline CSteamGameServerAPIContext g_SteamAPI = {};
+inline ISteamUGC* g_pSteamUGC = nullptr;
 inline plg::flat_hash_set<plg::string> g_Precached;
 
 class CoreConfig;
