@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.3...v2.3.4) (2025-11-04)
+
+
+### Bug Fixes
+
+* crash on unload (2) ([dd9cf62](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dd9cf62007387719705ca358689e5d0d53ee20a4))
+
 ## [2.3.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.2...v2.3.3) (2025-11-03)
 
 
