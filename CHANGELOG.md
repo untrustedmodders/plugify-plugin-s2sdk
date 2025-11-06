@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.4...v2.3.5) (2025-11-06)
+
+
+### Bug Fixes
+
+* replace checker ([0479e0a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0479e0a2d4299f5cb2d0dee5b3e848568e26d446))
+* update discord notify design ([9eec010](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9eec010d636c4671f78ca4e1f6588faccb45a3a3))
+
 ## [2.3.4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.3...v2.3.4) (2025-11-04)
 
 
