@@ -393,7 +393,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Discord Notification
-        if: ${{ success() }}
+        if: ${{ needs.build.result == 'success' && needs.package.result == 'success' && needs.repository.result == 'success' }}
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
@@ -401,7 +401,7 @@ jobs:
           embed-color: 955135
 
       - name: Send Failure Notification
-        if: ${{ failure() }}
+        if: ${{ needs.build.result == 'failure' || needs.package.result == 'failure' || needs.repository.result == 'failure' }}
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
