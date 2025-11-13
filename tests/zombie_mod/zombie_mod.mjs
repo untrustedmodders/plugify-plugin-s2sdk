@@ -31,6 +31,9 @@ let zm_human_armor = null
 let zm_human_speed = null
 let zm_human_gravity = null
 
+/* Detour */
+let canAcquireFunc = null
+
 /**
  * Plugin class
  */
@@ -68,6 +71,10 @@ export class ZombieMod extends Plugin {
         s2.OnClientConnected_Unregister(OnClientConnected)
         //s2.OnClientPutInServer_Unregister(OnClientPutInServer)
         s2.OnClientDisconnect_Post_Unregister(OnClientDisconnected)
+
+        if (canAcquireFunc) {
+            pl.UnhookDetour(canAcquireFunc)
+        }
     }
 
     initCvars() {
@@ -110,7 +117,7 @@ export class ZombieMod extends Plugin {
         const preHook = pl.CallbackType.Pre
 
         // CPlayer_ItemServices::CanAcquire( CEconItemView *pItem, AcquireMethod::Type acquireMethod, uint16 *pLimit )
-        const canAcquireFunc = pl.HookDetour(canAcquireAddress, pl.DataType.Int8, [pl.DataType.Pointer, pl.DataType.Pointer, pl.DataType.Int32, pl.DataType.Pointer], -1)
+        canAcquireFunc = pl.HookDetour(canAcquireAddress, pl.DataType.Int8, [pl.DataType.Pointer, pl.DataType.Pointer, pl.DataType.Int32, pl.DataType.Pointer], -1)
         if (canAcquireFunc === 0) {
             s2.PrintToServer("[ZM] Failed to find 'CPlayer_ItemServices::CanAcquire' function address")
             return
