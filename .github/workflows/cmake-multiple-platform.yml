@@ -183,6 +183,8 @@ jobs:
 
       - name: Build conda package
         shell: bash -el {0}
+        env:
+          MAMBA_NO_LOW_SPEED_LIMIT: 1
         run: |
           set -e
           # log (for debug)
