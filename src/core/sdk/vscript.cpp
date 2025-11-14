@@ -25,7 +25,7 @@ namespace {
 	    VScriptBinding result = {};
 
 #if defined(_MSC_VER)
-	    result.funcadr = pScriptFunction.m_pFunction;
+	    result.funcaddr = pScriptFunction.m_pFunction;
 		result.vtable_index = -1;
 #elif defined(__GNUC__) || defined(__clang__)
 	    if (pScriptFunction.m_flags & SF_MEMBER_FUNC) {

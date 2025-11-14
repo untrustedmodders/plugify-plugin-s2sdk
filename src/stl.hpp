@@ -14,7 +14,7 @@
 
 #include <parallel_hashmap/phmap.h>
 
-#define UNUSED(x) [[maybe_unused]] x
+#define UNUSED(x) [[maybe_unused]] auto _ = x
 
 #define NONCOPYABLE(x) \
 	x(const x&) = delete; \

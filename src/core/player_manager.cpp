@@ -416,7 +416,7 @@ plg::vector<int> PlayerManager::CollectRandomPlayer(TargetType targetType) const
     if (!eligible.empty()) {
         static std::random_device rd;
         static std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dist(0, eligible.size() - 1);
+        std::uniform_int_distribution<size_t> dist(0, eligible.size() - 1);
         return { eligible[dist(gen)] };
     }
 
