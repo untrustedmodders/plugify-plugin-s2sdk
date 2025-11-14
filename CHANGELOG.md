@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.7...v2.3.8) (2025-11-14)
+
+
+### Bug Fixes
+
+* enable MAMBA_NO_LOW_SPEED_LIMIT ([764fdb7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/764fdb7a8881b4ebc922554a234b19583eb72af9))
+
 ## [2.3.7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.6...v2.3.7) (2025-11-14)
 
 
