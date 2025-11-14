@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.5...v2.3.6) (2025-11-14)
+
+
+### Bug Fixes
+
+* improve notify with multiline ([1cec3c1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1cec3c1f31d134dc4b81c09d4e80a84e651e32c0))
+* new release ([c1dd2ea](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c1dd2ea02ea000fb202843e16eccdf036ea4759f))
+* unload issue ([1ffe0ff](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1ffe0ff3178485fffbed3a7a1461335dc1c6b1dc))
+* update sdk ([963e97e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/963e97ee23a7629d0f6fc0b00ce65c704b6af87d))
+* update sdk after new update ([d2cab00](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d2cab00eb1f4680d1b0ad59b5cb1bf75eb5b7ae8))
+
 ## [2.3.5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.4...v2.3.5) (2025-11-06)
 
 
