@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.3.9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.8...v2.3.9) (2025-11-16)
+
+
+### Bug Fixes
+
+* typo in notify ([dfc2b7d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dfc2b7dd5a42086e8a9e2ca12041a56346509ef0))
+* typo in notify ([f7858d7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f7858d7132fecaa41f644bf7a04cc27aeada9dd5))
+* update notify ([538db2f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/538db2fdcb23fe78200e17a222b838e145cbd68b))
+
 ## [2.3.8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.7...v2.3.8) (2025-11-14)
 
 
