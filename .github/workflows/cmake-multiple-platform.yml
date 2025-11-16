@@ -394,32 +394,32 @@ jobs:
     if: ${{ needs.setup.outputs.release_created && always() }}
     runs-on: ubuntu-latest
     steps:
-    - name: Send Discord Notification
-      if: ${{ needs.build.result == 'success' && needs.package.result == 'success' && needs.repository.result == 'success' }}
-      uses: tsickert/discord-webhook@v7.0.0
-      with:
-        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-        embed-description: |
-          ## <:plugin_creator:1336096248515657880> New Release: ${{ env.PROJECT_NAME }} ${{ needs.setup.outputs.tag_name }}
-          
-          ### <:link:1342486300653129811> Downloads
-          -# <:curved_arrow_right:1342544469148565545> [${{ needs.setup.outputs.tag_name }}](${{ needs.package.outputs.url }})
-          
-          ### 🐍 Conda Channel
-          -# <:curved_arrow_right:1342544469148565545> https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-          
-          <:blank:1335697913464098908>
-          **Install via conda:**
-          ```bash
-          conda install -c https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ ${{ env.PROJECT_NAME }}
-          ```
-        embed-color: 955135
+      - name: Send Discord Notification
+        if: ${{ needs.build.result == 'success' && needs.package.result == 'success' && needs.repository.result == 'success' }}
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-description: |
+            ## <:plugin_creator:1336096248515657880> New Release: ${{ env.PROJECT_NAME }} ${{ needs.setup.outputs.tag_name }}
+            
+            ### <:link:1342486300653129811> Downloads
+            -# <:curved_arrow_right:1342544469148565545> [${{ needs.setup.outputs.tag_name }}](${{ needs.package.outputs.url }})
+            
+            ### 🐍 Conda Channel
+            -# <:curved_arrow_right:1342544469148565545> https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+            
+            <:blank:1335697913464098908>
+            **Install via conda:**
+            ```bash
+            conda install -c https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ ${{ env.PROJECT_NAME }}
+            ```
+          embed-color: 955135
 
-    - name: Send Failure Notification
-      if: ${{ needs.build.result == 'failure' || needs.package.result == 'failure' || needs.repository.result == 'failure' }}
-      uses: tsickert/discord-webhook@v7.0.0
-      with:
-        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-        embed-description: |
-          ## <a:cry:1247121995997384738> Release workflow failed for ${{ env.PROJECT_NAME }} ${{ needs.setup.outputs.tag_name }}
-        embed-color: 16221227
+      - name: Send Failure Notification
+        if: ${{ needs.build.result == 'failure' || needs.package.result == 'failure' || needs.repository.result == 'failure' }}
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          embed-description: |
+            ## <a:cry:1247121995997384738> Release workflow failed for ${{ env.PROJECT_NAME }} ${{ needs.setup.outputs.tag_name }}
+          embed-color: 16221227
