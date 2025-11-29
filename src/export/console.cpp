@@ -131,7 +131,7 @@ extern "C" PLUGIN_API void PrintToChatColoredAll(const plg::string& message) {
  */
 extern "C" PLUGIN_API void ReplyToCommand(CommandCallingContext context, int playerSlot, const plg::string& message) {
 	if (playerSlot < 0) {
-		ConMsg("%s", message.c_str());
+		ConMsg("%s\n", message.c_str());
 		return;
 	}
 	switch (context) {
