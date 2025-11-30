@@ -25,6 +25,7 @@ using Manager = ListenerManager<Fn, std::shared_mutex>;
 	X(OnEntityCreated, void, int entityHandle) \
 	X(OnEntityDeleted, void, int entityHandle) \
 	X(OnEntityParentChanged, void, int entityHandle, int parentHandle) \
+	X(OnServerCheckTransmit, void, const plg::vector<CCheckTransmitInfo*>&) \
 	X(OnServerStartup, void) \
 	X(OnServerActivate, void) \
 	X(OnServerSpawn, void) \

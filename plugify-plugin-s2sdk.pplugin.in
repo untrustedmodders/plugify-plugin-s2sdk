@@ -27754,6 +27754,72 @@
       }
     },
     {
+      "name": "OnServerCheckTransmit_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnServerCheckTransmit_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnServerCheckTransmitCallback",
+            "funcName": "OnServerCheckTransmitCallback",
+            "description": "When entities is transmitted to another entities.",
+            "paramTypes": [
+              {
+                "name": "checkTransmitInfoList",
+                "type": "ptr64[]",
+                "description": "The array of CCheckTransmitInfo pointers"
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnServerCheckTransmit_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnServerCheckTransmit_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnServerCheckTransmitCallback",
+            "funcName": "OnServerCheckTransmitCallback",
+            "description": "When entities are transmitted to another entities.",
+            "paramTypes": [
+              {
+                "name": "checkTransmitInfoList",
+                "type": "ptr64[]",
+                "description": "The array of CCheckTransmitInfo pointers"
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnServerStartup_Register",
       "group": "Listeners",
       "description": "Register callback to event.",

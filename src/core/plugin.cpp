@@ -409,6 +409,17 @@ poly::ReturnAction Hook_DispatchConCommand(poly::PHook& hook, poly::Params& para
 	return poly::ReturnAction::Ignored;
 }
 
+poly::ReturnAction Hook_CheckTransmit(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+	auto ppInfoList = poly::GetArgument<CCheckTransmitInfo**>(params, 1);
+	auto nInfoCount = poly::GetArgument<uint32_t>(params, 2);
+
+	plg::view view(ppInfoList, nInfoCount);
+
+	g_OnServerCheckTransmitListenerManager(view.get());
+
+	return poly::ReturnAction::Ignored;
+}
+
 poly::ReturnAction Hook_CallGlobalChangeCallbacks(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
 	// auto cmd = poly::GetArgument<ICvar* const>(params, 0);
 	auto ref = poly::GetArgument<ConVarRefAbstract*>(params, 1);
@@ -723,6 +734,7 @@ void Source2SDK::OnPluginStart() {
 	g_HookManager.AddHookVTableFunc(&IServerGameDLL::GameFrame, g_pSource2Server, Hook_GameFrame, Post);
 	g_HookManager.AddHookVTableFunc(&ICvar::DispatchConCommand, g_pCVar, Hook_DispatchConCommand, Pre, Post);
 	g_HookManager.AddHookVTableFunc(&ICvar::CallGlobalChangeCallbacks, g_pCVar, Hook_CallGlobalChangeCallbacks, Post);
+	g_HookManager.AddHookVTableFunc(&ISource2GameEntities::CheckTransmit, g_pSource2GameEntities, Hook_CheckTransmit, Post);
 
 	//using LogDirect = LoggingResponse_t (*)(void* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, LeafCodeInfo_t*, LoggingMetaData_t*, Color, char const*, va_list*);
 	//g_HookManager.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, Pre);
