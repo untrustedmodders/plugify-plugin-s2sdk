@@ -8,6 +8,7 @@
 #include <variant.h>
 
 constexpr auto MaxPlayers = 64;
+constexpr auto MaxEdicts = 32768;
 
 class CAppSystemDict;
 class IAppSystem;

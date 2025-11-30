@@ -40,7 +40,7 @@ EventHookError EventManager::UnhookEvent(std::string_view name, EventListenerCal
 	if (it != m_hookMap.end()) {
 		auto hook = it->second;
 		auto status = hook->callbacks[mode].Unregister(callback) ? EventHookError::Okay : EventHookError::InvalidCallback;
-		if (hook->callbacks[HookMode::Pre].Empty() && hook->callbacks[HookMode::Post].Empty() || --hook->refCount == 0) {
+		if ((hook->callbacks[HookMode::Pre].Empty() && hook->callbacks[HookMode::Post].Empty()) || --hook->refCount == 0) {
 			m_hookMap.erase(it);
 		}
 		return status;
