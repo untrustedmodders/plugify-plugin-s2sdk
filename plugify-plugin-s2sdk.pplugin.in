@@ -6728,6 +6728,523 @@
       }
     },
     {
+      "name": "SetTransmitInfoEntity",
+      "group": "Transmit",
+      "description": "Sets a bit in the TransmitEntity bitvec, marking an entity as transmittable.",
+      "funcName": "SetTransmitInfoEntity",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to mark as transmittable."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ClearTransmitInfoEntity",
+      "group": "Transmit",
+      "description": "Clears a bit in the TransmitEntity bitvec, marking an entity as not transmittable.",
+      "funcName": "ClearTransmitInfoEntity",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to mark as not transmittable."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "IsTransmitInfoEntitySet",
+      "group": "Transmit",
+      "description": "Checks if a bit is set in the TransmitEntity bitvec.",
+      "funcName": "IsTransmitInfoEntitySet",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to check."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the entity is marked as transmittable, false otherwise."
+      }
+    },
+    {
+      "name": "SetTransmitInfoEntityAll",
+      "group": "Transmit",
+      "description": "Sets all bits in the TransmitEntity bitvec, marking all entities as transmittable.",
+      "funcName": "SetTransmitInfoEntityAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ClearTransmitInfoEntityAll",
+      "group": "Transmit",
+      "description": "Clears all bits in the TransmitEntity bitvec, marking all entities as not transmittable.",
+      "funcName": "ClearTransmitInfoEntityAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetTransmitInfoNonPlayer",
+      "group": "Transmit",
+      "description": "Sets a bit in the TransmitNonPlayers bitvec, marking a non-player entity as transmittable.",
+      "funcName": "SetTransmitInfoNonPlayer",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the non-player entity to mark as transmittable."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ClearTransmitInfoNonPlayer",
+      "group": "Transmit",
+      "description": "Clears a bit in the TransmitNonPlayers bitvec, marking a non-player entity as not transmittable.",
+      "funcName": "ClearTransmitInfoNonPlayer",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the non-player entity to mark as not transmittable."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "IsTransmitInfoNonPlayerSet",
+      "group": "Transmit",
+      "description": "Checks if a bit is set in the TransmitNonPlayers bitvec.",
+      "funcName": "IsTransmitInfoNonPlayerSet",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the non-player entity to check."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the entity is marked as transmittable, false otherwise."
+      }
+    },
+    {
+      "name": "SetTransmitInfoNonPlayerAll",
+      "group": "Transmit",
+      "description": "Sets all bits in the TransmitNonPlayers bitvec, marking all non-player entities as transmittable.",
+      "funcName": "SetTransmitInfoNonPlayerAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ClearTransmitInfoNonPlayerAll",
+      "group": "Transmit",
+      "description": "Clears all bits in the TransmitNonPlayers bitvec, marking all non-player entities as not transmittable.",
+      "funcName": "ClearTransmitInfoNonPlayerAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetTransmitInfoAlways",
+      "group": "Transmit",
+      "description": "Sets a bit in the TransmitAlways bitvec, marking an entity to always transmit.",
+      "funcName": "SetTransmitInfoAlways",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to mark as always transmittable."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ClearTransmitInfoAlways",
+      "group": "Transmit",
+      "description": "Clears a bit in the TransmitAlways bitvec, unmarking an entity from always transmit.",
+      "funcName": "ClearTransmitInfoAlways",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to unmark from always transmit."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "IsTransmitInfoAlwaysSet",
+      "group": "Transmit",
+      "description": "Checks if a bit is set in the TransmitAlways bitvec.",
+      "funcName": "IsTransmitInfoAlwaysSet",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to check."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the entity is marked to always transmit, false otherwise."
+      }
+    },
+    {
+      "name": "SetTransmitInfoAlwaysAll",
+      "group": "Transmit",
+      "description": "Sets all bits in the TransmitAlways bitvec, marking all entities to always transmit.",
+      "funcName": "SetTransmitInfoAlwaysAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ClearTransmitInfoAlwaysAll",
+      "group": "Transmit",
+      "description": "Clears all bits in the TransmitAlways bitvec, unmarking all entities from always transmit.",
+      "funcName": "ClearTransmitInfoAlwaysAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetTransmitInfoTargetSlotsCount",
+      "group": "Transmit",
+      "description": "Gets the count of target player slots.",
+      "funcName": "GetTransmitInfoTargetSlotsCount",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The number of target player slots, or 0 if the info pointer is null."
+      }
+    },
+    {
+      "name": "GetTransmitInfoTargetSlot",
+      "group": "Transmit",
+      "description": "Gets a player slot value at a specific index in the target slots vector.",
+      "funcName": "GetTransmitInfoTargetSlot",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index in the target slots vector."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The player slot value, or -1 if the index is invalid or info is null."
+      }
+    },
+    {
+      "name": "AddTransmitInfoTargetSlot",
+      "group": "Transmit",
+      "description": "Adds a player slot to the target slots vector.",
+      "funcName": "AddTransmitInfoTargetSlot",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The player slot value to add."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "RemoveTransmitInfoTargetSlot",
+      "group": "Transmit",
+      "description": "Removes a player slot from the target slots vector.",
+      "funcName": "RemoveTransmitInfoTargetSlot",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "Index within the target slots vector to remove."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetTransmitInfoTargetSlotsAll",
+      "group": "Transmit",
+      "description": "Gets the target slots vector.",
+      "funcName": "GetTransmitInfoTargetSlotsAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "int32[]",
+        "description": "The player slots array."
+      }
+    },
+    {
+      "name": "RemoveTransmitInfoTargetSlotsAll",
+      "group": "Transmit",
+      "description": "Clears all target player slots from the vector.",
+      "funcName": "RemoveTransmitInfoTargetSlotsAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetTransmitInfoPlayerSlot",
+      "group": "Transmit",
+      "description": "Gets the player slot value from the CCheckTransmitInfo.",
+      "funcName": "GetTransmitInfoPlayerSlot",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The player slot value, or -1 if info is null."
+      }
+    },
+    {
+      "name": "SetTransmitInfoPlayerSlot",
+      "group": "Transmit",
+      "description": "Sets the player slot value in the CCheckTransmitInfo.",
+      "funcName": "SetTransmitInfoPlayerSlot",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The player slot value to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetTransmitInfoFullUpdate",
+      "group": "Transmit",
+      "description": "Gets the full update flag from the CCheckTransmitInfo.",
+      "funcName": "GetTransmitInfoFullUpdate",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if full update is enabled, false otherwise."
+      }
+    },
+    {
+      "name": "SetTransmitInfoFullUpdate",
+      "group": "Transmit",
+      "description": "Sets the full update flag in the CCheckTransmitInfo.",
+      "funcName": "SetTransmitInfoFullUpdate",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "fullUpdate",
+          "type": "bool",
+          "ref": false,
+          "description": "The full update flag value to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "AddBodyImpulseAtPosition",
       "group": "Bodies",
       "description": "Applies an impulse to an entity at a specific world position.",

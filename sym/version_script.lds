@@ -771,6 +771,32 @@
         TraceHull;
         TraceLine;
 
+        SetTransmitInfoEntity;
+        ClearTransmitInfoEntity;
+        IsTransmitInfoEntitySet;
+        SetTransmitInfoEntityAll;
+        ClearTransmitInfoEntityAll;
+        SetTransmitInfoNonPlayer;
+        ClearTransmitInfoNonPlayer;
+        IsTransmitInfoNonPlayerSet;
+        SetTransmitInfoNonPlayerAll;
+        ClearTransmitInfoNonPlayerAll;
+        SetTransmitInfoAlways;
+        ClearTransmitInfoAlways;
+        IsTransmitInfoAlwaysSet;
+        SetTransmitInfoAlwaysAll;
+        ClearTransmitInfoAlwaysAll;
+        GetTransmitInfoTargetSlotsCount;
+        GetTransmitInfoTargetSlot;
+        AddTransmitInfoTargetSlot;
+        RemoveTransmitInfoTargetSlot;
+        GetTransmitInfoTargetSlotsAll;
+        RemoveTransmitInfoTargetSlotsAll;
+        GetTransmitInfoPlayerSlot;
+        SetTransmitInfoPlayerSlot;
+        GetTransmitInfoFullUpdate;
+        SetTransmitInfoFullUpdate;
+
         GetWeaponVDataFromKey;
         GetWeaponVData;
         GetWeaponType;
