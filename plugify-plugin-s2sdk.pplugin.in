@@ -9516,20 +9516,20 @@
         },
         {
           "name": "origin",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec3",
+          "ref": true,
           "description": "A pointer to a Vector representing the new absolute position. Can be nullptr."
         },
         {
           "name": "angles",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec3",
+          "ref": true,
           "description": "A pointer to a QAngle representing the new orientation. Can be nullptr."
         },
         {
           "name": "velocity",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec3",
+          "ref": true,
           "description": "A pointer to a Vector representing the new velocity. Can be nullptr."
         }
       ],
@@ -20569,20 +20569,20 @@
         },
         {
           "name": "origin",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec3",
+          "ref": true,
           "description": "A pointer to a Vector representing the new absolute position. Can be nullptr."
         },
         {
           "name": "angles",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec3",
+          "ref": true,
           "description": "A pointer to a QAngle representing the new orientation. Can be nullptr."
         },
         {
           "name": "velocity",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec3",
+          "ref": true,
           "description": "A pointer to a Vector representing the new velocity. Can be nullptr."
         }
       ],
