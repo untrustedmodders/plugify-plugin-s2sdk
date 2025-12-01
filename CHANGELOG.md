@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.3.9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.8...v2.3.9) (2025-12-01)
+
+
+### Bug Fixes
+
+* add event info validation ([9347087](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9347087a31b0b0f428603fcb3fc71ff6b49943ce))
+* add newline to console message output ([5cc8a75](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5cc8a75bd2f7070c015800fb1cb628e89b10d8bf))
+* add OnServerCheckTransmit listener ([77a0503](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/77a0503238dd193d8a37dcffb120513db67411d8))
+* add transmit functions ([cf4731e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/cf4731e562a07f7a34413395f3b33508fece6de6))
+* manifest teleport types ([588febb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/588febbff89264b98c182da9cad602791e8e5ac6))
+* some comp warnings ([578c493](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/578c49369095e72e78665aae1778c72f5509cc3f))
+* typo in notify ([dfc2b7d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dfc2b7dd5a42086e8a9e2ca12041a56346509ef0))
+* typo in notify ([f7858d7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f7858d7132fecaa41f644bf7a04cc27aeada9dd5))
+* update notify ([538db2f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/538db2fdcb23fe78200e17a222b838e145cbd68b))
+
 ## [2.3.8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.7...v2.3.8) (2025-11-14)
 
 
