@@ -33274,7 +33274,7 @@
     },
     {
       "name": "KeyValues3",
-      "group": "Keyvalues",
+      "group": "Keyvalues3",
       "description": "RAII wrapper for KeyValues3 handle.",
       "handleType": "ptr64",
       "invalidValue": "0",
