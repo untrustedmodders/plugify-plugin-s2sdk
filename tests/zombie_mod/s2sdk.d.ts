@@ -1142,7 +1142,7 @@ declare module ":s2sdk" {
    * @param {string} keyName - The name of the key to find or create
    * @returns {ptr64} - Pointer to the found or newly created KeyValues subkey (never NULL)
    */
-  export function Kv1FindKeyOrCreate(kv: bigint, keyName: string): bigint;
+  export function Kv1FindOrCreateKey(kv: bigint, keyName: string): bigint;
   /**
    * Creates a new subkey with the specified name
    *

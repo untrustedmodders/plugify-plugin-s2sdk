@@ -19,7 +19,7 @@
         Kv1GetName;
         Kv1SetName;
         Kv1FindKey;
-        Kv1FindKeyOrCreate;
+        Kv1FindOrCreateKey;
         Kv1CreateKey;
         Kv1CreateNewKey;
         Kv1AddSubKey;

@@ -78,7 +78,7 @@ extern "C" PLUGIN_API KeyValues* Kv1FindKey(KeyValues* kv, const plg::string& ke
  * @param keyName The name of the key to find or create
  * @return Pointer to the found or newly created KeyValues subkey (never NULL)
  */
-extern "C" PLUGIN_API KeyValues* Kv1FindKeyOrCreate(KeyValues* kv, const plg::string& keyName) {
+extern "C" PLUGIN_API KeyValues* Kv1FindOrCreateKey(KeyValues* kv, const plg::string& keyName) {
 	return kv ? kv->FindKey(keyName.c_str(), true) : nullptr;
 }
 

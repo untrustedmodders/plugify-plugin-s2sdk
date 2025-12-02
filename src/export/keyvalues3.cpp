@@ -39,8 +39,7 @@ extern "C" PLUGIN_API KeyValues3* Kv3CreateWithCluster(int32_t cluster_elem, int
  * @return Pointer to the newly created copy, or nullptr if other is null
  */
 extern "C" PLUGIN_API KeyValues3* Kv3CreateCopy(const KeyValues3* other) {
-    if (!other) return nullptr;
-    return new KeyValues3(*other);
+    return other ? new KeyValues3(*other) : nullptr;
 }
 
 /**
