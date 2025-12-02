@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.10](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.9...v2.3.10) (2025-12-02)
+
+
+### Bug Fixes
+
+* add class wrappers ([3f01ac2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3f01ac23df5d1d8bd9472b87deb3b8e2e52a3db0))
+* rename kv methods ([4fb4ceb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4fb4ceb99ea20026c60b606cb9d294dd8e553c7c))
+
 ## [2.3.9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.8...v2.3.9) (2025-12-01)
 
 
