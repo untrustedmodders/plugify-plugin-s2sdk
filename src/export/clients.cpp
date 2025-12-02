@@ -1389,7 +1389,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientCenter(int playerSlot) {
  * @param angles A pointer to a QAngle representing the new orientation. Can be nullptr.
  * @param velocity A pointer to a Vector representing the new velocity. Can be nullptr.
  */
-extern "C" PLUGIN_API void TeleportClient(int playerSlot, const Vector* origin, const QAngle* angles, const Vector* velocity) {
+extern "C" PLUGIN_API void TeleportClient(int playerSlot, const Vector& origin, const QAngle& angles, const Vector& velocity) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
 	pawn->Teleport(origin, angles, velocity);

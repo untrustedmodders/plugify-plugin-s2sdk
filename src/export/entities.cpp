@@ -1468,7 +1468,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityCenter(int entityHandle) {
  * @param angles A pointer to a QAngle representing the new orientation. Can be nullptr.
  * @param velocity A pointer to a Vector representing the new velocity. Can be nullptr.
  */
-extern "C" PLUGIN_API void TeleportEntity(int entityHandle, const Vector* origin, const QAngle* angles, const Vector* velocity) {
+extern "C" PLUGIN_API void TeleportEntity(int entityHandle, const Vector& origin, const QAngle& angles, const Vector& velocity) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
 	entity->Teleport(origin, angles, velocity);
