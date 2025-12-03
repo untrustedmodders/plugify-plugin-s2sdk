@@ -18609,6 +18609,66 @@
       }
     },
     {
+      "name": "FindEntityByClassname",
+      "group": "Entities",
+      "description": "Finds an entity by classname with iteration.",
+      "funcName": "FindEntityByClassname",
+      "paramTypes": [
+        {
+          "name": "startFrom",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh."
+        },
+        {
+          "name": "classname",
+          "type": "string",
+          "ref": false,
+          "description": "The class name to search for."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The handle of the found entity, or INVALID_EHANDLE_INDEX if none found."
+      }
+    },
+    {
+      "name": "FindEntityByClassnameNearest",
+      "group": "Entities",
+      "description": "Finds the nearest entity by classname to a point.",
+      "funcName": "FindEntityByClassnameNearest",
+      "paramTypes": [
+        {
+          "name": "startFrom",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh."
+        },
+        {
+          "name": "classname",
+          "type": "string",
+          "ref": false,
+          "description": "The class name to search for."
+        },
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The center point to search around."
+        },
+        {
+          "name": "maxRadius",
+          "type": "float",
+          "ref": false,
+          "description": "Maximum search radius."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The handle of the found entity, or INVALID_EHANDLE_INDEX if none found."
+      }
+    },
+    {
       "name": "FindEntityByClassnameWithin",
       "group": "Entities",
       "description": "Finds an entity by classname within a radius with iteration.",
@@ -35025,7 +35085,7 @@
           }
         },
         {
-          "name": "Find",
+          "name": "Find2",
           "method": "FindConVar2",
           "bindSelf": false,
           "retAlias": {
