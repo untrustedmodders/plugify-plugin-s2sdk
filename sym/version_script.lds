@@ -298,7 +298,8 @@
         IsValidEntHandle;
         IsValidEntPointer;
         GetFirstActiveEntity;
-        GetConcreteEntityListPointer;
+        GetPrevActiveEntity;
+        GetNextActiveEntity;
         HookEntityOutput;
         UnhookEntityOutput;
         FindEntityByClassname;

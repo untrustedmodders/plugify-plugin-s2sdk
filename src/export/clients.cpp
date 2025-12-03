@@ -1385,9 +1385,9 @@ extern "C" PLUGIN_API plg::vec3 GetClientCenter(int playerSlot) {
  * with an optional new orientation and velocity. If the client is invalid, the function does nothing.
  *
  * @param playerSlot The index of the player's slot to teleport.
- * @param origin A pointer to a Vector representing the new absolute position. Can be nullptr.
- * @param angles A pointer to a QAngle representing the new orientation. Can be nullptr.
- * @param velocity A pointer to a Vector representing the new velocity. Can be nullptr.
+ * @param origin A pointer to a Vector representing the new absolute position. Use nan vector to not set.
+ * @param angles A pointer to a QAngle representing the new orientation. Use nan vector to not set.
+ * @param velocity A pointer to a Vector representing the new velocity. Use nan vector to not set.
  */
 extern "C" PLUGIN_API void TeleportClient(int playerSlot, const Vector& origin, const QAngle& angles, const Vector& velocity) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);

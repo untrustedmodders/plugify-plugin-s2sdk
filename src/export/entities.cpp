@@ -186,18 +186,6 @@ extern "C" PLUGIN_API int GetNextActiveEntity(int entityHandle) {
 }
 
 /**
- * @brief Retrieves a pointer to the concrete entity list.
- *
- * This function returns a pointer to the concrete entity list, allowing for direct
- * access to the list of entities managed by the entity system.
- *
- * @return A pointer to the entity list structure.
- */
-extern "C" PLUGIN_API void* GetConcreteEntityListPointer() {
-	return &g_pGameEntitySystem->m_EntityList;
-}
-
-/**
  * @brief Adds an entity output hook on a specified entity class name.
  *
  * This function hooks a specified output for a given entity class name. The provided
@@ -1487,9 +1475,9 @@ extern "C" PLUGIN_API plg::vec3 GetEntityCenter(int entityHandle) {
  * with an optional new orientation and velocity. If the entity is invalid, the function does nothing.
  *
  * @param entityHandle The handle of the entity to teleport.
- * @param origin A pointer to a Vector representing the new absolute position. Can be nullptr.
- * @param angles A pointer to a QAngle representing the new orientation. Can be nullptr.
- * @param velocity A pointer to a Vector representing the new velocity. Can be nullptr.
+ * @param origin A pointer to a Vector representing the new absolute position. Use nan vector to not set.
+ * @param angles A pointer to a QAngle representing the new orientation. Use nan vector to not set.
+ * @param velocity A pointer to a Vector representing the new velocity. Use nan vector to not set.
  */
 extern "C" PLUGIN_API void TeleportEntity(int entityHandle, const Vector& origin, const QAngle& angles, const Vector& velocity) {
 	auto* entity = helpers::GetEntity(entityHandle);
