@@ -294,7 +294,7 @@ public:
 
 	void Teleport(const Vector& newPosition, const QAngle& newAngles, const Vector& newVelocity) {
 		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::Teleport", offset);
-		CALL_VIRTUAL(bool, *offset, this, &newPosition, &newAngles, &newVelocity);
+		CALL_VIRTUAL(bool, *offset, this, newPosition.IsValid() ? &newPosition : nullptr, newAngles.IsValid() ? &newAngles : nullptr, newVelocity.IsValid() ? &newVelocity : nullptr);
 	}
 
 	CHandle<CBaseEntity> GetHandle() { return m_pEntity->m_EHandle; }
