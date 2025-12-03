@@ -156,10 +156,33 @@ extern "C" PLUGIN_API bool IsValidEntPointer(CEntityInstance* entity) {
  * This function returns a pointer to the first active entity in the entity system,
  * which can be useful for iterating through active entities.
  *
- * @return A pointer to the first active entity.
+ * @return A handle to the first active entity.
  */
-extern "C" PLUGIN_API void* GetFirstActiveEntity() {
-	return g_pGameEntitySystem->m_EntityList.m_pFirstActiveEntity;
+extern "C" PLUGIN_API int GetFirstActiveEntity() {
+	auto* first = g_pGameEntitySystem->m_EntityList.m_pFirstActiveEntity;
+	return first ? first->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
+}
+
+/**
+ * @brief Retrieves the previous active entity.
+ *
+ * @param entity Current entity.
+ * @return int32 Handle to the previous entity.
+ */
+extern "C" PLUGIN_API int GetPrevActiveEntity(int entityHandle) {
+	auto* entity = g_pGameEntitySystem->GetEntityIdentity(CEntityHandle(entityHandle));
+	return entity && entity->m_pPrev ? entity->m_pPrev->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
+}
+
+/**
+ * @brief Retrieves the next active entity.
+ *
+ * @param entity Current entity.
+ * @return int32 Handle to the next entity.
+ */
+extern "C" PLUGIN_API int GetNextActiveEntity(int entityHandle) {
+	auto* entity = g_pGameEntitySystem->GetEntityIdentity(CEntityHandle(entityHandle));
+	return entity && entity->m_pNext ? entity->m_pNext->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
 
 /**
