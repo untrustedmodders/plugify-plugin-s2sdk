@@ -260,6 +260,7 @@
         SetConVarVector4;
         SetConVarQAngle;
         SendConVarValue;
+        SendConVarValue2;
         GetClientConVarValue;
         SetFakeClientConVarValue;
         QueryClientConVar;

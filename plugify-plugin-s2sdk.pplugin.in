@@ -15944,8 +15944,8 @@
       "funcName": "UnhookConVarChange",
       "paramTypes": [
         {
-          "name": "uint64",
-          "type": "string",
+          "name": "conVarHandle",
+          "type": "uint64",
           "ref": false,
           "description": "The handle to the console variable data."
         },
@@ -17546,6 +17546,35 @@
           "type": "uint64",
           "ref": false,
           "description": "The handle to the console variable data."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "ref": false,
+          "description": "The value to send to the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SendConVarValue2",
+      "group": "Cvars",
+      "description": "Replicates a console variable value to a specific client. This does not change the actual console variable value.",
+      "funcName": "SendConVarValue2",
+      "paramTypes": [
+        {
+          "name": "conVarHandle",
+          "type": "uint64",
+          "ref": false,
+          "description": "The handle to the console variable data."
+        },
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the client to replicate the value to."
         },
         {
           "name": "value",
@@ -33135,7 +33164,7 @@
           "bindSelf": true,
           "paramAliases": [],
           "retAlias": {
-            "name": "KeyValues",
+            "name": "KeyValues1",
             "owner": false
           }
         },
@@ -33145,7 +33174,7 @@
           "bindSelf": true,
           "paramAliases": [],
           "retAlias": {
-            "name": "KeyValues",
+            "name": "KeyValues1",
             "owner": false
           }
         },
@@ -33155,7 +33184,7 @@
           "bindSelf": true,
           "paramAliases": [],
           "retAlias": {
-            "name": "KeyValues",
+            "name": "KeyValues1",
             "owner": false
           }
         },
@@ -33165,7 +33194,7 @@
           "bindSelf": true,
           "paramAliases": [],
           "retAlias": {
-            "name": "KeyValues",
+            "name": "KeyValues1",
             "owner": false
           }
         },
@@ -33175,7 +33204,7 @@
           "bindSelf": true,
           "paramAliases": [
             {
-              "name": "KeyValues",
+              "name": "KeyValues1",
               "owner": false
             }
           ]
@@ -33186,7 +33215,7 @@
           "bindSelf": true,
           "paramAliases": [],
           "retAlias": {
-            "name": "KeyValues",
+            "name": "KeyValues1",
             "owner": false
           }
         },
@@ -33196,7 +33225,7 @@
           "bindSelf": true,
           "paramAliases": [],
           "retAlias": {
-            "name": "KeyValues",
+            "name": "KeyValues1",
             "owner": false
           }
         },
@@ -33938,13 +33967,7 @@
         {
           "name": "SetMemberToCopyOfValue",
           "method": "Kv3SetMemberToCopyOfValue",
-          "bindSelf": true,
-          "paramAliases": [
-            {
-              "name": "KeyValues3",
-              "owner": false
-            }
-          ]
+          "bindSelf": true
         },
         {
           "name": "SetMemberBool",
@@ -34958,7 +34981,7 @@
       "name": "ConVar",
       "group": "Cvars",
       "description": "RAII wrapper for ConVar handle.",
-      "handleType": "int64",
+      "handleType": "uint64",
       "invalidValue": "0",
       "constructors": [
         "CreateConVar",
@@ -34971,11 +34994,9 @@
         "CreateConVarUInt64",
         "CreateConVarFloat",
         "CreateConVarDouble",
-        "CreateConVarColor",
         "CreateConVarVector2",
         "CreateConVarVector3",
         "CreateConVarVector4",
-        "CreateConVarQAngle",
         "CreateConVarString",
         "FindConVar",
         "FindConVar2"
@@ -35032,7 +35053,7 @@
           "bindSelf": true
         },
         {
-          "name": "Get",
+          "name": "GetObject",
           "method": "GetConVar",
           "bindSelf": true
         },
@@ -35198,7 +35219,7 @@
         },
         {
           "name": "SendValue",
-          "method": "SendConVarValue",
+          "method": "SendConVarValue2",
           "bindSelf": true
         },
         {
@@ -35217,7 +35238,7 @@
       "name": "GameConfig",
       "group": "Gameconfig",
       "description": "RAII wrapper for GameConfig handle.",
-      "handleType": "int32",
+      "handleType": "uint32",
       "invalidValue": "0",
       "constructors": [
         "LoadGameConfigFile"

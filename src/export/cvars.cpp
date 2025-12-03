@@ -958,6 +958,21 @@ extern "C" PLUGIN_API void SendConVarValue(int playerSlot, uint64 conVarHandle, 
 }
 
 /**
+ * @brief Replicates a console variable value to a specific client. This does not change the actual console variable value.
+ *
+ * @param playerSlot The index of the player's slot to replicate the value to.
+ * @param conVarHandle The handle to the console variable data.
+ * @param value The value to send to the client.
+ */
+extern "C" PLUGIN_API void SendConVarValue2(uint64 conVarHandle, int playerSlot, const plg::string& value) {
+	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
+		cvars::SendConVarValue(playerSlot, conVar->GetName(), value);
+	} else {
+		plg::print(LS_WARNING, conVar.error());
+	}
+}
+
+/**
  * @brief Retrieves the value of a client's console variable and stores it in the output string.
  *
  * @param playerSlot The index of the player's slot whose console variable value is being retrieved.
