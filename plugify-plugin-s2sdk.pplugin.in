@@ -9517,20 +9517,20 @@
         {
           "name": "origin",
           "type": "vec3",
-          "ref": true,
-          "description": "A pointer to a Vector representing the new absolute position. Can be nullptr."
+          "ref": false,
+          "description": "A pointer to a Vector representing the new absolute position. Use nan vector to not set."
         },
         {
           "name": "angles",
           "type": "vec3",
-          "ref": true,
-          "description": "A pointer to a QAngle representing the new orientation. Can be nullptr."
+          "ref": false,
+          "description": "A pointer to a QAngle representing the new orientation. Use nan vector to not set."
         },
         {
           "name": "velocity",
           "type": "vec3",
-          "ref": true,
-          "description": "A pointer to a Vector representing the new velocity. Can be nullptr."
+          "ref": false,
+          "description": "A pointer to a Vector representing the new velocity. Use nan vector to not set."
         }
       ],
       "retType": {
@@ -18372,19 +18372,34 @@
       "funcName": "GetFirstActiveEntity",
       "paramTypes": [],
       "retType": {
-        "type": "ptr64",
-        "description": "A pointer to the first active entity."
+        "type": "int32",
+        "description": "A handle to the first active entity."
       }
     },
     {
-      "name": "GetConcreteEntityListPointer",
+      "name": "GetPrevActiveEntity",
       "group": "Entities",
-      "description": "Retrieves a pointer to the concrete entity list.",
-      "funcName": "GetConcreteEntityListPointer",
-      "paramTypes": [],
+      "description": "Retrieves the previous active entity.",
+      "funcName": "GetPrevActiveEntity",
+      "paramTypes": [
+        { "type": "int32", "name": "entityHandle" }
+      ],
       "retType": {
-        "type": "ptr64",
-        "description": "A pointer to the entity list structure."
+        "type": "int32",
+        "description": "Handle to the previous entity."
+      }
+    },
+    {
+      "name": "GetNextActiveEntity",
+      "group": "Entities",
+      "description": "Retrieves the next active entity.",
+      "funcName": "GetNextActiveEntity",
+      "paramTypes": [
+        { "type": "int32", "name": "entityHandle" }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "Handle to the next entity."
       }
     },
     {
@@ -20599,20 +20614,20 @@
         {
           "name": "origin",
           "type": "vec3",
-          "ref": true,
-          "description": "A pointer to a Vector representing the new absolute position. Can be nullptr."
+          "ref": false,
+          "description": "A pointer to a Vector representing the new absolute position. Use nan vector to not set."
         },
         {
           "name": "angles",
           "type": "vec3",
-          "ref": true,
-          "description": "A pointer to a QAngle representing the new orientation. Can be nullptr."
+          "ref": false,
+          "description": "A pointer to a QAngle representing the new orientation. Use nan vector to not set."
         },
         {
           "name": "velocity",
           "type": "vec3",
-          "ref": true,
-          "description": "A pointer to a Vector representing the new velocity. Can be nullptr."
+          "ref": false,
+          "description": "A pointer to a Vector representing the new velocity. Use nan vector to not set."
         }
       ],
       "retType": {
@@ -21781,7 +21796,7 @@
       ],
       "retType": {
         "type": "ptr64",
-        "description": "A pointer to the created EventInfo structure."
+        "description": "A pointer to the created IGameEvent object."
       }
     },
     {
@@ -21791,10 +21806,10 @@
       "funcName": "FireEvent",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "dontBroadcast",
@@ -21814,10 +21829,10 @@
       "funcName": "FireEventToClient",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "playerSlot",
@@ -21837,10 +21852,10 @@
       "funcName": "CancelCreatedEvent",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure of the event to cancel."
+          "description": "A pointer to the IGameEvent object of the event to cancel."
         }
       ],
       "retType": {
@@ -21854,10 +21869,10 @@
       "funcName": "GetEventBool",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -21878,10 +21893,10 @@
       "funcName": "GetEventFloat",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -21902,10 +21917,10 @@
       "funcName": "GetEventInt",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -21926,10 +21941,10 @@
       "funcName": "GetEventUInt64",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -21950,10 +21965,10 @@
       "funcName": "GetEventString",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -21974,10 +21989,10 @@
       "funcName": "GetEventPtr",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -21998,10 +22013,10 @@
       "funcName": "GetEventPlayerController",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22022,10 +22037,10 @@
       "funcName": "GetEventPlayerIndex",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22046,10 +22061,10 @@
       "funcName": "GetEventPlayerPawn",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22070,10 +22085,10 @@
       "funcName": "GetEventEntity",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22094,10 +22109,10 @@
       "funcName": "GetEventEntityIndex",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22118,10 +22133,10 @@
       "funcName": "GetEventEntityHandle",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22142,10 +22157,10 @@
       "funcName": "GetEventName",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         }
       ],
       "retType": {
@@ -22160,10 +22175,10 @@
       "funcName": "SetEventBool",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22189,10 +22204,10 @@
       "funcName": "SetEventFloat",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22218,10 +22233,10 @@
       "funcName": "SetEventInt",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22247,10 +22262,10 @@
       "funcName": "SetEventUInt64",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22276,10 +22291,10 @@
       "funcName": "SetEventString",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22305,10 +22320,10 @@
       "funcName": "SetEventPtr",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22334,10 +22349,10 @@
       "funcName": "SetEventPlayerController",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22363,10 +22378,10 @@
       "funcName": "SetEventPlayerIndex",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22392,10 +22407,10 @@
       "funcName": "SetEventEntity",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22421,10 +22436,10 @@
       "funcName": "SetEventEntityIndex",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22450,10 +22465,10 @@
       "funcName": "SetEventEntityHandle",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "key",
@@ -22479,10 +22494,10 @@
       "funcName": "SetEventBroadcast",
       "paramTypes": [
         {
-          "name": "info",
+          "name": "event",
           "type": "ptr64",
           "ref": false,
-          "description": "A pointer to the EventInfo structure containing event data."
+          "description": "A pointer to the IGameEvent object containing event data."
         },
         {
           "name": "dontBroadcast",
@@ -34997,11 +35012,27 @@
         "CreateConVarVector2",
         "CreateConVarVector3",
         "CreateConVarVector4",
-        "CreateConVarString",
-        "FindConVar",
-        "FindConVar2"
+        "CreateConVarString"
       ],
       "bindings": [
+        {
+          "name": "Find",
+          "method": "FindConVar",
+          "bindSelf": false,
+          "retAlias": {
+            "name": "ConVar",
+            "owner": false
+          }
+        },
+        {
+          "name": "Find",
+          "method": "FindConVar2",
+          "bindSelf": false,
+          "retAlias": {
+            "name": "ConVar",
+            "owner": false
+          }
+        },
         {
           "name": "HookChange",
           "method": "HookConVarChange",
