@@ -222,8 +222,12 @@ void utils::PrintHtmlCentre(CPlayerSlot slot, std::string_view message, int dura
 	event->SetInt("userid", slot);
 
 	IGameEventListener2* listener = addresses::GetLegacyGameEventListener(slot);
-	listener->FireGameEvent(event);
+	if (!listener) {
+		plg::print(LS_WARNING, "Could not get player event listener\n");
+		return;
+	}
 
+	listener->FireGameEvent(event);
 	g_pGameEventManager->FreeEvent(event);
 }
 

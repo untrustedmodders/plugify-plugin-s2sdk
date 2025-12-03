@@ -1,11 +1,6 @@
 #include "event_manager.hpp"
 
 EventManager::~EventManager() {
-	while (!m_freeEvents.empty()) {
-		delete m_freeEvents.top();
-		m_freeEvents.pop();
-	}
-
 	if (!m_hookMap.empty()) {
 		g_pGameEventManager->RemoveListener(this);
 	}
@@ -52,43 +47,27 @@ EventHookError EventManager::UnhookEvent(std::string_view name, EventListenerCal
 void EventManager::FireGameEvent(IGameEvent* event) {
 }
 
-void EventManager::FireEvent(EventInfo* info, bool dontBroadcast) {
-	g_pGameEventManager->FireEvent(info->event, dontBroadcast);
-
-	m_freeEvents.push(info);
+IGameEvent* EventManager::CreateEvent(std::string_view name, bool force) {
+	return g_pGameEventManager->CreateEvent(name.data(), force);
 }
 
-EventInfo* EventManager::CreateEvent(std::string_view name, bool force) {
-	IGameEvent* event = g_pGameEventManager->CreateEvent(name.data(), force);
+void EventManager::FireEvent(IGameEvent* event, bool dontBroadcast) {
+	g_pGameEventManager->FireEvent(event, dontBroadcast);
+}
 
-	if (event) {
-		EventInfo* info;
-		if (m_freeEvents.empty()) {
-			info = new EventInfo{};
-		} else {
-			info = m_freeEvents.top();
-			m_freeEvents.pop();
-		}
-
-		info->event = event;
-		info->dontBroadcast = false;
-
-		return info;
+void EventManager::FireEventToClient(IGameEvent* event, CPlayerSlot slot) {
+	IGameEventListener2* listener = addresses::GetLegacyGameEventListener(slot);
+	if (!listener) {
+		plg::print(LS_WARNING, "Could not get player event listener\n");
+		return;
 	}
 
-	return nullptr;
+	listener->FireGameEvent(event);
+	g_pGameEventManager->FreeEvent(event);
 }
 
-void EventManager::FireEventToClient(EventInfo* info, CPlayerSlot slot) {
-	IGameEventListener2* listener = addresses::GetLegacyGameEventListener(slot);
-
-	listener->FireGameEvent(info->event);
-}
-
-void EventManager::CancelCreatedEvent(EventInfo* info) {
-	g_pGameEventManager->FreeEvent(info->event);
-
-	m_freeEvents.push(info);
+void EventManager::CancelCreatedEvent(IGameEvent* event) {
+	g_pGameEventManager->FreeEvent(event);
 }
 
 ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast) {
@@ -109,12 +88,10 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 		if (!preHook.Empty()) {
 			plg::print(LS_DETAILED, "Pushing event `{}` pointer: {}, dont broadcast: {}, post: {}\n", event->GetName(), static_cast<const void*>(event), dontBroadcast, false);
 
-			EventInfo eventInfo{event, dontBroadcast};
-
 			auto funcs = preHook.Get();
 			for (const auto& func : funcs) {
-				auto result = func(name, &eventInfo, dontBroadcast);
-				localDontBroadcast = eventInfo.dontBroadcast;
+				auto result = func(name, event, dontBroadcast);
+				localDontBroadcast = event->GetBool("dont_broadcast");
 
 				if (result >= ResultType::Handled) {
 					// m_EventCopies.push(g_gameEventManager->DuplicateEvent(pEvent));
@@ -148,11 +125,10 @@ ResultType EventManager::OnFireEvent_Post(IGameEvent* event, bool dontBroadcast)
 			if (hook->postCopy) {
 				auto eventCopy = m_eventCopies.top();
 				plg::print(LS_DETAILED, "Pushing event `{}` pointer: {}, dont broadcast: {}, post: {}\n", eventCopy->GetName(), static_cast<const void*>(eventCopy), dontBroadcast, true);
-				EventInfo eventInfo{eventCopy, dontBroadcast};
 
-				postHook(hook->name, &eventInfo, dontBroadcast);
+				postHook(hook->name, eventCopy, dontBroadcast);
 
-				g_pGameEventManager->FreeEvent(eventInfo.event);
+				g_pGameEventManager->FreeEvent(eventCopy);
 
 				m_eventCopies.pop();
 			} else {
