@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.3.11](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.10...v2.3.11) (2025-12-03)
+
+
+### Bug Fixes
+
+* add entity iteration with handles ([96cda9c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/96cda9cac0885fc38d0dbf222510c475b0feb768))
+* add missing methods in manifest ([a893855](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a893855dda85666cc81fe0f6f326042fe4972eed))
+* move kv3 class to kv3 group ([aa2f701](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/aa2f70110e7b147d326c3a696dcdbb52516f6e23))
+* pass nullptr on invalid vec3's ([5a1dd0d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5a1dd0daf71307e498780c6cb91714645660f105))
+* remove GetConcreteEntityListPointer, add GetPrev and GetNext ([788c13f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/788c13fce8895c70d807800b29b22ad500160205))
+* rework EventManager ([088dff0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/088dff01090de6058ae3c3d8c49db077a550d5bc))
+* typo in manifest classes ([b3d363b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b3d363b75b41aae00256eaf67269d8d5b86f5169))
+* update manifest ([7817294](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7817294f6789e0eba05d8360b1cda3e93113c329))
+
 ## [2.3.10](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.9...v2.3.10) (2025-12-02)
 
 
