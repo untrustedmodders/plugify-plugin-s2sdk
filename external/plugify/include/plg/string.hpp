@@ -1890,7 +1890,7 @@ namespace plg {
 		// starts_with
 
 		constexpr bool starts_with(self_view sv) const noexcept {
-			return self_view(typename self_view::assume_valid(), data(), size()).starts_with(sv);
+			return self_view(data(), size()).starts_with(sv);
 		}
 
 		constexpr bool starts_with(value_type c) const noexcept {
@@ -1904,7 +1904,7 @@ namespace plg {
 		// ends_with
 
 		constexpr bool ends_with(self_view sv) const noexcept {
-			return self_view(typename self_view::assume_valid(), data(), size()).ends_with(sv);
+			return self_view(data(), size()).ends_with(sv);
 		}
 
 		constexpr bool ends_with(value_type c) const noexcept {
@@ -1918,15 +1918,15 @@ namespace plg {
 		// contains
 
 		constexpr bool contains(self_view sv) const noexcept {
-			return self_view(typename self_view::assume_valid(), data(), size()).contains(sv);
+			return self_view(data(), size()).contains(sv);
 		}
 
 		constexpr bool contains(value_type c) const noexcept {
-			return self_view(typename self_view::assume_valid(), data(), size()).contains(c);
+			return self_view(data(), size()).contains(c);
 		}
 
 		constexpr bool contains(const value_type* PLUGIFY_NO_NULL s) const {
-			return self_view(typename self_view::assume_valid(), data(), size()).contains(s);
+			return self_view(data(), size()).contains(s);
 		}
 
 		[[nodiscard]] constexpr bool invariants() const;
@@ -2148,18 +2148,34 @@ namespace plg {
 		}
 
 		constexpr void annotate_new(size_type current_size) const noexcept {
+			if (!is_long()) {
+				return;
+			}
+
 			annotate_contiguous_container(data() + capacity() + 1, data() + current_size + 1);
 		}
 
 		constexpr void annotate_delete() const noexcept {
+			if (!is_long()) {
+				return;
+			}
+
 			annotate_contiguous_container(data() + size() + 1, data() + capacity() + 1);
 		}
 
 		constexpr void annotate_increase(size_type n) const noexcept {
+			if (!is_long()) {
+				return;
+			}
+
 			annotate_contiguous_container(data() + size() + 1, data() + size() + 1 + n);
 		}
 
 		constexpr void annotate_shrink(size_type old_size) const noexcept {
+			if (!is_long()) {
+				return;
+			}
+
 			annotate_contiguous_container(data() + old_size + 1, data() + size() + 1);
 		}
 
@@ -3935,7 +3951,7 @@ std::ostream& operator<<(std::ostream& os, const plg::basic_string<Char, Traits,
 	return os;
 }
 
-#ifndef PLUGIFY_STRING_NO_STD_FORMAT
+#ifndef PLUGIFY_STRING_NO_STD_UTIL
 #include <functional>
 
 namespace plg {
@@ -4024,4 +4040,4 @@ namespace plg {
 		return result;
 	}
 }  // namespace plugify
-#endif	// PLUGIFY_STRING_NO_STD_FORMAT
+#endif // PLUGIFY_STRING_NO_STD_UTIL

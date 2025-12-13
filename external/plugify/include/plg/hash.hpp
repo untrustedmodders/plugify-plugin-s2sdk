@@ -75,6 +75,19 @@ namespace plg {
 
 		template <typename T1, typename T2>
 		bool operator()(const T1& lhs, const T2& rhs) const noexcept {
+			return lhs.size() == rhs.size() &&
+				std::equal(lhs.begin(), lhs.end(), rhs.begin(),
+				[](const auto& ac, const auto& bc) {
+					return std::tolower(ac) == std::tolower(bc);
+			});
+		}
+	};
+
+	struct case_insensitive_compare {
+		using is_transparent = void;  // Enables heterogeneous lookup
+
+		template <typename T1, typename T2>
+		bool operator()(const T1& lhs, const T2& rhs) const noexcept {
 			return std::lexicographical_compare(
 				lhs.begin(), lhs.end(),
 				rhs.begin(), rhs.end(),
@@ -85,8 +98,7 @@ namespace plg {
 		}
 	};
 
-	inline void hash_combine(size_t&) {
-	}
+	inline void hash_combine(std::size_t&) {}
 
 	template <class T>
 	inline void hash_combine(std::size_t& seed, const T& v) {
@@ -103,7 +115,7 @@ namespace plg {
 
 	template <typename T1, typename T2>
 	struct pair_hash {
-		size_t operator()(const std::pair<T1, T2>& p) const {
+		std::size_t operator()(const std::pair<T1, T2>& p) const {
 			return hash_combine_all(p.first, p.second);
 		}
 	};
