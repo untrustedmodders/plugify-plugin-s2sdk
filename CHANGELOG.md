@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.3.12](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.11...v2.3.12) (2025-12-13)
+
+
+### Bug Fixes
+
+* add unsafe view ([7bb0cf9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7bb0cf9498ab1306e9b513c2ae6adc1fabbcb504))
+* update plugify ([7b015ef](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7b015ef694e306b1f026fe9b927ed1320c0a678b))
+* update plugify ([c37a19e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c37a19e93e219fec0b0cf8d23fb9d8cf45cf4be7))
+* update sdk ([659c97c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/659c97c7c99838a93cf4218be49d1624753691cb))
+
 ## [2.3.11](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.10...v2.3.11) (2025-12-03)
 
 
