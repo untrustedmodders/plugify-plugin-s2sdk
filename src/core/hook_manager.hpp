@@ -1,9 +1,9 @@
 #pragma once
 
-#include "game_config.hpp"
+#include <polyhook/polyhook.hpp>
 #include <core/sdk/utils.hpp>
 
-#include <polyhook/polyhook.hpp>
+#include "game_config.hpp"
 
 class HookManager {
 	HookManager() = default;
@@ -26,17 +26,17 @@ public:
 			return it->second->GetAddress();
 		}
 
-		using trait = poly::details::function_traits<F>;
+		using trait = polyhook::details::function_traits<F>;
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		auto ihook = poly::VTableHook2::Find(ptr, (void*&) func);
+		auto ihook = polyhook::VTableHook2::Find(ptr, (void*&) func);
 		if (ihook != nullptr) {
 			callback(*ihook);
 			return ihook->GetAddress();
 		}
 
-		ihook = poly::VTableHook2::Create(ptr, (void*&) func, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		ihook = polyhook::VTableHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 #if PLUGIFY_IS_DEBUG
 			plg::print(LS_WARNING, "Could not hook table function \"{}\".\n", ptr);
@@ -62,17 +62,17 @@ public:
 			return it->second->GetAddress();
 		}
 
-		using trait = poly::details::function_traits<F>;
+		using trait = polyhook::details::function_traits<F>;
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		auto ihook = poly::VFuncHook2::Find(ptr, (void*&) func);
+		auto ihook = polyhook::VFuncHook2::Find(ptr, (void*&) func);
 		if (ihook != nullptr) {
 			callback(*ihook);
 			return ihook->GetAddress();
 		}
 
-		ihook = poly::VFuncHook2::Create(ptr, (void*&) func, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		ihook = polyhook::VFuncHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 #if PLUGIFY_IS_DEBUG
 			plg::print(LS_WARNING, "Could not hook virtual function \"{}\".\n", ptr);
@@ -102,17 +102,17 @@ public:
 			return nullptr;
 		}
 
-		auto ihook = poly::DetourHook::Find(*addr);
+		auto ihook = polyhook::DetourHook::Find(*addr);
 		if (ihook != nullptr) {
 			callback(*ihook);
 			return ihook->GetAddress();
 		}
 
-		using trait = poly::details::function_traits<F>;
+		using trait = polyhook::details::function_traits<F>;
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		ihook = poly::DetourHook::Create(*addr, ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		ihook = polyhook::DetourHook::Create(*addr, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;
@@ -134,17 +134,17 @@ public:
 			return it->second->GetAddress();
 		}
 
-		auto ihook = poly::DetourHook::Find(reinterpret_cast<void*>(addr));
+		auto ihook = polyhook::DetourHook::Find(reinterpret_cast<void*>(addr));
 		if (ihook != nullptr) {
 			callback(*ihook);
 			return ihook->GetAddress();
 		}
 
-		using trait = poly::details::function_traits<F>;
+		using trait = polyhook::details::function_traits<F>;
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		ihook = poly::DetourHook::Create(reinterpret_cast<void*>(addr), ret, plg::vector<poly::DataType>(args.begin(), args.end()), varIndex);
+		ihook = polyhook::DetourHook::Create(reinterpret_cast<void*>(addr), ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
 			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
 			return nullptr;
@@ -159,7 +159,7 @@ public:
 	template<typename F, int V = -1, typename C, typename... T>
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookVTableFunc(F func, void* ptr, C callback, T... types) {
-		return AddHookVTableFunc<F>(func, ptr, [&](const poly::IHook& hook) {
+		return AddHookVTableFunc<F>(func, ptr, [&](const polyhook::IHook& hook) {
 			([&]() { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
@@ -167,7 +167,7 @@ public:
 	template<typename F, int V = -1, typename C, typename... T>
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookVFuncFunc(F func, void* ptr, C callback, T... types) {
-		return AddHookVFuncFunc<F>(func, ptr, [&](const poly::IHook& hook) {
+		return AddHookVFuncFunc<F>(func, ptr, [&](const polyhook::IHook& hook) {
 			([&]() { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
@@ -175,7 +175,7 @@ public:
 	template<typename F, int V = -1, typename C, typename... T>
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookDetourFunc(std::string_view name, C callback, T... types) {
-		return AddHookDetourFunc<F>(name, [&](const poly::IHook& hook) {
+		return AddHookDetourFunc<F>(name, [&](const polyhook::IHook& hook) {
 			([&]() { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
@@ -183,7 +183,7 @@ public:
 	template<typename F, int V = -1, typename C, typename... T>
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookDetourFunc(uintptr_t addr, C callback, T... types) {
-		return AddHookDetourFunc<F>(addr, [&](const poly::IHook& hook) {
+		return AddHookDetourFunc<F>(addr, [&](const polyhook::IHook& hook) {
 			([&]() { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
@@ -214,11 +214,11 @@ public:
 
 	template<typename F>
 	int GetVirtualIndex(F func) {
-		return poly::GetVirtualIndex((void*&) func);
+		return polyhook::GetVirtualIndex((void*&) func);
 	}
 
 private:
-	plg::flat_hash_map<plg::string, std::unique_ptr<poly::IHook>, plg::string_hash, std::equal_to<>> m_dhooks;
-	plg::flat_hash_map<std::pair<void*, void*>, std::unique_ptr<poly::IHook>, plg::pair_hash<void*, void*>> m_vhooks;
+	plg::flat_hash_map<plg::string, std::unique_ptr<polyhook::IHook>, plg::string_hash, std::equal_to<>> m_dhooks;
+	plg::flat_hash_map<std::pair<void*, void*>, std::unique_ptr<polyhook::IHook>, plg::pair_hash<void*, void*>> m_vhooks;
 };
 inline HookManager& g_HookManager = HookManager::Instance();

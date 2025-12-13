@@ -47,11 +47,7 @@ namespace plg {
 
 			size_type size = n * sizeof(T);
 			if (std::is_constant_evaluated()) {
-				if constexpr (alignof(T) > alignof(std::max_align_t)) {
-					return static_cast<T*>(::operator new(size, std::align_val_t{alignof(T)}));
-				} else {
-					return static_cast<T*>(::operator new(size));
-				}
+				return static_cast<T*>(::operator new(size));
 			} else {
 				return malloc_allocate(size);
 			}
@@ -59,13 +55,9 @@ namespace plg {
 
 		constexpr void deallocate(T* p, [[maybe_unused]] size_type n) {
 			if (std::is_constant_evaluated()) {
-				if constexpr (alignof(T) > alignof(std::max_align_t)) {
-					::operator delete(p, std::align_val_t{alignof(T)});
-				} else {
-					::operator delete(p);
-				}
+				::operator delete(p);
 			} else {
-				malloc_deallocate(p);
+				std::free(p);
 			}
 		}
 
@@ -73,7 +65,8 @@ namespace plg {
 		static T* malloc_allocate(size_type size) {
 			T* ret;
 			if constexpr (alignof(T) > alignof(std::max_align_t)) {
-				ret = static_cast<T*>(aligned_allocate(size));
+				size_type aligned_size = (size + (alignof(T) - 1)) & ~(alignof(T) - 1);
+				ret = static_cast<T*>(aligned_allocate(alignof(T), aligned_size));
 			} else {
 				ret = static_cast<T*>(std::malloc(size));
 			}
@@ -81,14 +74,6 @@ namespace plg {
 				throw_bad_alloc();
 			}
 			return ret;
-		}
-
-		static void malloc_deallocate(T* ptr) {
-			if constexpr (alignof(T) > alignof(std::max_align_t)) {
-				aligned_deallocate(ptr);
-			} else {
-				std::free(ptr);
-			}
 		}
 
 		[[noreturn]] static void throw_bad_array_new_length() {
@@ -99,20 +84,11 @@ namespace plg {
 			PLUGIFY_THROW("bad allocation", std::bad_alloc);
 		}
 
-		static void* aligned_allocate(size_type size) {
+		static void* aligned_allocate(size_type alignment, size_type size) {
 #if PLUGIFY_PLATFORM_WINDOWS
-			return _aligned_malloc(size, alignof(T));
+			return _aligned_malloc(size, alignment);
 #else
-			size_type aligned_size = (size + (alignof(T) - 1)) & ~(alignof(T) - 1);
-			return std::aligned_alloc(alignof(T), aligned_size);
-#endif // PLUGIFY_PLATFORM_WINDOWS
-		}
-
-		static void aligned_deallocate(void* ptr) {
-#if PLUGIFY_PLATFORM_WINDOWS
-			_aligned_free(ptr);
-#else
-			std::free(ptr);
+			return std::aligned_alloc(alignment, size);
 #endif // PLUGIFY_PLATFORM_WINDOWS
 		}
 	};

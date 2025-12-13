@@ -986,5 +986,7 @@
         *_Register;
         *_Register2;
         *_Unregister;
+
+        __polyhook_*;
     local: *;
 };

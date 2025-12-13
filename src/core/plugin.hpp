@@ -1,7 +1,6 @@
 #pragma once
 
 #include <polyhook/polyhook.hpp>
-
 #include <igamesystem.h>
 #include <igamesystemfactory.h>
 #include <networksystem/inetworkmessages.h>

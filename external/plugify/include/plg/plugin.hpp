@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 #include <chrono>
+#include <span>
 #include <type_traits>
 
 #include "plg/any.hpp"
@@ -14,8 +15,6 @@
 #include "plg/api.hpp"
 
 namespace plg {
-	using GetMethodPtrFn = void* (*)(std::string_view);
-	using GetMethodPtr2Fn = void (*)(std::string_view, void**);
 	using GetBaseDirFn = plg::string (*)();
 	using GetExtensionsDirFn = plg::string (*)();
 	using GetConfigsDirFn = plg::string (*)();
@@ -24,8 +23,6 @@ namespace plg {
 	using GetCacheDirFn = plg::string (*)();
 	using IsExtensionLoadedFn = bool (*)(std::string_view, std::optional<plg::range_set<>>);
 
-	extern GetMethodPtrFn GetMethodPtr;
-	extern GetMethodPtr2Fn GetMethodPtr2;
 	extern GetBaseDirFn GetBaseDir;
 	extern GetExtensionsDirFn GetExtensionsDir;
 	extern GetConfigsDirFn GetConfigsDir;
@@ -90,8 +87,6 @@ namespace plg {
 
 #define EXPOSE_PLUGIN(plugin_api, plugin_class, plugin_addr) \
     namespace plg { \
-        GetMethodPtrFn GetMethodPtr{nullptr}; \
-        GetMethodPtr2Fn GetMethodPtr2{nullptr}; \
 		GetBaseDirFn GetBaseDir{nullptr}; \
 		GetExtensionsDirFn GetExtensionsDir{nullptr}; \
 		GetConfigsDirFn GetConfigsDir{nullptr}; \
@@ -111,13 +106,12 @@ namespace plg {
             GetLocationFn GetLocation{nullptr}; \
             GetDependenciesFn GetDependencies{nullptr}; \
         } \
-        extern "C" plugin_api int Plugify_Init(void** api, int version, void* handle) { \
+        extern "C" plugin_api int Plugify_Init(void** data, size_t len, int version, void* handle) { \
             if (version < kApiVersion) { \
                 return kApiVersion; \
             } \
+            std::span<void*> api(data, len); \
             size_t i = 0; \
-            GetMethodPtr = reinterpret_cast<GetMethodPtrFn>(api[i++]); \
-            GetMethodPtr2 = reinterpret_cast<GetMethodPtr2Fn>(api[i++]); \
             GetBaseDir = reinterpret_cast<GetBaseDirFn>(api[i++]); \
             GetExtensionsDir = reinterpret_cast<GetExtensionsDirFn>(api[i++]); \
             GetConfigsDir = reinterpret_cast<GetConfigsDirFn>(api[i++]); \
@@ -180,16 +174,17 @@ namespace plg {
 
 namespace plg {
 	namespace raw {
+		template<typename T>
 		struct vector {
-			uint8_t pad[sizeof(plg::vector<int>)]{};
+			alignas(plg::vector<T>) unsigned char pad[sizeof(plg::vector<T>)]{};
 		};
 
 		struct string {
-			uint8_t pad[sizeof(plg::string)]{};
+			alignas(plg::string) unsigned char pad[sizeof(plg::string)]{};
 		};
 
 		struct variant {
-			uint8_t pad[sizeof(plg::any)]{};
+			alignas(plg::any) unsigned char pad[sizeof(plg::any)]{};
 		};
 	} // namespace raw
 

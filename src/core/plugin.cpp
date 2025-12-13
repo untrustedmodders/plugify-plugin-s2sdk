@@ -44,10 +44,10 @@ void* wstring_S_empty_rep_storage = nullptr;
 
 constexpr char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
 
-poly::ReturnAction Hook_StartupServer(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//auto config = poly::GetArgument<const GameSessionConfiguration_t *>(params, 1);
-	//auto pWorldSession = poly::GetArgument<ISource2WorldSession*>(params, 2);
-	auto pMapName = poly::GetArgument<const char*>(params, 3);
+polyhook::ResultType Hook_StartupServer(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	//auto config = polyhook::GetArgument<const GameSessionConfiguration_t *>(params, 1);
+	//auto pWorldSession = polyhook::GetArgument<ISource2WorldSession*>(params, 2);
+	auto pMapName = polyhook::GetArgument<const char*>(params, 3);
 
 	plg::print(LS_DETAILED, "[StartupServer] = {}\n", pMapName);
 
@@ -55,22 +55,22 @@ poly::ReturnAction Hook_StartupServer(poly::PHook& hook, poly::Params& params, i
 
 	if (gpGlobals == nullptr) {
 		plg::print(LS_ERROR, "Failed to lookup gpGlobals\n");
-		return poly::ReturnAction::Ignored;
+		return polyhook::ResultType::Ignored;
 	}
 
 	g_OnServerStartupListenerManager();
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_DisconnectGameNow(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto reason = (ENetworkDisconnectionReason) poly::GetArgument<int>(params, 1);
+polyhook::ResultType Hook_DisconnectGameNow(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto reason = (ENetworkDisconnectionReason) polyhook::GetArgument<int>(params, 1);
 
 	if (reason == NETWORK_DISCONNECT_LOOPDEACTIVATE  || reason == NETWORK_DISCONNECT_EXITING) {
 		static ENetworkDisconnectionReason lastReason = NETWORK_DISCONNECT_INVALID;
 
 		if (reason < lastReason)
-			return poly::ReturnAction::Ignored;
+			return polyhook::ResultType::Ignored;
 
 		lastReason = reason;
 
@@ -85,14 +85,14 @@ poly::ReturnAction Hook_DisconnectGameNow(poly::PHook& hook, poly::Params& param
 		});
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_Release(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto server = poly::GetArgument<CNetworkGameServerBase*>(params, 1);
+polyhook::ResultType Hook_Release(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto server = polyhook::GetArgument<CNetworkGameServerBase*>(params, 1);
 
 	if (server->m_nRefCount > 1)
-		return poly::ReturnAction::Ignored;
+		return polyhook::ResultType::Ignored;
 
 	// g_HookManager.RemoveHookMemFunc(&CNetworkGameServerBase::Release, server);
 	// g_HookManager.RemoveHookMemFunc(&CNetworkGameServerBase::ActivateServer, server);
@@ -100,10 +100,10 @@ poly::ReturnAction Hook_Release(poly::PHook& hook, poly::Params& params, int cou
 	// g_HookManager.RemoveHookMemFunc(&CNetworkGameServerBase::StartChangeLevel, server);
 	// g_HookManager.RemoveHookMemFunc(&CNetworkGameServerBase::FinishChangeLevel, server);
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ActivateServer(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_ActivateServer(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	plg::print(LS_DETAILED, "[ActivateServer]\n");
 
 #if defined (CS2)
@@ -124,80 +124,80 @@ poly::ReturnAction Hook_ActivateServer(poly::PHook& hook, poly::Params& params, 
 	g_OnServerActivateListenerManager();
 	g_OnMapStartListenerManager();
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_SpawnServer(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_SpawnServer(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	plg::print(LS_DETAILED, "[SpawnServer]\n");
 
 	g_OnServerSpawnListenerManager();
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_FireEvent(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto event = poly::GetArgument<IGameEvent*>(params, 1);
-	auto dontBroadcast = poly::GetArgument<bool>(params, 2);
+polyhook::ResultType Hook_FireEvent(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto event = polyhook::GetArgument<IGameEvent*>(params, 1);
+	auto dontBroadcast = polyhook::GetArgument<bool>(params, 2);
 
 	/*if (event) {
 		plg::print(LS_DETAILED, "[FireEvent] = {}\n", event->GetName());
 	}*/
 
-	auto result = type == poly::CallbackType::Post ? g_EventManager.OnFireEvent_Post(event, dontBroadcast) : g_EventManager.OnFireEvent(event, dontBroadcast);
+	auto result = type == polyhook::CallbackType::Post ? g_EventManager.OnFireEvent_Post(event, dontBroadcast) : g_EventManager.OnFireEvent(event, dontBroadcast);
 	if (result >= ResultType::Handled) {
-		return poly::ReturnAction::Supercede;
+		return polyhook::ResultType::Supercede;
 	}
 
 	if (result == ResultType::Changed) {
-		poly::SetArgument<bool>(params, 2, !dontBroadcast);
-		return poly::ReturnAction::Handled;
+		polyhook::SetArgument<bool>(params, 2, !dontBroadcast);
+		return polyhook::ResultType::Handled;
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_PostEvent(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//auto slot = poly::GetArgument<int>(params, 1);
-	//auto localOnly = poly::GetArgument<bool>(params, 2);
-	//auto clientCount = poly::GetArgument<int>(params, 3);
-	auto clients = poly::GetArgument<uint64_t*>(params, 4);
-	auto message = poly::GetArgument<INetworkMessageInternal*>(params, 5);
-	auto pData = poly::GetArgument<CNetMessage*>(params, 6);
+polyhook::ResultType Hook_PostEvent(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	//auto slot = polyhook::GetArgument<int>(params, 1);
+	//auto localOnly = polyhook::GetArgument<bool>(params, 2);
+	//auto clientCount = polyhook::GetArgument<int>(params, 3);
+	auto clients = polyhook::GetArgument<uint64_t*>(params, 4);
+	auto message = polyhook::GetArgument<INetworkMessageInternal*>(params, 5);
+	auto pData = polyhook::GetArgument<CNetMessage*>(params, 6);
 
 	//plg::print(LS_DETAILED, "[PostEvent] = {}, {}, {}, {}\n", slot, localOnly, clientCount, static_cast<void*>(clients) );
 
-	if (type == poly::CallbackType::Pre) {
+	if (type == polyhook::CallbackType::Pre) {
 		g_MultiAddonManager.OnPostEvent(message, pData, clients);
 	}
 
 	auto result = g_UserMessageManager.ExecuteMessageCallbacks(message, pData, clients, static_cast<HookMode>(type));
 	if (result >= ResultType::Handled) {
-		return poly::ReturnAction::Supercede;
+		return polyhook::ResultType::Supercede;
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_GameFrame(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_GameFrame(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// bool simulating, bool bFirstTick, bool bLastTick
-	auto simulating = poly::GetArgument<bool>(params, 1);
-	auto bFirstTick = poly::GetArgument<bool>(params, 2);
-	auto bLastTick = poly::GetArgument<bool>(params, 3);
+	auto simulating = polyhook::GetArgument<bool>(params, 1);
+	auto bFirstTick = polyhook::GetArgument<bool>(params, 2);
+	auto bLastTick = polyhook::GetArgument<bool>(params, 3);
 
 	g_MultiAddonManager.OnGameFrame();
 	g_ServerManager.OnGameFrame();
 	g_TimerSystem.OnGameFrame(simulating);
 
 	g_OnGameFrameListenerManager(simulating, bFirstTick, bLastTick);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ClientActive(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_ClientActive(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// CPlayerSlot slot, bool bLoadGame, const char* name, uint64 steamID64
-	auto slot = poly::GetArgument<int>(params, 1);
-	auto bLoadGame = poly::GetArgument<bool>(params, 2);
-	auto name = poly::GetArgument<const char*>(params, 3);
-	auto steamID64 = (uint64) poly::GetArgument<uint64_t>(params, 4);
+	auto slot = polyhook::GetArgument<int>(params, 1);
+	auto bLoadGame = polyhook::GetArgument<bool>(params, 2);
+	auto name = polyhook::GetArgument<const char*>(params, 3);
+	auto steamID64 = (uint64) polyhook::GetArgument<uint64_t>(params, 4);
 
 	plg::print(LS_DETAILED, "[OnClientActive] = {}, {}, {}\n", slot, name, steamID64);
 
@@ -205,20 +205,20 @@ poly::ReturnAction Hook_ClientActive(poly::PHook& hook, poly::Params& params, in
 	g_PlayerManager.OnClientActive(slot, bLoadGame);
 
 	g_OnClientActiveListenerManager(slot, bLoadGame);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ClientDisconnect(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_ClientDisconnect(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// CPlayerSlot slot, int reason, const char* name, uint64 steamID64, const char* networkID
-	auto slot = poly::GetArgument<int>(params, 1);
-	auto reason = (ENetworkDisconnectionReason) poly::GetArgument<int>(params, 2);
-	auto name = poly::GetArgument<const char*>(params, 3);
-	auto steamID64 = poly::GetArgument<uint64_t>(params, 4);
-	auto networkID = poly::GetArgument<const char*>(params, 5);
+	auto slot = polyhook::GetArgument<int>(params, 1);
+	auto reason = (ENetworkDisconnectionReason) polyhook::GetArgument<int>(params, 2);
+	auto name = polyhook::GetArgument<const char*>(params, 3);
+	auto steamID64 = polyhook::GetArgument<uint64_t>(params, 4);
+	auto networkID = polyhook::GetArgument<const char*>(params, 5);
 
 	plg::print(LS_DETAILED, "[ClientDisconnect] = {}, {}, {}, {}, {}\n", slot,  static_cast<int>(reason), name, steamID64, networkID);
 
-	if (type == poly::CallbackType::Pre) {
+	if (type == polyhook::CallbackType::Pre) {
 		g_MultiAddonManager.OnClientDisconnect(slot, name, steamID64, networkID);
 		g_PlayerManager.OnClientDisconnect(slot, reason);
 	} else {
@@ -226,89 +226,89 @@ poly::ReturnAction Hook_ClientDisconnect(poly::PHook& hook, poly::Params& params
 		g_PanoramaVoteHandler.RemovePlayerFromVote(slot);
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ClientPutInServer(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_ClientPutInServer(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// CPlayerSlot slot, char const *name, int type, uint64 steamID64
-	auto slot = poly::GetArgument<int>(params, 1);
-	auto name = poly::GetArgument<const char*>(params, 2);
-	auto conType = poly::GetArgument<int>(params, 3);
-	auto steamID64 = poly::GetArgument<uint64_t>(params, 4);
+	auto slot = polyhook::GetArgument<int>(params, 1);
+	auto name = polyhook::GetArgument<const char*>(params, 2);
+	auto conType = polyhook::GetArgument<int>(params, 3);
+	auto steamID64 = polyhook::GetArgument<uint64_t>(params, 4);
 
 	plg::print(LS_DETAILED, "[ClientPutInServer] = {}, {}, {}, {}\n", slot, name, conType, steamID64);
 
 	g_PlayerManager.OnClientPutInServer(slot, name);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ClientSettingsChanged(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_ClientSettingsChanged(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// CPlayerSlot slot
-	auto slot = poly::GetArgument<int>(params, 1);
+	auto slot = polyhook::GetArgument<int>(params, 1);
 
 	plg::print(LS_DETAILED, "[ClientSettingsChanged] = {}\n", slot);
 
 	g_OnClientSettingsChangedListenerManager(slot);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_OnClientConnected(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_OnClientConnected(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// CPlayerSlot slot, const cha*r name, uint64 steamID64, const char* networkID, const char* pszAddress, bool bFakePlayer
-	auto slot = poly::GetArgument<int>(params, 1);
-	auto name = poly::GetArgument<const char*>(params, 2);
-	auto steamID64 = poly::GetArgument<uint64_t>(params, 3);
-	auto networkID = poly::GetArgument<const char*>(params, 4);
-	auto pszAddress = poly::GetArgument<const char*>(params, 5);
-	auto fakePlayer = poly::GetArgument<bool>(params, 6);
+	auto slot = polyhook::GetArgument<int>(params, 1);
+	auto name = polyhook::GetArgument<const char*>(params, 2);
+	auto steamID64 = polyhook::GetArgument<uint64_t>(params, 3);
+	auto networkID = polyhook::GetArgument<const char*>(params, 4);
+	auto pszAddress = polyhook::GetArgument<const char*>(params, 5);
+	auto fakePlayer = polyhook::GetArgument<bool>(params, 6);
 
 	plg::print(LS_DETAILED, "[OnClientConnected] = {}, {}, {}, {}, {}, {}\n", slot, name, steamID64, networkID, pszAddress, fakePlayer);
 
 	g_PlayerManager.OnClientConnected(slot, fakePlayer);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ClientFullyConnect(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_ClientFullyConnect(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// CPlayerSlot slot
-	auto slot = poly::GetArgument<int>(params, 1);
+	auto slot = polyhook::GetArgument<int>(params, 1);
 
 	plg::print(LS_DETAILED, "[ClientFullyConnect] = {}\n", slot);
 
 	g_OnClientFullyConnectListenerManager(slot);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ClientConnect(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_ClientConnect(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID, bool unk1, CBufferString *pRejectReason
-	auto slot = poly::GetArgument<int>(params, 1);
-	auto name = poly::GetArgument<const char*>(params, 2);
-	auto steamID64 = poly::GetArgument<uint64_t>(params, 3);
-	auto networkID = poly::GetArgument<const char*>(params, 4);
-	bool unk1 = poly::GetArgument<bool>(params, 5);
-	auto pRejectReason = poly::GetArgument<CBufferString*>(params, 6);
+	auto slot = polyhook::GetArgument<int>(params, 1);
+	auto name = polyhook::GetArgument<const char*>(params, 2);
+	auto steamID64 = polyhook::GetArgument<uint64_t>(params, 3);
+	auto networkID = polyhook::GetArgument<const char*>(params, 4);
+	bool unk1 = polyhook::GetArgument<bool>(params, 5);
+	auto pRejectReason = polyhook::GetArgument<CBufferString*>(params, 6);
 
 	plg::print(LS_DETAILED, "[ClientConnect] = {}, {}, {}, {}, {}, {} \n", slot, name, steamID64, networkID, unk1, pRejectReason->Get());
 
-	if (type == poly::CallbackType::Pre) {
+	if (type == polyhook::CallbackType::Pre) {
 		g_MultiAddonManager.OnClientConnect(slot, name, steamID64, networkID);
 		g_PlayerManager.OnClientConnect(slot, name, steamID64, networkID);
 	} else {
-		bool origRet = poly::GetReturn<bool>(ret);
+		bool origRet = polyhook::GetReturn<bool>(ret);
 		bool newRet = g_PlayerManager.OnClientConnect_Post(slot, origRet);
 		if (newRet != origRet) {
-			poly::SetReturn<bool>(ret, newRet);
-			return poly::ReturnAction::Override;
+			polyhook::SetReturn<bool>(ret, newRet);
+			return polyhook::ResultType::Override;
 		}
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ClientCommand(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_ClientCommand(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// CPlayerSlot slot, const CCommand& _cmd
-	auto slot = poly::GetArgument<int>(params, 1);
-	auto args = poly::GetArgument<const CCommand*>(params, 2);
+	auto slot = polyhook::GetArgument<int>(params, 1);
+	auto args = polyhook::GetArgument<const CCommand*>(params, 2);
 	if (args == nullptr) {
-		return poly::ReturnAction::Ignored;
+		return polyhook::ResultType::Ignored;
 	}
 
 	plg::print(LS_DETAILED, "[ClientCommand] = {}, {}\n", slot, args->GetCommandString());
@@ -317,13 +317,13 @@ poly::ReturnAction Hook_ClientCommand(poly::PHook& hook, poly::Params& params, i
 
 	auto result = g_ConCommandManager.ExecuteCommandCallbacks(cmd, CCommandContext(CommandTarget_t::CT_NO_TARGET, slot), *args, HookMode::Pre, CommandCallingContext::Console);
 	if (result >= ResultType::Handled) {
-		return poly::ReturnAction::Supercede;
+		return polyhook::ResultType::Supercede;
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_GameServerSteamAPIActivated(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_GameServerSteamAPIActivated(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	plg::print(LS_DETAILED, "[GameServerSteamAPIActivated]\n");
 
 	g_pSteamUGC = SteamGameServerUGC();
@@ -332,142 +332,142 @@ poly::ReturnAction Hook_GameServerSteamAPIActivated(poly::PHook& hook, poly::Par
 	g_MultiAddonManager.OnSteamAPIActivated();
 
 	//g_OnGameServerSteamAPIActivatedListenerManager();
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_GameServerSteamAPIDeactivated(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_GameServerSteamAPIDeactivated(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	plg::print(LS_DETAILED, "[GameServerSteamAPIDeactivated]\n");
 
 	g_PlayerManager.OnSteamAPIDeactivated();
 	g_MultiAddonManager.OnSteamAPIDeactivated();
 
 	//g_OnGameServerSteamAPIDeactivatedListenerManager();
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_UpdateWhenNotInGame(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_UpdateWhenNotInGame(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// float flFrameTime
-	auto frameTime = poly::GetArgument<float>(params, 1);
+	auto frameTime = polyhook::GetArgument<float>(params, 1);
 	//plg::print(LS_DETAILED, "UpdateWhenNotInGame = {}\n", frameTime);
 	g_OnUpdateWhenNotInGameListenerManager(frameTime);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_PreWorldUpdate(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_PreWorldUpdate(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// bool simulating
-	auto simulating = poly::GetArgument<bool>(params, 1);
+	auto simulating = polyhook::GetArgument<bool>(params, 1);
 	//plg::print(LS_DETAILED, "PreWorldUpdate = {}\n", simulating);
 
 	g_ServerManager.OnPreWorldUpdate();
 
 	g_OnPreWorldUpdateListenerManager(simulating);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_FireOutputInternal(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
+polyhook::ResultType Hook_FireOutputInternal(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	// CEntityIOOutput* const self, CEntityInstance* activator, CEntityInstance* caller, const CVariant* const value, float delay
-	auto self = poly::GetArgument<CEntityIOOutput* const>(params, 0);
-	auto activator = poly::GetArgument<CEntityInstance*>(params, 1);
-	auto caller = poly::GetArgument<CEntityInstance*>(params, 2);
-	//auto value = poly::GetArgument<const CVariant* const>(params, 3);
-	auto delay = poly::GetArgument<float>(params, 6);
+	auto self = polyhook::GetArgument<CEntityIOOutput* const>(params, 0);
+	auto activator = polyhook::GetArgument<CEntityInstance*>(params, 1);
+	auto caller = polyhook::GetArgument<CEntityInstance*>(params, 2);
+	//auto value = polyhook::GetArgument<const CVariant* const>(params, 3);
+	auto delay = polyhook::GetArgument<float>(params, 6);
 
-	ResultType result = type == poly::CallbackType::Post ?
+	ResultType result = type == polyhook::CallbackType::Post ?
 		g_EntityOutputManager.FireOutputInternal_Post(self, activator, caller, delay) :
 		g_EntityOutputManager.FireOutputInternal(self, activator, caller, delay);
 
 	if (result >= ResultType::Handled) {
-		return poly::ReturnAction::Supercede;
+		return polyhook::ResultType::Supercede;
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
 #if defined (CS2)
-poly::ReturnAction Hook_TerminateRound(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//auto pGameRules = poly::GetArgument<CCSGameRules*>(params, 0);
-	auto delay = poly::GetArgument<float>(params, 1);
-	auto reason = static_cast<CSRoundEndReason>(poly::GetArgument<uint32_t>(params, 2));
+polyhook::ResultType Hook_TerminateRound(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	//auto pGameRules = polyhook::GetArgument<CCSGameRules*>(params, 0);
+	auto delay = polyhook::GetArgument<float>(params, 1);
+	auto reason = static_cast<CSRoundEndReason>(polyhook::GetArgument<uint32_t>(params, 2));
 
 	g_pGameRules->m_bGameRestart = false;
 
 	g_OnRoundTerminatedListenerManager(delay, reason);
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 #endif
 
-poly::ReturnAction Hook_DispatchConCommand(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	// auto cmd = poly::GetArgument<ConCommandRef* const>(params, 1);
-	auto ctx = poly::GetArgument<const CCommandContext*>(params, 2);
-	auto args = poly::GetArgument<const CCommand*>(params, 3);
+polyhook::ResultType Hook_DispatchConCommand(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	// auto cmd = polyhook::GetArgument<ConCommandRef* const>(params, 1);
+	auto ctx = polyhook::GetArgument<const CCommandContext*>(params, 2);
+	auto args = polyhook::GetArgument<const CCommand*>(params, 3);
 	auto result = g_ConCommandManager.DispatchConCommand(ctx, args, static_cast<HookMode>(type));
 	if (result >= ResultType::Handled) {
-		return poly::ReturnAction::Supercede;
+		return polyhook::ResultType::Supercede;
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_CheckTransmit(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto ppInfoList = poly::GetArgument<CCheckTransmitInfo**>(params, 1);
-	auto nInfoCount = poly::GetArgument<uint32_t>(params, 2);
+polyhook::ResultType Hook_CheckTransmit(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto ppInfoList = polyhook::GetArgument<CCheckTransmitInfo**>(params, 1);
+	auto nInfoCount = polyhook::GetArgument<uint32_t>(params, 2);
 
 	plg::view view(ppInfoList, nInfoCount);
 
 	g_OnServerCheckTransmitListenerManager(view.get());
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_CallGlobalChangeCallbacks(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	// auto cmd = poly::GetArgument<ICvar* const>(params, 0);
-	auto ref = poly::GetArgument<ConVarRefAbstract*>(params, 1);
-	//auto nSlot = poly::GetArgument<CSplitScreenSlot>(params, 2);
-	auto newValue = poly::GetArgument<const char*>(params, 3);
-	auto oldValue = poly::GetArgument<const char*>(params, 4);
+polyhook::ResultType Hook_CallGlobalChangeCallbacks(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	// auto cmd = polyhook::GetArgument<ICvar* const>(params, 0);
+	auto ref = polyhook::GetArgument<ConVarRefAbstract*>(params, 1);
+	//auto nSlot = polyhook::GetArgument<CSplitScreenSlot>(params, 2);
+	auto newValue = polyhook::GetArgument<const char*>(params, 3);
+	auto oldValue = polyhook::GetArgument<const char*>(params, 4);
 
 	g_ConVarManager.OnCvarsChanged(ref, newValue, oldValue);
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_HostStateRequest(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto mgr = poly::GetArgument<CHostStateMgr*>(params, 0);
-	auto request = poly::GetArgument<CHostStateRequest*>(params, 1);
+polyhook::ResultType Hook_HostStateRequest(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto mgr = polyhook::GetArgument<CHostStateMgr*>(params, 0);
+	auto request = polyhook::GetArgument<CHostStateRequest*>(params, 1);
 
 	g_MultiAddonManager.OnHostStateRequest(mgr, request);
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ReplyConnection(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto server = poly::GetArgument<CNetworkGameServerBase*>(params, 0);
-	auto client = poly::GetArgument<CServerSideClient*>(params, 1);
+polyhook::ResultType Hook_ReplyConnection(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto server = polyhook::GetArgument<CNetworkGameServerBase*>(params, 0);
+	auto client = polyhook::GetArgument<CServerSideClient*>(params, 1);
 
-	type == poly::CallbackType::Post ? g_MultiAddonManager.OnReplyConnection_Post(server, client) : g_MultiAddonManager.OnReplyConnection(server, client);
+	type == polyhook::CallbackType::Post ? g_MultiAddonManager.OnReplyConnection_Post(server, client) : g_MultiAddonManager.OnReplyConnection(server, client);
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_SendNetMessage(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto client = poly::GetArgument<CServerSideClient*>(params, 0);
-	auto data = poly::GetArgument<CNetMessage*>(params, 1);
-	auto bufType = (NetChannelBufType_t) poly::GetArgument<int8_t>(params, 2);
+polyhook::ResultType Hook_SendNetMessage(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto client = polyhook::GetArgument<CServerSideClient*>(params, 0);
+	auto data = polyhook::GetArgument<CNetMessage*>(params, 1);
+	auto bufType = (NetChannelBufType_t) polyhook::GetArgument<int8_t>(params, 2);
 
 	if (client->IsFakeClient() || client->IsHLTV()) {
 		// Don't send messages to fake clients or replay clients
-		return poly::ReturnAction::Ignored;
+		return polyhook::ResultType::Ignored;
 	}
 
 	g_MultiAddonManager.OnSendNetMessage(client, data, bufType);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_OnAddEntity(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto handle = (CEntityHandle) poly::GetArgument<int>(params, 2);
+polyhook::ResultType Hook_OnAddEntity(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
 #if defined (CS2)
-	auto entity = poly::GetArgument<CBaseEntity*>(params, 1);
+	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
 	if (name == "cs_gamerules") {
 		g_pGameRulesProxy = static_cast<CBaseGameRulesProxy *>(entity);
@@ -492,13 +492,13 @@ poly::ReturnAction Hook_OnAddEntity(poly::PHook& hook, poly::Params& params, int
 #endif
 
 	g_OnEntityCreatedListenerManager(handle.ToInt());
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_OnRemoveEntity(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto handle = (CEntityHandle) poly::GetArgument<int>(params, 2);
+polyhook::ResultType Hook_OnRemoveEntity(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
 #if defined (CS2)
-	auto entity = poly::GetArgument<CBaseEntity*>(params, 1);
+	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
 	if (name == "cs_gamerules") {
 		g_pGameRulesProxy = nullptr;
@@ -509,87 +509,87 @@ poly::ReturnAction Hook_OnRemoveEntity(poly::PHook& hook, poly::Params& params, 
 #endif
 
 	g_OnEntityDeletedListenerManager(handle.ToInt());
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_OnEntityParentChanged(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto entity = poly::GetArgument<CBaseEntity*>(params, 1);
-	auto newParent = poly::GetArgument<CBaseEntity*>(params, 2);
+polyhook::ResultType Hook_OnEntityParentChanged(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
+	auto newParent = polyhook::GetArgument<CBaseEntity*>(params, 2);
 
 	g_OnEntityParentChangedListenerManager(entity->GetRefEHandle().ToInt(), newParent ? newParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ProcessRespondCvarValue(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto pClient = poly::GetArgument<CServerSideClientBase*>(params, 0);
-	auto pMsg = poly::GetArgument<CCLCMsg_RespondCvarValue_t*>(params, 1);
+polyhook::ResultType Hook_ProcessRespondCvarValue(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto pClient = polyhook::GetArgument<CServerSideClientBase*>(params, 0);
+	auto pMsg = polyhook::GetArgument<CCLCMsg_RespondCvarValue_t*>(params, 1);
 
 	g_PlayerManager.OnRespondCvarValue(pClient, *pMsg);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_BuildGameSessionManifest(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//auto pSystem = poly::GetArgument<IGameSystem*>(params, 0);
-	auto pMsg = poly::GetArgument<EventBuildGameSessionManifest_t*>(params, 1);
+polyhook::ResultType Hook_BuildGameSessionManifest(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	//auto pSystem = polyhook::GetArgument<IGameSystem*>(params, 0);
+	auto pMsg = polyhook::GetArgument<EventBuildGameSessionManifest_t*>(params, 1);
 
 	pMsg->m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
 	for (const auto& resource : g_Precached) {
 		pMsg->m_pResourceManifest->AddResource(resource.c_str());
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_RegisterFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
-	auto pBinding = poly::GetArgument<ScriptFunctionBinding_t*>(params, 1);
+polyhook::ResultType Hook_RegisterFunction(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
+	auto pBinding = polyhook::GetArgument<ScriptFunctionBinding_t*>(params, 1);
 	vscript::RegisterFunction(pBinding);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_RegisterScriptClass(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
-	auto pClassDesc = poly::GetArgument<ScriptClassDesc_t*>(params, 1);
+polyhook::ResultType Hook_RegisterScriptClass(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
+	auto pClassDesc = polyhook::GetArgument<ScriptClassDesc_t*>(params, 1);
 	vscript::RegisterScriptClass(pClassDesc);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_RegisterInstance(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
-	auto pClassDesc = poly::GetArgument<ScriptClassDesc_t*>(params, 1);
-	auto pInstance = poly::GetArgument<void*>(params, 2);
+polyhook::ResultType Hook_RegisterInstance(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
+	auto pClassDesc = polyhook::GetArgument<ScriptClassDesc_t*>(params, 1);
+	auto pInstance = polyhook::GetArgument<void*>(params, 2);
 	vscript::RegisterScriptClass(pClassDesc, pInstance);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 /*
 plg::flat_hash_map<HSCRIPT, const char*> scriptFunctionMap = {};
 
-poly::ReturnAction Hook_LookupFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
-	auto pszFunction = poly::GetArgument<const char *>(params, 1);
-	//auto hScope = poly::GetArgument<HSCRIPT>(params, 2);
-	//auto raw = poly::GetArgument<bool>(params, 3);
-	auto hScript = poly::GetReturn<HSCRIPT>(ret);
+polyhook::ResultType Hook_LookupFunction(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	//g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
+	auto pszFunction = polyhook::GetArgument<const char *>(params, 1);
+	//auto hScope = polyhook::GetArgument<HSCRIPT>(params, 2);
+	//auto raw = polyhook::GetArgument<bool>(params, 3);
+	auto hScript = polyhook::GetReturn<HSCRIPT>(ret);
 	scriptFunctionMap[hScript] = pszFunction;
 	plg::print(LS_MESSAGE, "LookupFunction - {}\n", pszFunction);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ReleaseFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
-	auto hScript = poly::GetArgument<HSCRIPT>(params, 1);
+polyhook::ResultType Hook_ReleaseFunction(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	//g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
+	auto hScript = polyhook::GetArgument<HSCRIPT>(params, 1);
 	//scriptFunctionMap.erase(hScript);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	//g_pScriptVM = poly::GetArgument<IScriptVM*>(params, 0);
-	auto hFunction = poly::GetArgument<HSCRIPT>(params, 1);
-	auto pArgs = poly::GetArgument<ScriptVariant_t*>(params, 2);
-	//auto nArgs = poly::GetArgument<int>(params, 3);
-	//auto pReturn = poly::GetArgument<ScriptVariant_t*>(params, 4);
-	auto hScope = poly::GetArgument<HSCRIPT>(params, 5);
-	//auto bWait = poly::GetArgument<bool>(params, 6);
+polyhook::ResultType Hook_ExecuteFunction(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	//g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
+	auto hFunction = polyhook::GetArgument<HSCRIPT>(params, 1);
+	auto pArgs = polyhook::GetArgument<ScriptVariant_t*>(params, 2);
+	//auto nArgs = polyhook::GetArgument<int>(params, 3);
+	//auto pReturn = polyhook::GetArgument<ScriptVariant_t*>(params, 4);
+	auto hScope = polyhook::GetArgument<HSCRIPT>(params, 5);
+	//auto bWait = polyhook::GetArgument<bool>(params, 6);
 
 	std::string_view current = scriptFunctionMap[hFunction];
 
@@ -601,7 +601,7 @@ poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params,
 		entity = (CBaseEntity*)g_pScriptVM->GetInstanceValue(thisEntity);
 	}
 	if (entity == nullptr) {
-		return poly::ReturnAction::Ignored;
+		return polyhook::ResultType::Ignored;
 	}
 
 	if (current == "OnSpawn") {
@@ -623,28 +623,28 @@ poly::ReturnAction Hook_ExecuteFunction(poly::PHook& hook, poly::Params& params,
 		}
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_SetValue(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto pScript = poly::GetArgument<IScriptVM*>(params, 0);
-	auto value = poly::GetArgument<const ScriptVariant_t*>(params, 3);
+polyhook::ResultType Hook_SetValue(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto pScript = polyhook::GetArgument<IScriptVM*>(params, 0);
+	auto value = polyhook::GetArgument<const ScriptVariant_t*>(params, 3);
 	//vscript::SetValue(pScript, *value);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 */
 #if defined (CS2)
-poly::ReturnAction Hook_IsolateEnter(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto isolate = poly::GetArgument<v8::Isolate*>(params, 0);
+polyhook::ResultType Hook_IsolateEnter(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto isolate = polyhook::GetArgument<v8::Isolate*>(params, 0);
 	isolate->SetData(v8::Isolate::GetNumberOfDataSlots() - 2, new v8::Locker(isolate));
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 
-poly::ReturnAction Hook_IsolateExit(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	auto isolate = poly::GetArgument<v8::Isolate*>(params, 0);
+polyhook::ResultType Hook_IsolateExit(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	auto isolate = polyhook::GetArgument<v8::Isolate*>(params, 0);
 	delete reinterpret_cast<v8::Locker*>(isolate->GetData(v8::Isolate::GetNumberOfDataSlots() - 2));
 	isolate->SetData(v8::Isolate::GetNumberOfDataSlots() - 2, nullptr);
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 #endif
 
@@ -658,8 +658,8 @@ constexpr WORD PE_FILE_MACHINE = IMAGE_FILE_MACHINE_I386;
 constexpr WORD PE_NT_OPTIONAL_HDR_MAGIC = IMAGE_NT_OPTIONAL_HDR32_MAGIC;
 #endif // PLUGIFY_ARCH_BITS
 
-poly::ReturnAction Hook_PreloadLibrary(poly::PHook& hook, poly::Params& params, int count, poly::Return& ret, poly::CallbackType type) {
-	HMODULE hModule = (HMODULE) poly::GetArgument<void*>(params, 0);
+polyhook::ResultType Hook_PreloadLibrary(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+	HMODULE hModule = (HMODULE) polyhook::GetArgument<void*>(params, 0);
 
 	IMAGE_DOS_HEADER* pDOSHeader = reinterpret_cast<IMAGE_DOS_HEADER*>(hModule);
 	IMAGE_NT_HEADERS* pNTHeaders = reinterpret_cast<IMAGE_NT_HEADERS*>(reinterpret_cast<uintptr_t>(hModule) + pDOSHeader->e_lfanew);
@@ -667,10 +667,10 @@ poly::ReturnAction Hook_PreloadLibrary(poly::PHook& hook, poly::Params& params, 
 
 	IMAGE_DATA_DIRECTORY clrRuntimeHeader = pOptionalHeader->DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR];
 	if (clrRuntimeHeader.VirtualAddress != 0 && clrRuntimeHeader.Size != 0) {
-		return poly::ReturnAction::Supercede;
+		return polyhook::ResultType::Supercede;
 	}
 
-	return poly::ReturnAction::Ignored;
+	return polyhook::ResultType::Ignored;
 }
 #else
 #include <dlfcn.h>
@@ -711,7 +711,7 @@ void Source2SDK::OnPluginStart() {
 		{ "data", plg::GetDataDir() },
 	});
 
-	using enum poly::CallbackType;
+	using enum polyhook::CallbackType;
 
 	g_HookManager.AddHookVTableFunc(&IGameEventManager2::FireEvent, g_pGameEventManager, Hook_FireEvent, Pre, Post);
 	using PostEventAbstract = void(IGameEventSystem::*)( CSplitScreenSlot slot, bool bLocalOnly, int nClientCount, const uint64 *clients, INetworkMessageInternal *pEvent, const CNetMessage *pData, unsigned long nSize, NetChannelBufType_t bufType);
@@ -819,9 +819,9 @@ void Source2SDK::OnServerStartup() {
 
 	if (g_pNetworkGameServer != nullptr) {
 		gpGlobals = g_pNetworkGameServer->GetGlobals();
-		g_HookManager.AddHookVTableFunc(&CNetworkGameServerBase::Release, g_pNetworkGameServer, Hook_Release, poly::CallbackType::Pre);
-		g_HookManager.AddHookVTableFunc(&CNetworkGameServerBase::ActivateServer, g_pNetworkGameServer, Hook_ActivateServer, poly::CallbackType::Post);
-		g_HookManager.AddHookVTableFunc(&CNetworkGameServerBase::SpawnServer, g_pNetworkGameServer, Hook_SpawnServer, poly::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CNetworkGameServerBase::Release, g_pNetworkGameServer, Hook_Release, polyhook::CallbackType::Pre);
+		g_HookManager.AddHookVTableFunc(&CNetworkGameServerBase::ActivateServer, g_pNetworkGameServer, Hook_ActivateServer, polyhook::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CNetworkGameServerBase::SpawnServer, g_pNetworkGameServer, Hook_SpawnServer, polyhook::CallbackType::Post);
 	}
 
 	if (g_pGameEntitySystem != nullptr) {
@@ -833,9 +833,9 @@ void Source2SDK::OnServerStartup() {
 	g_pGameEntitySystem = GameEntitySystem();
 
 	if (g_pGameEntitySystem != nullptr) {
-		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnAddEntity, g_pGameEntitySystem, Hook_OnAddEntity, poly::CallbackType::Post);
-		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem, Hook_OnRemoveEntity, poly::CallbackType::Post);
-		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem, Hook_OnEntityParentChanged, poly::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnAddEntity, g_pGameEntitySystem, Hook_OnAddEntity, polyhook::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem, Hook_OnRemoveEntity, polyhook::CallbackType::Post);
+		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem, Hook_OnEntityParentChanged, polyhook::CallbackType::Post);
 	}
 
 	g_MultiAddonManager.OnStartupServer();
