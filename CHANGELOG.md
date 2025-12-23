@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.13](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.12...v2.3.13) (2025-12-23)
+
+
+### Bug Fixes
+
+* m_pButtonStates crash ([050bb8f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/050bb8f299ff56eeb2168cefbe1c806b53a8d9b4))
+* refactor atomic category handling in schema ([dc8299a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dc8299a4f1bda15236b387c01c7f621b1e12096a))
+
 ## [2.3.12](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.11...v2.3.12) (2025-12-13)
 
 
