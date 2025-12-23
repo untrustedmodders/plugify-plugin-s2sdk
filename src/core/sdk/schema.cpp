@@ -226,21 +226,38 @@ namespace schema {
 				return {Class, -1};
 			}
 			case SCHEMA_TYPE_ATOMIC: {
-				if (type->m_eAtomicCategory == SCHEMA_ATOMIC_COLLECTION_OF_T) {
-					switch (static_cast<CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize) {
-						case sizeof(int8):
-							return {Collection, static_cast<int>(sizeof(int8))};
-						case sizeof(int16):
-							return {Collection, static_cast<int>(sizeof(int16))};
-						case sizeof(int32):
-							return {Collection, static_cast<int>(sizeof(int32))};
-						case sizeof(int64):
-							return {Collection, static_cast<int>(sizeof(int64))};
+				switch (type->m_eAtomicCategory) {
+					case SCHEMA_ATOMIC_PLAIN:
+						switch (static_cast<CSchemaType_Atomic*>(type)->m_nSize) {
+							case sizeof(int8):
+								return {Single, static_cast<int>(sizeof(int8))};
+							case sizeof(int16):
+								return {Single, static_cast<int>(sizeof(int16))};
+							case sizeof(int32):
+								return {Single, static_cast<int>(sizeof(int32))};
+							case sizeof(int64):
+								return {Single, static_cast<int>(sizeof(int64))};
+							default:
+								break;
+						}
+						break;
+					case SCHEMA_ATOMIC_COLLECTION_OF_T:
+						switch (static_cast<CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize) {
+							case sizeof(int8):
+								return {Collection, static_cast<int>(sizeof(int8))};
+							case sizeof(int16):
+								return {Collection, static_cast<int>(sizeof(int16))};
+							case sizeof(int32):
+								return {Collection, static_cast<int>(sizeof(int32))};
+							case sizeof(int64):
+								return {Collection, static_cast<int>(sizeof(int64))};
 						default:
 							break;
-					}
+						}
+						break;
+					default:
+						return {Invalid, -1};
 				}
-				return {Invalid, -1};
 			}
 			case SCHEMA_TYPE_BUILTIN: {
 				switch (static_cast<CSchemaType_Builtin*>(type)->m_eBuiltinType) {
