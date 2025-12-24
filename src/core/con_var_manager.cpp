@@ -400,7 +400,7 @@ void ConVarManager::UpdateConVarValue(
 		}
 
 		case EConVarType_String: {
-			cvars::SetConVar(conVar, CUtlString(value.data(), static_cast<int>(value.size())), replicate, notify);
+			cvars::SetConVar(conVar, CUtlString(value), replicate, notify);
 			break;
 		}
 

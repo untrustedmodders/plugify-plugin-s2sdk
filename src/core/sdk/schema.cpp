@@ -251,8 +251,8 @@ namespace schema {
 								return {Collection, static_cast<int>(sizeof(int32))};
 							case sizeof(int64):
 								return {Collection, static_cast<int>(sizeof(int64))};
-						default:
-							break;
+							default:
+								break;
 						}
 						break;
 					default:

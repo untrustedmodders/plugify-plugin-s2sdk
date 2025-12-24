@@ -26,7 +26,7 @@ namespace cvars {
 	}
 
 	inline void SetConVarString(ConVarRefAbstract conVar, std::string_view value, bool replicate, bool notify) {
-		conVar.SetString(CUtlString(value.data(), static_cast<int>(value.size())), -1);
+		conVar.SetString(CUtlString(value), -1);
 		if (replicate) ReplicateConVar(conVar, value);
 		if (notify) NotifyConVar(conVar, value);
 	}
@@ -207,7 +207,7 @@ namespace cvars {
 			return;
 		}
 
-		conVar.SetString(CUtlString(value.data(), static_cast<int>(value.size())));
+		conVar.SetString(CUtlString(value));
 	}
 
 	template<typename T>

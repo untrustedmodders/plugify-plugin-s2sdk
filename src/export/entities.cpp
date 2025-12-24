@@ -1526,7 +1526,7 @@ extern "C" PLUGIN_API void ApplyLocalAngularVelocityImpulseToEntity(int entityHa
  * @param callerHandle The handle of the entity sending this event.
  * @param value        The value associated with the input action.
  * @param type         The type or classification of the value.
-* @param outputId      An identifier for tracking the output of this operation.
+ * @param outputId      An identifier for tracking the output of this operation.
  */
 extern "C" PLUGIN_API void AcceptEntityInput(int entityHandle, const plg::string& inputName, int activatorHandle, int callerHandle, const plg::any& value, FieldType type, int outputId) {
 	auto* entity = helpers::GetEntity(entityHandle);
