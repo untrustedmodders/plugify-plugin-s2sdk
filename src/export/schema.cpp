@@ -4,6 +4,7 @@
 #include <core/sdk/utils.hpp>
 #include <schemasystem/schemasystem.h>
 #include <tier0/utlstring.h>
+#include <string.h>
 
 PLUGIFY_WARN_PUSH()
 
@@ -860,12 +861,15 @@ extern "C" PLUGIN_API plg::string GetEntSchemaString2(CEntityInstance* entity, c
 			switch (elementType) {
 				case schema::ElementType::Array:
 					if (elementSize == sizeof(char)) {
-						return plg::string(reinterpret_cast<char*>(reinterpret_cast<intptr_t>(entity) + offset), size - 1);
+						const char* src = reinterpret_cast<const char*>(reinterpret_cast<intptr_t>(entity) + offset);
+						const std::size_t len = strnlen(src, size);
+						return plg::string(src, len);
 					}
 					break;
 				case schema::ElementType::Collection:
 					if (elementSize == sizeof(char)) {
-						return reinterpret_cast<CUtlVector<char>*>(reinterpret_cast<intptr_t>(entity) + offset)->Base();
+						const auto& vec = *reinterpret_cast<CUtlVector<char>*>(reinterpret_cast<intptr_t>(entity) + offset);
+						return plg::string(vec.Base(), static_cast<size_t>(vec.Count()));
 					}
 					break;
 				case schema::ElementType::Single:
@@ -930,7 +934,10 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 			switch (elementType) {
 				case schema::ElementType::Array:
 					if (elementSize == sizeof(char)) {
-						value.copy(reinterpret_cast<char*>(reinterpret_cast<intptr_t>(entity) + offset), size - 1);
+						char* dst = reinterpret_cast<char*>(reinterpret_cast<intptr_t>(entity) + offset);
+						const size_t n = std::min(value.size(), size - 1);
+						value.copy(dst, n);
+						dst[n] = '\0';
 						return;
 					}
 					break;
