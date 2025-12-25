@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.14](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.13...v2.3.14) (2025-12-25)
+
+
+### Bug Fixes
+
+* add nulltermination to schema strings ([72f4e4d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/72f4e4db5b2d5eeb4590fbff296719b3868ac0dd))
+
 ## [2.3.13](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.12...v2.3.13) (2025-12-23)
 
 
