@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.15](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.14...v2.3.15) (2025-12-26)
+
+
+### Bug Fixes
+
+* add cvar/command getters ([348349c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/348349ced888b1377ea5a1ae67bc2a66ceb29fdf))
+* update AcceptInput sig ([f6045fb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f6045fbca5c391410d5bb52b5e6240cf2d3b6b34))
+
 ## [2.3.14](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.13...v2.3.14) (2025-12-25)
 
 
