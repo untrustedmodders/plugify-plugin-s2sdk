@@ -42,6 +42,8 @@ public:
 	ResultType DispatchConCommand(const CCommandContext* ctx, const CCommand* args, HookMode mode);
 	ResultType ExecuteCommandCallbacks(std::string_view name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext);
 
+	plg::vector<plg::string> GetAllCommands();
+
 private:
  	plg::flat_hash_map<plg::string, std::shared_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
 	std::recursive_mutex m_mutex;

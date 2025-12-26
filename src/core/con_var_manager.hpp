@@ -152,6 +152,8 @@ public:
 	    std::string_view folder
 	);
 
+	plg::vector<plg::string> GetAllConVars();
+
 private:
 	static void UpdateConVarValue(ConVarRefAbstract conVar, std::string_view value);
 

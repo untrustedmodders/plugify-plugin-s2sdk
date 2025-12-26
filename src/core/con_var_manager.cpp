@@ -459,3 +459,12 @@ void ConVarManager::UpdateConVarValue(
 			break;
 	}
 }
+
+plg::vector<plg::string> ConVarManager::GetAllConVars() {
+	plg::vector<plg::string> commands;
+	commands.reserve(m_cnvLookup.size());
+	for (const auto& [cvar, _] : m_cnvLookup) {
+		commands.push_back(cvar);
+	}
+	return commands;
+}

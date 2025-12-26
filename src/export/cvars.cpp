@@ -1035,10 +1035,23 @@ extern "C" PLUGIN_API bool AutoExecConfig(const plg::vector<uint64>& conVarHandl
 
 /**
  * @brief Returns the current server language.
+ *
  * @return The server language as a string.
  */
 extern "C" PLUGIN_API plg::string GetServerLanguage() {
 	return g_pCoreConfig->ServerLanguage;
+}
+
+/**
+ * @brief Returns all console variables registered by this plugin.
+ *
+ * Collects only ConVars created and owned by this S2SDK plugin.
+ * Engine ConVars and variables from other plugins are excluded.
+ *
+ * @return The vector of ConVar names.
+ */
+extern "C" PLUGIN_API plg::vector<plg::string> GetAllConVars() {
+	return g_ConVarManager.GetAllConVars();
 }
 
 PLUGIFY_WARN_POP()

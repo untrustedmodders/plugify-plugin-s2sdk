@@ -151,3 +151,32 @@ extern "C" PLUGIN_API void FakeClientCommand(int playerSlot, const plg::string& 
 
 	g_pCVar->DispatchConCommand(handle, context, args);
 }
+
+/**
+ * @brief Returns the names of all registered console commands and cvars.
+ *
+ * @return The vector of command/cvar names.
+ */
+extern "C" PLUGIN_API plg::vector<plg::string> GetAllConCommands(ConVarFlag flags) {
+	plg::vector<plg::string> commands;
+	ConCommandRef cmd = g_pCVar->FindFirstConCommand();
+	for (; cmd.IsValidRef(); cmd = g_pCVar->FindNextConCommand(cmd)) {
+		if (flags == ConVarFlag::None || cmd.IsFlagSet(static_cast<uint64>(flags))) {
+			commands.push_back(cmd.GetName());
+		}
+	}
+	return commands;
+}
+
+/**
+ * @brief Returns all console commands registered by this plugin.
+ *
+ * Collects only commands explicitly registered through the S2SDK plugin
+ * command manager. Engine-native commands and commands from other plugins
+ * are not included.
+ *
+ * @return The vector of ConCommand names.
+ */
+extern "C" PLUGIN_API plg::vector<plg::string> GetAllCommands() {
+	return g_ConCommandManager.GetAllCommands();
+}

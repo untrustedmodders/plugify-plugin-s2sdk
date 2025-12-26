@@ -182,6 +182,8 @@
         ServerCommandEx;
         ClientCommand;
         FakeClientCommand;
+        GetAllConCommands;
+        GetAllCommands;
 
         PrintToServer;
         PrintToConsole;
@@ -264,8 +266,9 @@
         GetClientConVarValue;
         SetFakeClientConVarValue;
         QueryClientConVar;
-        GetServerLanguage;
         AutoExecConfig;
+        GetServerLanguage;
+        GetAllConVars;
 
         FindModule;
         FindInterface;

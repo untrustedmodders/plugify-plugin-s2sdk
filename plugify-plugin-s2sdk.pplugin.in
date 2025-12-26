@@ -11955,6 +11955,196 @@
       }
     },
     {
+      "name": "GetAllConCommands",
+      "group": "Commands",
+      "description": " Returns the names of all registered console commands and cvars.",
+      "funcName": "GetAllConCommands",
+      "paramTypes": [
+        {
+          "name": "flags",
+          "type": "int64",
+          "ref": false,
+          "description": "Additional flags for the console variable.",
+          "enum": {
+            "name": "ConVarFlag",
+            "description": "Enum representing various flags for ConVars and ConCommands.",
+            "values": [
+              {
+                "value": 0,
+                "name": "None",
+                "description": "The default, no flags at all."
+              },
+              {
+                "value": 1,
+                "name": "LinkedConcommand",
+                "description": "Linked to a ConCommand."
+              },
+              {
+                "value": 2,
+                "name": "DevelopmentOnly",
+                "description": "Hidden in released products. Automatically removed if ALLOW_DEVELOPMENT_CVARS is defined."
+              },
+              {
+                "value": 4,
+                "name": "GameDll",
+                "description": "Defined by the game DLL."
+              },
+              {
+                "value": 8,
+                "name": "ClientDll",
+                "description": "Defined by the client DLL."
+              },
+              {
+                "value": 16,
+                "name": "Hidden",
+                "description": "Hidden. Doesn't appear in find or auto-complete. Like DEVELOPMENTONLY but cannot be compiled out."
+              },
+              {
+                "value": 32,
+                "name": "Protected",
+                "description": "Server cvar; data is not sent since it's sensitive (e.g., passwords)."
+              },
+              {
+                "value": 64,
+                "name": "SpOnly",
+                "description": "This cvar cannot be changed by clients connected to a multiplayer server."
+              },
+              {
+                "value": 128,
+                "name": "Archive",
+                "description": "Saved to vars.rc."
+              },
+              {
+                "value": 256,
+                "name": "Notify",
+                "description": "Notifies players when changed."
+              },
+              {
+                "value": 512,
+                "name": "UserInfo",
+                "description": "Changes the client's info string."
+              },
+              {
+                "value": 1024,
+                "name": "Missing0",
+                "description": "Hides the cvar from lookups."
+              },
+              {
+                "value": 2048,
+                "name": "Unlogged",
+                "description": "If this is a server cvar, changes are not logged to the file or console."
+              },
+              {
+                "value": 4096,
+                "name": "Missing1",
+                "description": "Hides the cvar from lookups."
+              },
+              {
+                "value": 8192,
+                "name": "Replicated",
+                "description": "Server-enforced setting on clients."
+              },
+              {
+                "value": 16384,
+                "name": "Cheat",
+                "description": "Only usable in singleplayer/debug or multiplayer with sv_cheats."
+              },
+              {
+                "value": 32768,
+                "name": "PerUser",
+                "description": "Causes auto-generated varnameN for splitscreen slots."
+              },
+              {
+                "value": 65536,
+                "name": "Demo",
+                "description": "Records this cvar when starting a demo file."
+              },
+              {
+                "value": 131072,
+                "name": "DontRecord",
+                "description": "Excluded from demo files."
+              },
+              {
+                "value": 262144,
+                "name": "Missing2",
+                "description": "Reserved for future use."
+              },
+              {
+                "value": 524288,
+                "name": "Release",
+                "description": "Cvars tagged with this are available to customers."
+              },
+              {
+                "value": 1048576,
+                "name": "MenuBarItem",
+                "description": "Marks the cvar as a menu bar item."
+              },
+              {
+                "value": 2097152,
+                "name": "Missing3",
+                "description": "Reserved for future use."
+              },
+              {
+                "value": 4194304,
+                "name": "NotConnected",
+                "description": "Cannot be changed by a client connected to a server."
+              },
+              {
+                "value": 8388608,
+                "name": "VconsoleFuzzyMatching",
+                "description": "Enables fuzzy matching for vconsole."
+              },
+              {
+                "value": 16777216,
+                "name": "ServerCanExecute",
+                "description": "The server can execute this command on clients."
+              },
+              {
+                "value": 33554432,
+                "name": "ClientCanExecute",
+                "description": "Allows clients to execute this command."
+              },
+              {
+                "value": 67108864,
+                "name": "ServerCannotQuery",
+                "description": "The server cannot query this cvar's value."
+              },
+              {
+                "value": 134217728,
+                "name": "VconsoleSetFocus",
+                "description": "Sets focus in the vconsole."
+              },
+              {
+                "value": 268435456,
+                "name": "ClientCmdCanExecute",
+                "description": "IVEngineClient::ClientCmd can execute this command."
+              },
+              {
+                "value": 536870912,
+                "name": "ExecutePerTick",
+                "description": "Executes the cvar every tick."
+              }
+            ]
+          }
+        }
+      ],
+      "retType": {
+        "type": "string[]",
+        "description": "The vector of command/cvar names."
+      }
+    },
+    {
+      "name": "GetAllCommands",
+      "group": "Commands",
+      "description": "Returns all console commands registered by this plugin.",
+      "funcName": "GetAllCommands",
+      "paramTypes": [],
+      "retType": {
+        "type": "string[]",
+        "description": "The vector of ConCommand names."
+      }
+    },
+    {
       "name": "PrintToServer",
       "group": "Console",
       "description": "Sends a message to the server console.",
@@ -17787,6 +17977,17 @@
       "retType": {
         "type": "string",
         "description": "The server language as a string."
+      }
+    },
+    {
+      "name": "GetAllConVars",
+      "group": "Cvars",
+      "description": "Returns all console variables registered by this plugin",
+      "funcName": "GetAllConVars",
+      "paramTypes": [],
+      "retType": {
+        "type": "string[]",
+        "description": "The vector of ConVar names."
       }
     },
     {

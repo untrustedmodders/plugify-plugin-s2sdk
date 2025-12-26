@@ -239,3 +239,12 @@ ResultType ConCommandManager::DispatchConCommand(const CCommandContext* ctx, con
 
     return ExecuteCommandCallbacks(arg0, *ctx, *args, mode, CommandCallingContext::Console);
 }
+
+plg::vector<plg::string> ConCommandManager::GetAllCommands() {
+	plg::vector<plg::string> commands;
+	commands.reserve(m_cmdLookup.size());
+	for (const auto& [command, _] : m_cmdLookup) {
+		commands.push_back(command);
+	}
+	return commands;
+}
