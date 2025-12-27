@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.16](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.15...v2.3.16) (2025-12-27)
+
+
+### Bug Fixes
+
+* add FixFlashAlertMessage parameter ([315dc52](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/315dc52bf54a8d6d2ce6e59df2ff3047c478e380))
+
 ## [2.3.15](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.14...v2.3.15) (2025-12-26)
 
 
