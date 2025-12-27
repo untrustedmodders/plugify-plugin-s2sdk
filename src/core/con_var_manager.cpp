@@ -463,8 +463,8 @@ void ConVarManager::UpdateConVarValue(
 plg::vector<plg::string> ConVarManager::GetAllConVars() {
 	plg::vector<plg::string> commands;
 	commands.reserve(m_cnvLookup.size());
-	for (const auto& [cvar, _] : m_cnvLookup) {
-		commands.push_back(cvar);
+	for (const auto& [convar, _] : m_cnvLookup) {
+		commands.push_back(convar);
 	}
 	return commands;
 }
