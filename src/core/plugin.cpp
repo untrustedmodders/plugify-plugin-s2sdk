@@ -107,16 +107,18 @@ polyhook::ResultType Hook_ActivateServer(void* hook, void* params, int count, vo
 	plg::print(LS_DETAILED, "[ActivateServer]\n");
 
 #if defined (CS2)
-	g_TimerSystem.CreateTimer(0.5f, [](uint32_t, const plg::vector<plg::any>& data) {
-		auto gameRules = *(CBaseGameRules**)plg::get<void*>(data[0]);
+	if (g_pCoreConfig->FixFlashAlertMessage) {
+		g_TimerSystem.CreateTimer(0.5f, [](uint32_t, const plg::vector<plg::any>& data) {
+			auto gameRules = *(CBaseGameRules**)plg::get<void*>(data[0]);
 
-		if (gameRules == nullptr || gameRules->m_bWarmupPeriod || gameRules->m_iRoundWinStatus > 0) {
-			return;
-		}
+			if (gameRules == nullptr || gameRules->m_bWarmupPeriod || gameRules->m_iRoundWinStatus > 0) {
+				return;
+			}
 
-		gameRules->m_bGameRestart = gameRules->m_flRestartRoundTime == 0.0f;
+			gameRules->m_bGameRestart = gameRules->m_flRestartRoundTime == 0.0f;
 
-	}, TimerFlag::Repeat | TimerFlag::NoMapChange, {&g_pGameRules});
+		}, TimerFlag::Repeat | TimerFlag::NoMapChange, {&g_pGameRules});
+	}
 #endif
 
 	g_Precached.clear();
@@ -389,7 +391,9 @@ polyhook::ResultType Hook_TerminateRound(void* hook, void* params, int count, vo
 	auto delay = polyhook::GetArgument<float>(params, 1);
 	auto reason = static_cast<CSRoundEndReason>(polyhook::GetArgument<uint32_t>(params, 2));
 
-	g_pGameRules->m_bGameRestart = false;
+	if (g_pCoreConfig->FixFlashAlertMessage) {
+		g_pGameRules->m_bGameRestart = false;
+	}
 
 	g_OnRoundTerminatedListenerManager(delay, reason);
 

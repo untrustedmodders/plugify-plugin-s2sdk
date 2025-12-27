@@ -61,6 +61,7 @@ bool CoreConfig::Initialize() {
 
 	ServerLanguage = config->GetString("ServerLanguage", "en");
 	FollowCS2ServerGuidelines = config->GetBool("FollowCS2ServerGuidelines", true);
+	FixFlashAlertMessage = config->GetBool("FixFlashAlertMessage", true);
 
 	return true;
 }

@@ -22,6 +22,7 @@ public:
 	//std::vector<std::regex> FilterConsoleCleaner{};
 	plg::string ServerLanguage{"en"};
 	bool FollowCS2ServerGuidelines{true};
+	bool FixFlashAlertMessage{true};
 
 private:
 	plg::vector<plg::string> m_paths;

@@ -22,5 +22,7 @@
   // Blck modifications of protected schema fields
   "FollowCS2ServerGuidelines": true,
   // The server language
-  "ServerLanguage": "en"
+  "ServerLanguage": "en",
+  // Fixed flashing of the alert message (ONLY CS2)
+  "FixFlashAlertMessage": true
 }
