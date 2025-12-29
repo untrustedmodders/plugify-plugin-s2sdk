@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.18](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.17...v2.3.18) (2025-12-29)
+
+
+### Bug Fixes
+
+* add color for schema ([d65c7bf](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d65c7bf7f53d1bafea564b4d6fae4015f04c2bcb))
+* add lookup methods for configs ([c2864ba](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c2864bad520442c17c70c3291339ed44829b4d05))
+* rework color to vec4 ([cc4192d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/cc4192dd082be11b0427ecfb359bf2e9f629c989))
+* rework color to vec4 (2) ([fd41b20](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fd41b20a3544d8354f60b546592dbb3767c8264d))
+* SetEntityParent rework ([957d0e9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/957d0e9c0627d5d7a311a9d4ec26d6b1b8e2e9df))
+* update manifest ([46ada4f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/46ada4fd2f4d4358fbe8092bf8d4c144426a1e56))
+
 ## [2.3.17](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.16...v2.3.17) (2025-12-27)
 
 
