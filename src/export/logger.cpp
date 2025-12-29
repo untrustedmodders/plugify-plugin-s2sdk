@@ -137,8 +137,9 @@ extern "C" PLUGIN_API void SetLoggerChannelVerbosityByTag(int channelID, const p
  * @param channelID The ID of the logging channel.
  * @return The color value of the specified logging channel.
  */
-extern "C" PLUGIN_API int GetLoggerChannelColor(int channelID) {
-	return LoggingSystem_GetChannelColor(channelID);
+extern "C" PLUGIN_API plg::vec4 GetLoggerChannelColor(int channelID) {
+	const auto& color = Color(LoggingSystem_GetChannelColor(channelID)).ToVector4D();
+	return *reinterpret_cast<const plg::vec4*>(&color);
 }
 
 /**
@@ -149,8 +150,8 @@ extern "C" PLUGIN_API int GetLoggerChannelColor(int channelID) {
  * @param channelID The ID of the logging channel.
  * @param color The new color value to set for the channel.
  */
-extern "C" PLUGIN_API void SetLoggerChannelColor(int channelID, int color) {
-	LoggingSystem_SetChannelColor(channelID, color);
+extern "C" PLUGIN_API void SetLoggerChannelColor(int channelID, const plg::vec4& color) {
+	LoggingSystem_SetChannelColor(channelID, NewColor(color).GetRawColor());
 }
 
 /**

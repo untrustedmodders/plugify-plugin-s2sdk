@@ -212,6 +212,8 @@ namespace helpers {
 				plg::visit([&variant](const auto& v) {
 					using T = std::decay_t<decltype(v)>;
 					if constexpr (std::is_same_v<T, int>) variant = *reinterpret_cast<const Color*>(&v);
+					else if constexpr (std::is_same_v<T, plg::vec3>) variant = NewColor(v);
+					else if constexpr (std::is_same_v<T, plg::vec4>) variant = NewColor(v);
 				}, value);
 				break;
 			case FieldType::QAngle:

@@ -717,22 +717,22 @@ extern "C" PLUGIN_API void Kv3SetToBinaryBlobExternal(KeyValues3* kv, const plg:
  * @brief Gets the color value from the KeyValues3 object
  * @param kv Pointer to the KeyValues3 object
  * @param defaultValue Default color value to return if kv is null
- * @return Color value as int32_t or defaultValue
+ * @return Color value as vec4 or defaultValue
  */
-extern "C" PLUGIN_API int32_t Kv3GetColor(const KeyValues3* kv, int32_t defaultValue) {
+extern "C" PLUGIN_API plg::vec4 Kv3GetColor(const KeyValues3* kv, const plg::vec4& defaultValue) {
     if (!kv) return defaultValue;
     Color defaultColor = *reinterpret_cast<const Color*>(&defaultValue);
-    Color result = kv->GetColor(defaultColor);
-    return *reinterpret_cast<const uint32_t*>(&result);
+    const auto& color = kv->GetColor(defaultColor).ToVector4D();
+    return *reinterpret_cast<const plg::vec4*>(&color);
 }
 
 /**
  * @brief Sets the KeyValues3 object to a color value
  * @param kv Pointer to the KeyValues3 object
- * @param color Color value as int32_t to set
+ * @param color Color value as vec4 to set
  */
-extern "C" PLUGIN_API void Kv3SetColor(KeyValues3* kv, int32_t color) {
-    if (kv) kv->SetColor(*reinterpret_cast<const Color*>(&color));
+extern "C" PLUGIN_API void Kv3SetColor(KeyValues3* kv, const plg::vec4& color) {
+    if (kv) kv->SetColor(NewColor(color));
 }
 
 // ============================================================================
@@ -1252,13 +1252,13 @@ extern "C" PLUGIN_API plg::string Kv3GetMemberString(const KeyValues3* kv, const
  * @param kv Pointer to the KeyValues3 object
  * @param name Name of the member
  * @param defaultValue Default color value to return if member not found
- * @return Color value as int32_t or defaultValue
+ * @return Color value as vec4 or defaultValue
  */
-extern "C" PLUGIN_API int32_t Kv3GetMemberColor(const KeyValues3* kv, const plg::string& name, int32_t defaultValue) {
+extern "C" PLUGIN_API plg::vec4 Kv3GetMemberColor(const KeyValues3* kv, const plg::string& name, const plg::vec4& defaultValue) {
     if (!kv) return defaultValue;
-    Color defaultColor = *reinterpret_cast<const Color*>(&defaultValue);
-    Color result = kv->GetMemberColor(CKV3MemberName::Make(name), defaultColor);
-    return *reinterpret_cast<const int32_t*>(&result);
+    Color defaultColor = NewColor(defaultValue);
+    const auto& color = kv->GetMemberColor(CKV3MemberName::Make(name), defaultColor).ToVector4D();
+    return *reinterpret_cast<const plg::vec4*>(&color);
 }
 
 /**
@@ -1595,10 +1595,10 @@ extern "C" PLUGIN_API void Kv3SetMemberStringExternal(KeyValues3* kv, const plg:
  * @brief Sets a table member to a color value
  * @param kv Pointer to the KeyValues3 object
  * @param name Name of the member
- * @param color Color value as int32_t to set
+ * @param color Color value as vec4 to set
  */
-extern "C" PLUGIN_API void Kv3SetMemberColor(KeyValues3* kv, const plg::string& name, int32_t color) {
-    if (kv) kv->SetMemberColor(CKV3MemberName::Make(name), *reinterpret_cast<const Color*>(&color));
+extern "C" PLUGIN_API void Kv3SetMemberColor(KeyValues3* kv, const plg::string& name, const plg::vec4& color) {
+    if (kv) kv->SetMemberColor(CKV3MemberName::Make(name), NewColor(color));
 }
 
 /**

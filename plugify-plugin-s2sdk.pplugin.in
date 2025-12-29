@@ -2149,14 +2149,14 @@
         },
         {
           "name": "defaultValue",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "Default color value to return if kv is null"
         }
       ],
       "retType": {
-        "type": "int32",
-        "description": "Color value as int32_t or defaultValue"
+        "type": "vec4",
+        "description": "Color value as vec4 or defaultValue"
       }
     },
     {
@@ -2173,9 +2173,9 @@
         },
         {
           "name": "color",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
-          "description": "Color value as int32_t to set"
+          "description": "Color value as vec4 to set"
         }
       ],
       "retType": {
@@ -3385,14 +3385,14 @@
         },
         {
           "name": "defaultValue",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "Default color value to return if member not found"
         }
       ],
       "retType": {
-        "type": "int32",
-        "description": "Color value as int32_t or defaultValue"
+        "type": "vec4",
+        "description": "Color value as vec4 or defaultValue"
       }
     },
     {
@@ -4291,9 +4291,9 @@
         },
         {
           "name": "color",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
-          "description": "Color value as int32_t to set"
+          "description": "Color value as vec4 to set"
         }
       ],
       "retType": {
@@ -23498,7 +23498,7 @@
         }
       ],
       "retType": {
-        "type": "int32",
+        "type": "vec4",
         "description": "The color value of the specified logging channel."
       }
     },
@@ -23516,7 +23516,7 @@
         },
         {
           "name": "color",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The new color value to set for the channel."
         }
@@ -30146,7 +30146,7 @@
         {
           "name": "message",
           "type": "ptr64",
-          "ref": false,
+          "ref": true,
           "description": "A pointer to store the retrieved message."
         }
       ],
@@ -30182,7 +30182,7 @@
         {
           "name": "message",
           "type": "ptr64",
-          "ref": false,
+          "ref": true,
           "description": "A pointer to store the retrieved message."
         }
       ],
@@ -35201,6 +35201,16 @@
           "bindSelf": true
         },
         {
+          "name": "GetVector4",
+          "method": "PbGetVector4",
+          "bindSelf": true
+        },
+        {
+          "name": "SetVector4",
+          "method": "PbSetVector4",
+          "bindSelf": true
+        },
+        {
           "name": "GetQAngle",
           "method": "PbGetQAngle",
           "bindSelf": true
@@ -35388,6 +35398,21 @@
         {
           "name": "AddVector3",
           "method": "PbAddVector3",
+          "bindSelf": true
+        },
+        {
+          "name": "GetRepeatedVector4",
+          "method": "PbGetRepeatedVector4",
+          "bindSelf": true
+        },
+        {
+          "name": "SetRepeatedVector4",
+          "method": "PbSetRepeatedVector4",
+          "bindSelf": true
+        },
+        {
+          "name": "AddVector4",
+          "method": "PbAddVector4",
           "bindSelf": true
         },
         {

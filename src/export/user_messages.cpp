@@ -197,8 +197,8 @@ extern "C" PLUGIN_API void UserMessageSetRecipientMask(UserMessage* userMessage,
  * @param message A pointer to store the retrieved message.
  * @return True if the message was successfully retrieved, false otherwise.
  */
-extern "C" PLUGIN_API bool UserMessageGetMessage(UserMessage* userMessage, const plg::string& fieldName, void** message) {
-	return userMessage ? userMessage->GetMessage(fieldName, reinterpret_cast<pb::Message**>(message)) : false;
+extern "C" PLUGIN_API bool UserMessageGetMessage(UserMessage* userMessage, const plg::string& fieldName, pb::Message*& message) {
+	return userMessage ? userMessage->GetMessage(fieldName, message) : false;
 }
 
 /**
@@ -210,8 +210,8 @@ extern "C" PLUGIN_API bool UserMessageGetMessage(UserMessage* userMessage, const
  * @param message A pointer to store the retrieved message.
  * @return True if the message was successfully retrieved, false otherwise.
  */
-extern "C" PLUGIN_API bool UserMessageGetRepeatedMessage(UserMessage* userMessage, const plg::string& fieldName, int index, const void** message) {
-	return userMessage ? userMessage->GetRepeatedMessage(fieldName, index, reinterpret_cast<const pb::Message**>(message)) : false;
+extern "C" PLUGIN_API bool UserMessageGetRepeatedMessage(UserMessage* userMessage, const plg::string& fieldName, int index, pb::Message*& message) {
+	return userMessage ? userMessage->GetRepeatedMessage(fieldName, index, message) : false;
 }
 
 /**
@@ -222,8 +222,8 @@ extern "C" PLUGIN_API bool UserMessageGetRepeatedMessage(UserMessage* userMessag
  * @param message A pointer to the message to add.
  * @return True if the message was successfully added, false otherwise.
  */
-extern "C" PLUGIN_API bool UserMessageAddMessage(UserMessage* userMessage, const plg::string& fieldName, void** message) {
-	return userMessage ? userMessage->AddMessage(fieldName, reinterpret_cast<pb::Message**>(message)) : false;
+extern "C" PLUGIN_API bool UserMessageAddMessage(UserMessage* userMessage, const plg::string& fieldName, const pb::Message* message) {
+	return userMessage ? userMessage->AddMessage(fieldName, message) : false;
 }
 
 /**
@@ -494,7 +494,7 @@ extern "C" PLUGIN_API plg::string PbReadString(UserMessage* userMessage, const p
  */
 extern "C" PLUGIN_API plg::vec4 PbReadColor(UserMessage* userMessage, const plg::string& fieldName, int index) {
 	if (!userMessage) return {};
-	Color returnValue;
+	plg::vec4 returnValue;
 	if (index < 0) {
 		if (!userMessage->GetColor(fieldName, returnValue)) {
 			plg::print(LS_WARNING, "Invalid field {} for message {}", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
@@ -506,8 +506,7 @@ extern "C" PLUGIN_API plg::vec4 PbReadColor(UserMessage* userMessage, const plg:
 			return {};
 		}
 	}
-	const auto& color = returnValue.ToVector4D();
-	return *reinterpret_cast<const plg::vec4*>(&color);
+	return returnValue;
 }
 
 /**
@@ -520,7 +519,7 @@ extern "C" PLUGIN_API plg::vec4 PbReadColor(UserMessage* userMessage, const plg:
  */
 extern "C" PLUGIN_API plg::vec2 PbReadVector2(UserMessage* userMessage, const plg::string& fieldName, int index) {
 	if (!userMessage) return {};
-	Vector2D returnValue;
+	plg::vec2 returnValue;
 	if (index < 0) {
 		if (!userMessage->GetVector2D(fieldName, returnValue)) {
 			plg::print(LS_WARNING, "Invalid field {} for message {}", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
@@ -532,7 +531,7 @@ extern "C" PLUGIN_API plg::vec2 PbReadVector2(UserMessage* userMessage, const pl
 			return {};
 		}
 	}
-	return *reinterpret_cast<plg::vec2*>(&returnValue);
+	return returnValue;
 }
 
 /**
@@ -545,7 +544,7 @@ extern "C" PLUGIN_API plg::vec2 PbReadVector2(UserMessage* userMessage, const pl
  */
 extern "C" PLUGIN_API plg::vec3 PbReadVector3(UserMessage* userMessage, const plg::string& fieldName, int index) {
 	if (!userMessage) return {};
-	Vector returnValue;
+	plg::vec3 returnValue;
 	if (index < 0) {
 		if (!userMessage->GetVector(fieldName, returnValue)) {
 			plg::print(LS_WARNING, "Invalid field {} for message {}", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
@@ -557,7 +556,7 @@ extern "C" PLUGIN_API plg::vec3 PbReadVector3(UserMessage* userMessage, const pl
 			return {};
 		}
 	}
-	return *reinterpret_cast<plg::vec3*>(&returnValue);
+	return returnValue;
 }
 
 /**
@@ -570,7 +569,7 @@ extern "C" PLUGIN_API plg::vec3 PbReadVector3(UserMessage* userMessage, const pl
  */
 extern "C" PLUGIN_API plg::vec4 PbReadVector4(UserMessage* userMessage, const plg::string& fieldName, int index) {
 	if (!userMessage) return {};
-	Vector4D returnValue;
+	plg::vec4 returnValue;
 	if (index < 0) {
 		if (!userMessage->GetVector4D(fieldName, returnValue)) {
 			plg::print(LS_WARNING, "Invalid field {} for message {}", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
@@ -582,7 +581,7 @@ extern "C" PLUGIN_API plg::vec4 PbReadVector4(UserMessage* userMessage, const pl
 			return {};
 		}
 	}
-	return *reinterpret_cast<plg::vec4*>(&returnValue);
+	return returnValue;
 }
 
 /**
@@ -595,7 +594,7 @@ extern "C" PLUGIN_API plg::vec4 PbReadVector4(UserMessage* userMessage, const pl
  */
 extern "C" PLUGIN_API plg::vec3 PbReadQAngle(UserMessage* userMessage, const plg::string& fieldName, int index) {
 	if (!userMessage) return {};
-	QAngle returnValue;
+	plg::vec3 returnValue;
 	if (index < 0) {
 		if (!userMessage->GetQAngle(fieldName, returnValue)) {
 			plg::print(LS_WARNING, "Invalid field {} for message {}", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
@@ -847,7 +846,7 @@ extern "C" PLUGIN_API bool PbGetColor(UserMessage* userMessage, const plg::strin
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetColor(UserMessage* userMessage, const plg::string& fieldName, const plg::vec4& value) {
-	return userMessage ? userMessage->SetColor(fieldName, NewColor(value)) : false;
+	return userMessage ? userMessage->SetColor(fieldName, value) : false;
 }
 
 /**
@@ -859,7 +858,7 @@ extern "C" PLUGIN_API bool PbSetColor(UserMessage* userMessage, const plg::strin
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetVector2(UserMessage* userMessage, const plg::string& fieldName, plg::vec2& out) {
-	return userMessage ? userMessage->GetVector2D(fieldName, reinterpret_cast<Vector2D&>(out)) : false;
+	return userMessage ? userMessage->GetVector2D(fieldName, out) : false;
 }
 
 /**
@@ -871,7 +870,7 @@ extern "C" PLUGIN_API bool PbGetVector2(UserMessage* userMessage, const plg::str
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetVector2(UserMessage* userMessage, const plg::string& fieldName, const plg::vec2& value) {
-	return userMessage ? userMessage->SetVector2D(fieldName, *reinterpret_cast<const Vector2D*>(&value)) : false;
+	return userMessage ? userMessage->SetVector2D(fieldName, value) : false;
 }
 
 /**
@@ -883,7 +882,7 @@ extern "C" PLUGIN_API bool PbSetVector2(UserMessage* userMessage, const plg::str
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetVector3(UserMessage* userMessage, const plg::string& fieldName, plg::vec3& out) {
-	return userMessage ? userMessage->GetVector(fieldName, reinterpret_cast<Vector&>(out)) : false;
+	return userMessage ? userMessage->GetVector(fieldName, out) : false;
 }
 
 /**
@@ -895,7 +894,7 @@ extern "C" PLUGIN_API bool PbGetVector3(UserMessage* userMessage, const plg::str
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetVector3(UserMessage* userMessage, const plg::string& fieldName, const plg::vec3& value) {
-	return userMessage ? userMessage->SetVector(fieldName, *reinterpret_cast<const Vector*>(&value)) : false;
+	return userMessage ? userMessage->SetVector(fieldName, value) : false;
 }
 
 /**
@@ -907,7 +906,7 @@ extern "C" PLUGIN_API bool PbSetVector3(UserMessage* userMessage, const plg::str
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetVector4(UserMessage* userMessage, const plg::string& fieldName, plg::vec4& out) {
-	return userMessage ? userMessage->GetVector4D(fieldName, reinterpret_cast<Vector4D&>(out)) : false;
+	return userMessage ? userMessage->GetVector4D(fieldName, out) : false;
 }
 
 /**
@@ -919,7 +918,7 @@ extern "C" PLUGIN_API bool PbGetVector4(UserMessage* userMessage, const plg::str
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetVector4(UserMessage* userMessage, const plg::string& fieldName, const plg::vec4& value) {
-	return userMessage ? userMessage->SetVector4D(fieldName, *reinterpret_cast<const Vector4D*>(&value)) : false;
+	return userMessage ? userMessage->SetVector4D(fieldName, value) : false;
 }
 
 /**
@@ -931,7 +930,7 @@ extern "C" PLUGIN_API bool PbSetVector4(UserMessage* userMessage, const plg::str
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetQAngle(UserMessage* userMessage, const plg::string& fieldName, plg::vec3& out) {
-	return userMessage ? userMessage->GetQAngle(fieldName, reinterpret_cast<QAngle&>(out)) : false;
+	return userMessage ? userMessage->GetQAngle(fieldName, out) : false;
 }
 
 /**
@@ -943,7 +942,7 @@ extern "C" PLUGIN_API bool PbGetQAngle(UserMessage* userMessage, const plg::stri
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetQAngle(UserMessage* userMessage, const plg::string& fieldName, const plg::vec3& value) {
-	return userMessage ? userMessage->SetQAngle(fieldName, *reinterpret_cast<const QAngle*>(&value)) : false;
+	return userMessage ? userMessage->SetQAngle(fieldName, value) : false;
 }
 
 /**
@@ -1298,7 +1297,7 @@ extern "C" PLUGIN_API bool PbAddString(UserMessage* userMessage, const plg::stri
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetRepeatedColor(UserMessage* userMessage, const plg::string& fieldName, int index, plg::vec4& out) {
-	return userMessage ? userMessage->GetRepeatedColor(fieldName, index, reinterpret_cast<Color&>(out)) : false;
+	return userMessage ? userMessage->GetRepeatedColor(fieldName, index,  out) : false;
 }
 
 /**
@@ -1311,7 +1310,7 @@ extern "C" PLUGIN_API bool PbGetRepeatedColor(UserMessage* userMessage, const pl
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetRepeatedColor(UserMessage* userMessage, const plg::string& fieldName, int index, const plg::vec4& value) {
-	return userMessage ? userMessage->SetRepeatedColor(fieldName, index, NewColor(value)) : false;
+	return userMessage ? userMessage->SetRepeatedColor(fieldName, index, value) : false;
 }
 
 /**
@@ -1323,7 +1322,7 @@ extern "C" PLUGIN_API bool PbSetRepeatedColor(UserMessage* userMessage, const pl
  * @return True if the value was successfully added, false otherwise.
  */
 extern "C" PLUGIN_API bool PbAddColor(UserMessage* userMessage, const plg::string& fieldName, const plg::vec4& value) {
-	return userMessage ? userMessage->AddColor(fieldName, NewColor(value)) : false;
+	return userMessage ? userMessage->AddColor(fieldName, value) : false;
 }
 
 /**
@@ -1336,7 +1335,7 @@ extern "C" PLUGIN_API bool PbAddColor(UserMessage* userMessage, const plg::strin
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetRepeatedVector2(UserMessage* userMessage, const plg::string& fieldName, int index, plg::vec2& out) {
-	return userMessage ? userMessage->GetRepeatedVector2D(fieldName, index, reinterpret_cast<Vector2D&>(out)) : false;
+	return userMessage ? userMessage->GetRepeatedVector2D(fieldName, index, out) : false;
 }
 
 /**
@@ -1349,7 +1348,7 @@ extern "C" PLUGIN_API bool PbGetRepeatedVector2(UserMessage* userMessage, const 
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetRepeatedVector2(UserMessage* userMessage, const plg::string& fieldName, int index, const plg::vec2& value) {
-	return userMessage ? userMessage->SetRepeatedVector2D(fieldName, index, *reinterpret_cast<const Vector2D*>(&value)) : false;
+	return userMessage ? userMessage->SetRepeatedVector2D(fieldName, index, value) : false;
 }
 
 /**
@@ -1361,7 +1360,7 @@ extern "C" PLUGIN_API bool PbSetRepeatedVector2(UserMessage* userMessage, const 
  * @return True if the value was successfully added, false otherwise.
  */
 extern "C" PLUGIN_API bool PbAddVector2(UserMessage* userMessage, const plg::string& fieldName, const plg::vec2& value) {
-	return userMessage ? userMessage->AddVector2D(fieldName, *reinterpret_cast<const Vector2D*>(&value)) : false;
+	return userMessage ? userMessage->AddVector2D(fieldName, value) : false;
 }
 
 /**
@@ -1374,7 +1373,7 @@ extern "C" PLUGIN_API bool PbAddVector2(UserMessage* userMessage, const plg::str
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetRepeatedVector3(UserMessage* userMessage, const plg::string& fieldName, int index, plg::vec3& out) {
-	return userMessage ? userMessage->GetRepeatedVector(fieldName, index, reinterpret_cast<Vector&>(out)) : false;
+	return userMessage ? userMessage->GetRepeatedVector(fieldName, index, out) : false;
 }
 
 /**
@@ -1387,7 +1386,7 @@ extern "C" PLUGIN_API bool PbGetRepeatedVector3(UserMessage* userMessage, const 
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetRepeatedVector3(UserMessage* userMessage, const plg::string& fieldName, int index, const plg::vec3& value) {
-	return userMessage ? userMessage->SetRepeatedVector(fieldName, index, *reinterpret_cast<const Vector*>(&value)) : false;
+	return userMessage ? userMessage->SetRepeatedVector(fieldName, index, value) : false;
 }
 
 /**
@@ -1399,7 +1398,7 @@ extern "C" PLUGIN_API bool PbSetRepeatedVector3(UserMessage* userMessage, const 
  * @return True if the value was successfully added, false otherwise.
  */
 extern "C" PLUGIN_API bool PbAddVector3(UserMessage* userMessage, const plg::string& fieldName, const plg::vec3& value) {
-	return userMessage ? userMessage->AddVector(fieldName, *reinterpret_cast<const Vector*>(&value)) : false;
+	return userMessage ? userMessage->AddVector(fieldName, value) : false;
 }
 
 /**
@@ -1412,7 +1411,7 @@ extern "C" PLUGIN_API bool PbAddVector3(UserMessage* userMessage, const plg::str
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetRepeatedVector4(UserMessage* userMessage, const plg::string& fieldName, int index, plg::vec4& out) {
-	return userMessage ? userMessage->GetRepeatedVector4D(fieldName, index, reinterpret_cast<Vector4D&>(out)) : false;
+	return userMessage ? userMessage->GetRepeatedVector4D(fieldName, index, out) : false;
 }
 
 /**
@@ -1425,7 +1424,7 @@ extern "C" PLUGIN_API bool PbGetRepeatedVector4(UserMessage* userMessage, const 
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetRepeatedVector4(UserMessage* userMessage, const plg::string& fieldName, int index, const plg::vec4& value) {
-	return userMessage ? userMessage->SetRepeatedVector4D(fieldName, index, *reinterpret_cast<const Vector4D*>(&value)) : false;
+	return userMessage ? userMessage->SetRepeatedVector4D(fieldName, index, value) : false;
 }
 
 /**
@@ -1437,7 +1436,7 @@ extern "C" PLUGIN_API bool PbSetRepeatedVector4(UserMessage* userMessage, const 
  * @return True if the value was successfully added, false otherwise.
  */
 extern "C" PLUGIN_API bool PbAddVector4(UserMessage* userMessage, const plg::string& fieldName, const plg::vec4& value) {
-	return userMessage ? userMessage->AddVector4D(fieldName, *reinterpret_cast<const Vector4D*>(&value)) : false;
+	return userMessage ? userMessage->AddVector4D(fieldName, value) : false;
 }
 
 /**
@@ -1450,7 +1449,7 @@ extern "C" PLUGIN_API bool PbAddVector4(UserMessage* userMessage, const plg::str
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetRepeatedQAngle(UserMessage* userMessage, const plg::string& fieldName, int index, plg::vec3& out) {
-	return userMessage ? userMessage->GetRepeatedQAngle(fieldName, index, reinterpret_cast<QAngle&>(out)) : false;
+	return userMessage ? userMessage->GetRepeatedQAngle(fieldName, index, out) : false;
 }
 
 /**
@@ -1463,7 +1462,7 @@ extern "C" PLUGIN_API bool PbGetRepeatedQAngle(UserMessage* userMessage, const p
  * @return True if the field was successfully set, false otherwise.
  */
 extern "C" PLUGIN_API bool PbSetRepeatedQAngle(UserMessage* userMessage, const plg::string& fieldName, int index, const plg::vec3& value) {
-	return userMessage ? userMessage->SetRepeatedQAngle(fieldName, index, *reinterpret_cast<const QAngle*>(&value)) : false;
+	return userMessage ? userMessage->SetRepeatedQAngle(fieldName, index, value) : false;
 }
 
 /**
@@ -1475,7 +1474,7 @@ extern "C" PLUGIN_API bool PbSetRepeatedQAngle(UserMessage* userMessage, const p
  * @return True if the value was successfully added, false otherwise.
  */
 extern "C" PLUGIN_API bool PbAddQAngle(UserMessage* userMessage, const plg::string& fieldName, const plg::vec3& value) {
-	return userMessage ? userMessage->AddQAngle(fieldName, *reinterpret_cast<const QAngle*>(&value)) : false;
+	return userMessage ? userMessage->AddQAngle(fieldName, value) : false;
 }
 
 PLUGIFY_WARN_POP()

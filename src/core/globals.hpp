@@ -135,3 +135,11 @@ namespace entities {
 	CEntityInstance* FindByTarget(CEntityInstance* startEntity, const char* name);
 	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius);
 }// namespace entities
+
+inline Color NewColor(const plg::vec4& color) {
+	return Color(static_cast<uint8>(color.x), static_cast<uint8>(color.y), static_cast<uint8>(color.z), static_cast<uint8>(color.w));
+}
+
+inline Color NewColor(const plg::vec3& color) {
+	return Color(static_cast<uint8>(color.x), static_cast<uint8>(color.y), static_cast<uint8>(color.z), 255);
+}
