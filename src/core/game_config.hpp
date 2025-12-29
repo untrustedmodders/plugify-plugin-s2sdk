@@ -470,6 +470,8 @@ public:
 	ModuleProvider& GetModuleProvider();
 	PatchManager& GetPatchManager();
 
+	plg::vector<GameConfig*> GetConfigs() const;
+
 private:
 	struct ConfigEntry {
 		std::unique_ptr<GameConfig> config;

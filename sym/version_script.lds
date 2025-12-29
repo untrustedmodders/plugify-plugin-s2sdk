@@ -448,6 +448,11 @@
         GetGameConfigVTable;
         GetGameConfigAddress;
         GetGameConfigSignature;
+        GetGameConfigPatchAll;
+        GetGameConfigOffsetAll;
+        GetGameConfigAddressAll;
+        GetGameConfigVTableAll;
+        GetGameConfigSignatureAll;
 
         GetGameRulesProxy;
         GetGameRules;

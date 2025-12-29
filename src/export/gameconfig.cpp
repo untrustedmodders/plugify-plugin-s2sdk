@@ -147,4 +147,99 @@ extern "C" PLUGIN_API void* GetGameConfigSignature(uint32_t id, const plg::strin
 	return nullptr;
 }
 
+/**
+ * @brief Retrieves a patch by scanning all loaded game configurations.
+ *
+ * This function scans all loaded game configurations and retrieves the first
+ * patch that matches the specified name.
+ *
+ * @param name The name of the patch to be retrieved.
+ * @return A string containing the patch, or an empty string if not found.
+ */
+extern "C" PLUGIN_API plg::string GetGameConfigPatchAll(const plg::string& name) {
+	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
+		if (auto patch = gameConfig->GetPatch(name)) {
+			return *patch;
+		}
+	}
+	plg::print(LS_WARNING, "Could not find patch: {} in any loaded config\n", name);
+	return {};
+}
+
+/**
+ * @brief Retrieves an offset by scanning all loaded game configurations.
+ *
+ * This function scans all loaded game configurations and retrieves the first
+ * offset that matches the specified name.
+ *
+ * @param name The name whose offset is to be retrieved.
+ * @return The offset associated with the specified name, or -1 if not found.
+ */
+extern "C" PLUGIN_API int GetGameConfigOffsetAll(const plg::string& name) {
+	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
+		if (auto offset = gameConfig->GetOffset(name)) {
+			return *offset;
+		}
+	}
+	plg::print(LS_WARNING, "Could not find offset: {} in any loaded config\n", name);
+	return -1;
+}
+
+/**
+ * @brief Retrieves an address by scanning all loaded game configurations.
+ *
+ * This function scans all loaded game configurations and retrieves the first
+ * address that matches the specified name.
+ *
+ * @param name The name whose address is to be retrieved.
+ * @return A pointer to the address associated with the specified name, or nullptr if not found.
+ */
+extern "C" PLUGIN_API void* GetGameConfigAddressAll(const plg::string& name) {
+	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
+		if (auto address = gameConfig->GetAddress(name)) {
+			return *address;
+		}
+	}
+	plg::print(LS_WARNING, "Could not find address: {} in any loaded config\n", name);
+	return nullptr;
+}
+
+/**
+ * @brief Retrieves a vtable by scanning all loaded game configurations.
+ *
+ * This function scans all loaded game configurations and retrieves the first
+ * vtable that matches the specified name.
+ *
+ * @param name The name whose vtable is to be retrieved.
+ * @return A pointer to the vtable associated with the specified name, or nullptr if not found.
+ */
+extern "C" PLUGIN_API void* GetGameConfigVTableAll(const plg::string& name) {
+	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
+		if (auto vtable = gameConfig->GetVTable(name)) {
+			return *vtable;
+		}
+	}
+	plg::print(LS_WARNING, "Could not find vtable: {} in any loaded config\n", name);
+	return nullptr;
+}
+
+/**
+ * @brief Retrieves a signature by scanning all loaded game configurations.
+ *
+ * This function scans all loaded game configurations and resolves the first
+ * signature that matches the specified name.
+ *
+ * @param name The name whose signature is to be resolved and retrieved.
+ * @return A pointer to the signature associated with the specified name, or nullptr if not found.
+ */
+extern "C" PLUGIN_API void* GetGameConfigSignatureAll(const plg::string& name) {
+	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
+		if (auto signature = gameConfig->GetSignature(name)) {
+			return *signature;
+		}
+	}
+	plg::print(LS_WARNING, "Could not find signature: {} in any loaded config\n", name);
+	return nullptr;
+}
+
 PLUGIFY_WARN_POP()
