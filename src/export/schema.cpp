@@ -181,6 +181,37 @@ extern "C" PLUGIN_API void SetEntDataFloat2(CEntityInstance* entity, int offset,
 //
 
 /**
+ * @brief Peeks into an entity's object schema and retrieves the color value at the given offset.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param offset The offset of the schema to use.
+ * @return The color value at the given memory location.
+ */
+extern "C" PLUGIN_API plg::vec4 GetEntDataColor2(CEntityInstance* entity, int offset) {
+	auto color = reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset)->ToVector4D();
+	return *reinterpret_cast<plg::vec4*>(&color);
+}
+
+/**
+ * @brief Peeks into an entity's object data and sets the color value at the given offset.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param offset The offset of the schema to use.
+ * @param value The color value to set.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-1 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataColor2(CEntityInstance* entity, int offset, const plg::vec4& value, bool changeState, int chainOffset) {
+	if (changeState) {
+		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+	}
+
+	*reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset) = Color(static_cast<int>(value.x), static_cast<int>(value.y), static_cast<int>(value.z), static_cast<int>(value.w));
+}
+
+//
+
+/**
  * @brief Peeks into an entity's object schema and retrieves the string value at the given offset.
  *
  * @param entity Pointer to the instance of the class where the value is to be set.
@@ -360,6 +391,44 @@ extern "C" PLUGIN_API void SetEntDataFloat(int entityHandle, int offset, double 
 	}
 
 	SetEntDataFloat2(entity, offset, value, size, changeState, chainOffset);
+}
+
+//
+
+/**
+ * @brief Peeks into an entity's object schema and retrieves the color value at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @return The color value at the given memory location.
+ */
+extern "C" PLUGIN_API plg::vec4 GetEntDataColor(int entityHandle, int offset) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot get '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return {};
+	}
+
+	return GetEntDataColor2(entity, offset);
+}
+
+/**
+ * @brief Peeks into an entity's object data and sets the color at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @param value The color value to set.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-1 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataColor(int entityHandle, int offset, const plg::vec4& value, bool changeState, int chainOffset) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot set '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return;
+	}
+
+	SetEntDataColor2(entity, offset, value, changeState, chainOffset);
 }
 
 //
