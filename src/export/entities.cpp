@@ -581,11 +581,11 @@ extern "C" PLUGIN_API void SetEntityFlags(int entityHandle, int flags) {
  * @param entityHandle The handle of the entity whose render color is to be retrieved.
  * @return The raw color value of the entity's render color, or 0 if the entity is invalid.
  */
-extern "C" PLUGIN_API int GetEntityRenderColor(int entityHandle) {
+extern "C" PLUGIN_API plg::vec4 GetEntityRenderColor(int entityHandle) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return {};
-	Color color = entity->m_clrRender;
-	return *reinterpret_cast<const int*>(&color);
+	const auto& color = entity->m_clrRender->ToVector4D();
+	return *reinterpret_cast<const plg::vec4*>(&color);
 }
 
 /**
@@ -597,10 +597,10 @@ extern "C" PLUGIN_API int GetEntityRenderColor(int entityHandle) {
  * @param entityHandle The handle of the entity whose render color is to be set.
  * @param color The new raw color value to set for the entity's render color.
  */
-extern "C" PLUGIN_API void SetEntityRenderColor(int entityHandle, int color) {
+extern "C" PLUGIN_API void SetEntityRenderColor(int entityHandle, const plg::vec4& color) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return;
-	entity->m_clrRender = *reinterpret_cast<Color*>(&color);
+	entity->m_clrRender = NewColor(color);
 }
 
 /**

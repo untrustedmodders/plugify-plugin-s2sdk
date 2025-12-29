@@ -241,8 +241,8 @@ extern "C" PLUGIN_API uint64_t CreateConVarDouble(const plg::string& name, doubl
  * @param max The maximum color value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarColor(const plg::string& name, int defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, int min, bool hasMax, int max) {
-	return g_ConVarManager.CreateConVar<Color>(name, description, *reinterpret_cast<Color*>(&defaultValue), flags, hasMin, *reinterpret_cast<Color*>(&min), hasMax, *reinterpret_cast<Color*>(&max));
+extern "C" PLUGIN_API uint64_t CreateConVarColor(const plg::string& name, const plg::vec4& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const plg::vec4& min, bool hasMax, const plg::vec4& max) {
+	return g_ConVarManager.CreateConVar<Color>(name, description, NewColor(defaultValue), flags, hasMin, NewColor(min), hasMax, NewColor(max));
 }
 
 /**
@@ -689,9 +689,9 @@ extern "C" PLUGIN_API plg::string GetConVarString(uint64 conVarHandle) {
  * @param conVarHandle The handle to the console variable data.
  * @return The current Color value of the console variable.
  */
-extern "C" PLUGIN_API int GetConVarColor(uint64 conVarHandle) {
-	const Color& color = cvars::GetConVarValueByHandle<Color>(conVarHandle);
-	return *reinterpret_cast<const int*>(&color);
+extern "C" PLUGIN_API plg::vec4 GetConVarColor(uint64 conVarHandle) {
+	const auto& color = cvars::GetConVarValueByHandle<Color>(conVarHandle).ToVector4D();
+	return *reinterpret_cast<const plg::vec4*>(&color);
 }
 
 /**
@@ -890,8 +890,8 @@ extern "C" PLUGIN_API void SetConVarString(uint64 conVarHandle, const plg::strin
  * @param replicate If set to true, the new convar value will be set on all clients. This will only work if the convar has the FCVAR_REPLICATED flag and actually exists on clients.
  * @param notify If set to true, clients will be notified that the convar has changed. This will only work if the convar has the FCVAR_NOTIFY flag.
  */
-extern "C" PLUGIN_API void SetConVarColor(uint64 conVarHandle, int value, bool replicate, bool notify) {
-	cvars::SetConVarByHandle(conVarHandle, *reinterpret_cast<Color*>(&value), replicate, notify);
+extern "C" PLUGIN_API void SetConVarColor(uint64 conVarHandle, const plg::vec4& value, bool replicate, bool notify) {
+	cvars::SetConVarByHandle(conVarHandle, NewColor(value), replicate, notify);
 }
 
 /**

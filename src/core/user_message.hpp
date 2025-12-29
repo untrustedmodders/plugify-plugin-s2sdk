@@ -148,12 +148,12 @@ public:
 		return m_msg->GetReflection()->HasField(*m_msg, field);
 	}
 
-	bool GetEnum(std::string_view fieldName, int* out) {
+	bool GetEnum(std::string_view fieldName, int& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(ENUM);
 		CHECK_FIELD_NOT_REPEATED();
 
-		*out = m_msg->GetReflection()->GetEnum(*m_msg, field)->number();
+		out = m_msg->GetReflection()->GetEnum(*m_msg, field)->number();
 		return true;
 	}
 
@@ -168,13 +168,13 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedEnum(std::string_view fieldName, int index, int* out) {
+	bool GetRepeatedEnum(std::string_view fieldName, int index, int& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(ENUM);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		*out = m_msg->GetReflection()->GetRepeatedEnum(*m_msg, field, index)->number();
+		out = m_msg->GetReflection()->GetRepeatedEnum(*m_msg, field, index)->number();
 		return true;
 	}
 
@@ -201,12 +201,12 @@ public:
 		return true;
 	}
 
-	bool GetInt32(std::string_view fieldName, int32_t* out) {
+	bool GetInt32(std::string_view fieldName, int32_t& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT32);
 		CHECK_FIELD_NOT_REPEATED();
 
-		*out = m_msg->GetReflection()->GetInt32(*m_msg, field);
+		out = m_msg->GetReflection()->GetInt32(*m_msg, field);
 		return true;
 	}
 
@@ -219,13 +219,13 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedInt32(std::string_view fieldName, int index, int32_t* out) {
+	bool GetRepeatedInt32(std::string_view fieldName, int index, int32_t& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT32);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		*out = m_msg->GetReflection()->GetRepeatedInt32(*m_msg, field, index);
+		out = m_msg->GetReflection()->GetRepeatedInt32(*m_msg, field, index);
 		return true;
 	}
 
@@ -248,12 +248,12 @@ public:
 		return true;
 	}
 
-	bool GetInt64(std::string_view fieldName, int64_t* out) {
+	bool GetInt64(std::string_view fieldName, int64_t& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT64);
 		CHECK_FIELD_NOT_REPEATED();
 
-		*out = m_msg->GetReflection()->GetInt64(*m_msg, field);
+		out = m_msg->GetReflection()->GetInt64(*m_msg, field);
 		return true;
 	}
 
@@ -266,13 +266,13 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedInt64(std::string_view fieldName, int index, int64_t* out) {
+	bool GetRepeatedInt64(std::string_view fieldName, int index, int64_t& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(INT64);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		*out = m_msg->GetReflection()->GetRepeatedInt64(*m_msg, field, index);
+		out = m_msg->GetReflection()->GetRepeatedInt64(*m_msg, field, index);
 		return true;
 	}
 
@@ -295,12 +295,12 @@ public:
 		return true;
 	}
 
-	bool GetUInt32(std::string_view fieldName, uint32_t* out) {
+	bool GetUInt32(std::string_view fieldName, uint32_t& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT32);
 		CHECK_FIELD_NOT_REPEATED();
 
-		*out = m_msg->GetReflection()->GetUInt32(*m_msg, field);
+		out = m_msg->GetReflection()->GetUInt32(*m_msg, field);
 		return true;
 	}
 
@@ -313,13 +313,13 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedUInt32(std::string_view fieldName, int index, uint32_t* out) {
+	bool GetRepeatedUInt32(std::string_view fieldName, int index, uint32_t& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT32);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		*out = m_msg->GetReflection()->GetRepeatedUInt32(*m_msg, field, index);
+		out = m_msg->GetReflection()->GetRepeatedUInt32(*m_msg, field, index);
 		return true;
 	}
 
@@ -342,12 +342,12 @@ public:
 		return true;
 	}
 
-	bool GetUInt64(std::string_view fieldName, uint64_t* out) {
+	bool GetUInt64(std::string_view fieldName, uint64_t& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT64);
 		CHECK_FIELD_NOT_REPEATED();
 
-		*out = m_msg->GetReflection()->GetUInt64(*m_msg, field);
+		out = m_msg->GetReflection()->GetUInt64(*m_msg, field);
 		return true;
 	}
 
@@ -360,13 +360,13 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedUInt64(std::string_view fieldName, int index, uint64_t* out) {
+	bool GetRepeatedUInt64(std::string_view fieldName, int index, uint64_t& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(UINT64);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		*out = m_msg->GetReflection()->GetRepeatedUInt64(*m_msg, field, index);
+		out = m_msg->GetReflection()->GetRepeatedUInt64(*m_msg, field, index);
 		return true;
 	}
 
@@ -389,12 +389,12 @@ public:
 		return true;
 	}
 
-	bool GetBool(std::string_view fieldName, bool* out) {
+	bool GetBool(std::string_view fieldName, bool& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(BOOL);
 		CHECK_FIELD_NOT_REPEATED();
 
-		*out = m_msg->GetReflection()->GetBool(*m_msg, field);
+		out = m_msg->GetReflection()->GetBool(*m_msg, field);
 		return true;
 	}
 
@@ -407,13 +407,13 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedBool(std::string_view fieldName, int index, bool* out) {
+	bool GetRepeatedBool(std::string_view fieldName, int index, bool& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(BOOL);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		*out = m_msg->GetReflection()->GetRepeatedBool(*m_msg, field, index);
+		out = m_msg->GetReflection()->GetRepeatedBool(*m_msg, field, index);
 		return true;
 	}
 
@@ -436,12 +436,12 @@ public:
 		return true;
 	}
 
-	bool GetFloat(std::string_view fieldName, float* out) {
+	bool GetFloat(std::string_view fieldName, float& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(FLOAT);
 		CHECK_FIELD_NOT_REPEATED();
 
-		*out = m_msg->GetReflection()->GetFloat(*m_msg, field);
+		out = m_msg->GetReflection()->GetFloat(*m_msg, field);
 		return true;
 	}
 
@@ -454,13 +454,13 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedFloat(std::string_view fieldName, int index, float* out) {
+	bool GetRepeatedFloat(std::string_view fieldName, int index, float& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(FLOAT);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		*out = m_msg->GetReflection()->GetRepeatedFloat(*m_msg, field, index);
+		out = m_msg->GetReflection()->GetRepeatedFloat(*m_msg, field, index);
 		return true;
 	}
 
@@ -483,12 +483,12 @@ public:
 		return true;
 	}
 
-	bool GetDouble(std::string_view fieldName, double* out) {
+	bool GetDouble(std::string_view fieldName, double& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(DOUBLE);
 		CHECK_FIELD_NOT_REPEATED();
 
-		*out = m_msg->GetReflection()->GetDouble(*m_msg, field);
+		out = m_msg->GetReflection()->GetDouble(*m_msg, field);
 		return true;
 	}
 
@@ -501,13 +501,13 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedDouble(std::string_view fieldName, int index, double* out) {
+	bool GetRepeatedDouble(std::string_view fieldName, int index, double& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(DOUBLE);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		*out = m_msg->GetReflection()->GetRepeatedDouble(*m_msg, field, index);
+		out = m_msg->GetReflection()->GetRepeatedDouble(*m_msg, field, index);
 		return true;
 	}
 
@@ -580,13 +580,13 @@ public:
 		return true;
 	}
 
-	bool GetColor(std::string_view fieldName, Color* out) {
+	bool GetColor(std::string_view fieldName, Color& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
 
 		auto msgRGBA = *(CMsgRGBA*) m_msg->GetReflection()->MutableMessage(m_msg, field);
-		out->SetColor(msgRGBA.r(), msgRGBA.g(), msgRGBA.b(), msgRGBA.a());
+		out.SetColor(msgRGBA.r(), msgRGBA.g(), msgRGBA.b(), msgRGBA.a());
 
 		return true;
 	}
@@ -605,14 +605,14 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedColor(std::string_view fieldName, int index, Color* out) {
+	bool GetRepeatedColor(std::string_view fieldName, int index, Color& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
 		const CMsgRGBA& msgRGBA = (const CMsgRGBA&) m_msg->GetReflection()->GetRepeatedMessage(*m_msg, field, index);
-		out->SetColor(msgRGBA.r(), msgRGBA.g(), msgRGBA.b(), msgRGBA.a());
+		out.SetColor(msgRGBA.r(), msgRGBA.g(), msgRGBA.b(), msgRGBA.a());
 
 		return true;
 	}
@@ -646,13 +646,13 @@ public:
 		return true;
 	}
 
-	bool GetVector2D(std::string_view fieldName, Vector2D* out) {
+	bool GetVector2D(std::string_view fieldName, Vector2D& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
 
 		auto msgVec2d = *(CMsgVector2D*) m_msg->GetReflection()->MutableMessage(m_msg, field);
-		out->Init(msgVec2d.x(), msgVec2d.y());
+		out.Init(msgVec2d.x(), msgVec2d.y());
 
 		return true;
 	}
@@ -669,14 +669,14 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedVector2D(std::string_view fieldName, int index, Vector2D* out) {
+	bool GetRepeatedVector2D(std::string_view fieldName, int index, Vector2D& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
 		const CMsgVector2D& msgVec2d = (const CMsgVector2D&) m_msg->GetReflection()->GetRepeatedMessage(*m_msg, field, index);
-		out->Init(msgVec2d.x(), msgVec2d.y());
+		out.Init(msgVec2d.x(), msgVec2d.y());
 
 		return true;
 	}
@@ -706,13 +706,13 @@ public:
 		return true;
 	}
 
-	bool GetVector(std::string_view fieldName, Vector* out) {
+	bool GetVector(std::string_view fieldName, Vector& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
 
 		auto msgVec = *(CMsgVector*) m_msg->GetReflection()->MutableMessage(m_msg, field);
-		out->Init(msgVec.x(), msgVec.y(), msgVec.z());
+		out.Init(msgVec.x(), msgVec.y(), msgVec.z());
 
 		return true;
 	}
@@ -730,14 +730,14 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedVector(std::string_view fieldName, int index, Vector* out) {
+	bool GetRepeatedVector(std::string_view fieldName, int index, Vector& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
 		const CMsgVector& msgVec = (const CMsgVector&) m_msg->GetReflection()->GetRepeatedMessage(*m_msg, field, index);
-		out->Init(msgVec.x(), msgVec.y(), msgVec.z());
+		out.Init(msgVec.x(), msgVec.y(), msgVec.z());
 
 		return true;
 	}
@@ -769,13 +769,79 @@ public:
 		return true;
 	}
 
-	bool GetQAngle(std::string_view fieldName, QAngle* out) {
+	bool GetVector4D(std::string_view fieldName, Vector4D& out) {
+		GETCHECK_FIELD();
+		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_NOT_REPEATED();
+
+		auto msgVec = *(CMsgVector*) m_msg->GetReflection()->MutableMessage(m_msg, field);
+		out.Init(msgVec.x(), msgVec.y(), msgVec.z(), msgVec.w());
+
+		return true;
+	}
+
+	bool SetVector4D(std::string_view fieldName, const Vector4D& vec) {
+		GETCHECK_FIELD();
+		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_NOT_REPEATED();
+
+		CMsgVector* msgVec = (CMsgVector*) m_msg->GetReflection()->MutableMessage(m_msg, field);
+		msgVec->set_x(vec.x);
+		msgVec->set_y(vec.y);
+		msgVec->set_z(vec.z);
+		msgVec->set_w(vec.w);
+
+		return true;
+	}
+
+	bool GetRepeatedVector4D(std::string_view fieldName, int index, Vector4D& out) {
+		GETCHECK_FIELD();
+		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_REPEATED();
+		CHECK_REPEATED_ELEMENT(index);
+
+		const CMsgVector& msgVec = (const CMsgVector&) m_msg->GetReflection()->GetRepeatedMessage(*m_msg, field, index);
+		out.Init(msgVec.x(), msgVec.y(), msgVec.z(), msgVec.w());
+
+		return true;
+	}
+
+	bool SetRepeatedVector4D(std::string_view fieldName, int index, const Vector4D& vec) {
+		GETCHECK_FIELD();
+		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_REPEATED();
+		CHECK_REPEATED_ELEMENT(index);
+
+		CMsgVector* msgVec = (CMsgVector*) m_msg->GetReflection()->MutableRepeatedMessage(m_msg, field, index);
+		msgVec->set_x(vec.x);
+		msgVec->set_y(vec.y);
+		msgVec->set_z(vec.z);
+		msgVec->set_w(vec.w);
+
+		return true;
+	}
+
+	bool AddVector4D(std::string_view fieldName, const Vector4D& vec) {
+		GETCHECK_FIELD();
+		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_REPEATED();
+
+		CMsgVector* msgVec = (CMsgVector*) m_msg->GetReflection()->AddMessage(m_msg, field);
+		msgVec->set_x(vec.x);
+		msgVec->set_y(vec.y);
+		msgVec->set_z(vec.z);
+		msgVec->set_w(vec.w);
+
+		return true;
+	}
+
+	bool GetQAngle(std::string_view fieldName, QAngle& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_NOT_REPEATED();
 
 		auto msgAng = *(CMsgQAngle*) m_msg->GetReflection()->MutableMessage(m_msg, field);
-		out->Init(msgAng.x(), msgAng.y(), msgAng.z());
+		out.Init(msgAng.x(), msgAng.y(), msgAng.z());
 
 		return true;
 	}
@@ -793,14 +859,14 @@ public:
 		return true;
 	}
 
-	bool GetRepeatedQAngle(std::string_view fieldName, int index, QAngle* out) {
+	bool GetRepeatedQAngle(std::string_view fieldName, int index, QAngle& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
 		const CMsgQAngle& msgAng = (const CMsgQAngle&) m_msg->GetReflection()->GetRepeatedMessage(*m_msg, field, index);
-		out->Init(msgAng.x(), msgAng.y(), msgAng.z());
+		out.Init(msgAng.x(), msgAng.y(), msgAng.z());
 
 		return true;
 	}

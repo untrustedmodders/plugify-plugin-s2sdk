@@ -206,7 +206,7 @@ extern "C" PLUGIN_API void SetEntDataColor2(CEntityInstance* entity, int offset,
 		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
 	}
 
-	*reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset) = Color(static_cast<int>(value.x), static_cast<int>(value.y), static_cast<int>(value.z), static_cast<int>(value.w));
+	*reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset) = NewColor(value);
 }
 
 //

@@ -574,10 +574,10 @@ extern "C" PLUGIN_API int GetClientRenderColor(int playerSlot) {
  * @param playerSlot The index of the player's slot whose render color is to be set.
  * @param color The new raw color value to set for the client's render color.
  */
-extern "C" PLUGIN_API void SetClientRenderColor(int playerSlot, int color) {
+extern "C" PLUGIN_API void SetClientRenderColor(int playerSlot, const plg::vec4& color) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->m_clrRender = *reinterpret_cast<Color*>(&color);
+	pawn->m_clrRender = NewColor(color);
 }
 
 /**

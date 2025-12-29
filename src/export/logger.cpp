@@ -14,13 +14,13 @@ PLUGIFY_WARN_IGNORE(4190)
  * according to the defined properties.
  *
  * @param name The name of the logging channel.
- * @param iFlags Flags associated with the logging channel.
+ * @param flags Flags associated with the logging channel.
  * @param verbosity The verbosity level for the logging channel.
  * @param color The color for messages logged to this channel.
  * @return The ID of the newly created logging channel.
  */
-extern "C" PLUGIN_API int RegisterLoggingChannel(const plg::string& name, int iFlags, LoggingVerbosity_t verbosity, int color) {
-	return LoggingSystem_RegisterLoggingChannel(name.c_str(), nullptr, iFlags, verbosity, *reinterpret_cast<Color*>(&color));
+extern "C" PLUGIN_API int RegisterLoggingChannel(const plg::string& name, int flags, LoggingVerbosity_t verbosity, const plg::vec4& color) {
+	return LoggingSystem_RegisterLoggingChannel(name.c_str(), nullptr, flags, verbosity, NewColor(color));
 }
 
 /**
@@ -204,8 +204,8 @@ extern "C" PLUGIN_API int Log(int channelID, LoggingSeverity_t severity, const p
  * @param message The message to log.
  * @return An integer indicating the result of the logging operation.
  */
-extern "C" PLUGIN_API int LogColored(int channelID, LoggingSeverity_t severity, int color, const plg::string& message) {
-	return LoggingSystem_LogDirect(channelID, severity, *reinterpret_cast<Color*>(&color), message.c_str());
+extern "C" PLUGIN_API int LogColored(int channelID, LoggingSeverity_t severity, const plg::vec4& color, const plg::string& message) {
+	return LoggingSystem_LogDirect(channelID, severity, NewColor(color), message.c_str());
 }
 
 /**
@@ -243,9 +243,9 @@ extern "C" PLUGIN_API int LogFull(int channelID, LoggingSeverity_t severity, con
  * @param message The message to log.
  * @return An integer indicating the result of the logging operation.
  */
-extern "C" PLUGIN_API int LogFullColored(int channelID, LoggingSeverity_t severity, const plg::string& file, int line, const plg::string& function, int color, const plg::string& message) {
+extern "C" PLUGIN_API int LogFullColored(int channelID, LoggingSeverity_t severity, const plg::string& file, int line, const plg::string& function, const plg::vec4& color, const plg::string& message) {
 	LoggingRareOptions_t codeInfo{file.c_str(), line, function.c_str()};
-	return LoggingSystem_LogDirect(channelID, severity, codeInfo, *reinterpret_cast<Color*>(&color), message.c_str());
+	return LoggingSystem_LogDirect(channelID, severity, codeInfo, NewColor(color), message.c_str());
 }
 
 PLUGIFY_WARN_POP()

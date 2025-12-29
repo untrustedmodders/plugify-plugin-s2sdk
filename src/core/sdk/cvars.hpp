@@ -160,6 +160,10 @@ namespace cvars {
 							int color = static_cast<int>(v);
 							SetConVar(*conVar, *reinterpret_cast<Color*>(&color), replicate, notify);
 						}
+						else if constexpr (std::is_same_v<T, plg::vec4>)
+							SetConVar<Color>(*conVar, NewColor(v), replicate, notify);
+						else if constexpr (std::is_same_v<T, plg::vec3>)
+							SetConVar<Color>(*conVar, NewColor(v), replicate, notify);
 					}, value);
 					break;
 				case EConVarType_Vector2:
@@ -256,8 +260,8 @@ namespace cvars {
 					return plg::string(str.Get(), static_cast<size_t>(str.Length()));
 				}
 				case EConVarType_Color: {
-					const auto& color = GetConVarValue<Color>(*conVar);
-					return *reinterpret_cast<const int*>(&color);
+					const auto& color = GetConVarValue<Color>(*conVar).ToVector4D();
+					return *reinterpret_cast<const plg::vec4*>(&color);
 				}
 				case EConVarType_Vector2: {
 					const auto& vec2 = GetConVarValue<Vector2D>(*conVar);

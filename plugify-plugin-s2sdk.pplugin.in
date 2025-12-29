@@ -263,13 +263,13 @@
         },
         {
           "name": "defaultValue",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The default color value to return if the key is not found"
         }
       ],
       "retType": {
-        "type": "int32",
+        "type": "vec4",
         "description": "The color value as a 32-bit integer (RGBA)"
       }
     },
@@ -293,7 +293,7 @@
         },
         {
           "name": "value",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The color value as a 32-bit integer (RGBA)"
         }
@@ -8249,7 +8249,7 @@
         },
         {
           "name": "color",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The new raw color value to set for the client's render color."
         }
@@ -14658,7 +14658,7 @@
         },
         {
           "name": "defaultValue",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The default color value for the console variable."
         },
@@ -14843,7 +14843,7 @@
         },
         {
           "name": "min",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The minimum color value if hasMin is true."
         },
@@ -14855,7 +14855,7 @@
         },
         {
           "name": "max",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The maximum color value if hasMax is true."
         }
@@ -17048,7 +17048,7 @@
         }
       ],
       "retType": {
-        "type": "int32",
+        "type": "vec4",
         "description": "The current Color value of the console variable."
       }
     },
@@ -17558,7 +17558,7 @@
         },
         {
           "name": "value",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The value to set for the console variable."
         },
@@ -19501,7 +19501,7 @@
         }
       ],
       "retType": {
-        "type": "int32",
+        "type": "vec4",
         "description": "The raw color value of the entity's render color, or 0 if the entity is invalid."
       }
     },
@@ -19519,7 +19519,7 @@
         },
         {
           "name": "color",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The new raw color value to set for the entity's render color."
         }
@@ -23076,7 +23076,7 @@
           "description": "The name of the logging channel."
         },
         {
-          "name": "iFlags",
+          "name": "flags",
           "type": "int32",
           "ref": false,
           "description": "Flags associated with the logging channel."
@@ -23120,7 +23120,7 @@
         },
         {
           "name": "color",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The color for messages logged to this channel."
         }
@@ -23704,7 +23704,7 @@
         },
         {
           "name": "color",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The color for the log message."
         },
@@ -23878,7 +23878,7 @@
         },
         {
           "name": "color",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The color for the log message."
         },
@@ -30589,7 +30589,7 @@
         }
       ],
       "retType": {
-        "type": "int32",
+        "type": "vec4",
         "description": "The color value read, or an empty value if invalid."
       }
     },
@@ -30654,6 +30654,36 @@
       }
     },
     {
+      "name": "PbReadVector4",
+      "group": "Protobuf",
+      "description": "Reads a 4D vector from a UserMessage.",
+      "funcName": "PbReadVector4",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the UserMessage object."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "Name of the field to read."
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "Index of the repeated field (use -1 for non-repeated fields)."
+        }
+      ],
+      "retType": {
+        "type": "vec4",
+        "description": "The 4D vector value read, or an empty value if invalid."
+      }
+    },
+    {
       "name": "PbReadQAngle",
       "group": "Protobuf",
       "description": "Reads a QAngle (rotation vector) from a UserMessage.",
@@ -30703,8 +30733,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "int32",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -30763,8 +30793,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "int32",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -30823,8 +30853,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "int64",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -30883,8 +30913,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "uint32",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -30943,8 +30973,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "uint64",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -31003,8 +31033,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "bool",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -31063,8 +31093,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "float",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -31123,8 +31153,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "double",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -31243,8 +31273,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec4",
+          "ref": true,
           "description": "The output string."
         }
       ],
@@ -31273,7 +31303,7 @@
         },
         {
           "name": "value",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The value to set."
         }
@@ -31303,8 +31333,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec2",
+          "ref": true,
           "description": "The output string."
         }
       ],
@@ -31363,8 +31393,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec3",
+          "ref": true,
           "description": "The output string."
         }
       ],
@@ -31404,6 +31434,66 @@
       }
     },
     {
+      "name": "PbGetVector4",
+      "group": "Protobuf",
+      "description": "Gets a Vector4 value from a field in the UserMessage.",
+      "funcName": "PbGetVector4",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "out",
+          "type": "vec4",
+          "ref": true,
+          "description": "The output string."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the field was successfully retrieved, false otherwise."
+      }
+    },
+    {
+      "name": "PbSetVector4",
+      "group": "Protobuf",
+      "description": "Sets a Vector3 value for a field in the UserMessage.",
+      "funcName": "PbSetVector4",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "value",
+          "type": "vec4",
+          "ref": false,
+          "description": "The value to set."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the field was successfully set, false otherwise."
+      }
+    },
+    {
       "name": "PbGetQAngle",
       "group": "Protobuf",
       "description": "Gets a QAngle value from a field in the UserMessage.",
@@ -31423,8 +31513,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec3",
+          "ref": true,
           "description": "The output string."
         }
       ],
@@ -31489,8 +31579,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "int32",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -31591,8 +31681,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "int32",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -31693,8 +31783,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "int64",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -31795,8 +31885,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "uint32",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -31897,8 +31987,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "uint64",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -31999,8 +32089,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "bool",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -32101,8 +32191,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "float",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -32203,8 +32293,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "double",
+          "ref": true,
           "description": "The output value."
         }
       ],
@@ -32407,8 +32497,8 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
+          "type": "vec4",
+          "ref": true,
           "description": "The output color."
         }
       ],
@@ -32443,7 +32533,7 @@
         },
         {
           "name": "value",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The value to set."
         }
@@ -32473,7 +32563,7 @@
         },
         {
           "name": "value",
-          "type": "int32",
+          "type": "vec4",
           "ref": false,
           "description": "The value to add."
         }
@@ -32509,9 +32599,9 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
-          "description": "The output vector2."
+          "type": "vec2",
+          "ref": true,
+          "description": "The output vector."
         }
       ],
       "retType": {
@@ -32611,9 +32701,9 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
-          "description": "The output vector2."
+          "type": "vec3",
+          "ref": true,
+          "description": "The output vector."
         }
       ],
       "retType": {
@@ -32688,6 +32778,108 @@
       }
     },
     {
+      "name": "PbGetRepeatedVector4",
+      "group": "Protobuf",
+      "description": "Gets a repeated Vector4 value from a field in the UserMessage.",
+      "funcName": "PbGetRepeatedVector4",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the repeated field."
+        },
+        {
+          "name": "out",
+          "type": "vec4",
+          "ref": true,
+          "description": "The output vector."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the field was successfully retrieved, false otherwise."
+      }
+    },
+    {
+      "name": "PbSetRepeatedVector4",
+      "group": "Protobuf",
+      "description": "Sets a repeated Vector4 value for a field in the UserMessage.",
+      "funcName": "PbSetRepeatedVector4",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the repeated field."
+        },
+        {
+          "name": "value",
+          "type": "vec4",
+          "ref": false,
+          "description": "The value to set."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the field was successfully set, false otherwise."
+      }
+    },
+    {
+      "name": "PbAddVector4",
+      "group": "Protobuf",
+      "description": "Adds a Vector4 value to a repeated field in the UserMessage.",
+      "funcName": "PbAddVector4",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "value",
+          "type": "vec4",
+          "ref": false,
+          "description": "The value to add."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the value was successfully added, false otherwise."
+      }
+    },
+    {
       "name": "PbGetRepeatedQAngle",
       "group": "Protobuf",
       "description": "Gets a repeated QAngle value from a field in the UserMessage.",
@@ -32713,9 +32905,9 @@
         },
         {
           "name": "out",
-          "type": "ptr64",
-          "ref": false,
-          "description": "The output vector2."
+          "type": "vec3",
+          "ref": true,
+          "description": "The output vector."
         }
       ],
       "retType": {
@@ -34876,6 +35068,11 @@
         {
           "name": "ReadVector3",
           "method": "PbReadVector3",
+          "bindSelf": true
+        },
+        {
+          "name": "ReadVector4",
+          "method": "PbReadVector4",
           "bindSelf": true
         },
         {

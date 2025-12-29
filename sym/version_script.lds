@@ -693,6 +693,7 @@
         PbReadColor;
         PbReadVector2;
         PbReadVector3;
+        PbReadVector4;
         PbReadQAngle;
         PbGetEnum;
         PbSetEnum;
@@ -718,6 +719,8 @@
         PbSetVector2;
         PbGetVector3;
         PbSetVector3;
+        PbGetVector4;
+        PbSetVector4;
         PbGetQAngle;
         PbSetQAngle;
         PbGetRepeatedEnum;
@@ -756,6 +759,9 @@
         PbGetRepeatedVector3;
         PbSetRepeatedVector3;
         PbAddVector3;
+        PbGetRepeatedVector4;
+        PbSetRepeatedVector4;
+        PbAddVector4;
         PbGetRepeatedQAngle;
         PbSetRepeatedQAngle;
         PbAddQAngle;

@@ -165,10 +165,10 @@ extern "C" PLUGIN_API KeyValues* Kv1GetNextKey(KeyValues* kv) {
  * @param defaultValue The default color value to return if the key is not found
  * @return The color value as a 32-bit integer (RGBA)
  */
-extern "C" PLUGIN_API int Kv1GetColor(KeyValues* kv, const plg::string& keyName, int defaultValue) {
+extern "C" PLUGIN_API plg::vec4 Kv1GetColor(KeyValues* kv, const plg::string& keyName, const plg::vec4& defaultValue) {
 	if (!kv) return defaultValue;
-	Color color = kv->GetColor(keyName.c_str(), *reinterpret_cast<Color*>(&defaultValue));
-	return *reinterpret_cast<const int*>(&color);
+	const auto& color = kv->GetColor(keyName.c_str(), NewColor(defaultValue)).ToVector4D();
+	return *reinterpret_cast<const plg::vec4*>(&color);
 }
 
 /**
@@ -180,8 +180,8 @@ extern "C" PLUGIN_API int Kv1GetColor(KeyValues* kv, const plg::string& keyName,
  * @param keyName The name of the key to set the color for
  * @param value The color value as a 32-bit integer (RGBA)
  */
-extern "C" PLUGIN_API void Kv1SetColor(KeyValues* kv, const plg::string& keyName, int value) {
-	if (kv) kv->SetColor(keyName.c_str(), *reinterpret_cast<Color*>(&value));
+extern "C" PLUGIN_API void Kv1SetColor(KeyValues* kv, const plg::string& keyName, const plg::vec4& value) {
+	if (kv) kv->SetColor(keyName.c_str(), NewColor(value));
 }
 
 /**
