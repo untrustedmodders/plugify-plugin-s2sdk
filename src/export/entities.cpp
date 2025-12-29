@@ -838,13 +838,29 @@ extern "C" PLUGIN_API int GetEntityParent(int entityHandle) {
  * @brief Sets the parent of an entity.
  *
  * This function updates the parent of the specified entity.
+ * If either the entity or the new parent is invalid, the function remove parent.
+ *
+ * @param entityHandle The handle of the entity whose parent is to be set.
+ * @param parentHandle The handle of the new parent entity.
+ */
+extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle) {
+	auto* entity = helpers::GetEntity(entityHandle);
+	if (!entity) return;
+	CEntityInstance* parent = parentHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(parentHandle)) : nullptr;
+	entity->SetParent2(parent);
+}
+
+/**
+ * @brief Sets the parent of an entity to attachment by name.
+ *
+ * This function updates the parent of the specified entity.
  * If either the entity or the new parent is invalid, the function does nothing.
  *
  * @param entityHandle The handle of the entity whose parent is to be set.
  * @param parentHandle The handle of the new parent entity.
  * @param attachmentName The name of the entity's attachment.
  */
-extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle, const plg::string& attachmentName) {
+extern "C" PLUGIN_API void SetEntityParentAttachment(int entityHandle, int parentHandle, const plg::string& attachmentName) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
 	auto* parent = helpers::GetEntity(parentHandle);

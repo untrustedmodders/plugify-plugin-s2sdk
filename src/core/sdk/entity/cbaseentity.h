@@ -174,6 +174,7 @@ public:
 	SCHEMA_FIELD(CUtlSymbolLarge, m_target);
 	SCHEMA_FIELD(CUtlSymbolLarge, m_iGlobalname);
 	SCHEMA_FIELD(CHandle<CBaseEntity>, m_hGroundEntity)
+	SCHEMA_FIELD(CHandle<CBaseEntity>, m_hOwnerEntity)
 	SCHEMA_FIELD(float, m_flWaterLevel)
 	SCHEMA_FIELD(int, m_fEffects)
 
@@ -273,6 +274,14 @@ public:
     VSCRIPT_MEMBER_FUNCTION(ValidatePrivateScriptScope, void)
 
 	int entindex() { return m_pEntity->m_EHandle.GetEntryIndex(); }
+
+	void SetParent2(CEntityInstance* newParent)
+	{
+		if (newParent)
+			AcceptInput("SetParent", "!activator", newParent);
+		else
+			AcceptInput("ClearParent");
+	}
 
 	string GetName() {
 		return m_iGlobalname->String();

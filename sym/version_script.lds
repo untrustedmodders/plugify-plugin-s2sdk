@@ -347,6 +347,7 @@
         SetEntityOwner;
         GetEntityParent;
         SetEntityParent;
+        SetEntityParentAttachment;
         GetEntityAbsOrigin;
         SetEntityAbsOrigin;
         GetEntityAbsScale;
