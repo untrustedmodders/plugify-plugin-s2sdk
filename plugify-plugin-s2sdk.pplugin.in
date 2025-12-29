@@ -20033,6 +20033,29 @@
           "name": "parentHandle",
           "type": "int32",
           "ref": false,
+          "description": "The handle of the new parent entity. (Can be invalid to clean parent)"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntityParentAttachment",
+      "group": "Entities",
+      "description": "Sets the parent of an entity to attachment by name.",
+      "funcName": "SetEntityParentAttachment",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose parent is to be set."
+        },
+        {
+          "name": "parentHandle",
+          "type": "int32",
+          "ref": false,
           "description": "The handle of the new parent entity."
         },
         {
@@ -22951,6 +22974,96 @@
       }
     },
     {
+      "name": "GetGameConfigPatchAll",
+      "group": "Gameconfig",
+      "description": "Retrieves a patch by scanning all loaded game configurations.",
+      "funcName": "GetGameConfigPatchAll",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the patch to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "A string containing the patch, or an empty string if not found."
+      }
+    },
+    {
+      "name": "GetGameConfigOffsetAll",
+      "group": "Gameconfig",
+      "description": "Retrieves an offset by scanning all loaded game configurations.",
+      "funcName": "GetGameConfigOffsetAll",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name whose offset is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The offset associated with the specified name, or -1 if not found."
+      }
+    },
+    {
+      "name": "GetGameConfigAddressAll",
+      "group": "Gameconfig",
+      "description": "Retrieves an address by scanning all loaded game configurations.",
+      "funcName": "GetGameConfigAddressAll",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name whose address is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the address associated with the specified name, or nullptr if not found."
+      }
+    },
+    {
+      "name": "GetGameConfigVTableAll",
+      "group": "Gameconfig",
+      "description": "Retrieves a vtable by scanning all loaded game configurations.",
+      "funcName": "GetGameConfigVTableAll",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the vtable to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the vtable associated with the specified name, or nullptr if not found."
+      }
+    },
+    {
+      "name": "GetGameConfigSignatureAll",
+      "group": "Gameconfig",
+      "description": "Retrieves a signature by scanning all loaded game configurations.",
+      "funcName": "GetGameConfigSignatureAll",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name whose signature is to be resolved and retrieved."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the signature associated with the specified name, or nullptr if not found."
+      }
+    },
+    {
       "name": "RegisterLoggingChannel",
       "group": "Logger",
       "description": "Registers a new logging channel with specified properties.",
@@ -25309,6 +25422,71 @@
       }
     },
     {
+      "name": "GetEntDataColor2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object schema and retrieves the color value at the given offset.",
+      "funcName": "GetEntDataColor2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        }
+      ],
+      "retType": {
+        "type": "vec4",
+        "description": "The color value at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataColor2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the color at the given offset.",
+      "funcName": "SetEntDataColor2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "vec4",
+          "ref": false,
+          "description": "The color value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-1 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "GetEntDataString2",
       "group": "Schema",
       "description": "Peeks into an entity's object schema and retrieves the string value at the given offset.",
@@ -25668,6 +25846,71 @@
           "type": "int32",
           "ref": false,
           "description": "Number of bytes to write (valid values are 1, 2, 4 or 8)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-1 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataColor",
+      "group": "Schema",
+      "description": "Peeks into an entity's object schema and retrieves the color value at the given offset.",
+      "funcName": "GetEntDataColor",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        }
+      ],
+      "retType": {
+        "type": "vec4",
+        "description": "The color value at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataColor",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the color at the given offset.",
+      "funcName": "SetEntDataColor",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "vec4",
+          "ref": false,
+          "description": "The color value to set."
         },
         {
           "name": "changeState",
