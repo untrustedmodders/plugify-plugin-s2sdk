@@ -573,6 +573,8 @@
         SetEntSchema2;
         GetEntSchemaFloat2;
         SetEntSchemaFloat2;
+        GetEntSchemaColor2;
+        SetEntSchemaColor2;
         GetEntSchemaString2;
         SetEntSchemaString2;
         GetEntSchemaVector3D2;
@@ -589,6 +591,8 @@
         SetEntSchema;
         GetEntSchemaFloat;
         SetEntSchemaFloat;
+        GetEntSchemaColor;
+        SetEntSchemaColor;
         GetEntSchemaString;
         SetEntSchemaString;
         GetEntSchemaVector3D;

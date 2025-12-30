@@ -32,7 +32,7 @@ extern "C" PLUGIN_API uint64_t CreateConVar(const plg::string& name, const plg::
 		if constexpr (std::is_pointer_v<T> || std::is_same_v<T, int8_t> || std::is_same_v<T, uint8_t> || std::is_same_v<T, char16_t> || std::is_same_v<T, char> || std::is_same_v<T, plg::mat4x4>) {
 			plg::print(LS_WARNING, "Type not supported: {}\n", typeid(T).name());
 		} else if constexpr (std::is_same_v<T, plg::string>) {
-			result = g_ConVarManager.CreateConVar<CUtlString>(name, description, CUtlString(v.c_str(), static_cast<int>(v.size())), flags);
+			result = g_ConVarManager.CreateConVar<CUtlString>(name, description, CUtlString(v), flags);
 		} else if constexpr (std::is_same_v<T, plg::vec2>) {
 			result = g_ConVarManager.CreateConVar<Vector2D>(name, description, std::bit_cast<Vector2D>(v), flags);
 		} else if constexpr (std::is_same_v<T, plg::vec3>) {
@@ -333,7 +333,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarQAngle(const plg::string& name, const
  * @return A handle to the created console variable.
  */
 extern "C" PLUGIN_API uint64_t CreateConVarString(const plg::string& name, const plg::string& defaultValue, const plg::string& description, ConVarFlag flags) {
-	return g_ConVarManager.CreateConVar<CUtlString>(name, description, CUtlString(defaultValue.c_str(), static_cast<int>(defaultValue.size())), flags);
+	return g_ConVarManager.CreateConVar<CUtlString>(name, description, CUtlString(defaultValue), flags);
 }
 
 /**

@@ -141,7 +141,7 @@ extern "C" PLUGIN_API void ClientCommand(int playerSlot, const plg::string& comm
  */
 extern "C" PLUGIN_API void FakeClientCommand(int playerSlot, const plg::string& command) {
 	CCommand args;
-	CUtlString str(command.c_str(), static_cast<int>(command.size()));
+	CUtlString str(command);
 	args.Tokenize(str);
 	auto handle = g_pCVar->FindConCommand(args.Arg(0));
 	if (!handle.IsValidRef())
