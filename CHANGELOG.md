@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.19](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.18...v2.3.19) (2025-12-30)
+
+
+### Bug Fixes
+
+* add schema colors getter/setter and replace all unsafe casr by std::bit_cast ([8a35f61](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8a35f61d13d402058661f3189096a8b59e6d61f8))
+* update manifest with set set schema methods ([801e7df](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/801e7dff57f7331eb2863381183d991ac75a7ebd))
+
 ## [2.3.18](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.17...v2.3.18) (2025-12-29)
 
 
