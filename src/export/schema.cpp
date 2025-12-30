@@ -1637,6 +1637,52 @@ extern "C" PLUGIN_API void SetEntSchemaFloat(int entityHandle, const plg::string
 //
 
 /**
+ * @brief Retrieves a color value from an entity's schema.
+ *
+ * This function is considered safer and more robust over GetEntData, because it performs strict offset checking and typing rules.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param element Element # (starting from 0) if schema is an array.
+ * @return A color value at the given schema offset.
+ */
+extern "C" PLUGIN_API plg::vec4 GetEntSchemaColor(int entityHandle, const plg::string& className, const plg::string& memberName, int element) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot set '{}::{}' with invalid entity handle: {}\n", className, memberName, entityHandle);
+		return {};
+	}
+
+	return GetEntSchemaColor2(entity, className, memberName, element);
+}
+
+/**
+ * @brief Sets a color value in an entity's schema.
+ *
+ * This function is considered safer and more robust over GetEntData, because it performs strict offset checking and typing rules.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param value The color value to set.
+ * @param changeState If true, change will be sent over the network.
+ * @param element Element # (starting from 0) if schema is an array.
+ * @return A color value at the given schema offset.
+ */
+extern "C" PLUGIN_API void SetEntSchemaColor(int entityHandle, const plg::string& className, const plg::string& memberName, const plg::vec4& value, bool changeState, int element) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot set '{}::{}' with invalid entity handle: {}\n", className, memberName, entityHandle);
+		return;
+	}
+
+	SetEntSchemaColor2(entity, className, memberName, value, changeState, element);
+}
+
+//
+
+/**
  * @brief Retrieves a string value from an entity's schema.
 *
 * This function is considered safer and more robust over GetEntData, because it performs strict offset checking and typing rules.

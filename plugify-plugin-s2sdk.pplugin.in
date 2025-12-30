@@ -26348,7 +26348,91 @@
       ],
       "retType": {
         "type": "void",
-        "description": "An float value at the given schema offset."
+        "description": "A float value at the given schema offset."
+      }
+    },
+    {
+      "name": "GetEntSchemaColor2",
+      "group": "Schema",
+      "description": "Retrieves a color value from an entity's schema.",
+      "funcName": "GetEntSchemaColor2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "element",
+          "type": "int32",
+          "ref": false,
+          "description": "Element # (starting from 0) if schema is an array."
+        }
+      ],
+      "retType": {
+        "type": "vec4",
+        "description": "A color value at the given schema offset."
+      }
+    },
+    {
+      "name": "SetEntSchemaColor2",
+      "group": "Schema",
+      "description": "Sets a color value in an entity's schema.",
+      "funcName": "SetEntSchemaColor2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "value",
+          "type": "vec4",
+          "ref": false,
+          "description": "The color value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "element",
+          "type": "int32",
+          "ref": false,
+          "description": "Element # (starting from 0) if schema is an array."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "A color value at the given schema offset."
       }
     },
     {
@@ -26995,7 +27079,91 @@
       ],
       "retType": {
         "type": "void",
-        "description": "An float value at the given schema offset."
+        "description": "A float value at the given schema offset."
+      }
+    },
+    {
+      "name": "GetEntSchemaColor",
+      "group": "Schema",
+      "description": "Retrieves a color value from an entity's schema.",
+      "funcName": "GetEntSchemaColor",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "element",
+          "type": "int32",
+          "ref": false,
+          "description": "Element # (starting from 0) if schema is an array."
+        }
+      ],
+      "retType": {
+        "type": "vec4",
+        "description": "A color value at the given schema offset."
+      }
+    },
+    {
+      "name": "SetEntSchemaColor",
+      "group": "Schema",
+      "description": "Sets a color value in an entity's schema.",
+      "funcName": "SetEntSchemaColor",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "value",
+          "type": "vec4",
+          "ref": false,
+          "description": "The color value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "element",
+          "type": "int32",
+          "ref": false,
+          "description": "Element # (starting from 0) if schema is an array."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "A color value at the given schema offset."
       }
     },
     {
