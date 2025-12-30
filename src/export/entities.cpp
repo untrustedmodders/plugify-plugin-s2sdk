@@ -240,7 +240,7 @@ extern "C" PLUGIN_API int FindEntityByClassname(int startFrom, const plg::string
  * @return The handle of the nearest entity, or INVALID_EHANDLE_INDEX if none found.
  */
 extern "C" PLUGIN_API int FindEntityByClassnameNearest(const plg::string& classname, const plg::vec3& origin, float maxRadius) {
-	CEntityInstance* found = entities::FindEntityByClassNameNearest(classname.c_str(), *reinterpret_cast<const Vector*>(&origin), maxRadius);
+	CEntityInstance* found = entities::FindEntityByClassNameNearest(classname.c_str(), std::bit_cast<Vector>(origin), maxRadius);
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
 
@@ -255,7 +255,7 @@ extern "C" PLUGIN_API int FindEntityByClassnameNearest(const plg::string& classn
  */
 extern "C" PLUGIN_API int FindEntityByClassnameWithin(int startFrom, const plg::string& classname, const plg::vec3& origin, float radius) {
 	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
-	CEntityInstance* found = entities::FindEntityByClassNameWithin(startEnt, classname.c_str(), *reinterpret_cast<const Vector*>(&origin), radius);
+	CEntityInstance* found = entities::FindEntityByClassNameWithin(startEnt, classname.c_str(), std::bit_cast<Vector>(origin), radius);
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
 
@@ -281,7 +281,7 @@ extern "C" PLUGIN_API int FindEntityByName(int startFrom, const plg::string& nam
  * @return The handle of the nearest entity, or INVALID_EHANDLE_INDEX if none found.
  */
 extern "C" PLUGIN_API int FindEntityByNameNearest(const plg::string& name, const plg::vec3& origin, float maxRadius) {
-	CEntityInstance* found = entities::FindByNameNearest(name.c_str(), *reinterpret_cast<const Vector*>(&origin), maxRadius);
+	CEntityInstance* found = entities::FindByNameNearest(name.c_str(), std::bit_cast<Vector>(origin), maxRadius);
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
 
@@ -296,7 +296,7 @@ extern "C" PLUGIN_API int FindEntityByNameNearest(const plg::string& name, const
  */
 extern "C" PLUGIN_API int FindEntityByNameWithin(int startFrom, const plg::string& name, const plg::vec3& origin, float radius) {
 	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
-	CEntityInstance* found = entities::FindByNameWithin(startEnt, name.c_str(), *reinterpret_cast<const Vector*>(&origin), radius);
+	CEntityInstance* found = entities::FindByNameWithin(startEnt, name.c_str(), std::bit_cast<Vector>(origin), radius);
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
 
@@ -323,7 +323,7 @@ extern "C" PLUGIN_API int FindEntityByTarget(int startFrom, const plg::string& n
  */
 extern "C" PLUGIN_API int FindEntityInSphere(int startFrom, const plg::vec3& origin, float radius) {
 	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
-	CEntityInstance* found = entities::FindInSphere(startEnt, nullptr, *reinterpret_cast<const Vector*>(&origin), radius);
+	CEntityInstance* found = entities::FindInSphere(startEnt, nullptr, std::bit_cast<Vector>(origin), radius);
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
 
@@ -584,8 +584,7 @@ extern "C" PLUGIN_API void SetEntityFlags(int entityHandle, int flags) {
 extern "C" PLUGIN_API plg::vec4 GetEntityRenderColor(int entityHandle) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return {};
-	const auto& color = entity->m_clrRender->ToVector4D();
-	return *reinterpret_cast<const plg::vec4*>(&color);
+	return std::bit_cast<plg::vec4>(entity->m_clrRender->ToVector4D());
 }
 
 /**
@@ -880,8 +879,7 @@ extern "C" PLUGIN_API void SetEntityParentAttachment(int entityHandle, int paren
 extern "C" PLUGIN_API plg::vec3 GetEntityAbsOrigin(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const Vector& vec = entity->GetAbsOrigin();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(entity->GetAbsOrigin());
 }
 
 /**
@@ -896,7 +894,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAbsOrigin(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityAbsOrigin(int entityHandle, const plg::vec3& origin) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->SetAbsOrigin(*reinterpret_cast<const Vector*>(&origin));
+	entity->SetAbsOrigin(std::bit_cast<Vector>(origin));
 }
 
 /**
@@ -941,8 +939,7 @@ extern "C" PLUGIN_API void SetEntityAbsScale(int entityHandle, float scale) {
 extern "C" PLUGIN_API plg::vec3 GetEntityAbsAngles(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const QAngle& ang = entity->GetAngles();
-	return *reinterpret_cast<const plg::vec3*>(&ang);
+	return std::bit_cast<plg::vec3>(entity->GetAngles());
 }
 
 /**
@@ -972,8 +969,7 @@ extern "C" PLUGIN_API void SetEntityAbsAngles(int entityHandle, const QAngle& an
 extern "C" PLUGIN_API plg::vec3 GetEntityLocalOrigin(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const Vector& vec = entity->GetLocalOrigin();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(entity->GetLocalOrigin());
 }
 
 /**
@@ -988,7 +984,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityLocalOrigin(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityLocalOrigin(int entityHandle, const plg::vec3& origin) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->SetLocalOrigin(*reinterpret_cast<const Vector*>(&origin));
+	entity->SetLocalOrigin(std::bit_cast<Vector>(origin));
 }
 
 /**
@@ -1033,8 +1029,7 @@ extern "C" PLUGIN_API void SetEntityLocalScale(int entityHandle, float scale) {
 extern "C" PLUGIN_API plg::vec3 GetEntityLocalAngles(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const QAngle& ang = entity->GetAngles();
-	return *reinterpret_cast<const plg::vec3*>(&ang);
+	return std::bit_cast<plg::vec3>(entity->GetAngles());
 }
 
 /**
@@ -1064,8 +1059,7 @@ extern "C" PLUGIN_API void SetEntityLocalAngles(int entityHandle, const QAngle& 
 extern "C" PLUGIN_API plg::vec3 GetEntityAbsVelocity(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const Vector& vec = entity->GetVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(entity->GetVelocity());
 }
 
 /**
@@ -1080,7 +1074,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAbsVelocity(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityAbsVelocity(int entityHandle, const plg::vec3& velocity) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->SetVelocity(*reinterpret_cast<const Vector*>(&velocity));
+	entity->SetVelocity(std::bit_cast<Vector>(velocity));
 }
 
 /**
@@ -1095,8 +1089,7 @@ extern "C" PLUGIN_API void SetEntityAbsVelocity(int entityHandle, const plg::vec
 extern "C" PLUGIN_API plg::vec3 GetEntityBaseVelocity(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const Vector& vec = entity->GetBaseVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(entity->GetBaseVelocity());
 }
 
 /**
@@ -1111,8 +1104,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityBaseVelocity(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityLocalAngVelocity(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const QAngle& ang = entity->GetLocalAngularVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&ang);
+	return std::bit_cast<plg::vec3>(entity->GetLocalAngularVelocity());
 }
 
 /**
@@ -1127,8 +1119,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityLocalAngVelocity(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityAngVelocity(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const Vector& vec = entity->GetAngularVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(entity->GetAngularVelocity());
 }
 /**
  * @brief Sets the angular velocity of an entity.
@@ -1157,8 +1148,7 @@ extern "C" PLUGIN_API void SetEntityAngVelocity(int entityHandle, const plg::vec
 extern "C" PLUGIN_API plg::vec3 GetEntityLocalVelocity(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const Vector& vec = entity->GetLocalVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(entity->GetLocalVelocity());
 }
 
 /**
@@ -1173,8 +1163,8 @@ extern "C" PLUGIN_API plg::vec3 GetEntityLocalVelocity(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityAngRotation(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
-	const QAngle& ang = entity->m_CBodyComponent->m_pSceneNode->m_angRotation;
-	return *reinterpret_cast<const plg::vec3*>(&ang);
+	const QAngle& rotation = entity->m_CBodyComponent->m_pSceneNode->m_angRotation;
+	return std::bit_cast<plg::vec3>(rotation);
 }
 /**
  * @brief Sets the angular rotation of an entity.
@@ -1188,7 +1178,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAngRotation(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityAngRotation(int entityHandle, const plg::vec3& rotation) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->m_CBodyComponent->m_pSceneNode->m_angRotation = *reinterpret_cast<const QAngle*>(&rotation);
+	entity->m_CBodyComponent->m_pSceneNode->m_angRotation = std::bit_cast<QAngle>(rotation);
 }
 
 /**
@@ -1203,8 +1193,7 @@ extern "C" PLUGIN_API void SetEntityAngRotation(int entityHandle, const plg::vec
 extern "C" PLUGIN_API plg::vec3 TransformPointEntityToWorld(int entityHandle, const plg::vec3& point) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& pos = entity->TransformPointEntityToWorld(*reinterpret_cast<const Vector*>(&point));
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(entity->TransformPointEntityToWorld(std::bit_cast<Vector>(point)));
 }
 
 /**
@@ -1219,8 +1208,7 @@ extern "C" PLUGIN_API plg::vec3 TransformPointEntityToWorld(int entityHandle, co
 extern "C" PLUGIN_API plg::vec3 TransformPointWorldToEntity(int entityHandle, const plg::vec3& point) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& pos = entity->TransformPointWorldToEntity(*reinterpret_cast<const Vector*>(&point));
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(entity->TransformPointWorldToEntity(std::bit_cast<Vector>(point)));
 }
 
 /**
@@ -1234,8 +1222,7 @@ extern "C" PLUGIN_API plg::vec3 TransformPointWorldToEntity(int entityHandle, co
 extern "C" PLUGIN_API plg::vec3 GetEntityEyePosition(int entityHandle) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& pos = entity->EyePosition();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(entity->EyePosition());
 }
 
 /**
@@ -1250,8 +1237,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityEyePosition(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityEyeAngles(int entityHandle) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const QAngle& ang = entity->EyeAngles();
-    return *reinterpret_cast<const plg::vec3*>(&ang);
+    return std::bit_cast<plg::vec3>(entity->EyeAngles());
 }
 
 /**
@@ -1266,7 +1252,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityEyeAngles(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityForwardVector(int entityHandle, const plg::vec3& forward) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->SetForwardVector(*reinterpret_cast<const Vector*>(&forward));
+	entity->SetForwardVector(std::bit_cast<Vector>(forward));
 }
 
 /**
@@ -1278,8 +1264,7 @@ extern "C" PLUGIN_API void SetEntityForwardVector(int entityHandle, const plg::v
 extern "C" PLUGIN_API plg::vec3 GetEntityForwardVector(int entityHandle) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& pos = entity->GetForwardVector();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(entity->GetForwardVector());
 }
 
 /**
@@ -1291,8 +1276,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityForwardVector(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityLeftVector(int entityHandle) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& pos = entity->GetLeftVector();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(entity->GetLeftVector());
 }
 
 /**
@@ -1307,8 +1291,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityLeftVector(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityRightVector(int entityHandle) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& pos = entity->GetRightVector();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(entity->GetRightVector());
 }
 
 /**
@@ -1320,8 +1303,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityRightVector(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityUpVector(int entityHandle) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& pos = entity->GetUpVector();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(entity->GetUpVector());
 }
 
 /**
@@ -1454,8 +1436,7 @@ extern "C" PLUGIN_API void RemoveEntityEffects(int entityHandle, int effects) {
 extern "C" PLUGIN_API plg::vec3 GetEntityBoundingMaxs(int entityHandle) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& vec = entity->GetBoundingMaxs();
-    return *reinterpret_cast<const plg::vec3*>(&vec);
+    return std::bit_cast<plg::vec3>(entity->GetBoundingMaxs());
 }
 
 /**
@@ -1467,8 +1448,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityBoundingMaxs(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityBoundingMins(int entityHandle) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& vec = entity->GetBoundingMins();
-    return *reinterpret_cast<const plg::vec3*>(&vec);
+    return std::bit_cast<plg::vec3>(entity->GetBoundingMins());
 }
 
 /**
@@ -1480,8 +1460,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityBoundingMins(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityCenter(int entityHandle) {
     auto* entity = helpers::GetEntity(entityHandle);
     if (!entity) return {};
-    const Vector& vec = entity->GetCenter();
-    return *reinterpret_cast<const plg::vec3*>(&vec);
+    return std::bit_cast<plg::vec3>(entity->GetCenter());
 }
 
 /**
@@ -1512,7 +1491,7 @@ extern "C" PLUGIN_API void TeleportEntity(int entityHandle, const Vector& origin
 extern "C" PLUGIN_API void ApplyAbsVelocityImpulseToEntity(int entityHandle, const plg::vec3& vecImpulse) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->ApplyAbsVelocityImpulse(*reinterpret_cast<const Vector*>(&vecImpulse));
+	entity->ApplyAbsVelocityImpulse(std::bit_cast<Vector>(vecImpulse));
 }
 
 /**
@@ -1526,7 +1505,7 @@ extern "C" PLUGIN_API void ApplyAbsVelocityImpulseToEntity(int entityHandle, con
 extern "C" PLUGIN_API void ApplyLocalAngularVelocityImpulseToEntity(int entityHandle, const plg::vec3& angImpulse) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->ApplyLocalAngularVelocityImpulse(*reinterpret_cast<const Vector*>(&angImpulse));
+	entity->ApplyLocalAngularVelocityImpulse(std::bit_cast<Vector>(angImpulse));
 }
 
 /**
@@ -1688,7 +1667,7 @@ extern "C" PLUGIN_API int TakeEntityDamage(int entityHandle, int inflictorHandle
 	if (!inflictor) return {};
 	auto* attacker = helpers::GetEntity(attackerHandle);
 	if (!attacker) return {};
-	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(inflictor->GetScriptInstance(), attacker->GetScriptInstance(), *reinterpret_cast<const Vector*>(&force), *reinterpret_cast<const Vector*>(&hitPos), damage, damageTypes);
+	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(inflictor->GetScriptInstance(), attacker->GetScriptInstance(), std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
 	int applied = entity->TakeDamage(takeDamageInfo);
 	CTakeDamage{}.DestroyDamageInfo(takeDamageInfo);
 	return applied;

@@ -346,11 +346,11 @@ public:
 				} else if constexpr (std::is_same_v<T, double>) {
 					ESKeyValues->SetDouble(key, v);
 				} else if constexpr (std::is_same_v<T, plg::vec2>) {
-					ESKeyValues->SetVector2D(key, *reinterpret_cast<const Vector2D*>(&v));
+					ESKeyValues->SetVector2D(key, std::bit_cast<Vector2D>(v));
 				} else if constexpr (std::is_same_v<T, plg::vec3>) {
-					ESKeyValues->SetVector(key, *reinterpret_cast<const Vector*>(&v));
+					ESKeyValues->SetVector(key, std::bit_cast<Vector>(v));
 				} else if constexpr (std::is_same_v<T, plg::vec4>) {
-					ESKeyValues->SetVector4D(key, *reinterpret_cast<const Vector4D*>(&v));
+					ESKeyValues->SetVector4D(key, std::bit_cast<Vector4D>(v));
 				} else if constexpr (std::is_same_v<T, plg::mat4x4>) {
 					ESKeyValues->SetMatrix3x4(key, *reinterpret_cast<const matrix3x4_t*>(&v));
 				} else if constexpr (std::is_arithmetic_v<T>) {

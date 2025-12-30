@@ -26,8 +26,7 @@ PLUGIFY_WARN_IGNORE(4190)
 extern "C" PLUGIN_API plg::vec3 GetEntityAttachmentAngles(int entityHandle, int attachmentIndex) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return {};
-	Vector angles = entity->GetAttachmentAngles(attachmentIndex);
-	return *reinterpret_cast<const plg::vec3*>(&angles);
+	return std::bit_cast<plg::vec3>(entity->GetAttachmentAngles(attachmentIndex));
 }
 
 /**
@@ -43,8 +42,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAttachmentAngles(int entityHandle, int 
 extern "C" PLUGIN_API plg::vec3 GetEntityAttachmentForward(int entityHandle, int attachmentIndex) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return {};
-	Vector forward = entity->GetAttachmentForward(attachmentIndex);
-	return *reinterpret_cast<const plg::vec3*>(&forward);
+	return std::bit_cast<plg::vec3>(entity->GetAttachmentForward(attachmentIndex));
 }
 
 /**
@@ -60,8 +58,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityAttachmentForward(int entityHandle, int
 extern "C" PLUGIN_API plg::vec3 GetEntityAttachmentOrigin(int entityHandle, int attachmentIndex) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return {};
-	Vector origin = entity->GetAttachmentOrigin(attachmentIndex);
-	return *reinterpret_cast<const plg::vec3*>(&origin);
+	return std::bit_cast<plg::vec3>(entity->GetAttachmentOrigin(attachmentIndex));
 }
 
 /**
@@ -136,8 +133,7 @@ extern "C" PLUGIN_API int GetEntityRenderAlpha(int entityHandle) {
 extern "C" PLUGIN_API plg::vec3 GetEntityRenderColor2(int entityHandle) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return {};
-	Vector color = entity->GetRenderColor();
-	return *reinterpret_cast<const plg::vec3*>(&color);
+	return std::bit_cast<plg::vec3>(entity->GetRenderColor());
 }
 
 /**
@@ -318,7 +314,7 @@ extern "C" PLUGIN_API void SetEntitySingleMeshGroup(int entityHandle, const plg:
 extern "C" PLUGIN_API void SetEntitySize(int entityHandle, const plg::vec3& mins, const plg::vec3& maxs) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
 	if (!entity) return;
-	entity->SetSize(*reinterpret_cast<const Vector*>(&mins), *reinterpret_cast<const Vector*>(&maxs));
+	entity->SetSize(std::bit_cast<Vector>(mins), std::bit_cast<Vector>(maxs));
 }
 
 /**

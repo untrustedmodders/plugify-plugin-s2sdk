@@ -22,7 +22,7 @@ PLUGIFY_WARN_IGNORE(4190)
 extern "C" PLUGIN_API void AddBodyImpulseAtPosition(int entityHandle, const plg::vec3& position, const plg::vec3& impulse) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->m_CBodyComponent->AddImpulseAtPosition(*reinterpret_cast<const Vector*>(&position), *reinterpret_cast<const Vector*>(&impulse));
+	entity->m_CBodyComponent->AddImpulseAtPosition(std::bit_cast<Vector>(position), std::bit_cast<Vector>(impulse));
 }
 
 /**
@@ -35,7 +35,7 @@ extern "C" PLUGIN_API void AddBodyImpulseAtPosition(int entityHandle, const plg:
 extern "C" PLUGIN_API void AddBodyVelocity(int entityHandle, const plg::vec3& linearVelocity, const plg::vec3& angularVelocity) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->m_CBodyComponent->AddVelocity(*reinterpret_cast<const Vector*>(&linearVelocity), *reinterpret_cast<const Vector*>(&angularVelocity));
+	entity->m_CBodyComponent->AddVelocity(std::bit_cast<Vector>(linearVelocity), std::bit_cast<Vector>(angularVelocity));
 }
 
 /**
@@ -108,7 +108,7 @@ extern "C" PLUGIN_API float SetBodySequenceDuration(int entityHandle, const plg:
 extern "C" PLUGIN_API void SetBodyAngularVelocity(int entityHandle, const plg::vec3& angVelocity) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->m_CBodyComponent->SetAngularVelocity(*reinterpret_cast<const Vector*>(&angVelocity));
+	entity->m_CBodyComponent->SetAngularVelocity(std::bit_cast<Vector>(angVelocity));
 }
 
 /**
@@ -132,7 +132,7 @@ extern "C" PLUGIN_API void SetBodyMaterialGroup(int entityHandle, const plg::str
 extern "C" PLUGIN_API void SetBodyVelocity(int entityHandle, const plg::vec3& velocity) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->m_CBodyComponent->SetVelocity(*reinterpret_cast<const Vector*>(&velocity));
+	entity->m_CBodyComponent->SetVelocity(std::bit_cast<Vector>(velocity));
 }
 
 PLUGIFY_WARN_POP()

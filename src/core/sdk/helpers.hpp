@@ -193,25 +193,25 @@ namespace helpers {
 			case FieldType::Vector3d:
 				plg::visit([&variant](const auto& v) {
 					using T = std::decay_t<decltype(v)>;
-					if constexpr (std::is_same_v<T, plg::vec3> || std::is_same_v<T, plg::vec4>) variant = *reinterpret_cast<const Vector*>(&v);
+					if constexpr (std::is_same_v<T, plg::vec3>) variant = std::bit_cast<Vector>(v);
 				}, value);
 				break;
 			case FieldType::Vector2d:
 				plg::visit([&variant](const auto& v) {
 					using T = std::decay_t<decltype(v)>;
-					if constexpr (std::is_same_v<T, plg::vec2> || std::is_same_v<T, plg::vec3> || std::is_same_v<T, plg::vec4>) variant = *reinterpret_cast<const Vector2D*>(&v);
+					if constexpr (std::is_same_v<T, plg::vec2>) variant = std::bit_cast<Vector2D>(v);
 				}, value);
 				break;
 			case FieldType::Vector4d:
 				plg::visit([&variant](const auto& v) {
 					using T = std::decay_t<decltype(v)>;
-					if constexpr (std::is_same_v<T, plg::vec4>) variant = *reinterpret_cast<const Vector4D*>(&v);
+					if constexpr (std::is_same_v<T, plg::vec4>) variant = std::bit_cast<Vector4D>(v);
 				}, value);
 				break;
 			case FieldType::Color32:
 				plg::visit([&variant](const auto& v) {
 					using T = std::decay_t<decltype(v)>;
-					if constexpr (std::is_same_v<T, int>) variant = *reinterpret_cast<const Color*>(&v);
+					if constexpr (std::is_same_v<T, int>) variant = Color(v);
 					else if constexpr (std::is_same_v<T, plg::vec3>) variant = NewColor(v);
 					else if constexpr (std::is_same_v<T, plg::vec4>) variant = NewColor(v);
 				}, value);
@@ -219,13 +219,13 @@ namespace helpers {
 			case FieldType::QAngle:
 				plg::visit([&variant](const auto& v) {
 					using T = std::decay_t<decltype(v)>;
-					if constexpr (std::is_same_v<T, plg::vec3> || std::is_same_v<T, plg::vec4>) variant = *reinterpret_cast<const QAngle*>(&v);
+					if constexpr (std::is_same_v<T, plg::vec3>) variant = std::bit_cast<QAngle>(v);
 				}, value);
 				break;
 			case FieldType::Quaternion:
 				plg::visit([&variant](const auto& v) {
 					using T = std::decay_t<decltype(v)>;
-					if constexpr (std::is_same_v<T, plg::vec4>) variant = *reinterpret_cast<const Quaternion*>(&v);
+					if constexpr (std::is_same_v<T, plg::vec4>) variant = std::bit_cast<Quaternion>(v);
 				}, value);
 				break;
 			default:
@@ -242,11 +242,11 @@ namespace helpers {
 					} else if constexpr (std::is_arithmetic_v<T>) {
 						variant = v;
 					} else if constexpr (std::is_same_v<T, plg::vec2>) {
-						variant = *reinterpret_cast<const Vector2D*>(&v);
+						variant = std::bit_cast<Vector2D>(v);
 					} else if constexpr (std::is_same_v<T, plg::vec3>) {
-						variant = *reinterpret_cast<const Vector*>(&v);
+						variant = std::bit_cast<Vector>(v);
 					} else if constexpr (std::is_same_v<T, plg::vec4>) {
-						variant = *reinterpret_cast<const Vector4D*>(&v);
+						variant = std::bit_cast<Vector4D>(v);
 					}
 				}, value);
 				break;

@@ -188,8 +188,7 @@ extern "C" PLUGIN_API void SetEntDataFloat2(CEntityInstance* entity, int offset,
  * @return The color value at the given memory location.
  */
 extern "C" PLUGIN_API plg::vec4 GetEntDataColor2(CEntityInstance* entity, int offset) {
-	auto color = reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset)->ToVector4D();
-	return *reinterpret_cast<plg::vec4*>(&color);
+	return std::bit_cast<plg::vec4>(reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset)->ToVector4D());
 }
 
 /**
@@ -831,7 +830,7 @@ extern "C" PLUGIN_API double GetEntSchemaFloat2(CEntityInstance* entity, const p
  * @param value The float value to set.
  * @param changeState If true, change will be sent over the network.
  * @param element Element # (starting from 0) if schema is an array.
- * @return An float value at the given schema offset.
+ * @return A float value at the given schema offset.
  */
 extern "C" PLUGIN_API void SetEntSchemaFloat2(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, double value, bool changeState, int element) {
 	if (g_pCoreConfig->FollowCS2ServerGuidelines && schema::CS2BadList.contains(memberName)) {
@@ -894,6 +893,129 @@ extern "C" PLUGIN_API void SetEntSchemaFloat2(CEntityInstance* entity, const plg
 			break;
 		default:
 			plg::print(LS_WARNING, "Schema field '{}::{}' is not a float, but '{}'\n", className, memberName, type->m_sTypeName.Get());
+			break;
+	}
+}
+
+//
+
+//
+
+/**
+ * @brief Retrieves a color value from an entity's schema.
+ *
+ * This function is considered safer and more robust over GetEntData, because it performs strict offset checking and typing rules.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param element Element # (starting from 0) if schema is an array.
+ * @return A float value at the given schema offset.
+ */
+extern "C" PLUGIN_API plg::vec4 GetEntSchemaColor2(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, int element) {
+	const auto [offset, networked, size, type] = schema::GetOffset(className, memberName);
+	if (offset == 0) {
+		plg::print(LS_WARNING, "Cannot find offset for '{}::{}' with entity pointer: {}\n", className, memberName, static_cast<const void*>(entity));
+		return {};
+	}
+
+	const auto [elementType, elementSize] = schema::IsIntType(type);
+	switch (elementType) {
+		case schema::ElementType::Array:
+			switch (elementSize) {
+				case sizeof(int):
+					return std::bit_cast<plg::vec4>(reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset)[element].ToVector4D());
+				default:
+					return {};
+			}
+			break;
+		case schema::ElementType::Collection:
+			switch (elementSize) {
+				case sizeof(int):
+					return std::bit_cast<plg::vec4>(reinterpret_cast<CUtlVector<Color>*>(reinterpret_cast<intptr_t>(entity) + offset)->Element(element).ToVector4D());
+				default:
+					return {};
+			}
+			break;
+		case schema::ElementType::Single:
+			switch (size) {
+				case sizeof(int):
+					return std::bit_cast<plg::vec4>(reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset)->ToVector4D());
+				default:
+					return {};
+			}
+			break;
+		default:
+			plg::print(LS_WARNING, "Schema field '{}::{}' is not a integer, but '{}'\n", className, memberName, type->m_sTypeName.Get());
+			return {};
+	}
+}
+
+/**
+ * @brief Sets a float value in an entity's schema.
+ *
+ * This function is considered safer and more robust over GetEntData, because it performs strict offset checking and typing rules.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param value The float value to set.
+ * @param changeState If true, change will be sent over the network.
+ * @param element Element # (starting from 0) if schema is an array.
+ * @return A color value at the given schema offset.
+ */
+extern "C" PLUGIN_API void SetEntSchemaColor2(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, const plg::vec4& value, bool changeState, int element) {
+	if (g_pCoreConfig->FollowCS2ServerGuidelines && schema::CS2BadList.contains(memberName)) {
+		plg::print(LS_WARNING, "Cannot set '{}::{}' with \"FollowCS2ServerGuidelines\" option enabled.\n", className, memberName);
+		return;
+	}
+
+	const auto [offset, networked, size, type] = schema::GetOffset(className, memberName);
+	if (offset == 0) {
+		plg::print(LS_WARNING, "Cannot find offset for '{}::{}' with entity pointer: {}\n", className, memberName, static_cast<const void*>(entity));
+		return;
+	}
+
+	if (changeState) {
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className);
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			plg::print(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
+	}
+
+	const auto [elementType, elementSize] = schema::IsIntType(type);
+	switch (elementType) {
+		case schema::ElementType::Array:
+			switch (elementSize) {
+				case sizeof(int):
+					reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset)[element] = NewColor(value);
+					break;
+				default:
+					break;
+			}
+			break;
+		case schema::ElementType::Collection:
+			switch (elementSize) {
+				case sizeof(int):
+					reinterpret_cast<CUtlVector<Color>*>(reinterpret_cast<intptr_t>(entity) + offset)->Element(element) = NewColor(value);
+					break;
+				default:
+					break;
+			}
+			break;
+		case schema::ElementType::Single:
+			switch (size) {
+				case sizeof(int):
+					*reinterpret_cast<Color*>(reinterpret_cast<intptr_t>(entity) + offset) = NewColor(value);
+					break;
+				default:
+					break;
+			}
+			break;
+		default:
+			plg::print(LS_WARNING, "Schema field '{}::{}' is not a integer, but '{}'\n", className, memberName, type->m_sTypeName.Get());
 			break;
 	}
 }
@@ -1500,7 +1622,7 @@ extern "C" PLUGIN_API double GetEntSchemaFloat(int entityHandle, const plg::stri
  * @param value The float value to set.
  * @param changeState If true, change will be sent over the network.
  * @param element Element # (starting from 0) if schema is an array.
- * @return An float value at the given schema offset.
+ * @return A float value at the given schema offset.
  */
 extern "C" PLUGIN_API void SetEntSchemaFloat(int entityHandle, const plg::string& className, const plg::string& memberName, double value, bool changeState, int element) {
 	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));

@@ -169,29 +169,29 @@ namespace cvars {
 				case EConVarType_Vector2:
 					plg::visit([&](const auto& v) {
 						using T = std::decay_t<decltype(v)>;
-						if constexpr (std::is_same_v<T, plg::vec2> || std::is_same_v<T, plg::vec3> || std::is_same_v<T, plg::vec4>)
-							SetConVar<Vector2D>(*conVar, *reinterpret_cast<const Vector2D*>(&v), replicate, notify);
+						if constexpr (std::is_same_v<T, plg::vec2>)
+							SetConVar<Vector2D>(*conVar, std::bit_cast<Vector2D>(v), replicate, notify);
 					}, value);
 					break;
 				case EConVarType_Vector3:
 					plg::visit([&](const auto& v) {
 						using T = std::decay_t<decltype(v)>;
-						if constexpr (std::is_same_v<T, plg::vec3> || std::is_same_v<T, plg::vec4>)
-							SetConVar<Vector>(*conVar, *reinterpret_cast<const Vector*>(&v), replicate, notify);
+						if constexpr (std::is_same_v<T, plg::vec3>)
+							SetConVar<Vector>(*conVar, std::bit_cast<Vector>(v), replicate, notify);
 					}, value);
 					break;
 				case EConVarType_Vector4:
 					plg::visit([&](const auto& v) {
 						using T = std::decay_t<decltype(v)>;
 						if constexpr (std::is_same_v<T, plg::vec4>)
-							SetConVar<Vector4D>(*conVar, *reinterpret_cast<const Vector4D*>(&v), replicate, notify);
+							SetConVar<Vector4D>(*conVar, std::bit_cast<Vector4D>(v), replicate, notify);
 					}, value);
 					break;
 				case EConVarType_Qangle:
 					plg::visit([&](const auto& v) {
 						using T = std::decay_t<decltype(v)>;
-						if constexpr (std::is_same_v<T, plg::vec3> || std::is_same_v<T, plg::vec4>)
-							SetConVar<QAngle>(*conVar, *reinterpret_cast<const QAngle*>(&v), replicate, notify);
+						if constexpr (std::is_same_v<T, plg::vec3>)
+							SetConVar<QAngle>(*conVar, std::bit_cast<QAngle>(v), replicate, notify);
 					}, value);
 					break;
 				default:
@@ -260,24 +260,19 @@ namespace cvars {
 					return plg::string(str.Get(), static_cast<size_t>(str.Length()));
 				}
 				case EConVarType_Color: {
-					const auto& color = GetConVarValue<Color>(*conVar).ToVector4D();
-					return *reinterpret_cast<const plg::vec4*>(&color);
+					return std::bit_cast<plg::vec4>(GetConVarValue<Color>(*conVar).ToVector4D());
 				}
 				case EConVarType_Vector2: {
-					const auto& vec2 = GetConVarValue<Vector2D>(*conVar);
-					return *reinterpret_cast<const plg::vec2*>(&vec2);
+					return std::bit_cast<plg::vec2>(GetConVarValue<Vector2D>(*conVar));
 				}
 				case EConVarType_Vector3: {
-					const auto& vec3 = GetConVarValue<Vector>(*conVar);
-					return *reinterpret_cast<const plg::vec3*>(&vec3);
+					return std::bit_cast<plg::vec3>(GetConVarValue<Vector>(*conVar));
 				}
 				case EConVarType_Vector4: {
-					const auto& vec4 = GetConVarValue<Vector4D>(*conVar);
-					return *reinterpret_cast<const plg::vec4*>(&vec4);
+					return std::bit_cast<plg::vec4>(GetConVarValue<Vector4D>(*conVar));
 				}
 				case EConVarType_Qangle: {
-					const auto& qang = GetConVarValue<QAngle>(*conVar);
-					return *reinterpret_cast<const plg::vec3*>(&qang);
+					return std::bit_cast<plg::vec3>(GetConVarValue<QAngle>(*conVar));
 				}
 				case EConVarType_Invalid:
 				case EConVarType_MAX:

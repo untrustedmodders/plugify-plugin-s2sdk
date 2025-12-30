@@ -8231,7 +8231,7 @@
         }
       ],
       "retType": {
-        "type": "int32",
+        "type": "vec4",
         "description": "The raw color value of the client's render color, or 0 if the client is invalid."
       }
     },

@@ -721,9 +721,7 @@ extern "C" PLUGIN_API void Kv3SetToBinaryBlobExternal(KeyValues3* kv, const plg:
  */
 extern "C" PLUGIN_API plg::vec4 Kv3GetColor(const KeyValues3* kv, const plg::vec4& defaultValue) {
     if (!kv) return defaultValue;
-    Color defaultColor = *reinterpret_cast<const Color*>(&defaultValue);
-    const auto& color = kv->GetColor(defaultColor).ToVector4D();
-    return *reinterpret_cast<const plg::vec4*>(&color);
+    return std::bit_cast<plg::vec4>(kv->GetColor(NewColor(defaultValue)).ToVector4D());
 }
 
 /**
@@ -747,9 +745,7 @@ extern "C" PLUGIN_API void Kv3SetColor(KeyValues3* kv, const plg::vec4& color) {
  */
 extern "C" PLUGIN_API plg::vec3 Kv3GetVector(const KeyValues3* kv, const plg::vec3& defaultValue) {
     if (!kv) return defaultValue;
-    // Vector is binary compatible with plg::vec3
-    Vector result = kv->GetVector(*reinterpret_cast<const Vector*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec3*>(&result);
+    return std::bit_cast<plg::vec3>(kv->GetVector(std::bit_cast<Vector>(defaultValue)));
 }
 
 /**
@@ -760,9 +756,7 @@ extern "C" PLUGIN_API plg::vec3 Kv3GetVector(const KeyValues3* kv, const plg::ve
  */
 extern "C" PLUGIN_API plg::vec2 Kv3GetVector2D(const KeyValues3* kv, const plg::vec2& defaultValue) {
     if (!kv) return defaultValue;
-    // Vector2D is binary compatible with plg::vec2
-    Vector2D result = kv->GetVector2D(*reinterpret_cast<const Vector2D*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec2*>(&result);
+    return std::bit_cast<plg::vec2>(kv->GetVector2D(std::bit_cast<Vector2D>(defaultValue)));
 }
 
 /**
@@ -773,9 +767,7 @@ extern "C" PLUGIN_API plg::vec2 Kv3GetVector2D(const KeyValues3* kv, const plg::
  */
 extern "C" PLUGIN_API plg::vec4 Kv3GetVector4D(const KeyValues3* kv, const plg::vec4& defaultValue) {
     if (!kv) return defaultValue;
-    // Vector4D is binary compatible with plg::vec4
-    Vector4D result = kv->GetVector4D(*reinterpret_cast<const Vector4D*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec4*>(&result);
+    return std::bit_cast<plg::vec4>(kv->GetVector4D(std::bit_cast<Vector4D>(defaultValue)));
 }
 
 /**
@@ -786,9 +778,7 @@ extern "C" PLUGIN_API plg::vec4 Kv3GetVector4D(const KeyValues3* kv, const plg::
  */
 extern "C" PLUGIN_API plg::vec4 Kv3GetQuaternion(const KeyValues3* kv, const plg::vec4& defaultValue) {
     if (!kv) return defaultValue;
-    // Quaternion is binary compatible with plg::vec4
-    Quaternion result = kv->GetQuaternion(*reinterpret_cast<const Quaternion*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec4*>(&result);
+    return std::bit_cast<plg::vec4>(kv->GetQuaternion(std::bit_cast<Quaternion>(defaultValue)));
 }
 
 /**
@@ -799,9 +789,7 @@ extern "C" PLUGIN_API plg::vec4 Kv3GetQuaternion(const KeyValues3* kv, const plg
  */
 extern "C" PLUGIN_API plg::vec3 Kv3GetQAngle(const KeyValues3* kv, const plg::vec3& defaultValue) {
     if (!kv) return defaultValue;
-    // QAngle is binary compatible with plg::vec3
-    QAngle result = kv->GetQAngle(*reinterpret_cast<const QAngle*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec3*>(&result);
+    return std::bit_cast<plg::vec3>(kv->GetQAngle(std::bit_cast<QAngle>(defaultValue)));
 }
 
 /**
@@ -827,7 +815,7 @@ extern "C" PLUGIN_API plg::mat4x4 Kv3GetMatrix3x4(const KeyValues3* kv, const pl
  * @param vec 3D vector to set
  */
 extern "C" PLUGIN_API void Kv3SetVector(KeyValues3* kv, const plg::vec3& vec) {
-    if (kv) kv->SetVector(*reinterpret_cast<const Vector*>(&vec));
+    if (kv) kv->SetVector(std::bit_cast<Vector>(vec));
 }
 
 /**
@@ -836,7 +824,7 @@ extern "C" PLUGIN_API void Kv3SetVector(KeyValues3* kv, const plg::vec3& vec) {
  * @param vec2d 2D vector to set
  */
 extern "C" PLUGIN_API void Kv3SetVector2D(KeyValues3* kv, const plg::vec2& vec2d) {
-    if (kv) kv->SetVector2D(*reinterpret_cast<const Vector2D*>(&vec2d));
+    if (kv) kv->SetVector2D(std::bit_cast<Vector2D>(vec2d));
 }
 
 /**
@@ -845,7 +833,7 @@ extern "C" PLUGIN_API void Kv3SetVector2D(KeyValues3* kv, const plg::vec2& vec2d
  * @param vec4d 4D vector to set
  */
 extern "C" PLUGIN_API void Kv3SetVector4D(KeyValues3* kv, const plg::vec4& vec4d) {
-    if (kv) kv->SetVector4D(*reinterpret_cast<const Vector4D*>(&vec4d));
+    if (kv) kv->SetVector4D(std::bit_cast<Vector4D>(vec4d));
 }
 
 /**
@@ -854,7 +842,7 @@ extern "C" PLUGIN_API void Kv3SetVector4D(KeyValues3* kv, const plg::vec4& vec4d
  * @param quat Quaternion to set (as vec4)
  */
 extern "C" PLUGIN_API void Kv3SetQuaternion(KeyValues3* kv, const plg::vec4& quat) {
-    if (kv) kv->SetQuaternion(*reinterpret_cast<const Quaternion*>(&quat));
+    if (kv) kv->SetQuaternion(std::bit_cast<Quaternion>(quat));
 }
 
 /**
@@ -863,7 +851,7 @@ extern "C" PLUGIN_API void Kv3SetQuaternion(KeyValues3* kv, const plg::vec4& qua
  * @param ang QAngle to set (as vec3)
  */
 extern "C" PLUGIN_API void Kv3SetQAngle(KeyValues3* kv, const plg::vec3& ang) {
-    if (kv) kv->SetQAngle(*reinterpret_cast<const QAngle*>(&ang));
+    if (kv) kv->SetQAngle(std::bit_cast<QAngle>(ang));
 }
 
 /**
@@ -1256,9 +1244,7 @@ extern "C" PLUGIN_API plg::string Kv3GetMemberString(const KeyValues3* kv, const
  */
 extern "C" PLUGIN_API plg::vec4 Kv3GetMemberColor(const KeyValues3* kv, const plg::string& name, const plg::vec4& defaultValue) {
     if (!kv) return defaultValue;
-    Color defaultColor = NewColor(defaultValue);
-    const auto& color = kv->GetMemberColor(CKV3MemberName::Make(name), defaultColor).ToVector4D();
-    return *reinterpret_cast<const plg::vec4*>(&color);
+    return std::bit_cast<plg::vec4>(kv->GetMemberColor(CKV3MemberName::Make(name), NewColor(defaultValue)).ToVector4D());
 }
 
 /**
@@ -1270,8 +1256,7 @@ extern "C" PLUGIN_API plg::vec4 Kv3GetMemberColor(const KeyValues3* kv, const pl
  */
 extern "C" PLUGIN_API plg::vec3 Kv3GetMemberVector(const KeyValues3* kv, const plg::string& name, const plg::vec3& defaultValue) {
     if (!kv) return defaultValue;
-    Vector result = kv->GetMemberVector(CKV3MemberName::Make(name), *reinterpret_cast<const Vector*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec3*>(&result);
+    return std::bit_cast<plg::vec3>(kv->GetMemberVector(CKV3MemberName::Make(name), std::bit_cast<Vector>(defaultValue)));
 }
 
 /**
@@ -1283,8 +1268,7 @@ extern "C" PLUGIN_API plg::vec3 Kv3GetMemberVector(const KeyValues3* kv, const p
  */
 extern "C" PLUGIN_API plg::vec2 Kv3GetMemberVector2D(const KeyValues3* kv, const plg::string& name, const plg::vec2& defaultValue) {
     if (!kv) return defaultValue;
-    Vector2D result = kv->GetMemberVector2D(CKV3MemberName::Make(name), *reinterpret_cast<const Vector2D*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec2*>(&result);
+    return std::bit_cast<plg::vec2>(kv->GetMemberVector2D(CKV3MemberName::Make(name), std::bit_cast<Vector2D>(defaultValue)));
 }
 
 /**
@@ -1296,8 +1280,7 @@ extern "C" PLUGIN_API plg::vec2 Kv3GetMemberVector2D(const KeyValues3* kv, const
  */
 extern "C" PLUGIN_API plg::vec4 Kv3GetMemberVector4D(const KeyValues3* kv, const plg::string& name, const plg::vec4& defaultValue) {
     if (!kv) return defaultValue;
-    Vector4D result = kv->GetMemberVector4D(CKV3MemberName::Make(name), *reinterpret_cast<const Vector4D*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec4*>(&result);
+    return std::bit_cast<plg::vec4>(kv->GetMemberVector4D(CKV3MemberName::Make(name), std::bit_cast<Vector4D>(defaultValue)));
 }
 
 /**
@@ -1309,8 +1292,7 @@ extern "C" PLUGIN_API plg::vec4 Kv3GetMemberVector4D(const KeyValues3* kv, const
  */
 extern "C" PLUGIN_API plg::vec4 Kv3GetMemberQuaternion(const KeyValues3* kv, const plg::string& name, const plg::vec4& defaultValue) {
     if (!kv) return defaultValue;
-    Quaternion result = kv->GetMemberQuaternion(CKV3MemberName::Make(name), *reinterpret_cast<const Quaternion*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec4*>(&result);
+    return std::bit_cast<plg::vec4>(kv->GetMemberQuaternion(CKV3MemberName::Make(name), std::bit_cast<Quaternion>(defaultValue)));
 }
 
 /**
@@ -1322,8 +1304,7 @@ extern "C" PLUGIN_API plg::vec4 Kv3GetMemberQuaternion(const KeyValues3* kv, con
  */
 extern "C" PLUGIN_API plg::vec3 Kv3GetMemberQAngle(const KeyValues3* kv, const plg::string& name, const plg::vec3& defaultValue) {
     if (!kv) return defaultValue;
-    QAngle result = kv->GetMemberQAngle(CKV3MemberName::Make(name), *reinterpret_cast<const QAngle*>(&defaultValue));
-    return *reinterpret_cast<const plg::vec3*>(&result);
+    return std::bit_cast<plg::vec3>(kv->GetMemberQAngle(CKV3MemberName::Make(name), std::bit_cast<QAngle>(defaultValue)));
 }
 
 /**
@@ -1608,7 +1589,7 @@ extern "C" PLUGIN_API void Kv3SetMemberColor(KeyValues3* kv, const plg::string& 
  * @param vec 3D vector to set
  */
 extern "C" PLUGIN_API void Kv3SetMemberVector(KeyValues3* kv, const plg::string& name, const plg::vec3& vec) {
-    if (kv) kv->SetMemberVector(CKV3MemberName::Make(name), *reinterpret_cast<const Vector*>(&vec));
+    if (kv) kv->SetMemberVector(CKV3MemberName::Make(name), std::bit_cast<Vector>(vec));
 }
 
 /**
@@ -1618,7 +1599,7 @@ extern "C" PLUGIN_API void Kv3SetMemberVector(KeyValues3* kv, const plg::string&
  * @param vec2d 2D vector to set
  */
 extern "C" PLUGIN_API void Kv3SetMemberVector2D(KeyValues3* kv, const plg::string& name, const plg::vec2& vec2d) {
-    if (kv) kv->SetMemberVector2D(CKV3MemberName::Make(name), *reinterpret_cast<const Vector2D*>(&vec2d));
+    if (kv) kv->SetMemberVector2D(CKV3MemberName::Make(name), std::bit_cast<Vector2D>(vec2d));
 }
 
 /**
@@ -1628,7 +1609,7 @@ extern "C" PLUGIN_API void Kv3SetMemberVector2D(KeyValues3* kv, const plg::strin
  * @param vec4d 4D vector to set
  */
 extern "C" PLUGIN_API void Kv3SetMemberVector4D(KeyValues3* kv, const plg::string& name, const plg::vec4& vec4d) {
-    if (kv) kv->SetMemberVector4D(CKV3MemberName::Make(name), *reinterpret_cast<const Vector4D*>(&vec4d));
+    if (kv) kv->SetMemberVector4D(CKV3MemberName::Make(name), std::bit_cast<Vector4D>(vec4d));
 }
 
 /**
@@ -1638,7 +1619,7 @@ extern "C" PLUGIN_API void Kv3SetMemberVector4D(KeyValues3* kv, const plg::strin
  * @param quat Quaternion to set (as vec4)
  */
 extern "C" PLUGIN_API void Kv3SetMemberQuaternion(KeyValues3* kv, const plg::string& name, const plg::vec4& quat) {
-    if (kv) kv->SetMemberQuaternion(CKV3MemberName::Make(name), *reinterpret_cast<const Quaternion*>(&quat));
+    if (kv) kv->SetMemberQuaternion(CKV3MemberName::Make(name), std::bit_cast<Quaternion>(quat));
 }
 
 /**
@@ -1648,7 +1629,7 @@ extern "C" PLUGIN_API void Kv3SetMemberQuaternion(KeyValues3* kv, const plg::str
  * @param ang QAngle to set (as vec3)
  */
 extern "C" PLUGIN_API void Kv3SetMemberQAngle(KeyValues3* kv, const plg::string& name, const plg::vec3& ang) {
-    if (kv) kv->SetMemberQAngle(CKV3MemberName::Make(name), *reinterpret_cast<const QAngle*>(&ang));
+    if (kv) kv->SetMemberQAngle(CKV3MemberName::Make(name), std::bit_cast<QAngle>(ang));
 }
 
 /**

@@ -559,10 +559,10 @@ extern "C" PLUGIN_API void SetClientFlags(int playerSlot, int flags) {
  * @param playerSlot The index of the player's slot whose render color is to be retrieved.
  * @return The raw color value of the client's render color, or 0 if the client is invalid.
  */
-extern "C" PLUGIN_API int GetClientRenderColor(int playerSlot) {
+extern "C" PLUGIN_API plg::vec4 GetClientRenderColor(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	return pawn->m_clrRender->GetRawColor();
+	return std::bit_cast<plg::vec4>(pawn->m_clrRender->ToVector4D());
 }
 
 /**
@@ -772,8 +772,7 @@ extern "C" PLUGIN_API void SetClientTeam(int playerSlot, CSTeam team) {
 extern "C" PLUGIN_API plg::vec3 GetClientAbsOrigin(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const Vector& vec = pawn->GetAbsOrigin();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(pawn->GetAbsOrigin());
 }
 
 /**
@@ -788,7 +787,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientAbsOrigin(int playerSlot) {
 extern "C" PLUGIN_API void SetClientAbsOrigin(int playerSlot, const plg::vec3& origin) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->SetAbsOrigin(*reinterpret_cast<const Vector*>(&origin));
+	pawn->SetAbsOrigin(std::bit_cast<Vector>(origin));
 }
 
 /**
@@ -833,8 +832,7 @@ extern "C" PLUGIN_API void SetClientAbsScale(int playerSlot, float scale) {
 extern "C" PLUGIN_API plg::vec3 GetClientAbsAngles(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const QAngle& ang = pawn->GetAngles();
-	return *reinterpret_cast<const plg::vec3*>(&ang);
+	return std::bit_cast<plg::vec3>(pawn->GetAngles());
 }
 
 /**
@@ -864,8 +862,7 @@ extern "C" PLUGIN_API void SetClientAbsAngles(int playerSlot, const QAngle& angl
 extern "C" PLUGIN_API plg::vec3 GetClientLocalOrigin(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const Vector& vec = pawn->GetLocalOrigin();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(pawn->GetLocalOrigin());
 }
 
 /**
@@ -880,7 +877,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientLocalOrigin(int playerSlot) {
 extern "C" PLUGIN_API void SetClientLocalOrigin(int playerSlot, const plg::vec3& origin) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->SetLocalOrigin(*reinterpret_cast<const Vector*>(&origin));
+	pawn->SetLocalOrigin(std::bit_cast<Vector>(origin));
 }
 
 /**
@@ -925,8 +922,7 @@ extern "C" PLUGIN_API void SetClientLocalScale(int playerSlot, float scale) {
 extern "C" PLUGIN_API plg::vec3 GetClientLocalAngles(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const QAngle& ang = pawn->GetAngles();
-	return *reinterpret_cast<const plg::vec3*>(&ang);
+	return std::bit_cast<plg::vec3>(pawn->GetAngles());
 }
 
 /**
@@ -956,8 +952,7 @@ extern "C" PLUGIN_API void SetClientLocalAngles(int playerSlot, const QAngle& an
 extern "C" PLUGIN_API plg::vec3 GetClientAbsVelocity(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const Vector& vec = pawn->GetVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(pawn->GetVelocity());
 }
 
 /**
@@ -972,7 +967,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientAbsVelocity(int playerSlot) {
 extern "C" PLUGIN_API void SetClientAbsVelocity(int playerSlot, const plg::vec3& velocity) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->SetVelocity(*reinterpret_cast<const Vector*>(&velocity));
+	pawn->SetVelocity(std::bit_cast<Vector>(velocity));
 }
 
 /**
@@ -987,8 +982,7 @@ extern "C" PLUGIN_API void SetClientAbsVelocity(int playerSlot, const plg::vec3&
 extern "C" PLUGIN_API plg::vec3 GetClientBaseVelocity(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const Vector& vec = pawn->GetBaseVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(pawn->GetBaseVelocity());
 }
 
 /**
@@ -1003,8 +997,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientBaseVelocity(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientLocalAngVelocity(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const QAngle& ang = pawn->GetLocalAngularVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&ang);
+	return std::bit_cast<plg::vec3>(pawn->GetLocalAngularVelocity());
 }
 
 /**
@@ -1019,8 +1012,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientLocalAngVelocity(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientAngVelocity(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const Vector& vec = pawn->GetAngularVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(pawn->GetAngularVelocity());
 }
 
 /**
@@ -1050,8 +1042,7 @@ extern "C" PLUGIN_API void SetClientAngVelocity(int playerSlot, const plg::vec3&
 extern "C" PLUGIN_API plg::vec3 GetClientLocalVelocity(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const Vector& vec = pawn->GetLocalVelocity();
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(pawn->GetLocalVelocity());
 }
 
 /**
@@ -1066,8 +1057,8 @@ extern "C" PLUGIN_API plg::vec3 GetClientLocalVelocity(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientAngRotation(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	const QAngle& ang = pawn->m_CBodyComponent->m_pSceneNode->m_angRotation;
-	return *reinterpret_cast<const plg::vec3*>(&ang);
+	const QAngle& rotation = pawn->m_CBodyComponent->m_pSceneNode->m_angRotation;
+	return std::bit_cast<plg::vec3>(rotation);
 }
 
 /**
@@ -1082,7 +1073,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientAngRotation(int playerSlot) {
 extern "C" PLUGIN_API void SetClientAngRotation(int playerSlot, const plg::vec3& rotation) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->m_CBodyComponent->m_pSceneNode->m_angRotation = *reinterpret_cast<const QAngle*>(&rotation);
+	pawn->m_CBodyComponent->m_pSceneNode->m_angRotation = std::bit_cast<QAngle>(rotation);
 }
 
 /**
@@ -1097,8 +1088,7 @@ extern "C" PLUGIN_API void SetClientAngRotation(int playerSlot, const plg::vec3&
 extern "C" PLUGIN_API plg::vec3 TransformPointClientToWorld(int playerSlot, const plg::vec3& point) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& pos = pawn->TransformPointEntityToWorld(*reinterpret_cast<const Vector*>(&point));
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(pawn->TransformPointEntityToWorld(std::bit_cast<Vector>(point)));
 }
 
 /**
@@ -1113,8 +1103,7 @@ extern "C" PLUGIN_API plg::vec3 TransformPointClientToWorld(int playerSlot, cons
 extern "C" PLUGIN_API plg::vec3 TransformPointWorldToClient(int playerSlot, const plg::vec3& point) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& pos = pawn->TransformPointWorldToEntity(*reinterpret_cast<const Vector*>(&point));
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(pawn->TransformPointWorldToEntity(std::bit_cast<Vector>(point)));
 }
 
 /**
@@ -1128,8 +1117,7 @@ extern "C" PLUGIN_API plg::vec3 TransformPointWorldToClient(int playerSlot, cons
 extern "C" PLUGIN_API plg::vec3 GetClientEyePosition(int playerSlot) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& pos = pawn->EyePosition();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(pawn->EyePosition());
 }
 
 /**
@@ -1144,8 +1132,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientEyePosition(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientEyeAngles(int playerSlot) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const QAngle& ang = pawn->EyeAngles();
-    return *reinterpret_cast<const plg::vec3*>(&ang);
+    return std::bit_cast<plg::vec3>(pawn->EyeAngles());
 }
 
 /**
@@ -1160,7 +1147,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientEyeAngles(int playerSlot) {
 extern "C" PLUGIN_API void SetClientForwardVector(int playerSlot, const plg::vec3& forward) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->SetForwardVector(*reinterpret_cast<const Vector*>(&forward));
+	pawn->SetForwardVector(std::bit_cast<Vector>(forward));
 }
 
 /**
@@ -1172,8 +1159,7 @@ extern "C" PLUGIN_API void SetClientForwardVector(int playerSlot, const plg::vec
 extern "C" PLUGIN_API plg::vec3 GetClientForwardVector(int playerSlot) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& pos = pawn->GetForwardVector();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(pawn->GetForwardVector());
 }
 
 /**
@@ -1185,8 +1171,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientForwardVector(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientLeftVector(int playerSlot) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& pos = pawn->GetLeftVector();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(pawn->GetLeftVector());
 }
 
 /**
@@ -1201,8 +1186,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientLeftVector(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientRightVector(int playerSlot) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& pos = pawn->GetRightVector();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(pawn->GetRightVector());
 }
 
 /**
@@ -1214,8 +1198,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientRightVector(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientUpVector(int playerSlot) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& pos = pawn->GetUpVector();
-    return *reinterpret_cast<const plg::vec3*>(&pos);
+    return std::bit_cast<plg::vec3>(pawn->GetUpVector());
 }
 
 /**
@@ -1348,8 +1331,7 @@ extern "C" PLUGIN_API void RemoveClientEffects(int playerSlot, int effects) {
 extern "C" PLUGIN_API plg::vec3 GetClientBoundingMaxs(int playerSlot) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& vec = pawn->GetBoundingMaxs();
-    return *reinterpret_cast<const plg::vec3*>(&vec);
+    return std::bit_cast<plg::vec3>(pawn->GetBoundingMaxs());
 }
 
 /**
@@ -1361,8 +1343,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientBoundingMaxs(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientBoundingMins(int playerSlot) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& vec = pawn->GetBoundingMins();
-    return *reinterpret_cast<const plg::vec3*>(&vec);
+    return std::bit_cast<plg::vec3>(pawn->GetBoundingMins());
 }
 
 /**
@@ -1374,8 +1355,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientBoundingMins(int playerSlot) {
 extern "C" PLUGIN_API plg::vec3 GetClientCenter(int playerSlot) {
     auto [controller, pawn] = helpers::GetController2(playerSlot);
     if (!pawn) return {};
-    const Vector& vec = pawn->GetCenter();
-    return *reinterpret_cast<const plg::vec3*>(&vec);
+    return std::bit_cast<plg::vec3>(pawn->GetCenter());
 }
 
 /**
@@ -1406,7 +1386,7 @@ extern "C" PLUGIN_API void TeleportClient(int playerSlot, const Vector& origin, 
 extern "C" PLUGIN_API void ApplyAbsVelocityImpulseToClient(int playerSlot, const plg::vec3& vecImpulse) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->ApplyAbsVelocityImpulse(*reinterpret_cast<const Vector*>(&vecImpulse));
+	pawn->ApplyAbsVelocityImpulse(std::bit_cast<Vector>(vecImpulse));
 }
 
 /**
@@ -1420,7 +1400,7 @@ extern "C" PLUGIN_API void ApplyAbsVelocityImpulseToClient(int playerSlot, const
 extern "C" PLUGIN_API void ApplyLocalAngularVelocityImpulseToClient(int playerSlot, const plg::vec3& angImpulse) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->ApplyLocalAngularVelocityImpulse(*reinterpret_cast<const Vector*>(&angImpulse));
+	pawn->ApplyLocalAngularVelocityImpulse(std::bit_cast<Vector>(angImpulse));
 }
 
 /**
@@ -1582,7 +1562,7 @@ extern "C" PLUGIN_API int TakeClientDamage(int playerSlot, int inflictorSlot, in
 	if (!inflictor) return {};
 	auto [controller3, attacker] = helpers::GetController2(attackerSlot);
 	if (!attacker) return {};
-	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(inflictor->GetScriptInstance(), attacker->GetScriptInstance(), *reinterpret_cast<const Vector*>(&force), *reinterpret_cast<const Vector*>(&hitPos), damage, damageTypes);
+	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(inflictor->GetScriptInstance(), attacker->GetScriptInstance(), std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
 	int applied = pawn->TakeDamage(takeDamageInfo);
 	CTakeDamage{}.DestroyDamageInfo(takeDamageInfo);
 	return applied;

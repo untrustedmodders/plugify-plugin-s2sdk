@@ -167,8 +167,7 @@ extern "C" PLUGIN_API KeyValues* Kv1GetNextKey(KeyValues* kv) {
  */
 extern "C" PLUGIN_API plg::vec4 Kv1GetColor(KeyValues* kv, const plg::string& keyName, const plg::vec4& defaultValue) {
 	if (!kv) return defaultValue;
-	const auto& color = kv->GetColor(keyName.c_str(), NewColor(defaultValue)).ToVector4D();
-	return *reinterpret_cast<const plg::vec4*>(&color);
+	return std::bit_cast<plg::vec4>(kv->GetColor(keyName.c_str(), NewColor(defaultValue)).ToVector4D());
 }
 
 /**

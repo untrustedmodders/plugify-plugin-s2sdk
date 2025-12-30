@@ -34,11 +34,11 @@ extern "C" PLUGIN_API uint64_t CreateConVar(const plg::string& name, const plg::
 		} else if constexpr (std::is_same_v<T, plg::string>) {
 			result = g_ConVarManager.CreateConVar<CUtlString>(name, description, CUtlString(v.c_str(), static_cast<int>(v.size())), flags);
 		} else if constexpr (std::is_same_v<T, plg::vec2>) {
-			result = g_ConVarManager.CreateConVar<Vector2D>(name, description, *reinterpret_cast<const Vector2D*>(&v), flags);
+			result = g_ConVarManager.CreateConVar<Vector2D>(name, description, std::bit_cast<Vector2D>(v), flags);
 		} else if constexpr (std::is_same_v<T, plg::vec3>) {
-			result = g_ConVarManager.CreateConVar<Vector>(name, description, *reinterpret_cast<const Vector*>(&v), flags);
+			result = g_ConVarManager.CreateConVar<Vector>(name, description, std::bit_cast<Vector>(v), flags);
 		} else if constexpr (std::is_same_v<T, plg::vec4>) {
-			result = g_ConVarManager.CreateConVar<Vector4D>(name, description, *reinterpret_cast<const Vector4D*>(&v), flags);
+			result = g_ConVarManager.CreateConVar<Vector4D>(name, description, std::bit_cast<Vector4D>(v), flags);
 		} else if constexpr (std::is_same_v<T, int64_t>) {
 			result = g_ConVarManager.CreateConVar<int64>(name, description, v, flags);
 		} else if constexpr (std::is_same_v<T, uint64_t>) {
@@ -690,8 +690,7 @@ extern "C" PLUGIN_API plg::string GetConVarString(uint64 conVarHandle) {
  * @return The current Color value of the console variable.
  */
 extern "C" PLUGIN_API plg::vec4 GetConVarColor(uint64 conVarHandle) {
-	const auto& color = cvars::GetConVarValueByHandle<Color>(conVarHandle).ToVector4D();
-	return *reinterpret_cast<const plg::vec4*>(&color);
+	return std::bit_cast<plg::vec4>(cvars::GetConVarValueByHandle<Color>(conVarHandle).ToVector4D());
 }
 
 /**
@@ -701,8 +700,7 @@ extern "C" PLUGIN_API plg::vec4 GetConVarColor(uint64 conVarHandle) {
  * @return The current Vector2D value of the console variable.
  */
 extern "C" PLUGIN_API plg::vec2 GetConVarVector2(uint64 conVarHandle) {
-	const Vector2D& vec = cvars::GetConVarValueByHandle<Vector2D>(conVarHandle);
-	return *reinterpret_cast<const plg::vec2*>(&vec);
+	return std::bit_cast<plg::vec2>(cvars::GetConVarValueByHandle<Vector2D>(conVarHandle));
 }
 
 /**
@@ -712,8 +710,7 @@ extern "C" PLUGIN_API plg::vec2 GetConVarVector2(uint64 conVarHandle) {
  * @return The current Vector value of the console variable.
  */
 extern "C" PLUGIN_API plg::vec3 GetConVarVector(uint64 conVarHandle) {
-	const Vector& vec = cvars::GetConVarValueByHandle<Vector>(conVarHandle);
-	return *reinterpret_cast<const plg::vec3*>(&vec);
+	return std::bit_cast<plg::vec3>(cvars::GetConVarValueByHandle<Vector>(conVarHandle));
 }
 
 /**
@@ -723,8 +720,7 @@ extern "C" PLUGIN_API plg::vec3 GetConVarVector(uint64 conVarHandle) {
  * @return The current Vector4D value of the console variable.
  */
 extern "C" PLUGIN_API plg::vec4 GetConVarVector4(uint64 conVarHandle) {
-	const Vector4D& vec = cvars::GetConVarValueByHandle<Vector4D>(conVarHandle);
-	return *reinterpret_cast<const plg::vec4*>(&vec);
+	return std::bit_cast<plg::vec4>(cvars::GetConVarValueByHandle<Vector4D>(conVarHandle));
 }
 
 /**
@@ -734,8 +730,7 @@ extern "C" PLUGIN_API plg::vec4 GetConVarVector4(uint64 conVarHandle) {
  * @return The current QAngle value of the console variable.
  */
 extern "C" PLUGIN_API plg::vec3 GetConVarQAngle(uint64 conVarHandle) {
-	const QAngle& ang = cvars::GetConVarValueByHandle<QAngle>(conVarHandle);
-	return *reinterpret_cast<const plg::vec3*>(&ang);
+	return std::bit_cast<plg::vec3>(cvars::GetConVarValueByHandle<QAngle>(conVarHandle));
 }
 
 /**

@@ -30,9 +30,9 @@ extern "C" PLUGIN_API void DebugBreak() {
  */
 extern "C" PLUGIN_API void DebugDrawBox(const plg::vec3& center, const plg::vec3& mins, const plg::vec3& maxs,
 			 int r, int g, int b, int a, float duration) {
-	Debug{}.DebugDrawBox(*reinterpret_cast<const Vector*>(&center),
-						 *reinterpret_cast<const Vector*>(&mins),
-						 *reinterpret_cast<const Vector*>(&maxs),
+	Debug{}.DebugDrawBox(std::bit_cast<Vector>(center),
+						 std::bit_cast<Vector>(mins),
+						 std::bit_cast<Vector>(maxs),
 						 r, g, b, a, duration);
 }
 
@@ -49,11 +49,11 @@ extern "C" PLUGIN_API void DebugDrawBox(const plg::vec3& center, const plg::vec3
  */
 extern "C" PLUGIN_API void DebugDrawBoxDirection(const plg::vec3& center, const plg::vec3& mins, const plg::vec3& maxs,
 					  const plg::vec3& forward, const plg::vec3& color, float alpha, float duration) {
-	Debug{}.DebugDrawBoxDirection(*reinterpret_cast<const Vector*>(&center),
-								  *reinterpret_cast<const Vector*>(&mins),
-								  *reinterpret_cast<const Vector*>(&maxs),
-								  *reinterpret_cast<const Vector*>(&forward),
-								  *reinterpret_cast<const Vector*>(&color),
+	Debug{}.DebugDrawBoxDirection(std::bit_cast<Vector>(center),
+								  std::bit_cast<Vector>(mins),
+								  std::bit_cast<Vector>(maxs),
+								  std::bit_cast<Vector>(forward),
+								  std::bit_cast<Vector>(color),
 								  alpha, duration);
 }
 
@@ -69,8 +69,8 @@ extern "C" PLUGIN_API void DebugDrawBoxDirection(const plg::vec3& center, const 
  */
 extern "C" PLUGIN_API void DebugDrawCircle(const plg::vec3& center, const plg::vec3& color,
 				float alpha, float radius, bool zTest, float duration) {
-	Debug{}.DebugDrawCircle(*reinterpret_cast<const Vector*>(&center),
-							*reinterpret_cast<const Vector*>(&color),
+	Debug{}.DebugDrawCircle(std::bit_cast<Vector>(center),
+							std::bit_cast<Vector>(color),
 							alpha, radius, zTest, duration);
 }
 
@@ -94,8 +94,8 @@ extern "C" PLUGIN_API void DebugDrawClear() {
  */
 extern "C" PLUGIN_API void DebugDrawLine(const plg::vec3& origin, const plg::vec3& target,
 			  int r, int g, int b, bool zTest, float duration) {
-	Debug{}.DebugDrawLine(*reinterpret_cast<const Vector*>(&origin),
-						  *reinterpret_cast<const Vector*>(&target),
+	Debug{}.DebugDrawLine(std::bit_cast<Vector>(origin),
+						  std::bit_cast<Vector>(target),
 						  r, g, b, zTest, duration);
 }
 
@@ -110,9 +110,9 @@ extern "C" PLUGIN_API void DebugDrawLine(const plg::vec3& origin, const plg::vec
  */
 extern "C" PLUGIN_API void DebugDrawLine_vCol(const plg::vec3& start, const plg::vec3& end,
 				   const plg::vec3& color, bool zTest, float duration) {
-	Debug{}.DebugDrawLine_vCol(*reinterpret_cast<const Vector*>(&start),
-							   *reinterpret_cast<const Vector*>(&end),
-							   *reinterpret_cast<const Vector*>(&color),
+	Debug{}.DebugDrawLine_vCol(std::bit_cast<Vector>(start),
+							   std::bit_cast<Vector>(end),
+							   std::bit_cast<Vector>(color),
 							   zTest, duration);
 }
 
@@ -146,8 +146,8 @@ extern "C" PLUGIN_API void DebugDrawScreenTextLine(float x, float y, int lineOff
  */
 extern "C" PLUGIN_API void DebugDrawSphere(const plg::vec3& center, const plg::vec3& color,
 				float alpha, float radius, bool zTest, float duration) {
-	Debug{}.DebugDrawSphere(*reinterpret_cast<const Vector*>(&center),
-							*reinterpret_cast<const Vector*>(&color),
+	Debug{}.DebugDrawSphere(std::bit_cast<Vector>(center),
+							std::bit_cast<Vector>(color),
 							alpha, radius, zTest, duration);
 }
 
@@ -161,7 +161,7 @@ extern "C" PLUGIN_API void DebugDrawSphere(const plg::vec3& center, const plg::v
  */
 extern "C" PLUGIN_API void DebugDrawText(const plg::vec3& origin, const plg::string& text,
 			  bool viewCheck, float duration) {
-	Debug{}.DebugDrawText(*reinterpret_cast<const Vector*>(&origin), text.c_str(), viewCheck, duration);
+	Debug{}.DebugDrawText(std::bit_cast<Vector>(origin), text.c_str(), viewCheck, duration);
 }
 
 /**
@@ -206,7 +206,7 @@ extern "C" PLUGIN_API void DebugScriptAssert(bool assertion, const plg::string& 
  * @param duration Duration (in seconds) to display the axis.
  */
 extern "C" PLUGIN_API void DebugAxis(const plg::vec3& origin, const plg::quat& orientation, float scale, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Axis(*reinterpret_cast<const Vector*>(&origin), *reinterpret_cast<const Quaternion*>(&orientation), scale, zTest, duration);
+	CDebugOverlayScriptHelper{}.Axis(std::bit_cast<Vector>(origin), std::bit_cast<Quaternion>(orientation), scale, zTest, duration);
 }
 
 /**
@@ -222,7 +222,7 @@ extern "C" PLUGIN_API void DebugAxis(const plg::vec3& origin, const plg::quat& o
  * @param duration Duration (in seconds) to display the box.
  */
 extern "C" PLUGIN_API void DebugBox(const plg::vec3& mins, const plg::vec3& maxs, int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Box(*reinterpret_cast<const Vector*>(&mins), *reinterpret_cast<const Vector*>(&maxs), r, g, b, a, zTest, duration);
+	CDebugOverlayScriptHelper{}.Box(std::bit_cast<Vector>(mins), std::bit_cast<Vector>(maxs), r, g, b, a, zTest, duration);
 }
 
 /**
@@ -241,10 +241,10 @@ extern "C" PLUGIN_API void DebugBox(const plg::vec3& mins, const plg::vec3& maxs
  */
 extern "C" PLUGIN_API void DebugBoxAngles(const plg::vec3& origin, const plg::vec3& mins, const plg::vec3& maxs, const plg::quat& orientation,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.BoxAngles(*reinterpret_cast<const Vector*>(&origin),
-		*reinterpret_cast<const Vector*>(&mins),
-		*reinterpret_cast<const Vector*>(&maxs),
-		*reinterpret_cast<const Quaternion*>(&orientation),
+	CDebugOverlayScriptHelper{}.BoxAngles(std::bit_cast<Vector>(origin),
+		std::bit_cast<Vector>(mins),
+		std::bit_cast<Vector>(maxs),
+		std::bit_cast<Quaternion>(orientation),
 		r, g, b, a, zTest, duration);
 }
 
@@ -264,8 +264,8 @@ extern "C" PLUGIN_API void DebugBoxAngles(const plg::vec3& origin, const plg::ve
  */
 extern "C" PLUGIN_API void DebugCapsule(const plg::vec3& origin, const plg::quat& orientation, float radius, float halfHeight,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Capsule(*reinterpret_cast<const Vector*>(&origin),
-		*reinterpret_cast<const Quaternion*>(&orientation),
+	CDebugOverlayScriptHelper{}.Capsule(std::bit_cast<Vector>(origin),
+		std::bit_cast<Quaternion>(orientation),
 		radius, halfHeight, r, g, b, a, zTest, duration);
 }
 
@@ -284,8 +284,8 @@ extern "C" PLUGIN_API void DebugCapsule(const plg::vec3& origin, const plg::quat
  */
 extern "C" PLUGIN_API void DebugCircle(const plg::vec3& center, const plg::quat& orientation, float radius,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Circle(*reinterpret_cast<const Vector*>(&center),
-		*reinterpret_cast<const Quaternion*>(&orientation),
+	CDebugOverlayScriptHelper{}.Circle(std::bit_cast<Vector>(center),
+		std::bit_cast<Quaternion>(orientation),
 		radius, r, g, b, a, zTest, duration);
 }
 
@@ -303,7 +303,7 @@ extern "C" PLUGIN_API void DebugCircle(const plg::vec3& center, const plg::quat&
  */
 extern "C" PLUGIN_API void DebugCircleScreenOriented(const plg::vec3& center, float radius,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.CircleScreenOriented(*reinterpret_cast<const Vector*>(&center), radius, r, g, b, a, zTest, duration);
+	CDebugOverlayScriptHelper{}.CircleScreenOriented(std::bit_cast<Vector>(center), radius, r, g, b, a, zTest, duration);
 }
 
 /**
@@ -322,8 +322,8 @@ extern "C" PLUGIN_API void DebugCircleScreenOriented(const plg::vec3& center, fl
  */
 extern "C" PLUGIN_API void DebugCone(const plg::vec3& origin, const plg::vec3& direction, float radius, float height,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Cone(*reinterpret_cast<const Vector*>(&origin),
-		*reinterpret_cast<const Vector*>(&direction),
+	CDebugOverlayScriptHelper{}.Cone(std::bit_cast<Vector>(origin),
+		std::bit_cast<Vector>(direction),
 		radius, height, r, g, b, a, zTest, duration);
 }
 
@@ -340,7 +340,7 @@ extern "C" PLUGIN_API void DebugCone(const plg::vec3& origin, const plg::vec3& d
  * @param duration Duration (in seconds) to display the cross.
  */
 extern "C" PLUGIN_API void DebugCross(const plg::vec3& origin, float size, int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Cross(*reinterpret_cast<const Vector*>(&origin), size, r, g, b, a, zTest, duration);
+	CDebugOverlayScriptHelper{}.Cross(std::bit_cast<Vector>(origin), size, r, g, b, a, zTest, duration);
 }
 
 /**
@@ -356,7 +356,7 @@ extern "C" PLUGIN_API void DebugCross(const plg::vec3& origin, float size, int r
  * @param duration Duration (in seconds) to display the cross.
  */
 extern "C" PLUGIN_API void DebugCross3D(const plg::vec3& origin, float size, int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Cross3D(*reinterpret_cast<const Vector*>(&origin), size, r, g, b, a, zTest, duration);
+	CDebugOverlayScriptHelper{}.Cross3D(std::bit_cast<Vector>(origin), size, r, g, b, a, zTest, duration);
 }
 
 /**
@@ -374,8 +374,8 @@ extern "C" PLUGIN_API void DebugCross3D(const plg::vec3& origin, float size, int
  */
 extern "C" PLUGIN_API void DebugCross3DOriented(const plg::vec3& origin, const plg::quat& orientation, float size,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Cross3DOriented(*reinterpret_cast<const Vector*>(&origin),
-		*reinterpret_cast<const Quaternion*>(&orientation),
+	CDebugOverlayScriptHelper{}.Cross3DOriented(std::bit_cast<Vector>(origin),
+		std::bit_cast<Quaternion>(orientation),
 		size, r, g, b, a, zTest, duration);
 }
 
@@ -395,8 +395,8 @@ extern "C" PLUGIN_API void DebugCross3DOriented(const plg::vec3& origin, const p
  */
 extern "C" PLUGIN_API void DebugDrawTickMarkedLine(const plg::vec3& start, const plg::vec3& end, float tickDist,
 	int r, int g, int b, int a, int nTickCount, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.DrawTickMarkedLine(*reinterpret_cast<const Vector*>(&start),
-		*reinterpret_cast<const Vector*>(&end),
+	CDebugOverlayScriptHelper{}.DrawTickMarkedLine(std::bit_cast<Vector>(start),
+		std::bit_cast<Vector>(end),
 		tickDist, r, g, b, a, nTickCount, zTest, duration);
 }
 
@@ -480,8 +480,8 @@ extern "C" PLUGIN_API void DebugEntityText(int entityHandle, int textOffset, con
  */
 extern "C" PLUGIN_API void DebugFilledRect2D(const plg::vec2& min, const plg::vec2& max,
 	int r, int g, int b, int a, float duration) {
-	CDebugOverlayScriptHelper{}.FilledRect2D(*reinterpret_cast<const Vector2D*>(&min),
-		*reinterpret_cast<const Vector2D*>(&max),
+	CDebugOverlayScriptHelper{}.FilledRect2D(std::bit_cast<Vector2D>(min),
+		std::bit_cast<Vector2D>(max),
 		r, g, b, a, duration);
 }
 
@@ -500,8 +500,8 @@ extern "C" PLUGIN_API void DebugFilledRect2D(const plg::vec2& min, const plg::ve
  */
 extern "C" PLUGIN_API void DebugHorzArrow(const plg::vec3& start, const plg::vec3& end, float width,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.HorzArrow(*reinterpret_cast<const Vector*>(&start),
-		*reinterpret_cast<const Vector*>(&end),
+	CDebugOverlayScriptHelper{}.HorzArrow(std::bit_cast<Vector>(start),
+		std::bit_cast<Vector>(end),
 		width, r, g, b, a, zTest, duration);
 }
 
@@ -519,8 +519,8 @@ extern "C" PLUGIN_API void DebugHorzArrow(const plg::vec3& start, const plg::vec
  */
 extern "C" PLUGIN_API void DebugLine(const plg::vec3& start, const plg::vec3& end,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Line(*reinterpret_cast<const Vector*>(&start),
-		*reinterpret_cast<const Vector*>(&end),
+	CDebugOverlayScriptHelper{}.Line(std::bit_cast<Vector>(start),
+		std::bit_cast<Vector>(end),
 		r, g, b, a, zTest, duration);
 }
 
@@ -537,8 +537,8 @@ extern "C" PLUGIN_API void DebugLine(const plg::vec3& start, const plg::vec3& en
  */
 extern "C" PLUGIN_API void DebugLine2D(const plg::vec2& start, const plg::vec2& end,
 	int r, int g, int b, int a, float duration) {
-	CDebugOverlayScriptHelper{}.Line2D(*reinterpret_cast<const Vector2D*>(&start),
-		*reinterpret_cast<const Vector2D*>(&end),
+	CDebugOverlayScriptHelper{}.Line2D(std::bit_cast<Vector2D>(start),
+		std::bit_cast<Vector2D>(end),
 		r, g, b, a, duration);
 }
 
@@ -592,8 +592,8 @@ extern "C" PLUGIN_API void DebugRemoveAllInScope(utlstringtoken id) {
  */
 extern "C" PLUGIN_API void DebugSolidCone(const plg::vec3& origin, const plg::vec3& direction, float radius, float height,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.SolidCone(*reinterpret_cast<const Vector*>(&origin),
-		*reinterpret_cast<const Vector*>(&direction),
+	CDebugOverlayScriptHelper{}.SolidCone(std::bit_cast<Vector>(origin),
+		std::bit_cast<Vector>(direction),
 		radius, height, r, g, b, a, zTest, duration);
 }
 
@@ -611,7 +611,7 @@ extern "C" PLUGIN_API void DebugSolidCone(const plg::vec3& origin, const plg::ve
  */
 extern "C" PLUGIN_API void DebugSphere(const plg::vec3& center, float radius,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Sphere(*reinterpret_cast<const Vector*>(&center),
+	CDebugOverlayScriptHelper{}.Sphere(std::bit_cast<Vector>(center),
 		radius, r, g, b, a, zTest, duration);
 }
 
@@ -632,11 +632,11 @@ extern "C" PLUGIN_API void DebugSphere(const plg::vec3& center, float radius,
 extern "C" PLUGIN_API void DebugSweptBox(const plg::vec3& start, const plg::vec3& end,
 	const plg::vec3& mins, const plg::vec3& maxs, const plg::quat& orientation,
 	int r, int g, int b, int a, float duration) {
-	CDebugOverlayScriptHelper{}.SweptBox(*reinterpret_cast<const Vector*>(&start),
-		*reinterpret_cast<const Vector*>(&end),
-		*reinterpret_cast<const Vector*>(&mins),
-		*reinterpret_cast<const Vector*>(&maxs),
-		*reinterpret_cast<const Quaternion*>(&orientation),
+	CDebugOverlayScriptHelper{}.SweptBox(std::bit_cast<Vector>(start),
+		std::bit_cast<Vector>(end),
+		std::bit_cast<Vector>(mins),
+		std::bit_cast<Vector>(maxs),
+		std::bit_cast<Quaternion>(orientation),
 		r, g, b, a, duration);
 }
 
@@ -655,7 +655,7 @@ extern "C" PLUGIN_API void DebugSweptBox(const plg::vec3& start, const plg::vec3
  */
 extern "C" PLUGIN_API void DebugText(const plg::vec3& origin, int lineOffset, const plg::string& text,
 	float scale, int r, int g, int b, int a, float duration) {
-	CDebugOverlayScriptHelper{}.Text(*reinterpret_cast<const Vector*>(&origin),
+	CDebugOverlayScriptHelper{}.Text(std::bit_cast<Vector>(origin),
 		lineOffset, text, scale, r, g, b, a, duration);
 }
 
@@ -676,11 +676,11 @@ extern "C" PLUGIN_API void DebugText(const plg::vec3& origin, int lineOffset, co
 extern "C" PLUGIN_API void DebugTexture(const plg::string& textureName, const plg::vec2& min, const plg::vec2& max,
 	int r, int g, int b, int a, const plg::vec2& uvMin, const plg::vec2& uvMax, float duration) {
 	CDebugOverlayScriptHelper{}.Texture(textureName,
-		*reinterpret_cast<const Vector2D*>(&min),
-		*reinterpret_cast<const Vector2D*>(&max),
+		std::bit_cast<Vector2D>(min),
+		std::bit_cast<Vector2D>(max),
 		r, g, b, a,
-		*reinterpret_cast<const Vector2D*>(&uvMin),
-		*reinterpret_cast<const Vector2D*>(&uvMax),
+		std::bit_cast<Vector2D>(uvMin),
+		std::bit_cast<Vector2D>(uvMax),
 		duration);
 }
 
@@ -699,9 +699,9 @@ extern "C" PLUGIN_API void DebugTexture(const plg::string& textureName, const pl
  */
 extern "C" PLUGIN_API void DebugTriangle(const plg::vec3& v1, const plg::vec3& v2, const plg::vec3& v3,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.Triangle(*reinterpret_cast<const Vector*>(&v1),
-		*reinterpret_cast<const Vector*>(&v2),
-		*reinterpret_cast<const Vector*>(&v3),
+	CDebugOverlayScriptHelper{}.Triangle(std::bit_cast<Vector>(v1),
+		std::bit_cast<Vector>(v2),
+		std::bit_cast<Vector>(v3),
 		r, g, b, a, zTest, duration);
 }
 
@@ -720,8 +720,8 @@ extern "C" PLUGIN_API void DebugTriangle(const plg::vec3& v1, const plg::vec3& v
  */
 extern "C" PLUGIN_API void DebugVectorText3D(const plg::vec3& origin, const plg::quat& orientation, const plg::string& text,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.VectorText3D(*reinterpret_cast<const Vector*>(&origin),
-		*reinterpret_cast<const Quaternion*>(&orientation),
+	CDebugOverlayScriptHelper{}.VectorText3D(std::bit_cast<Vector>(origin),
+		std::bit_cast<Quaternion>(orientation),
 		text, r, g, b, a, zTest, duration);
 }
 
@@ -740,8 +740,8 @@ extern "C" PLUGIN_API void DebugVectorText3D(const plg::vec3& origin, const plg:
  */
 extern "C" PLUGIN_API void DebugVertArrow(const plg::vec3& start, const plg::vec3& end, float width,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.VertArrow(*reinterpret_cast<const Vector*>(&start),
-		*reinterpret_cast<const Vector*>(&end),
+	CDebugOverlayScriptHelper{}.VertArrow(std::bit_cast<Vector>(start),
+		std::bit_cast<Vector>(end),
 		width, r, g, b, a, zTest, duration);
 }
 
@@ -761,7 +761,7 @@ extern "C" PLUGIN_API void DebugVertArrow(const plg::vec3& start, const plg::vec
  */
 extern "C" PLUGIN_API void DebugYawArrow(const plg::vec3& origin, float yaw, float length, float width,
 	int r, int g, int b, int a, bool zTest, float duration) {
-	CDebugOverlayScriptHelper{}.YawArrow(*reinterpret_cast<const Vector*>(&origin),
+	CDebugOverlayScriptHelper{}.YawArrow(std::bit_cast<Vector>(origin),
 		yaw, length, width, r, g, b, a, zTest, duration);
 }
 
