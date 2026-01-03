@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.3.21](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.20...v2.3.21) (2026-01-03)
+
+
+### Bug Fixes
+
+* add build type to configure step ([1e2445b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1e2445b921ed7aea39c72165d4b23af5b197ec29))
+* add GetEventPlayerSlot/SetEventPlayerSlot ([efdedc3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/efdedc31e266c177788665eb34933462de885b20))
+* win build ([6e3ff4a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6e3ff4ae3af3ba88ed968bec3e57f03e5f1e5d94))
+
 ## [2.3.20](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.19...v2.3.20) (2025-12-30)
 
 
