@@ -150,6 +150,16 @@ extern "C" PLUGIN_API int GetEventPlayerIndex(IGameEvent* event, const plg::stri
 }
 
 /**
+ * @brief Retrieves the player slot of a game event's key.
+ * @param event A pointer to the IGameEvent object containing event data.
+ * @param key The key for which to retrieve the player index.
+ * @return The player slot associated with the key.
+ */
+extern "C" PLUGIN_API int GetEventPlayerSlot(IGameEvent* event, const plg::string& key) {
+	return event ? event->GetPlayerSlot(GameEventKeySymbol_t::Make(key)).Get() : INVALID_PLAYER_SLOT_INDEX;
+}
+
+/**
  * @brief Retrieves the player pawn address of a game event's key.
  * @param event A pointer to the IGameEvent object containing event data.
  * @param key The key for which to retrieve the player pawn address.
@@ -277,6 +287,16 @@ extern "C" PLUGIN_API void SetEventPlayerController(IGameEvent* event, const plg
  * @param value The player index value to set.
  */
 extern "C" PLUGIN_API void SetEventPlayerIndex(IGameEvent* event, const plg::string& key, int value) {
+	if (event) event->SetPlayer(GameEventKeySymbol_t::Make(key), CPlayerSlot(value));
+}
+
+/**
+ * @brief Sets the player slot value of a game event's key.
+ * @param event A pointer to the IGameEvent object containing event data.
+ * @param key The key for which to set the player index value.
+ * @param value The player slot value to set.
+ */
+extern "C" PLUGIN_API void SetEventPlayerSlot(IGameEvent* event, const plg::string& key, int value) {
 	if (event) event->SetPlayer(GameEventKeySymbol_t::Make(key), CPlayerSlot(value));
 }
 

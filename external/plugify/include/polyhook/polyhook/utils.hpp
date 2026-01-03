@@ -512,6 +512,8 @@ namespace polyhook
 		template <typename T>
 		constexpr DataType GetType()
 		{
+			if constexpr (std::is_enum_v<T>)
+				return GetType<std::underlying_type_t<T>>();
 			if constexpr (std::is_same_v<T, void>)
 				return DataType::Void;
 			else if constexpr (std::is_same_v<T, bool>)

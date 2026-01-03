@@ -22339,6 +22339,30 @@
       }
     },
     {
+      "name": "GetEventPlayerSlot",
+      "group": "Events",
+      "description": "Retrieves the player slot of a game event's key.",
+      "funcName": "GetEventPlayerSlot",
+      "paramTypes": [
+        {
+          "name": "event",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the IGameEvent object containing event data."
+        },
+        {
+          "name": "key",
+          "type": "string",
+          "ref": false,
+          "description": "The key for which to retrieve the player index."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The player slot associated with the key."
+      }
+    },
+    {
       "name": "GetEventPlayerPawn",
       "group": "Events",
       "description": "Retrieves the player pawn address of a game event's key.",
@@ -22678,6 +22702,35 @@
           "type": "int32",
           "ref": false,
           "description": "The player index value to set."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEventPlayerSlot",
+      "group": "Events",
+      "description": "Sets the player slot value of a game event's key.",
+      "funcName": "SetEventPlayerSlot",
+      "paramTypes": [
+        {
+          "name": "event",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the IGameEvent object containing event data."
+        },
+        {
+          "name": "key",
+          "type": "string",
+          "ref": false,
+          "description": "The key for which to set the player slot value."
+        },
+        {
+          "name": "value",
+          "type": "int32",
+          "ref": false,
+          "description": "The player slot value to set."
         }
       ],
       "retType": {
@@ -35666,6 +35719,11 @@
           "bindSelf": true
         },
         {
+          "name": "GetPlayerSlot",
+          "method": "GetEventPlayerSlot",
+          "bindSelf": true
+        },
+        {
           "name": "GetPlayerPawn",
           "method": "GetEventPlayerPawn",
           "bindSelf": true
@@ -35728,6 +35786,11 @@
         {
           "name": "SetPlayerIndex",
           "method": "SetEventPlayerIndex",
+          "bindSelf": true
+        },
+        {
+          "name": "SetPlayerSlot",
+          "method": "SetEventPlayerSlot",
           "bindSelf": true
         },
         {

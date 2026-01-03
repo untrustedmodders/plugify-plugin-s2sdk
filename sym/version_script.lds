@@ -422,6 +422,7 @@
         GetEventPtr;
         GetEventPlayerController;
         GetEventPlayerIndex;
+        GetEventPlayerSlot;
         GetEventPlayerPawn;
         GetEventEntity;
         GetEventEntityIndex;
@@ -435,6 +436,7 @@
         SetEventPtr;
         SetEventPlayerController;
         SetEventPlayerIndex;
+        SetEventPlayerSlot;
         SetEventEntity;
         SetEventEntityIndex;
         SetEventEntityHandle;
