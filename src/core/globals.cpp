@@ -1,13 +1,15 @@
 
+#include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/utils.hpp>
 #include <core/sdk/virtual.hpp>
-#include <core/sdk/entity/cbaseentity.h>
 #include <engine/igameeventsystem.h>
 #include <IEngineSound.h>
 #include <igameevents.h>
 #include <igamesystemfactory.h>
 
 #include "globals.hpp"
+
+#include "sdk/helpers.hpp"
 
 #include "con_var_manager.hpp"
 #include "core_config.hpp"
@@ -140,7 +142,8 @@ namespace entities {
 	}
 
 	CEntityInstance* FindEntityByName(CEntityInstance* startEntity, const char* name) {
-		auto handle = CEntities{}.FindByName(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
+		ParamScope scope(startEntity);
+		auto handle = CEntities{}.FindByName(scope.GetInstance(0), name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
@@ -150,12 +153,14 @@ namespace entities {
 	}
 
 	CEntityInstance* FindByNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
-		auto handle = CEntities{}.FindByNameWithin(startEntity ? startEntity->GetScriptInstance() : nullptr, name, origin, maxRadius);
+		ParamScope scope(startEntity);
+		auto handle = CEntities{}.FindByNameWithin(scope.GetInstance(0), name, origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindEntityByClassName(CEntityInstance* startEntity, const char* name) {
-		auto handle = CEntities{}.FindByClassname(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
+		ParamScope scope(startEntity);
+		auto handle = CEntities{}.FindByClassname(scope.GetInstance(0), name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
@@ -165,27 +170,32 @@ namespace entities {
 	}
 
 	CEntityInstance* FindEntityByClassNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
-		auto handle = CEntities{}.FindByClassnameWithin(startEntity ? startEntity->GetScriptInstance() : nullptr, name, origin, maxRadius);
+		ParamScope scope(startEntity);
+		auto handle = CEntities{}.FindByClassnameWithin(scope.GetInstance(0), name, origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name) {
-		auto handle = CEntities{}.FindByModel(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
+		ParamScope scope(startEntity);
+		auto handle = CEntities{}.FindByModel(scope.GetInstance(0), name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
-		auto handle = CEntities{}.FindByModelWithin(startEntity ? startEntity->GetScriptInstance() : nullptr, name, origin, maxRadius);
+		ParamScope scope(startEntity);
+		auto handle = CEntities{}.FindByModelWithin(scope.GetInstance(0), name, origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindByTarget(CEntityInstance* startEntity, const char* name) {
-		auto handle = CEntities{}.FindByTarget(startEntity ? startEntity->GetScriptInstance() : nullptr, name);
+		ParamScope scope(startEntity);
+		auto handle = CEntities{}.FindByTarget(scope.GetInstance(0), name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
-		auto handle = CEntities{}.FindInSphere(startEntity ? startEntity->GetScriptInstance() : nullptr, name, origin, maxRadius);
+		ParamScope scope(startEntity);
+		auto handle = CEntities{}.FindInSphere(scope.GetInstance(0), name, origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 }// namespace entities

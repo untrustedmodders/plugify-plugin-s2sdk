@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "core/sdk/helpers.hpp"
+
 #include "cbaseentity.h"
 
 class Trace {
@@ -44,6 +46,8 @@ public:
 		bool& outStartSolid,
 		Vector& outNormal
 	) {
+		ParamScope scope(ent);
+
 		// Create input table
 		ScriptVariant_t inputTableVar;
 		g_pScriptVM->CreateTable(inputTableVar);
@@ -52,7 +56,7 @@ public:
 		// Populate input table with parameters
 		g_pScriptVM->SetValue(table, "start", start);
 		g_pScriptVM->SetValue(table, "end", end);
-		g_pScriptVM->SetValue(table, "ent", ent->GetScriptInstance());
+		g_pScriptVM->SetValue(table, "ent", scope.GetInstance(0));
 		if (mins) {
 			g_pScriptVM->SetValue(table, "mins", *mins);
 		}
@@ -111,6 +115,8 @@ public:
 		CEntityInstance*& outEntHit,
 		bool& outStartSolid
 	) {
+		ParamScope scope(ignore);
+
 		// Create input table
 		ScriptVariant_t inputTableVar;
 		g_pScriptVM->CreateTable(inputTableVar);
@@ -122,7 +128,7 @@ public:
 		g_pScriptVM->SetValue(table, "min", min);
 		g_pScriptVM->SetValue(table, "max", max);
 		g_pScriptVM->SetValue(table, "mask", mask);
-		g_pScriptVM->SetValue(table, "ignore", ignore->GetScriptInstance());
+		g_pScriptVM->SetValue(table, "ignore", scope.GetInstance(0));
 
 		// Call the original Trace method with the table
 		bool result = TraceHull(table);
@@ -173,6 +179,7 @@ public:
 		CEntityInstance*& outEntHit,
 		bool& outStartSolid
 	) {
+		ParamScope scope(ignore);
 		// Create input table
 		ScriptVariant_t inputTableVar;
 		g_pScriptVM->CreateTable(inputTableVar);
@@ -182,7 +189,7 @@ public:
 		g_pScriptVM->SetValue(table, "startpos", startPos);
 		g_pScriptVM->SetValue(table, "endpos", endPos);
 		g_pScriptVM->SetValue(table, "mask", mask);
-		g_pScriptVM->SetValue(table, "ignore", ignore->GetScriptInstance());
+		g_pScriptVM->SetValue(table, "ignore", scope.GetInstance(0));
 
 		// Call the original Trace method with the table
 		bool result = TraceLine(table);

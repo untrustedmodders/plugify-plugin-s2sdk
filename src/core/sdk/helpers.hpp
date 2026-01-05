@@ -254,3 +254,45 @@ namespace helpers {
 		return variant;
 	}
 }
+
+class ParamScope {
+public:
+	template<typename... Entities>
+	ParamScope(Entities... entities) {
+		(AddEntity(entities), ...);
+	}
+
+	ParamScope(const ParamScope&) = delete;
+	ParamScope& operator=(const ParamScope&) = delete;
+
+	ParamScope(ParamScope&& other) noexcept
+		: m_instances(std::move(other.m_instances)) {
+	}
+
+	~ParamScope() {
+		for (auto& instance : m_instances) {
+			if (instance) {
+				g_pScriptVM->RemoveInstance(instance);
+			}
+		}
+	}
+
+	void AddEntity(CEntityInstance* entity) {
+		if (!entity) {
+			m_instances.emplace_back(nullptr);
+			return;
+		}
+
+		HSCRIPT instance = g_pScriptVM->RegisterInstance(
+			entity->GetScriptDesc(),
+			entity
+		);
+
+		m_instances.emplace_back(instance);
+	}
+
+	HSCRIPT GetInstance(size_t index) const { return m_instances[index]; }
+
+private:
+	plg::inplace_vector<HSCRIPT, 7> m_instances;
+};

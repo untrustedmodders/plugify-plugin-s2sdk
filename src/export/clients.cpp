@@ -1470,7 +1470,8 @@ extern "C" PLUGIN_API void DisconnectClientRedirectedOutput(int playerSlot, cons
 	if (!pawn) return;
 	auto* target = helpers::GetEntity(targetHandle);
 	if (!target) return;
-	reinterpret_cast<CEntityInstance2*>(pawn)->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), target->GetScriptInstance());
+	ParamScope scope(target);
+	reinterpret_cast<CEntityInstance2*>(pawn)->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), scope.GetInstance(0));
 }
 
 /**
@@ -1492,7 +1493,8 @@ extern "C" PLUGIN_API void FireClientOutput(int playerSlot, const plg::string& o
 	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
-	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), activator ? activator->GetScriptInstance() : nullptr, caller ? caller->GetScriptInstance() : nullptr, variant, delay);
+	ParamScope scope(activator, caller);
+	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), scope.GetInstance(0), scope.GetInstance(1), variant, delay);
 }
 
 /**
