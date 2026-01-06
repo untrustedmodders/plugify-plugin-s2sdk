@@ -1638,10 +1638,12 @@ extern "C" PLUGIN_API void ForcePlayerSuicide(int playerSlot, bool explode, bool
 /**
  * @brief Disconnects a client from the server as soon as the next frame starts.
  *
- * @param playerSlot The index of the player's slot to be kicked.
+ * @param playerSlot The index of the player's slot to be kicked.*
+ * @param reason The network-level reason code describing why the client is being disconnected.
+ * @param message The optional internal diagnostic message. If empty, no message is passed to the engine.
  */
-extern "C" PLUGIN_API void KickClient(int playerSlot) {
-	g_pEngineServer->DisconnectClient(playerSlot, NETWORK_DISCONNECT_KICKED);
+extern "C" PLUGIN_API void KickClient(int playerSlot, ENetworkDisconnectionReason reason, const plg::string& message) {
+	g_pEngineServer->DisconnectClient(playerSlot, reason, message.empty() ? nullptr : message.c_str());
 }
 
 /**

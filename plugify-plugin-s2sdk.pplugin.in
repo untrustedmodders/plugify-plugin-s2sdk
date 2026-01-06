@@ -10415,6 +10415,629 @@
           "type": "int32",
           "ref": false,
           "description": "The index of the player's slot to be kicked."
+        },
+        {
+          "name": "reason",
+          "type": "int32",
+          "ref": false,
+          "description": "The network-level reason code describing why the client is being disconnected.",
+          "enum": {
+            "name": "NetworkDisconnectionReason",
+            "description": "Enum representing reasons for network disconnection.",
+            "values": [
+              {
+                "value": 0,
+                "name": "Invalid",
+                "description": "Invalid."
+              },
+              {
+                "value": 1,
+                "name": "Shutdown",
+                "description": "Shutdown."
+              },
+              {
+                "value": 2,
+                "name": "DisconnectByUser",
+                "description": "Disconnect by user."
+              },
+              {
+                "value": 3,
+                "name": "DisconnectByServer",
+                "description": "Disconnect by server."
+              },
+              {
+                "value": 4,
+                "name": "Lost",
+                "description": "Lost."
+              },
+              {
+                "value": 5,
+                "name": "Overflow",
+                "description": "Overflow."
+              },
+              {
+                "value": 6,
+                "name": "SteamBanned",
+                "description": "Steam banned."
+              },
+              {
+                "value": 7,
+                "name": "SteamInuse",
+                "description": "Steam inuse."
+              },
+              {
+                "value": 8,
+                "name": "SteamTicket",
+                "description": "Steam ticket."
+              },
+              {
+                "value": 9,
+                "name": "SteamLogon",
+                "description": "Steam logon."
+              },
+              {
+                "value": 10,
+                "name": "SteamAuthcancelled",
+                "description": "Steam authcancelled."
+              },
+              {
+                "value": 11,
+                "name": "SteamAuthalreadyused",
+                "description": "Steam authalreadyused."
+              },
+              {
+                "value": 12,
+                "name": "SteamAuthinvalid",
+                "description": "Steam authinvalid."
+              },
+              {
+                "value": 13,
+                "name": "SteamVacbanstate",
+                "description": "Steam vacbanstate."
+              },
+              {
+                "value": 14,
+                "name": "SteamLoggedInElsewhere",
+                "description": "Steam logged in elsewhere."
+              },
+              {
+                "value": 15,
+                "name": "SteamVacCheckTimedout",
+                "description": "Steam vac check timedout."
+              },
+              {
+                "value": 16,
+                "name": "SteamDropped",
+                "description": "Steam dropped."
+              },
+              {
+                "value": 17,
+                "name": "SteamOwnership",
+                "description": "Steam ownership."
+              },
+              {
+                "value": 18,
+                "name": "ServerinfoOverflow",
+                "description": "Serverinfo overflow."
+              },
+              {
+                "value": 19,
+                "name": "TickmsgOverflow",
+                "description": "Tickmsg overflow."
+              },
+              {
+                "value": 20,
+                "name": "StringtablemsgOverflow",
+                "description": "Stringtablemsg overflow."
+              },
+              {
+                "value": 21,
+                "name": "DeltaentmsgOverflow",
+                "description": "Deltaentmsg overflow."
+              },
+              {
+                "value": 22,
+                "name": "TempentmsgOverflow",
+                "description": "Tempentmsg overflow."
+              },
+              {
+                "value": 23,
+                "name": "SoundsmsgOverflow",
+                "description": "Soundsmsg overflow."
+              },
+              {
+                "value": 24,
+                "name": "Snapshotoverflow",
+                "description": "Snapshotoverflow."
+              },
+              {
+                "value": 25,
+                "name": "Snapshoterror",
+                "description": "Snapshoterror."
+              },
+              {
+                "value": 26,
+                "name": "Reliableoverflow",
+                "description": "Reliableoverflow."
+              },
+              {
+                "value": 27,
+                "name": "Baddeltatick",
+                "description": "Baddeltatick."
+              },
+              {
+                "value": 28,
+                "name": "Nomoresplits",
+                "description": "Nomoresplits."
+              },
+              {
+                "value": 29,
+                "name": "Timedout",
+                "description": "Timedout."
+              },
+              {
+                "value": 30,
+                "name": "Disconnected",
+                "description": "Disconnected."
+              },
+              {
+                "value": 31,
+                "name": "Leavingsplit",
+                "description": "Leavingsplit."
+              },
+              {
+                "value": 32,
+                "name": "Differentclasstables",
+                "description": "Differentclasstables."
+              },
+              {
+                "value": 33,
+                "name": "Badrelaypassword",
+                "description": "Badrelaypassword."
+              },
+              {
+                "value": 34,
+                "name": "Badspectatorpassword",
+                "description": "Badspectatorpassword."
+              },
+              {
+                "value": 35,
+                "name": "Hltvrestricted",
+                "description": "Hltvrestricted."
+              },
+              {
+                "value": 36,
+                "name": "Nospectators",
+                "description": "Nospectators."
+              },
+              {
+                "value": 37,
+                "name": "Hltvunavailable",
+                "description": "Hltvunavailable."
+              },
+              {
+                "value": 38,
+                "name": "Hltvstop",
+                "description": "Hltvstop."
+              },
+              {
+                "value": 39,
+                "name": "Kicked",
+                "description": "Kicked."
+              },
+              {
+                "value": 40,
+                "name": "Banadded",
+                "description": "Banadded."
+              },
+              {
+                "value": 41,
+                "name": "Kickbanadded",
+                "description": "Kickbanadded."
+              },
+              {
+                "value": 42,
+                "name": "Hltvdirect",
+                "description": "Hltvdirect."
+              },
+              {
+                "value": 43,
+                "name": "PureserverClientextra",
+                "description": "Pureserver clientextra."
+              },
+              {
+                "value": 44,
+                "name": "PureserverMismatch",
+                "description": "Pureserver mismatch."
+              },
+              {
+                "value": 45,
+                "name": "Usercmd",
+                "description": "Usercmd."
+              },
+              {
+                "value": 46,
+                "name": "RejectedByGame",
+                "description": "Rejected by game."
+              },
+              {
+                "value": 47,
+                "name": "MessageParseError",
+                "description": "Message parse error."
+              },
+              {
+                "value": 48,
+                "name": "InvalidMessageError",
+                "description": "Invalid message error."
+              },
+              {
+                "value": 49,
+                "name": "BadServerPassword",
+                "description": "Bad server password."
+              },
+              {
+                "value": 50,
+                "name": "DirectConnectReservation",
+                "description": "Direct connect reservation."
+              },
+              {
+                "value": 51,
+                "name": "ConnectionFailure",
+                "description": "Connection failure."
+              },
+              {
+                "value": 52,
+                "name": "NoPeerGroupHandlers",
+                "description": "No peer group handlers."
+              },
+              {
+                "value": 53,
+                "name": "Reconnection",
+                "description": "Reconnection."
+              },
+              {
+                "value": 54,
+                "name": "Loopshutdown",
+                "description": "Loopshutdown."
+              },
+              {
+                "value": 55,
+                "name": "Loopdeactivate",
+                "description": "Loopdeactivate."
+              },
+              {
+                "value": 56,
+                "name": "HostEndgame",
+                "description": "Host endgame."
+              },
+              {
+                "value": 57,
+                "name": "LoopLevelloadActivate",
+                "description": "Loop levelload activate."
+              },
+              {
+                "value": 58,
+                "name": "CreateServerFailed",
+                "description": "Create server failed."
+              },
+              {
+                "value": 59,
+                "name": "Exiting",
+                "description": "Exiting."
+              },
+              {
+                "value": 60,
+                "name": "RequestHoststateIdle",
+                "description": "Request hoststate idle."
+              },
+              {
+                "value": 61,
+                "name": "RequestHoststateHltvrelay",
+                "description": "Request hoststate hltvrelay."
+              },
+              {
+                "value": 62,
+                "name": "ClientConsistencyFail",
+                "description": "Client consistency fail."
+              },
+              {
+                "value": 63,
+                "name": "ClientUnableToCrcMap",
+                "description": "Client unable to crc map."
+              },
+              {
+                "value": 64,
+                "name": "ClientNoMap",
+                "description": "Client no map."
+              },
+              {
+                "value": 65,
+                "name": "ClientDifferentMap",
+                "description": "Client different map."
+              },
+              {
+                "value": 66,
+                "name": "ServerRequiresSteam",
+                "description": "Server requires steam."
+              },
+              {
+                "value": 67,
+                "name": "SteamDenyMisc",
+                "description": "Steam deny misc."
+              },
+              {
+                "value": 68,
+                "name": "SteamDenyBadAntiCheat",
+                "description": "Steam deny bad anti cheat."
+              },
+              {
+                "value": 69,
+                "name": "ServerShutdown",
+                "description": "Server shutdown."
+              },
+              {
+                "value": 71,
+                "name": "ReplayIncompatible",
+                "description": "Replay incompatible."
+              },
+              {
+                "value": 72,
+                "name": "ConnectRequestTimedout",
+                "description": "Connect request timedout."
+              },
+              {
+                "value": 73,
+                "name": "ServerIncompatible",
+                "description": "Server incompatible."
+              },
+              {
+                "value": 74,
+                "name": "LocalproblemManyrelays",
+                "description": "Localproblem manyrelays."
+              },
+              {
+                "value": 75,
+                "name": "LocalproblemHostedserverprimaryrelay",
+                "description": "Localproblem hostedserverprimaryrelay."
+              },
+              {
+                "value": 76,
+                "name": "LocalproblemNetworkconfig",
+                "description": "Localproblem networkconfig."
+              },
+              {
+                "value": 77,
+                "name": "LocalproblemOther",
+                "description": "Localproblem other."
+              },
+              {
+                "value": 79,
+                "name": "RemoteTimeout",
+                "description": "Remote timeout."
+              },
+              {
+                "value": 80,
+                "name": "RemoteTimeoutConnecting",
+                "description": "Remote timeout connecting."
+              },
+              {
+                "value": 81,
+                "name": "RemoteOther",
+                "description": "Remote other."
+              },
+              {
+                "value": 82,
+                "name": "RemoteBadcrypt",
+                "description": "Remote badcrypt."
+              },
+              {
+                "value": 83,
+                "name": "RemoteCertnottrusted",
+                "description": "Remote certnottrusted."
+              },
+              {
+                "value": 84,
+                "name": "Unusual",
+                "description": "Unusual."
+              },
+              {
+                "value": 85,
+                "name": "InternalError",
+                "description": "Internal error."
+              },
+              {
+                "value": 128,
+                "name": "RejectBadchallenge",
+                "description": "Reject badchallenge."
+              },
+              {
+                "value": 129,
+                "name": "RejectNolobby",
+                "description": "Reject nolobby."
+              },
+              {
+                "value": 130,
+                "name": "RejectBackgroundMap",
+                "description": "Reject background map."
+              },
+              {
+                "value": 131,
+                "name": "RejectSinglePlayer",
+                "description": "Reject single player."
+              },
+              {
+                "value": 132,
+                "name": "RejectHiddenGame",
+                "description": "Reject hidden game."
+              },
+              {
+                "value": 133,
+                "name": "RejectLanrestrict",
+                "description": "Reject lanrestrict."
+              },
+              {
+                "value": 134,
+                "name": "RejectBadpassword",
+                "description": "Reject badpassword."
+              },
+              {
+                "value": 135,
+                "name": "RejectServerfull",
+                "description": "Reject serverfull."
+              },
+              {
+                "value": 136,
+                "name": "RejectInvalidreservation",
+                "description": "Reject invalidreservation."
+              },
+              {
+                "value": 137,
+                "name": "RejectFailedchannel",
+                "description": "Reject failedchannel."
+              },
+              {
+                "value": 138,
+                "name": "RejectConnectFromLobby",
+                "description": "Reject connect from lobby."
+              },
+              {
+                "value": 139,
+                "name": "RejectReservedForLobby",
+                "description": "Reject reserved for lobby."
+              },
+              {
+                "value": 140,
+                "name": "RejectInvalidkeylength",
+                "description": "Reject invalidkeylength."
+              },
+              {
+                "value": 141,
+                "name": "RejectOldprotocol",
+                "description": "Reject oldprotocol."
+              },
+              {
+                "value": 142,
+                "name": "RejectNewprotocol",
+                "description": "Reject newprotocol."
+              },
+              {
+                "value": 143,
+                "name": "RejectInvalidconnection",
+                "description": "Reject invalidconnection."
+              },
+              {
+                "value": 144,
+                "name": "RejectInvalidcertlen",
+                "description": "Reject invalidcertlen."
+              },
+              {
+                "value": 145,
+                "name": "RejectInvalidsteamcertlen",
+                "description": "Reject invalidsteamcertlen."
+              },
+              {
+                "value": 146,
+                "name": "RejectSteam",
+                "description": "Reject steam."
+              },
+              {
+                "value": 147,
+                "name": "RejectServerauthdisabled",
+                "description": "Reject serverauthdisabled."
+              },
+              {
+                "value": 148,
+                "name": "RejectServercdkeyauthinvalid",
+                "description": "Reject servercdkeyauthinvalid."
+              },
+              {
+                "value": 149,
+                "name": "RejectBanned",
+                "description": "Reject banned."
+              },
+              {
+                "value": 150,
+                "name": "KickedTeamkilling",
+                "description": "Kicked teamkilling."
+              },
+              {
+                "value": 151,
+                "name": "KickedTkStart",
+                "description": "Kicked tk start."
+              },
+              {
+                "value": 152,
+                "name": "KickedUntrustedaccount",
+                "description": "Kicked untrustedaccount."
+              },
+              {
+                "value": 153,
+                "name": "KickedConvictedaccount",
+                "description": "Kicked convictedaccount."
+              },
+              {
+                "value": 154,
+                "name": "KickedCompetitivecooldown",
+                "description": "Kicked competitivecooldown."
+              },
+              {
+                "value": 155,
+                "name": "KickedTeamhurting",
+                "description": "Kicked teamhurting."
+              },
+              {
+                "value": 156,
+                "name": "KickedHostagekilling",
+                "description": "Kicked hostagekilling."
+              },
+              {
+                "value": 157,
+                "name": "KickedVotedoff",
+                "description": "Kicked votedoff."
+              },
+              {
+                "value": 158,
+                "name": "KickedIdle",
+                "description": "Kicked idle."
+              },
+              {
+                "value": 159,
+                "name": "KickedSuicide",
+                "description": "Kicked suicide."
+              },
+              {
+                "value": 160,
+                "name": "KickedNosteamlogin",
+                "description": "Kicked nosteamlogin."
+              },
+              {
+                "value": 161,
+                "name": "KickedNosteamticket",
+                "description": "Kicked nosteamticket."
+              },
+              {
+                "value": 162,
+                "name": "KickedInputautomation",
+                "description": "Kicked inputautomation."
+              },
+              {
+                "value": 163,
+                "name": "KickedVacnetabnormalbehavior",
+                "description": "Kicked vacnetabnormalbehavior."
+              },
+              {
+                "value": 164,
+                "name": "KickedInsecureclient",
+                "description": "Kicked insecureclient."
+              }
+            ]
+          }
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "ref": false,
+          "description": "The optional internal diagnostic message. If empty, no message is passed to the engine."
         }
       ],
       "retType": {
@@ -28183,7 +28806,618 @@
               {
                 "name": "reason",
                 "type": "int32",
-                "description": "The reason for disconnect"
+                "description": "The reason for disconnect",
+                "enum": {
+                  "name": "NetworkDisconnectionReason",
+                  "description": "Enum representing reasons for network disconnection.",
+                  "values": [
+                    {
+                      "value": 0,
+                      "name": "Invalid",
+                      "description": "Invalid."
+                    },
+                    {
+                      "value": 1,
+                      "name": "Shutdown",
+                      "description": "Shutdown."
+                    },
+                    {
+                      "value": 2,
+                      "name": "DisconnectByUser",
+                      "description": "Disconnect by user."
+                    },
+                    {
+                      "value": 3,
+                      "name": "DisconnectByServer",
+                      "description": "Disconnect by server."
+                    },
+                    {
+                      "value": 4,
+                      "name": "Lost",
+                      "description": "Lost."
+                    },
+                    {
+                      "value": 5,
+                      "name": "Overflow",
+                      "description": "Overflow."
+                    },
+                    {
+                      "value": 6,
+                      "name": "SteamBanned",
+                      "description": "Steam banned."
+                    },
+                    {
+                      "value": 7,
+                      "name": "SteamInuse",
+                      "description": "Steam inuse."
+                    },
+                    {
+                      "value": 8,
+                      "name": "SteamTicket",
+                      "description": "Steam ticket."
+                    },
+                    {
+                      "value": 9,
+                      "name": "SteamLogon",
+                      "description": "Steam logon."
+                    },
+                    {
+                      "value": 10,
+                      "name": "SteamAuthcancelled",
+                      "description": "Steam authcancelled."
+                    },
+                    {
+                      "value": 11,
+                      "name": "SteamAuthalreadyused",
+                      "description": "Steam authalreadyused."
+                    },
+                    {
+                      "value": 12,
+                      "name": "SteamAuthinvalid",
+                      "description": "Steam authinvalid."
+                    },
+                    {
+                      "value": 13,
+                      "name": "SteamVacbanstate",
+                      "description": "Steam vacbanstate."
+                    },
+                    {
+                      "value": 14,
+                      "name": "SteamLoggedInElsewhere",
+                      "description": "Steam logged in elsewhere."
+                    },
+                    {
+                      "value": 15,
+                      "name": "SteamVacCheckTimedout",
+                      "description": "Steam vac check timedout."
+                    },
+                    {
+                      "value": 16,
+                      "name": "SteamDropped",
+                      "description": "Steam dropped."
+                    },
+                    {
+                      "value": 17,
+                      "name": "SteamOwnership",
+                      "description": "Steam ownership."
+                    },
+                    {
+                      "value": 18,
+                      "name": "ServerinfoOverflow",
+                      "description": "Serverinfo overflow."
+                    },
+                    {
+                      "value": 19,
+                      "name": "TickmsgOverflow",
+                      "description": "Tickmsg overflow."
+                    },
+                    {
+                      "value": 20,
+                      "name": "StringtablemsgOverflow",
+                      "description": "Stringtablemsg overflow."
+                    },
+                    {
+                      "value": 21,
+                      "name": "DeltaentmsgOverflow",
+                      "description": "Deltaentmsg overflow."
+                    },
+                    {
+                      "value": 22,
+                      "name": "TempentmsgOverflow",
+                      "description": "Tempentmsg overflow."
+                    },
+                    {
+                      "value": 23,
+                      "name": "SoundsmsgOverflow",
+                      "description": "Soundsmsg overflow."
+                    },
+                    {
+                      "value": 24,
+                      "name": "Snapshotoverflow",
+                      "description": "Snapshotoverflow."
+                    },
+                    {
+                      "value": 25,
+                      "name": "Snapshoterror",
+                      "description": "Snapshoterror."
+                    },
+                    {
+                      "value": 26,
+                      "name": "Reliableoverflow",
+                      "description": "Reliableoverflow."
+                    },
+                    {
+                      "value": 27,
+                      "name": "Baddeltatick",
+                      "description": "Baddeltatick."
+                    },
+                    {
+                      "value": 28,
+                      "name": "Nomoresplits",
+                      "description": "Nomoresplits."
+                    },
+                    {
+                      "value": 29,
+                      "name": "Timedout",
+                      "description": "Timedout."
+                    },
+                    {
+                      "value": 30,
+                      "name": "Disconnected",
+                      "description": "Disconnected."
+                    },
+                    {
+                      "value": 31,
+                      "name": "Leavingsplit",
+                      "description": "Leavingsplit."
+                    },
+                    {
+                      "value": 32,
+                      "name": "Differentclasstables",
+                      "description": "Differentclasstables."
+                    },
+                    {
+                      "value": 33,
+                      "name": "Badrelaypassword",
+                      "description": "Badrelaypassword."
+                    },
+                    {
+                      "value": 34,
+                      "name": "Badspectatorpassword",
+                      "description": "Badspectatorpassword."
+                    },
+                    {
+                      "value": 35,
+                      "name": "Hltvrestricted",
+                      "description": "Hltvrestricted."
+                    },
+                    {
+                      "value": 36,
+                      "name": "Nospectators",
+                      "description": "Nospectators."
+                    },
+                    {
+                      "value": 37,
+                      "name": "Hltvunavailable",
+                      "description": "Hltvunavailable."
+                    },
+                    {
+                      "value": 38,
+                      "name": "Hltvstop",
+                      "description": "Hltvstop."
+                    },
+                    {
+                      "value": 39,
+                      "name": "Kicked",
+                      "description": "Kicked."
+                    },
+                    {
+                      "value": 40,
+                      "name": "Banadded",
+                      "description": "Banadded."
+                    },
+                    {
+                      "value": 41,
+                      "name": "Kickbanadded",
+                      "description": "Kickbanadded."
+                    },
+                    {
+                      "value": 42,
+                      "name": "Hltvdirect",
+                      "description": "Hltvdirect."
+                    },
+                    {
+                      "value": 43,
+                      "name": "PureserverClientextra",
+                      "description": "Pureserver clientextra."
+                    },
+                    {
+                      "value": 44,
+                      "name": "PureserverMismatch",
+                      "description": "Pureserver mismatch."
+                    },
+                    {
+                      "value": 45,
+                      "name": "Usercmd",
+                      "description": "Usercmd."
+                    },
+                    {
+                      "value": 46,
+                      "name": "RejectedByGame",
+                      "description": "Rejected by game."
+                    },
+                    {
+                      "value": 47,
+                      "name": "MessageParseError",
+                      "description": "Message parse error."
+                    },
+                    {
+                      "value": 48,
+                      "name": "InvalidMessageError",
+                      "description": "Invalid message error."
+                    },
+                    {
+                      "value": 49,
+                      "name": "BadServerPassword",
+                      "description": "Bad server password."
+                    },
+                    {
+                      "value": 50,
+                      "name": "DirectConnectReservation",
+                      "description": "Direct connect reservation."
+                    },
+                    {
+                      "value": 51,
+                      "name": "ConnectionFailure",
+                      "description": "Connection failure."
+                    },
+                    {
+                      "value": 52,
+                      "name": "NoPeerGroupHandlers",
+                      "description": "No peer group handlers."
+                    },
+                    {
+                      "value": 53,
+                      "name": "Reconnection",
+                      "description": "Reconnection."
+                    },
+                    {
+                      "value": 54,
+                      "name": "Loopshutdown",
+                      "description": "Loopshutdown."
+                    },
+                    {
+                      "value": 55,
+                      "name": "Loopdeactivate",
+                      "description": "Loopdeactivate."
+                    },
+                    {
+                      "value": 56,
+                      "name": "HostEndgame",
+                      "description": "Host endgame."
+                    },
+                    {
+                      "value": 57,
+                      "name": "LoopLevelloadActivate",
+                      "description": "Loop levelload activate."
+                    },
+                    {
+                      "value": 58,
+                      "name": "CreateServerFailed",
+                      "description": "Create server failed."
+                    },
+                    {
+                      "value": 59,
+                      "name": "Exiting",
+                      "description": "Exiting."
+                    },
+                    {
+                      "value": 60,
+                      "name": "RequestHoststateIdle",
+                      "description": "Request hoststate idle."
+                    },
+                    {
+                      "value": 61,
+                      "name": "RequestHoststateHltvrelay",
+                      "description": "Request hoststate hltvrelay."
+                    },
+                    {
+                      "value": 62,
+                      "name": "ClientConsistencyFail",
+                      "description": "Client consistency fail."
+                    },
+                    {
+                      "value": 63,
+                      "name": "ClientUnableToCrcMap",
+                      "description": "Client unable to crc map."
+                    },
+                    {
+                      "value": 64,
+                      "name": "ClientNoMap",
+                      "description": "Client no map."
+                    },
+                    {
+                      "value": 65,
+                      "name": "ClientDifferentMap",
+                      "description": "Client different map."
+                    },
+                    {
+                      "value": 66,
+                      "name": "ServerRequiresSteam",
+                      "description": "Server requires steam."
+                    },
+                    {
+                      "value": 67,
+                      "name": "SteamDenyMisc",
+                      "description": "Steam deny misc."
+                    },
+                    {
+                      "value": 68,
+                      "name": "SteamDenyBadAntiCheat",
+                      "description": "Steam deny bad anti cheat."
+                    },
+                    {
+                      "value": 69,
+                      "name": "ServerShutdown",
+                      "description": "Server shutdown."
+                    },
+                    {
+                      "value": 71,
+                      "name": "ReplayIncompatible",
+                      "description": "Replay incompatible."
+                    },
+                    {
+                      "value": 72,
+                      "name": "ConnectRequestTimedout",
+                      "description": "Connect request timedout."
+                    },
+                    {
+                      "value": 73,
+                      "name": "ServerIncompatible",
+                      "description": "Server incompatible."
+                    },
+                    {
+                      "value": 74,
+                      "name": "LocalproblemManyrelays",
+                      "description": "Localproblem manyrelays."
+                    },
+                    {
+                      "value": 75,
+                      "name": "LocalproblemHostedserverprimaryrelay",
+                      "description": "Localproblem hostedserverprimaryrelay."
+                    },
+                    {
+                      "value": 76,
+                      "name": "LocalproblemNetworkconfig",
+                      "description": "Localproblem networkconfig."
+                    },
+                    {
+                      "value": 77,
+                      "name": "LocalproblemOther",
+                      "description": "Localproblem other."
+                    },
+                    {
+                      "value": 79,
+                      "name": "RemoteTimeout",
+                      "description": "Remote timeout."
+                    },
+                    {
+                      "value": 80,
+                      "name": "RemoteTimeoutConnecting",
+                      "description": "Remote timeout connecting."
+                    },
+                    {
+                      "value": 81,
+                      "name": "RemoteOther",
+                      "description": "Remote other."
+                    },
+                    {
+                      "value": 82,
+                      "name": "RemoteBadcrypt",
+                      "description": "Remote badcrypt."
+                    },
+                    {
+                      "value": 83,
+                      "name": "RemoteCertnottrusted",
+                      "description": "Remote certnottrusted."
+                    },
+                    {
+                      "value": 84,
+                      "name": "Unusual",
+                      "description": "Unusual."
+                    },
+                    {
+                      "value": 85,
+                      "name": "InternalError",
+                      "description": "Internal error."
+                    },
+                    {
+                      "value": 128,
+                      "name": "RejectBadchallenge",
+                      "description": "Reject badchallenge."
+                    },
+                    {
+                      "value": 129,
+                      "name": "RejectNolobby",
+                      "description": "Reject nolobby."
+                    },
+                    {
+                      "value": 130,
+                      "name": "RejectBackgroundMap",
+                      "description": "Reject background map."
+                    },
+                    {
+                      "value": 131,
+                      "name": "RejectSinglePlayer",
+                      "description": "Reject single player."
+                    },
+                    {
+                      "value": 132,
+                      "name": "RejectHiddenGame",
+                      "description": "Reject hidden game."
+                    },
+                    {
+                      "value": 133,
+                      "name": "RejectLanrestrict",
+                      "description": "Reject lanrestrict."
+                    },
+                    {
+                      "value": 134,
+                      "name": "RejectBadpassword",
+                      "description": "Reject badpassword."
+                    },
+                    {
+                      "value": 135,
+                      "name": "RejectServerfull",
+                      "description": "Reject serverfull."
+                    },
+                    {
+                      "value": 136,
+                      "name": "RejectInvalidreservation",
+                      "description": "Reject invalidreservation."
+                    },
+                    {
+                      "value": 137,
+                      "name": "RejectFailedchannel",
+                      "description": "Reject failedchannel."
+                    },
+                    {
+                      "value": 138,
+                      "name": "RejectConnectFromLobby",
+                      "description": "Reject connect from lobby."
+                    },
+                    {
+                      "value": 139,
+                      "name": "RejectReservedForLobby",
+                      "description": "Reject reserved for lobby."
+                    },
+                    {
+                      "value": 140,
+                      "name": "RejectInvalidkeylength",
+                      "description": "Reject invalidkeylength."
+                    },
+                    {
+                      "value": 141,
+                      "name": "RejectOldprotocol",
+                      "description": "Reject oldprotocol."
+                    },
+                    {
+                      "value": 142,
+                      "name": "RejectNewprotocol",
+                      "description": "Reject newprotocol."
+                    },
+                    {
+                      "value": 143,
+                      "name": "RejectInvalidconnection",
+                      "description": "Reject invalidconnection."
+                    },
+                    {
+                      "value": 144,
+                      "name": "RejectInvalidcertlen",
+                      "description": "Reject invalidcertlen."
+                    },
+                    {
+                      "value": 145,
+                      "name": "RejectInvalidsteamcertlen",
+                      "description": "Reject invalidsteamcertlen."
+                    },
+                    {
+                      "value": 146,
+                      "name": "RejectSteam",
+                      "description": "Reject steam."
+                    },
+                    {
+                      "value": 147,
+                      "name": "RejectServerauthdisabled",
+                      "description": "Reject serverauthdisabled."
+                    },
+                    {
+                      "value": 148,
+                      "name": "RejectServercdkeyauthinvalid",
+                      "description": "Reject servercdkeyauthinvalid."
+                    },
+                    {
+                      "value": 149,
+                      "name": "RejectBanned",
+                      "description": "Reject banned."
+                    },
+                    {
+                      "value": 150,
+                      "name": "KickedTeamkilling",
+                      "description": "Kicked teamkilling."
+                    },
+                    {
+                      "value": 151,
+                      "name": "KickedTkStart",
+                      "description": "Kicked tk start."
+                    },
+                    {
+                      "value": 152,
+                      "name": "KickedUntrustedaccount",
+                      "description": "Kicked untrustedaccount."
+                    },
+                    {
+                      "value": 153,
+                      "name": "KickedConvictedaccount",
+                      "description": "Kicked convictedaccount."
+                    },
+                    {
+                      "value": 154,
+                      "name": "KickedCompetitivecooldown",
+                      "description": "Kicked competitivecooldown."
+                    },
+                    {
+                      "value": 155,
+                      "name": "KickedTeamhurting",
+                      "description": "Kicked teamhurting."
+                    },
+                    {
+                      "value": 156,
+                      "name": "KickedHostagekilling",
+                      "description": "Kicked hostagekilling."
+                    },
+                    {
+                      "value": 157,
+                      "name": "KickedVotedoff",
+                      "description": "Kicked votedoff."
+                    },
+                    {
+                      "value": 158,
+                      "name": "KickedIdle",
+                      "description": "Kicked idle."
+                    },
+                    {
+                      "value": 159,
+                      "name": "KickedSuicide",
+                      "description": "Kicked suicide."
+                    },
+                    {
+                      "value": 160,
+                      "name": "KickedNosteamlogin",
+                      "description": "Kicked nosteamlogin."
+                    },
+                    {
+                      "value": 161,
+                      "name": "KickedNosteamticket",
+                      "description": "Kicked nosteamticket."
+                    },
+                    {
+                      "value": 162,
+                      "name": "KickedInputautomation",
+                      "description": "Kicked inputautomation."
+                    },
+                    {
+                      "value": 163,
+                      "name": "KickedVacnetabnormalbehavior",
+                      "description": "Kicked vacnetabnormalbehavior."
+                    },
+                    {
+                      "value": 164,
+                      "name": "KickedInsecureclient",
+                      "description": "Kicked insecureclient."
+                    }
+                  ]
+                }
               }
             ],
             "retType": {
@@ -28221,7 +29455,618 @@
               {
                 "name": "reason",
                 "type": "int32",
-                "description": "The reason for disconnect"
+                "description": "The reason for disconnect",
+                "enum": {
+                  "name": "NetworkDisconnectionReason",
+                  "description": "Enum representing reasons for network disconnection.",
+                  "values": [
+                    {
+                      "value": 0,
+                      "name": "Invalid",
+                      "description": "Invalid."
+                    },
+                    {
+                      "value": 1,
+                      "name": "Shutdown",
+                      "description": "Shutdown."
+                    },
+                    {
+                      "value": 2,
+                      "name": "DisconnectByUser",
+                      "description": "Disconnect by user."
+                    },
+                    {
+                      "value": 3,
+                      "name": "DisconnectByServer",
+                      "description": "Disconnect by server."
+                    },
+                    {
+                      "value": 4,
+                      "name": "Lost",
+                      "description": "Lost."
+                    },
+                    {
+                      "value": 5,
+                      "name": "Overflow",
+                      "description": "Overflow."
+                    },
+                    {
+                      "value": 6,
+                      "name": "SteamBanned",
+                      "description": "Steam banned."
+                    },
+                    {
+                      "value": 7,
+                      "name": "SteamInuse",
+                      "description": "Steam inuse."
+                    },
+                    {
+                      "value": 8,
+                      "name": "SteamTicket",
+                      "description": "Steam ticket."
+                    },
+                    {
+                      "value": 9,
+                      "name": "SteamLogon",
+                      "description": "Steam logon."
+                    },
+                    {
+                      "value": 10,
+                      "name": "SteamAuthcancelled",
+                      "description": "Steam authcancelled."
+                    },
+                    {
+                      "value": 11,
+                      "name": "SteamAuthalreadyused",
+                      "description": "Steam authalreadyused."
+                    },
+                    {
+                      "value": 12,
+                      "name": "SteamAuthinvalid",
+                      "description": "Steam authinvalid."
+                    },
+                    {
+                      "value": 13,
+                      "name": "SteamVacbanstate",
+                      "description": "Steam vacbanstate."
+                    },
+                    {
+                      "value": 14,
+                      "name": "SteamLoggedInElsewhere",
+                      "description": "Steam logged in elsewhere."
+                    },
+                    {
+                      "value": 15,
+                      "name": "SteamVacCheckTimedout",
+                      "description": "Steam vac check timedout."
+                    },
+                    {
+                      "value": 16,
+                      "name": "SteamDropped",
+                      "description": "Steam dropped."
+                    },
+                    {
+                      "value": 17,
+                      "name": "SteamOwnership",
+                      "description": "Steam ownership."
+                    },
+                    {
+                      "value": 18,
+                      "name": "ServerinfoOverflow",
+                      "description": "Serverinfo overflow."
+                    },
+                    {
+                      "value": 19,
+                      "name": "TickmsgOverflow",
+                      "description": "Tickmsg overflow."
+                    },
+                    {
+                      "value": 20,
+                      "name": "StringtablemsgOverflow",
+                      "description": "Stringtablemsg overflow."
+                    },
+                    {
+                      "value": 21,
+                      "name": "DeltaentmsgOverflow",
+                      "description": "Deltaentmsg overflow."
+                    },
+                    {
+                      "value": 22,
+                      "name": "TempentmsgOverflow",
+                      "description": "Tempentmsg overflow."
+                    },
+                    {
+                      "value": 23,
+                      "name": "SoundsmsgOverflow",
+                      "description": "Soundsmsg overflow."
+                    },
+                    {
+                      "value": 24,
+                      "name": "Snapshotoverflow",
+                      "description": "Snapshotoverflow."
+                    },
+                    {
+                      "value": 25,
+                      "name": "Snapshoterror",
+                      "description": "Snapshoterror."
+                    },
+                    {
+                      "value": 26,
+                      "name": "Reliableoverflow",
+                      "description": "Reliableoverflow."
+                    },
+                    {
+                      "value": 27,
+                      "name": "Baddeltatick",
+                      "description": "Baddeltatick."
+                    },
+                    {
+                      "value": 28,
+                      "name": "Nomoresplits",
+                      "description": "Nomoresplits."
+                    },
+                    {
+                      "value": 29,
+                      "name": "Timedout",
+                      "description": "Timedout."
+                    },
+                    {
+                      "value": 30,
+                      "name": "Disconnected",
+                      "description": "Disconnected."
+                    },
+                    {
+                      "value": 31,
+                      "name": "Leavingsplit",
+                      "description": "Leavingsplit."
+                    },
+                    {
+                      "value": 32,
+                      "name": "Differentclasstables",
+                      "description": "Differentclasstables."
+                    },
+                    {
+                      "value": 33,
+                      "name": "Badrelaypassword",
+                      "description": "Badrelaypassword."
+                    },
+                    {
+                      "value": 34,
+                      "name": "Badspectatorpassword",
+                      "description": "Badspectatorpassword."
+                    },
+                    {
+                      "value": 35,
+                      "name": "Hltvrestricted",
+                      "description": "Hltvrestricted."
+                    },
+                    {
+                      "value": 36,
+                      "name": "Nospectators",
+                      "description": "Nospectators."
+                    },
+                    {
+                      "value": 37,
+                      "name": "Hltvunavailable",
+                      "description": "Hltvunavailable."
+                    },
+                    {
+                      "value": 38,
+                      "name": "Hltvstop",
+                      "description": "Hltvstop."
+                    },
+                    {
+                      "value": 39,
+                      "name": "Kicked",
+                      "description": "Kicked."
+                    },
+                    {
+                      "value": 40,
+                      "name": "Banadded",
+                      "description": "Banadded."
+                    },
+                    {
+                      "value": 41,
+                      "name": "Kickbanadded",
+                      "description": "Kickbanadded."
+                    },
+                    {
+                      "value": 42,
+                      "name": "Hltvdirect",
+                      "description": "Hltvdirect."
+                    },
+                    {
+                      "value": 43,
+                      "name": "PureserverClientextra",
+                      "description": "Pureserver clientextra."
+                    },
+                    {
+                      "value": 44,
+                      "name": "PureserverMismatch",
+                      "description": "Pureserver mismatch."
+                    },
+                    {
+                      "value": 45,
+                      "name": "Usercmd",
+                      "description": "Usercmd."
+                    },
+                    {
+                      "value": 46,
+                      "name": "RejectedByGame",
+                      "description": "Rejected by game."
+                    },
+                    {
+                      "value": 47,
+                      "name": "MessageParseError",
+                      "description": "Message parse error."
+                    },
+                    {
+                      "value": 48,
+                      "name": "InvalidMessageError",
+                      "description": "Invalid message error."
+                    },
+                    {
+                      "value": 49,
+                      "name": "BadServerPassword",
+                      "description": "Bad server password."
+                    },
+                    {
+                      "value": 50,
+                      "name": "DirectConnectReservation",
+                      "description": "Direct connect reservation."
+                    },
+                    {
+                      "value": 51,
+                      "name": "ConnectionFailure",
+                      "description": "Connection failure."
+                    },
+                    {
+                      "value": 52,
+                      "name": "NoPeerGroupHandlers",
+                      "description": "No peer group handlers."
+                    },
+                    {
+                      "value": 53,
+                      "name": "Reconnection",
+                      "description": "Reconnection."
+                    },
+                    {
+                      "value": 54,
+                      "name": "Loopshutdown",
+                      "description": "Loopshutdown."
+                    },
+                    {
+                      "value": 55,
+                      "name": "Loopdeactivate",
+                      "description": "Loopdeactivate."
+                    },
+                    {
+                      "value": 56,
+                      "name": "HostEndgame",
+                      "description": "Host endgame."
+                    },
+                    {
+                      "value": 57,
+                      "name": "LoopLevelloadActivate",
+                      "description": "Loop levelload activate."
+                    },
+                    {
+                      "value": 58,
+                      "name": "CreateServerFailed",
+                      "description": "Create server failed."
+                    },
+                    {
+                      "value": 59,
+                      "name": "Exiting",
+                      "description": "Exiting."
+                    },
+                    {
+                      "value": 60,
+                      "name": "RequestHoststateIdle",
+                      "description": "Request hoststate idle."
+                    },
+                    {
+                      "value": 61,
+                      "name": "RequestHoststateHltvrelay",
+                      "description": "Request hoststate hltvrelay."
+                    },
+                    {
+                      "value": 62,
+                      "name": "ClientConsistencyFail",
+                      "description": "Client consistency fail."
+                    },
+                    {
+                      "value": 63,
+                      "name": "ClientUnableToCrcMap",
+                      "description": "Client unable to crc map."
+                    },
+                    {
+                      "value": 64,
+                      "name": "ClientNoMap",
+                      "description": "Client no map."
+                    },
+                    {
+                      "value": 65,
+                      "name": "ClientDifferentMap",
+                      "description": "Client different map."
+                    },
+                    {
+                      "value": 66,
+                      "name": "ServerRequiresSteam",
+                      "description": "Server requires steam."
+                    },
+                    {
+                      "value": 67,
+                      "name": "SteamDenyMisc",
+                      "description": "Steam deny misc."
+                    },
+                    {
+                      "value": 68,
+                      "name": "SteamDenyBadAntiCheat",
+                      "description": "Steam deny bad anti cheat."
+                    },
+                    {
+                      "value": 69,
+                      "name": "ServerShutdown",
+                      "description": "Server shutdown."
+                    },
+                    {
+                      "value": 71,
+                      "name": "ReplayIncompatible",
+                      "description": "Replay incompatible."
+                    },
+                    {
+                      "value": 72,
+                      "name": "ConnectRequestTimedout",
+                      "description": "Connect request timedout."
+                    },
+                    {
+                      "value": 73,
+                      "name": "ServerIncompatible",
+                      "description": "Server incompatible."
+                    },
+                    {
+                      "value": 74,
+                      "name": "LocalproblemManyrelays",
+                      "description": "Localproblem manyrelays."
+                    },
+                    {
+                      "value": 75,
+                      "name": "LocalproblemHostedserverprimaryrelay",
+                      "description": "Localproblem hostedserverprimaryrelay."
+                    },
+                    {
+                      "value": 76,
+                      "name": "LocalproblemNetworkconfig",
+                      "description": "Localproblem networkconfig."
+                    },
+                    {
+                      "value": 77,
+                      "name": "LocalproblemOther",
+                      "description": "Localproblem other."
+                    },
+                    {
+                      "value": 79,
+                      "name": "RemoteTimeout",
+                      "description": "Remote timeout."
+                    },
+                    {
+                      "value": 80,
+                      "name": "RemoteTimeoutConnecting",
+                      "description": "Remote timeout connecting."
+                    },
+                    {
+                      "value": 81,
+                      "name": "RemoteOther",
+                      "description": "Remote other."
+                    },
+                    {
+                      "value": 82,
+                      "name": "RemoteBadcrypt",
+                      "description": "Remote badcrypt."
+                    },
+                    {
+                      "value": 83,
+                      "name": "RemoteCertnottrusted",
+                      "description": "Remote certnottrusted."
+                    },
+                    {
+                      "value": 84,
+                      "name": "Unusual",
+                      "description": "Unusual."
+                    },
+                    {
+                      "value": 85,
+                      "name": "InternalError",
+                      "description": "Internal error."
+                    },
+                    {
+                      "value": 128,
+                      "name": "RejectBadchallenge",
+                      "description": "Reject badchallenge."
+                    },
+                    {
+                      "value": 129,
+                      "name": "RejectNolobby",
+                      "description": "Reject nolobby."
+                    },
+                    {
+                      "value": 130,
+                      "name": "RejectBackgroundMap",
+                      "description": "Reject background map."
+                    },
+                    {
+                      "value": 131,
+                      "name": "RejectSinglePlayer",
+                      "description": "Reject single player."
+                    },
+                    {
+                      "value": 132,
+                      "name": "RejectHiddenGame",
+                      "description": "Reject hidden game."
+                    },
+                    {
+                      "value": 133,
+                      "name": "RejectLanrestrict",
+                      "description": "Reject lanrestrict."
+                    },
+                    {
+                      "value": 134,
+                      "name": "RejectBadpassword",
+                      "description": "Reject badpassword."
+                    },
+                    {
+                      "value": 135,
+                      "name": "RejectServerfull",
+                      "description": "Reject serverfull."
+                    },
+                    {
+                      "value": 136,
+                      "name": "RejectInvalidreservation",
+                      "description": "Reject invalidreservation."
+                    },
+                    {
+                      "value": 137,
+                      "name": "RejectFailedchannel",
+                      "description": "Reject failedchannel."
+                    },
+                    {
+                      "value": 138,
+                      "name": "RejectConnectFromLobby",
+                      "description": "Reject connect from lobby."
+                    },
+                    {
+                      "value": 139,
+                      "name": "RejectReservedForLobby",
+                      "description": "Reject reserved for lobby."
+                    },
+                    {
+                      "value": 140,
+                      "name": "RejectInvalidkeylength",
+                      "description": "Reject invalidkeylength."
+                    },
+                    {
+                      "value": 141,
+                      "name": "RejectOldprotocol",
+                      "description": "Reject oldprotocol."
+                    },
+                    {
+                      "value": 142,
+                      "name": "RejectNewprotocol",
+                      "description": "Reject newprotocol."
+                    },
+                    {
+                      "value": 143,
+                      "name": "RejectInvalidconnection",
+                      "description": "Reject invalidconnection."
+                    },
+                    {
+                      "value": 144,
+                      "name": "RejectInvalidcertlen",
+                      "description": "Reject invalidcertlen."
+                    },
+                    {
+                      "value": 145,
+                      "name": "RejectInvalidsteamcertlen",
+                      "description": "Reject invalidsteamcertlen."
+                    },
+                    {
+                      "value": 146,
+                      "name": "RejectSteam",
+                      "description": "Reject steam."
+                    },
+                    {
+                      "value": 147,
+                      "name": "RejectServerauthdisabled",
+                      "description": "Reject serverauthdisabled."
+                    },
+                    {
+                      "value": 148,
+                      "name": "RejectServercdkeyauthinvalid",
+                      "description": "Reject servercdkeyauthinvalid."
+                    },
+                    {
+                      "value": 149,
+                      "name": "RejectBanned",
+                      "description": "Reject banned."
+                    },
+                    {
+                      "value": 150,
+                      "name": "KickedTeamkilling",
+                      "description": "Kicked teamkilling."
+                    },
+                    {
+                      "value": 151,
+                      "name": "KickedTkStart",
+                      "description": "Kicked tk start."
+                    },
+                    {
+                      "value": 152,
+                      "name": "KickedUntrustedaccount",
+                      "description": "Kicked untrustedaccount."
+                    },
+                    {
+                      "value": 153,
+                      "name": "KickedConvictedaccount",
+                      "description": "Kicked convictedaccount."
+                    },
+                    {
+                      "value": 154,
+                      "name": "KickedCompetitivecooldown",
+                      "description": "Kicked competitivecooldown."
+                    },
+                    {
+                      "value": 155,
+                      "name": "KickedTeamhurting",
+                      "description": "Kicked teamhurting."
+                    },
+                    {
+                      "value": 156,
+                      "name": "KickedHostagekilling",
+                      "description": "Kicked hostagekilling."
+                    },
+                    {
+                      "value": 157,
+                      "name": "KickedVotedoff",
+                      "description": "Kicked votedoff."
+                    },
+                    {
+                      "value": 158,
+                      "name": "KickedIdle",
+                      "description": "Kicked idle."
+                    },
+                    {
+                      "value": 159,
+                      "name": "KickedSuicide",
+                      "description": "Kicked suicide."
+                    },
+                    {
+                      "value": 160,
+                      "name": "KickedNosteamlogin",
+                      "description": "Kicked nosteamlogin."
+                    },
+                    {
+                      "value": 161,
+                      "name": "KickedNosteamticket",
+                      "description": "Kicked nosteamticket."
+                    },
+                    {
+                      "value": 162,
+                      "name": "KickedInputautomation",
+                      "description": "Kicked inputautomation."
+                    },
+                    {
+                      "value": 163,
+                      "name": "KickedVacnetabnormalbehavior",
+                      "description": "Kicked vacnetabnormalbehavior."
+                    },
+                    {
+                      "value": 164,
+                      "name": "KickedInsecureclient",
+                      "description": "Kicked insecureclient."
+                    }
+                  ]
+                }
               }
             ],
             "retType": {
