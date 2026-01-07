@@ -107,7 +107,7 @@ polyhook::ResultType Hook_Release(void* hook, void* params, int count, void* ret
 void LoadMOTDFile() {
 	INetworkStringTable* table = g_pNetworkStringTableServer->FindTable("InfoPanel");
 	if (table == nullptr) {
-		plg::print(LS_WARNING, "Failed to find table InfoPanel");
+		plg::print(LS_WARNING, "Failed to find table InfoPanel\n");
 		return;
 	}
 	
@@ -122,13 +122,13 @@ void LoadMOTDFile() {
 	}
 
 	if (!fs::exists(motdPath)) {
-		plg::print(LS_WARNING, "File not found at {}", plg::as_string(motdPath));
+		plg::print(LS_WARNING, "File not found at {}\n", plg::as_string(motdPath));
 		return;
 	}
 
 	std::ifstream file(motdPath, std::ios::binary);
 	if (!file.is_open()) {
-		plg::print(LS_WARNING, "Failed to open {}", plg::as_string(motdPath));
+		plg::print(LS_WARNING, "Failed to open {}\n", plg::as_string(motdPath));
 		return;
 	}
 
@@ -139,11 +139,11 @@ void LoadMOTDFile() {
 
 	SetStringUserDataRequest_t data {
 		.m_pRawData = msg.data(),
-		.m_cbDataSize = static_cast<uint32_t>(msg.length())
+		.m_cbDataSize = static_cast<uint32_t>(msg.length() + 1)
 	};
 
 	if (table->AddString(true, "motd", &data) != INVALID_STRING_INDEX) {
-		plg::print(LS_WARNING, "Successfully added MOTD string");
+		plg::print(LS_WARNING, "Successfully added MOTD string\n");
 	}
 }
 
