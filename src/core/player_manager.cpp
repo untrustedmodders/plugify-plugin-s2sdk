@@ -200,6 +200,9 @@ bool PlayerManager::OnClientConnect(CPlayerSlot slot, char const* name, uint64 s
 	if (Player* player = ToPlayer(slot)) {
 		player->Init(slot, steamID64);
 
+		cvars::SendConVarValueQueryToClient(slot, "cl_language", CLIENT_LANGUAGE_ID);
+		cvars::SendConVarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
+
 		s_refuseConnection = false;
 
 		plg::string playerName(name);
@@ -232,10 +235,6 @@ bool PlayerManager::OnClientConnect_Post(CPlayerSlot slot, bool origRet) {
 }
 
 void PlayerManager::OnClientConnected(CPlayerSlot slot, bool fakePlayer) {
-	if (!fakePlayer) {
-		cvars::SendConVarValueQueryToClient(slot, "cl_language", CLIENT_LANGUAGE_ID);
-		cvars::SendConVarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
-	}
 	g_OnClientConnectedListenerManager(slot);
 }
 
