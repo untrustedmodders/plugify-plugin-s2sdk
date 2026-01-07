@@ -19046,6 +19046,42 @@
       }
     },
     {
+      "name": "GetPublicAddress",
+      "group": "Entities",
+      "description": "Returns the public network address of the host.",
+      "funcName": "GetPublicAddress",
+      "paramTypes": [
+        {
+          "name": "onlyBase",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, omits port, otherwise returning only the base address."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "A string representation of the public address."
+      }
+    },
+    {
+      "name": "GetLocalAddress",
+      "group": "Entities",
+      "description": "Returns the local network address of the host.",
+      "funcName": "GetLocalAddress",
+      "paramTypes": [
+        {
+          "name": "onlyBase",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, omits port, otherwise returning only the base address."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "A string representation of the local address."
+      }
+    },
+    {
       "name": "EntIndexToEntPointer",
       "group": "Entities",
       "description": "Converts an entity index into an entity pointer.",

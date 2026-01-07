@@ -253,4 +253,24 @@ extern "C" PLUGIN_API void EmitSoundToClient(int playerSlot, int channel, const 
 	utils::PlaySoundToClient(playerSlot, channel, sound.c_str(), volume, static_cast<soundlevel_t>(soundLevel), flags, pitch, origin, soundTime);
 }
 
+/**
+ * @brief Returns the public network address of the host.
+ *
+ * @param onlyBase If true, omits port, otherwise returning only the base address.
+ * @return A string representation of the public address.
+ */
+extern "C" PLUGIN_API plg::string GetPublicAddress(bool onlyBase) {
+	return g_pNetworkSystem->GetPublicAdr().ToString(onlyBase);
+}
+
+/**
+ * @brief Returns the local network address of the host.
+ *
+ * @param onlyBase If true, omits port, otherwise returning only the base address.
+ * @return A string representation of the local address.
+ */
+extern "C" PLUGIN_API plg::string GetLocalAddress(bool onlyBase) {
+	return g_pNetworkSystem->GetLocalAdr().ToString(onlyBase);
+}
+
 PLUGIFY_WARN_POP()

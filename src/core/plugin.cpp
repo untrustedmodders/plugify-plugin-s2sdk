@@ -1,5 +1,6 @@
 #include <core/sdk/entity/cgamerules.h>
 #include <core/sdk/entity/cteam.h>
+#include <core/sdk/cvars.hpp>
 #include <dynlibutils/module.hpp>
 #include <dynlibutils/virtual.hpp>
 #include <dynlibutils/vthook.hpp>
@@ -103,6 +104,49 @@ polyhook::ResultType Hook_Release(void* hook, void* params, int count, void* ret
 	return polyhook::ResultType::Ignored;
 }
 
+void LoadMOTDFile() {
+	INetworkStringTable* table = g_pNetworkStringTableServer->FindTable("InfoPanel");
+	if (table == nullptr) {
+		plg::print(LS_WARNING, "Failed to find table InfoPanel");
+		return;
+	}
+	
+	using namespace std::literals;
+	auto motdCvar = g_pCVar->FindConVar("motdfile");
+	auto motdFile = std::string(motdCvar.IsValidRef() ? cvars::GetConVarValue<CUtlString>(motdCvar) : "motd.txt"sv);
+	auto motdPath = utils::GameDirectory() / S2SDK_GAME_NAME / motdFile;
+
+	if (!fs::exists(motdPath)) {
+		std::ofstream file(motdPath, std::ios::out | std::ios::trunc);
+		file << "https://plugify.net/";
+	}
+
+	if (!fs::exists(motdPath)) {
+		plg::print(LS_WARNING, "File not found at {}", plg::as_string(motdPath));
+		return;
+	}
+
+	std::ifstream file(motdPath, std::ios::binary);
+	if (!file.is_open()) {
+		plg::print(LS_WARNING, "Failed to open {}", plg::as_string(motdPath));
+		return;
+	}
+
+	std::string msg(
+		(std::istreambuf_iterator(file)),
+		std::istreambuf_iterator<char>()
+	);
+
+	SetStringUserDataRequest_t data {
+		.m_pRawData = msg.data(),
+		.m_cbDataSize = static_cast<uint32_t>(msg.length())
+	};
+
+	if (table->AddString(true, "motd", &data) != INVALID_STRING_INDEX) {
+		plg::print(LS_WARNING, "Successfully added MOTD string");
+	}
+}
+
 polyhook::ResultType Hook_ActivateServer(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	plg::print(LS_DETAILED, "[ActivateServer]\n");
 
@@ -125,6 +169,8 @@ polyhook::ResultType Hook_ActivateServer(void* hook, void* params, int count, vo
 
 	g_OnServerActivateListenerManager();
 	g_OnMapStartListenerManager();
+
+	LoadMOTDFile();
 
 	return polyhook::ResultType::Ignored;
 }
@@ -846,4 +892,3 @@ void Source2SDK::OnServerStartup() {
 
 	RegisterEventListeners();
 }
-

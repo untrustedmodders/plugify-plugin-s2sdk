@@ -291,6 +291,8 @@
         EmitSound;
         StopSound;
         EmitSoundToClient;
+        GetPublicAddress;
+        GetLocalAddress;
 
         EntIndexToEntPointer;
         EntPointerToEntIndex;
