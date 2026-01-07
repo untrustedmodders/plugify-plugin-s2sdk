@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.22](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.21...v2.3.22) (2026-01-07)
+
+
+### Bug Fixes
+
+* add address methods and motd fix ([1cfa877](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1cfa877bf59cafe95cfe69fd7b1edf2b5a41fbf1))
+* add null term for motd string ([5463a52](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5463a52e7a218b09f9fa38d0d591690c492f121b))
+* add reason enum to KickClient ([011cecb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/011cecb4cf4e47d99b30a510905a525a7475af25))
+* prevent player language from resetting on map change ([3ac8f05](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3ac8f054d9c3d5c493cbf8f520748c0d48204f02))
+* rework hscript params ([53fed5a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/53fed5a0ff04fc6f7990f60c4b7ef7ddeeb5ca32))
+* update sdk ([5b30b95](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5b30b957acc0250e8c9387322e2083bb378b96a1))
+
 ## [2.3.21](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.20...v2.3.21) (2026-01-03)
 
 
