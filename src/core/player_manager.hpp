@@ -122,6 +122,7 @@ public:
 	Player* ToPlayer(CPlayerUserId userID) const;
 	Player* ToPlayer(CSteamID steamid, bool validate = false) const;
 
+	void OnGameFrame();
 	void OnSteamAPIActivated();
 	void OnSteamAPIDeactivated();
 	bool OnClientConnect(CPlayerSlot slot, char const* name, uint64 steamID64, char const* networkID);
@@ -137,6 +138,7 @@ public:
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(PlayerManager, OnValidateAuthTicket, ValidateAuthTicketResponse_t, m_CallbackValidateAuthTicketResponse);
 
+	static void UpdatePlayers();
 	static int MaxClients();
 
 	plg::vector<int> TargetPlayerString(CPlayerSlot caller, std::string_view target) const;

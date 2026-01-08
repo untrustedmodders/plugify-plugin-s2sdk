@@ -165,12 +165,14 @@ polyhook::ResultType Hook_ActivateServer(void* hook, void* params, int count, vo
 	}
 #endif
 
+	if (g_pCoreConfig->FixLoadMotd) {
+		LoadMOTDFile();
+	}
+
 	g_Precached.clear();
 
 	g_OnServerActivateListenerManager();
 	g_OnMapStartListenerManager();
-
-	LoadMOTDFile();
 
 	return polyhook::ResultType::Ignored;
 }
@@ -234,6 +236,7 @@ polyhook::ResultType Hook_GameFrame(void* hook, void* params, int count, void* r
 
 	g_MultiAddonManager.OnGameFrame();
 	g_ServerManager.OnGameFrame();
+	g_PlayerManager.OnGameFrame();
 	g_TimerSystem.OnGameFrame(simulating);
 
 	g_OnGameFrameListenerManager(simulating, bFirstTick, bLastTick);
@@ -374,7 +377,13 @@ polyhook::ResultType Hook_ClientCommand(void* hook, void* params, int count, voi
 polyhook::ResultType Hook_GameServerSteamAPIActivated(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	plg::print(LS_DETAILED, "[GameServerSteamAPIActivated]\n");
 
+	g_pSteam = SteamGameServer();
 	g_pSteamUGC = SteamGameServerUGC();
+
+	if (!g_pSteam || !g_pSteamUGC) {
+		plg::print(LS_WARNING, "StramAPI could not be initialized!\n");
+		return polyhook::ResultType::Ignored;
+	}
 
 	g_PlayerManager.OnSteamAPIActivated();
 	g_MultiAddonManager.OnSteamAPIActivated();

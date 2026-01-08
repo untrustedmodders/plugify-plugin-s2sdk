@@ -54,6 +54,7 @@ inline CBaseEntity* g_pPointScript = nullptr;
 inline IScriptVM* g_pScriptVM = nullptr;
 inline plg::flat_map<CSTeam, CTeam*> g_pTeamManagers;
 inline ISteamUGC* g_pSteamUGC = nullptr;
+inline ISteamGameServer* g_pSteam = nullptr;
 inline plg::flat_hash_set<plg::string> g_Precached;
 
 class CoreConfig;

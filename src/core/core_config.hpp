@@ -23,6 +23,8 @@ public:
 	plg::string ServerLanguage{"en"};
 	bool FollowCS2ServerGuidelines{true};
 	bool FixFlashAlertMessage{true};
+	bool FixServerListPlayer{true};
+	bool FixLoadMotd{true};
 
 private:
 	plg::vector<plg::string> m_paths;

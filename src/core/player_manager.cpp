@@ -1,12 +1,13 @@
+#include <core/sdk/cvars.hpp>
 #include <core/sdk/entity/cbaseplayercontroller.h>
 #include <core/sdk/entity/cplayercontroller.h>
 #include <core/sdk/entity/cplayerpawn.h>
 #include <core/sdk/utils.hpp>
-#include <core/sdk/cvars.hpp>
 #include <eiface.h>
 #include <inetchannelinfo.h>
 #include <iserver.h>
 #include <netmessages.h>
+#include <isteamgameserver.h>
 
 #include "player_manager.hpp"
 #include "listeners.hpp"
@@ -165,6 +166,17 @@ void Player::OnRepondCvarValue(const CCLCMsg_RespondCvarValue_t& msg) {
 	}
 }
 
+void PlayerManager::OnGameFrame() {
+	static double s_nextUpdate = 0.0;
+
+	double currentTime = Plat_FloatTime();
+	if (currentTime > s_nextUpdate) {
+		UpdatePlayers();
+
+		s_nextUpdate = currentTime + 5.0;
+	}
+}
+
 void PlayerManager::OnSteamAPIActivated() {
 	if (m_callbackRegistered)
 		return;
@@ -281,6 +293,19 @@ bool PlayerManager::QueryCvarValue(CPlayerSlot slot, std::string_view convarName
 void PlayerManager::OnRespondCvarValue(CServerSideClientBase* client, const CCLCMsg_RespondCvarValue_t& msg) {
 	if (Player* player = ToPlayer(client)) {
 		player->OnRepondCvarValue(msg);
+	}
+}
+
+void PlayerManager::UpdatePlayers() {
+	if(!gpGlobals)
+		return;
+
+	for (int i = 0; i < gpGlobals->maxClients; ++i) {
+		if (auto steamId = g_pEngineServer->GetClientSteamID(i)) {
+			if (CPlayerController* controller = static_cast<CPlayerController*>(utils::GetController(i))) {
+				g_pSteam->BUpdateUserData(*steamId, controller->GetPlayerName(), g_pSource2GameClients->GetPlayerScore(i));
+			}
+		}
 	}
 }
 
