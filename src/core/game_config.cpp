@@ -1,6 +1,6 @@
-#include "game_config.hpp"
-
 #include <core/sdk/utils.hpp>
+
+#include "game_config.hpp"
 
 #if _WIN32
 #include <windows.h>
@@ -157,7 +157,7 @@ Result<void> ConfigLoader::LoadSignatures(pcf::Config* config) {
 				plg::string signature = config->GetString(S2SDK_PLATFORM);
 
 				if (signature.empty()) {
-					plg::print(LS_WARNING, "Empty signature for: {}\n", sig.name);
+					plg::print(LS_WARNING, "No signature for " S2SDK_PLATFORM ": {}\n", sig.name);
 					continue;
 				}
 
@@ -190,7 +190,15 @@ Result<void> ConfigLoader::LoadOffsets(pcf::Config* config) {
 			if (config->IsObject()) {
 				OffsetData offset;
 				offset.name = config->GetName();
-				offset.value = config->GetAsInt32(S2SDK_PLATFORM, -1);
+				if (config->HasKey(S2SDK_PLATFORM)) {
+					offset.value = config->GetAsInt32(S2SDK_PLATFORM);
+				}
+
+				if (!offset.value) {
+					plg::print(LS_WARNING, "No offset for " S2SDK_PLATFORM ": {}\n", offset.name);
+					continue;
+				}
+
 				m_offsets[offset.name] = std::move(offset);
 			}
 		} while (config->JumpNext());
@@ -213,6 +221,17 @@ Result<void> ConfigLoader::LoadVTables(pcf::Config* config) {
 				vt.name = config->GetName();
 				vt.library = config->GetString("library");
 				vt.table = config->GetString("table");
+
+				if (vt.library.empty()) {
+					plg::print(LS_WARNING, "No library for " S2SDK_PLATFORM ": {}\n", vt.name);
+					continue;
+				}
+
+				if (vt.table.empty()) {
+					plg::print(LS_WARNING, "No table for " S2SDK_PLATFORM ": {}\n", vt.name);
+					continue;
+				}
+
 				m_vtables[vt.name] = std::move(vt);
 			}
 		} while (config->JumpNext());
@@ -233,8 +252,28 @@ Result<void> ConfigLoader::LoadPatches(pcf::Config* config) {
 			if (config->IsObject()) {
 				PatchData patch;
 				patch.name = config->GetName();
-				patch.baseAddress = config->GetString("address");
+				if (config->HasKey("signature")) {
+					patch.base = config->GetString("signature");
+					patch.type = PatchData::Type::Signature;
+				} else if (config->HasKey("address")) {
+					patch.base = config->GetString("address");
+					patch.type = PatchData::Type::Address;
+				} else if (config->HasKey("vtable")) {
+					patch.base = config->GetString("vtable");
+					patch.type = PatchData::Type::VTable;
+				}
 				patch.pattern = config->GetString(S2SDK_PLATFORM);
+
+				if (patch.base.empty()) {
+					plg::print(LS_WARNING, "No address for " S2SDK_PLATFORM ": {}\n", patch.name);
+					continue;
+				}
+
+				if (patch.pattern.empty()) {
+					plg::print(LS_WARNING, "No pattern for " S2SDK_PLATFORM ": {}\n", patch.name);
+					continue;
+				}
+
 				m_patches[patch.name] = std::move(patch);
 			}
 		} while (config->JumpNext());
@@ -256,7 +295,7 @@ Result<void> ConfigLoader::LoadAddresses(pcf::Config* config) {
 				auto name = config->GetName();
 				auto result = ParseAddressConfig(config, name);
 				if (result) {
-					m_addresses[name] = std::move(*result);
+					m_addresses[std::move(name)] = std::move(*result);
 				} else {
 					plg::print(LS_WARNING, "Failed to parse address '{}': {}\n",
 							   name, result.error());
@@ -273,10 +312,19 @@ Result<void> ConfigLoader::LoadAddresses(pcf::Config* config) {
 Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::string_view name) {
 	AddressData addr;
 	addr.name = name;
-	addr.baseSignature = config->GetString("signature");
+	if (config->HasKey("signature")) {
+		addr.base = config->GetString("signature");
+		addr.type = AddressData::Type::Signature;
+	} else if (config->HasKey("address")) {
+		addr.base = config->GetString("address");
+		addr.type = AddressData::Type::Address;
+	} else if (config->HasKey("vtable")) {
+		addr.base = config->GetString("vtable");
+		addr.type = AddressData::Type::VTable;
+	}
 
-	if (addr.baseSignature.empty()) {
-		return MakeError("Missing base signature");
+	if (addr.base.empty()) {
+		return MakeError("Missing base");
 	}
 
 	// Parse indirection chain
@@ -291,9 +339,11 @@ Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::s
 						addr.indirections.push_back(IndirectionStep::MakeOffset(value));
 					} else if (stepName == "read") {
 						addr.indirections.push_back(IndirectionStep::MakeDereference(value));
+					}  else if (stepName == "index") {
+						addr.indirections.push_back(IndirectionStep::MakeIndex(value));
 					} else if (stepName == "read_offs32") {
 						addr.indirections.push_back(IndirectionStep::MakeRelative(value));
-					} else {
+					}else {
 						plg::print(LS_WARNING, "Unknown indirection type: {}\n", stepName);
 					}
 
@@ -532,8 +582,8 @@ Result<void> GameConfig::Initialize() {
 	switch (m_options.cacheStrategy) {
 		case CacheStrategy::Eager:
 			GC_TRY_VOID(PreloadSignatures());
-			GC_TRY_VOID(PreloadAddresses());
 			GC_TRY_VOID(PreloadVTables());
+			GC_TRY_VOID(PreloadAddresses());
 			break;
 
 		case CacheStrategy::Hybrid:
@@ -579,23 +629,65 @@ Result<void> GameConfig::PreloadSignatures() {
 Result<void> GameConfig::PreloadAddresses() {
 	std::atomic_flag hadErrors = {};
 
-	m_loader.ForEachAddress([&](const AddressData& addr) {
-		// Get or resolve base signature
-		auto baseSig = m_cache.GetSignature(addr.baseSignature);
-		if (!baseSig) {
-			auto sigResult = ResolveSignatureInternal(addr.baseSignature);
-			if (sigResult) {
-				baseSig = *sigResult;
-			} else {
-				plg::print(LS_WARNING, "Failed to resolve base signature '{}' for address '{}'\n",
-						   addr.baseSignature, addr.name);
-				m_cache.CacheAddress(ResolvedAddress::Failed(addr.name, sigResult.error()));
-				hadErrors.test_and_set(std::memory_order_relaxed);
-				return;
+	auto addrLookup = [&](const AddressData& addr) -> std::optional<Memory> {
+		switch (addr.type) {
+			case AddressData::Type::Address: {
+				// Get or resolve base signature
+				if (auto baseAddr = m_cache.GetAddress(addr.base)) {
+					return baseAddr->address;
+				}
+				if (auto addrResult = ResolveAddressInternal(addr.base)) {
+					return addrResult->address;
+				} else {
+					plg::print(LS_WARNING, "Failed to resolve base address '{}' for address '{}'\n",
+							   addr.base, addr.name);
+					m_cache.CacheAddress(ResolvedAddress::Failed(addr.name, addrResult.error()));
+					hadErrors.test_and_set(std::memory_order_relaxed);
+				}
+				break;
 			}
+			case AddressData::Type::Signature: {
+				// Get or resolve base signature
+				if (auto baseSig = m_cache.GetSignature(addr.base)) {
+					return baseSig->address;
+				}
+				if (auto sigResult = ResolveSignatureInternal(addr.base)) {
+					return sigResult->address;
+				} else {
+					plg::print(LS_WARNING, "Failed to resolve base signature '{}' for address '{}'\n",
+							   addr.base, addr.name);
+					m_cache.CacheAddress(ResolvedAddress::Failed(addr.name, sigResult.error()));
+					hadErrors.test_and_set(std::memory_order_relaxed);
+				}
+				break;
+			}
+			case AddressData::Type::VTable: {
+				// Get or resolve base vtable
+				if (auto baseVt = m_cache.GetVTable(addr.base)) {
+					return baseVt->address;
+				}
+				if (auto vtResult = ResolveVTableInternal(addr.base)) {
+					return vtResult->address;
+				} else {
+					plg::print(LS_WARNING, "Failed to resolve base vt '{}' for address '{}'\n",
+							   addr.base, addr.name);
+					m_cache.CacheAddress(ResolvedAddress::Failed(addr.name, vtResult.error()));
+					hadErrors.test_and_set(std::memory_order_relaxed);
+				}
+				break;
+			}
+			default:
+				break;
 		}
+		return std::nullopt;
+	};
 
-		auto result = m_addressResolver.Resolve(addr, *baseSig);
+	m_loader.ForEachAddress([&](const AddressData& addr) {
+		auto baseAddr = addrLookup(addr);
+		if (!baseAddr)
+			return;
+
+		auto result = m_addressResolver.Resolve(addr, *baseAddr);
 		if (result) {
 			m_cache.CacheAddress(*result);
 		} else {
@@ -639,7 +731,7 @@ Result<void> GameConfig::ApplyAllPatches(const PatchOptions& options) {
 	std::atomic_flag hadErrors = {};
 
 	m_loader.ForEachPatch([&](const PatchData& patch) {
-		auto result = ApplyPatch(patch.name, patch.baseAddress, options);
+		auto result = ApplyPatch(patch, options);
 		if (!result) {
 			plg::print(LS_WARNING, "Failed to apply patch '{}': {}\n",
 					   patch.name, result.error());
@@ -720,12 +812,29 @@ Result<ResolvedAddress> GameConfig::ResolveAddressInternal(std::string_view name
 	auto result = m_addressResolver.ResolveByName(
 		name,
 		m_loader,
-		[&](std::string_view sigName) -> std::optional<ResolvedSignature> {
-			auto sigResult = ResolveSignatureInternal(sigName);
-			if (sigResult) {
-				return *sigResult;
+		[&](std::string_view name, AddressData::Type type) -> Result<Memory> {
+			switch (type) {
+				case AddressData::Type::Signature:
+					if (auto sigResult = ResolveSignatureInternal(name)) {
+						return sigResult->address;
+					} else {
+						return MakeError(std::move(sigResult.error()));
+					}
+				case AddressData::Type::Address:
+					if (auto addrResult = ResolveAddressInternal(name)) {
+						return addrResult->address;
+					} else {
+						return MakeError(std::move(addrResult.error()));
+					}
+				case AddressData::Type::VTable:
+					if (auto vtResult = ResolveVTableInternal(name)) {
+						return vtResult->address;
+					} else {
+						return MakeError(std::move(vtResult.error()));
+					}
+				default:
+					return MakeError("Invalid address type");
 			}
-			return std::nullopt;
 		}
 	);
 
@@ -760,25 +869,33 @@ Result<ResolvedVTable> GameConfig::ResolveVTableInternal(std::string_view name) 
 }
 
 Result<void> GameConfig::ApplyPatch(
-	std::string_view name,
-	std::string_view address,
+	const PatchData& patch,
 	const PatchOptions& options
 ) {
 	// Get patch pattern from config
-	auto patchResult = GetPatch(name);
+	auto patchResult = GetPatch(patch.name);
 	if (!patchResult) {
 		return MakeError(std::move(patchResult.error()));
 	}
 
+	auto addrLookup = [&] -> Result<Memory> {
+		switch (patch.type) {
+			case PatchData::Type::Address: return GetAddress(patch.base);
+			case PatchData::Type::Signature: return GetSignature(patch.base);
+			case PatchData::Type::VTable: return GetVTable(patch.base);
+			default: return MakeError("Invalid address type");
+		}
+	};
+
 	// Get target address
-	auto addrResult = HasAddress(address) ? GetAddress(address) : GetSignature(address);
+	auto addrResult = addrLookup();
 	if (!addrResult) {
 		return MakeError(std::move(addrResult.error()));
 	}
 
 	// Apply the patch
 	auto& patchManager = g_GameConfigManager.GetPatchManager();
-	return patchManager.ApplyPatch(name, *addrResult, *patchResult, options);
+	return patchManager.ApplyPatch(patch.name, *addrResult, *patchResult, options);
 }
 
 Result<Memory> GameConfig::GetAddress(std::string_view name) {
@@ -838,7 +955,7 @@ Result<int32_t> GameConfig::GetOffset(std::string_view name) {
 		return MakeError("Offset not found: {}", name);
 	}
 
-	return offset->value;
+	return *offset->value;
 }
 
 Result<plg::string> GameConfig::GetPatch(std::string_view name) {
@@ -904,6 +1021,11 @@ void GameConfig::PreloadAll() {
 	auto sigResult = PreloadSignatures();
 	if (!sigResult) {
 		plg::print(LS_WARNING, "Cannot preload - {}\n", sigResult.error());
+		return;
+	}
+	auto vtResult = PreloadVTables();
+	if (!vtResult) {
+		plg::print(LS_WARNING, "Cannot preload - {}\n", vtResult.error());
 		return;
 	}
 	auto addrResult = PreloadAddresses();
@@ -1043,14 +1165,14 @@ Result<Memory> SignatureResolver::ResolveSymbol(const std::shared_ptr<Module>& m
 
 Result<ResolvedAddress> AddressResolver::Resolve(
 	const AddressData& address,
-	const ResolvedSignature& baseSignature
+	Memory baseAddress
 ) const {
-	if (!baseSignature) {
-		return MakeError("Base signature is invalid");
+	if (!baseAddress) {
+		return MakeError("Base address is invalid");
 	}
 
 	auto finalAddr = ApplyIndirections(
-		baseSignature.address,
+		baseAddress,
 		address.indirections
 	);
 
@@ -1058,25 +1180,25 @@ Result<ResolvedAddress> AddressResolver::Resolve(
 		return MakeError(std::move(finalAddr.error()));
 	}
 
-	return ResolvedAddress{*finalAddr, address.name, address.baseSignature};
+	return ResolvedAddress{*finalAddr, address.name, address.base};
 }
 
 Result<ResolvedAddress> AddressResolver::ResolveByName(
 	std::string_view name,
 	const ConfigLoader& loader,
-	const std::function<std::optional<ResolvedSignature>(std::string_view)>& sigLookup
+	const std::function<Result<Memory>(std::string_view, AddressData::Type)>& addressLookup
 ) const {
 	auto addrData = loader.GetAddress(name);
 	if (!addrData) {
 		return MakeError("Address not found in config: {}", name);
 	}
 
-	auto baseSig = sigLookup(addrData->baseSignature);
-	if (!baseSig) {
-		return MakeError("Base signature not resolved: {}", addrData->baseSignature);
+	auto baseAddress = addressLookup(addrData->base, addrData->type);
+	if (!baseAddress) {
+		return MakeError("Base signature {} not resolved: {}", addrData->base, baseAddress.error());
 	}
 
-	return Resolve(*addrData, *baseSig);
+	return Resolve(*addrData, *baseAddress);
 }
 
 Result<Memory> AddressResolver::ApplyIndirections(
@@ -1106,8 +1228,11 @@ Result<Memory> AddressResolver::ApplyStep(Memory current, const IndirectionStep&
 		case IndirectionStep::Type::Offset:
 			return current.Offset(step.offset);
 
+		case IndirectionStep::Type::Index:
+			return current.Deref(1, step.offset * sizeof(uintptr_t));
+
 		case IndirectionStep::Type::Dereference:
-			return current.Offset(step.offset).DerefSelf();
+			return current.Deref(1, step.offset);
 
 		case IndirectionStep::Type::RelativeOffset: {
 			auto target = current.Offset(step.offset);
@@ -1131,8 +1256,7 @@ Result<ResolvedVTable> VTableResolver::Resolve(const VTableData& vtable) const {
 		return MakeError("Module not found: {}", vtable.library);
 	}
 
-	Result<Memory> addrResult = ResolveTable(module, vtable.name);
-
+	Result<Memory> addrResult = ResolveTable(module, vtable.table);
 	if (!addrResult) {
 		return MakeError(std::move(addrResult.error()));
 	}

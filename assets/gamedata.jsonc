@@ -136,9 +136,10 @@
       // patches
 
       // String: "Script_Warning"
+      // patching mov esi, 1 to 2
       "VScriptInitialization": {
         "library": "vscript",
-        "win64": "BE 01 2A 2A 2A 2B D6 74 2A 3B D6",
+        "win64": "BE ? ? ? ? 2B D6",
         "linuxsteamrt64": "83 FE 01 0F 84 67"
       },
       // String: "Player.Swim" and "player_jump"
@@ -342,11 +343,24 @@
             "read_offs32": 218
           }
         ]
+      },
+      "GetHammerUniqueId": {
+        "vtable": "CPointEntity",
+        "win64": [
+          {
+            "index": 118
+          }
+        ],
+        "linuxsteamrt64": [
+          {
+            "index": 117
+          }
+        ]
       }
     },
 	"Patches": {
       "VScriptPatch": {
-        "address": "VScriptInitialization",
+        "signature": "VScriptInitialization",
         "win64": "BE 02",
         "linuxsteamrt64": "83 FE 02"
       },
@@ -356,27 +370,27 @@
         "linuxsteamrt64": "B0 01"
       },
       "FixWaterFloorJumpPatch": {
-        "address": "CheckJumpButtonWater",
+        "signature": "CheckJumpButtonWater",
         "win64": "11 43",
         "linuxsteamrt64": "11 43"
       },
       "CPhysBoxUsePatch": {
-        "address": "CPhysBox_Use",
+        "signature": "CPhysBox_Use",
         "win64": "49 89 F8 90",
         "linuxsteamrt64": "48 89 DA 90 90"
       },
       "ServerMovementUnlockPatch": {
-        "address": "ServerMovementUnlock",
+        "signature": "ServerMovementUnlock",
         "win64": "E9 B1 00 00 00 90",
         "linuxsteamrt64": "90 90 90 90 90 90"
       },
       "BotNavIgnorePatch": {
-        "address": "BotNavIgnore",
+        "signature": "BotNavIgnore",
         "win64": "E9 2C 00 00 00 90",
         "linuxsteamrt64": "E9 25 00 00 00 90"
       },
       "EmitSoundVolumePatch": {
-        "address": "EmitSoundVolume",
+        "signature": "EmitSoundVolume",
         "win64": "41 B9 E9 54 60 BD",
         "linuxsteamrt64": "B8 E9 54 60 BD"
       }
@@ -394,11 +408,9 @@
         "library": "vscript",
         "table": "CLuaVM"
       },
-      "GetHammerUniqueId": {
+      "CPointEntity": {
         "library": "server",
-        "table": "CPointEntity",
-        "win64": 118,
-        "linuxsteamrt64": 117
+        "table": "CPointEntity"
       }
 	}
   },

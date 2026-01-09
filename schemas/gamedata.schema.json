@@ -12,6 +12,10 @@
           "description": "A offset number in bytes",
           "type": "number"
         },
+        "index": {
+          "description": "A index number to read a cell from",
+          "type": "number"
+        },
         "read": {
           "description": "A offset number to read a cell from",
           "type": "number"
@@ -35,8 +39,16 @@
             "^.+$": {
               "description": "A address name",
               "type": "object",
+              "address": {
+                "description": "An address name from Addresses sections",
+                "type": "string"
+              },
               "signature": {
-                "description": "An address name from \"Addressess\" and \"Signatures\" sections",
+                "description": "An address name from Signatures sections",
+                "type": "string"
+              },
+              "vtable": {
+                "description": "An address name from VTables sections",
                 "type": "string"
               },
               "win64": {
@@ -59,52 +71,18 @@
                 "items": {
                   "$ref": "#/$defs/addressObject"
                 }
-              }
-            }
-          }
-        },
-        "Keys": {
-          "description": "Keys section",
-          "type": "object",
-          "patternProperties": {
-            "^.+$": {
-              "description": "A key name",
-              "type": "object",
-              "properties": {
-                "win64": {
-                  "description": "A key value on Windows side",
-                  "type": [
-                    "null",
-                    "boolean",
-                    "number",
-                    "string",
-                    "array",
-                    "object"
-                  ]
-                },
-                "linuxsteamrt64": {
-                  "description": "A key value on Linux side",
-                  "type": [
-                    "null",
-                    "boolean",
-                    "number",
-                    "string",
-                    "array",
-                    "object"
-                  ]
-                },
-                "osx64": {
-                  "description": "A key value on macOS side",
-                  "type": [
-                    "null",
-                    "boolean",
-                    "number",
-                    "string",
-                    "array",
-                    "object"
-                  ]
-                }
-              }
+              },
+              "oneOf": [
+                {"required": ["address"]},
+                {"required": ["signature"]},
+                {"required": ["vtable"]}
+              ],
+              "anyOf": [
+                {"required": ["win64"]},
+                {"required": ["linuxsteamrt64"]},
+                {"required": ["osx64"]}
+              ],
+              "additionalProperties": false
             }
           }
         },
@@ -128,7 +106,13 @@
                   "description": "A offset number on macOS side",
                   "type": "number"
                 }
-              }
+              },
+              "anyOf": [
+                {"required": ["win64"]},
+                {"required": ["linuxsteamrt64"]},
+                {"required": ["osx64"]}
+              ],
+              "additionalProperties": false
             }
           }
         },
@@ -159,7 +143,13 @@
               },
               "required": [
                 "library"
-              ]
+              ],
+              "anyOf": [
+                {"required": ["win64"]},
+                {"required": ["linuxsteamrt64"]},
+                {"required": ["osx64"]}
+              ],
+              "additionalProperties": false
             }
           }
         },
@@ -172,9 +162,17 @@
               "type": "object",
               "properties": {
                 "address": {
-				  "description": "An address name from \"Addressess\" and \"Signatures\" sections",
-				  "type": "string"
-				},
+                  "description": "An address name from Addresses sections",
+                  "type": "string"
+                },
+                "signature": {
+                  "description": "An address name from Signatures sections",
+                  "type": "string"
+                },
+                "vtable": {
+                  "description": "An address name from VTables sections",
+                  "type": "string"
+                },
                 "win64": {
                   "description": "A patch bytes string on Windows side. Passes ? to skip a byte",
                   "type": "string"
@@ -188,9 +186,17 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "address"
-              ]
+              "oneOf": [
+                {"required": ["address"]},
+                {"required": ["signature"]},
+                {"required": ["vtable"]}
+              ],
+              "anyOf": [
+                {"required": ["win64"]},
+                {"required": ["linuxsteamrt64"]},
+                {"required": ["osx64"]}
+              ],
+              "additionalProperties": false
             }
           }
         },
@@ -212,8 +218,10 @@
                 }
               },
               "required": [
-                "library"
-              ]
+                "library",
+                "table"
+              ],
+              "additionalProperties": false
             }
           }
         }

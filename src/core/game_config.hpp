@@ -14,9 +14,9 @@ struct SignatureData {
 	enum class Type { Pattern, Symbol };
 
 	Type type;
+	plg::string name;       // Identifier name
 	plg::string value;      // Pattern string or symbol name
 	plg::string library;    // Module/library name
-	plg::string name;       // Identifier name
 
 	bool IsSymbol() const { return type == Type::Symbol; }
 	bool IsPattern() const { return type == Type::Pattern; }
@@ -25,8 +25,9 @@ struct SignatureData {
 struct IndirectionStep {
 	enum class Type {
 		Offset,           // Simple offset
+		Index,            // Virtual function index
 		Dereference,      // Dereference pointer
-		RelativeOffset    // Relative offset (RIP-relative on x64)
+		RelativeOffset,   // Relative offset (RIP-relative on x64)
 	};
 
 	Type type;
@@ -36,7 +37,11 @@ struct IndirectionStep {
 		return { Type::Offset, off };
 	}
 
-	static IndirectionStep MakeDereference(int32_t off = 0) {
+	static IndirectionStep MakeIndex(int32_t off) {
+		return { Type::Index, off };
+	}
+
+	static IndirectionStep MakeDereference(int32_t off) {
 		return { Type::Dereference, off };
 	}
 
@@ -46,14 +51,17 @@ struct IndirectionStep {
 };
 
 struct AddressData {
-	plg::string name;
-	plg::string baseSignature;  // Reference to a signature
+	enum class Type { Signature, Address, VTable };
+
+	Type type;
+	plg::string name;  // Identifier name
+	plg::string base;  // Reference to a signature/address/vtable
 	plg::vector<IndirectionStep> indirections;
 };
 
 struct OffsetData {
 	plg::string name;
-	int32_t value;
+	std::optional<int32_t> value;
 };
 
 struct VTableData {
@@ -63,8 +71,11 @@ struct VTableData {
 };
 
 struct PatchData {
+	enum class Type { Signature, Address, VTable };
+
+	Type type;
 	plg::string name;
-	plg::string baseAddress; // Reference to an address
+	plg::string base; // Reference to a signature/address/vtable
 	plg::string pattern;
 };
 
@@ -160,12 +171,12 @@ struct ResolvedSignature {
 struct ResolvedAddress {
 	Memory address;
 	plg::string name;
-	plg::string baseSignature;
+	plg::string base;
 	plg::string error;
 
 	ResolvedAddress() : address(nullptr) {}
-	ResolvedAddress(Memory addr, plg::string n, plg::string base)
-		: address(addr), name(std::move(n)), baseSignature(std::move(base)) {}
+	ResolvedAddress(Memory addr, plg::string name_, plg::string base_)
+		: address(addr), name(std::move(name_)), base(std::move(base_)) {}
 
 	static ResolvedAddress Failed(plg::string name, plg::string error) {
 		ResolvedAddress result;
@@ -240,14 +251,14 @@ public:
 	// Resolve an address using cached signatures
 	Result<ResolvedAddress> Resolve(
 		const AddressData& address,
-		const ResolvedSignature& baseSignature
+		Memory baseAddress
 	) const;
 
 	// Resolve an address by looking up base signature
 	Result<ResolvedAddress> ResolveByName(
 		std::string_view name,
 		const ConfigLoader& loader,
-		const std::function<std::optional<ResolvedSignature>(std::string_view)>& sigLookup
+		const std::function<Result<Memory>(std::string_view, AddressData::Type type)>& addressLookup
 	) const;
 
 private:
@@ -410,7 +421,7 @@ public:
 	void PrintDiagnostics() const;
 
 	// Apply patch
-	Result<void> ApplyPatch(std::string_view name, std::string_view address, const PatchOptions& options = {});
+	Result<void> ApplyPatch(const PatchData& patch, const PatchOptions& options = {});
 	Result<void> ApplyAllPatches(const PatchOptions& options = {});
 
 	// Restore patches
