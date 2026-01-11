@@ -11,7 +11,7 @@ using Memory = DynLibUtils::CMemory;
 using Module = DynLibUtils::CAssemblyModule<std::shared_mutex>;
 
 struct SignatureData {
-	enum class Type { Pattern, Symbol };
+	enum class Type { Invalid, Pattern, Symbol };
 
 	Type type;
 	plg::string name;       // Identifier name
@@ -24,6 +24,7 @@ struct SignatureData {
 
 struct IndirectionStep {
 	enum class Type {
+		Invalid,
 		Offset,           // Simple offset
 		Index,            // Virtual function index
 		Dereference,      // Dereference pointer
@@ -51,12 +52,16 @@ struct IndirectionStep {
 };
 
 struct AddressData {
-	enum class Type { Signature, Address, VTable };
+	enum class Type { Invalid, Signature, Address, VTable };
 
 	Type type;
 	plg::string name;  // Identifier name
 	plg::string base;  // Reference to a signature/address/vtable
 	plg::vector<IndirectionStep> indirections;
+
+	bool IsSignature() const { return type == Type::Signature; }
+	bool IsAddress() const { return type == Type::Address; }
+	bool IsVTable() const { return type == Type::VTable; }
 };
 
 struct OffsetData {
@@ -71,12 +76,16 @@ struct VTableData {
 };
 
 struct PatchData {
-	enum class Type { Signature, Address, VTable };
+	enum class Type { Invalid, Signature, Address, VTable };
 
 	Type type;
 	plg::string name;
 	plg::string base; // Reference to a signature/address/vtable
 	plg::string pattern;
+
+	bool IsSignature() const { return type == Type::Signature; }
+	bool IsAddress() const { return type == Type::Address; }
+	bool IsVTable() const { return type == Type::VTable; }
 };
 
 enum class CacheStrategy {
@@ -155,8 +164,8 @@ struct ResolvedSignature {
 	plg::string error;
 
 	ResolvedSignature() : address(nullptr) {}
-	ResolvedSignature(Memory addr, plg::string n)
-		: address(addr), name(std::move(n)) {}
+	ResolvedSignature(Memory addr, plg::string name_)
+		: address(addr), name(std::move(name_)) {}
 
 	static ResolvedSignature Failed(plg::string name, plg::string error) {
 		ResolvedSignature result;
@@ -194,8 +203,8 @@ struct ResolvedVTable {
 	plg::string error;
 
 	ResolvedVTable() : address(nullptr) {}
-	ResolvedVTable(Memory addr, plg::string n)
-		: address(addr), name(std::move(n)) {}
+	ResolvedVTable(Memory addr, plg::string name_)
+		: address(addr), name(std::move(name_)) {}
 
 	static ResolvedVTable Failed(plg::string name, plg::string error) {
 		ResolvedVTable result;
