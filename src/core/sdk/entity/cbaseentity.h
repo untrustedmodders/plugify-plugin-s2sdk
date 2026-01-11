@@ -390,7 +390,7 @@ public:
 	}
 
 	void AcceptInput(string inputName, const variant_t& value = variant_t(), CEntityInstance* activator = nullptr, CEntityInstance* caller = nullptr, int outputId = 0) {
-		addresses::CEntityInstance_AcceptInput(this, inputName, activator, caller, const_cast<variant_t*>(&value), outputId);
+		addresses::CEntityInstance_AcceptInput(this, inputName, activator, caller, const_cast<variant_t*>(&value), outputId, nullptr);
 	}
 
 	void SetMoveType(MoveType_t nMoveType) {

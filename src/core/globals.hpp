@@ -99,7 +99,7 @@ namespace addresses {
 
 	inline void (*DispatchSpawn)(CEntityInstance* entity, CEntityKeyValues* entityKeyValues);
 
-	inline void (*CEntityInstance_AcceptInput)(CEntityInstance* self, const char* inputName, CEntityInstance* activator, CEntityInstance* caller, variant_t* value, int outputID);
+	inline void (*CEntityInstance_AcceptInput)(CEntityInstance* self, const char* inputName, CEntityInstance* activator, CEntityInstance* caller, variant_t* value, int outputID, void*);
 
 	inline SndOpEventGuid_t (*CBaseEntity_EmitSoundFilter)(IRecipientFilter& filter, CEntityIndex ent, const EmitSound_t& params);
 
