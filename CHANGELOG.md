@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.23](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.22...v2.3.23) (2026-01-11)
+
+
+### Bug Fixes
+
+* AcceptInput crash ([0fdfb74](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0fdfb742d70b8d7b0ba6d58956fe5a2863397f11))
+* add Invalid types for config datas ([a0dcf32](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a0dcf32cb6387fc5e732056747269e2152647077))
+* add new fixes ([85c5c4a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/85c5c4ab08d847b2ae6a399581235f38bc81e6df))
+* add new patches from cs2 fixes ([9bab1cb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9bab1cb571d39a7fb04b10675a3d0eb3314c7b91))
+* some issue with vtables ([1d8520c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1d8520c4def2ee2c6766216b76862dd21ee64838))
+
 ## [2.3.22](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.21...v2.3.22) (2026-01-07)
 
 
