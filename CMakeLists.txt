@@ -131,7 +131,7 @@ endif()
 
 add_subdirectory(external/sourcesdk)
 
-set(S2SDK_GAME_NAME "csgo" CACHE INTERNAL "Set game name")
+set(S2SDK_GAME_NAME "csgo" CACHE STRING "Set game name")
 set(S2SDK_COMPILE_DEFINITIONS
         S2SDK_VERSION="${S2SDK_VERSION}"
         S2SDK_PACKAGE="${S2SDK_PACKAGE}"
