@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.3.24](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.23...v2.3.24) (2026-01-16)
+
+
+### Bug Fixes
+
+* rework scope and setparent to vscript ([99b5b89](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/99b5b8925a1789a8da2141bbac239f4d6ff58d9b))
+* update deps ([4cc5fc0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4cc5fc06ba7c6df2fcee6f95705e159630caeb7e))
+* update sdk ([08e17e4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/08e17e4f3b814e3d5224d6f6fa2ab4064973806e))
+
 ## [2.3.23](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.22...v2.3.23) (2026-01-11)
 
 
