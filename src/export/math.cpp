@@ -47,8 +47,8 @@ extern "C" PLUGIN_API Quaternion AxisAngleToQuaternion(const Vector& axis, float
 extern "C" PLUGIN_API Vector CalcClosestPointOnEntityOBB(int entityHandle, const Vector& position) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return vec3_origin;
-	ParamScope scope(entity);
-	return Math{}.CalcClosestPointOnEntityOBB(scope.GetInstance(0), position);
+	ParamScope params(entity);
+	return Math{}.CalcClosestPointOnEntityOBB(params(0), position);
 }
 
 /**
@@ -61,8 +61,8 @@ extern "C" PLUGIN_API float CalcDistanceBetweenEntityOBB(int entityHandle1, int 
 	auto* ent1 = helpers::GetEntity(entityHandle1);
 	auto* ent2 = helpers::GetEntity(entityHandle2);
 	if (!ent1 || !ent2) return -1.0f;
-	ParamScope scope(ent1, ent2);
-	return Math{}.CalcDistanceBetweenEntityOBB(scope.GetInstance(0), scope.GetInstance(1));
+	ParamScope params(ent1, ent2);
+	return Math{}.CalcDistanceBetweenEntityOBB(params(0), params(1));
 }
 
 /**

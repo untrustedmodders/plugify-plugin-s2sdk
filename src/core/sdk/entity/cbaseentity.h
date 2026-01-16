@@ -275,14 +275,6 @@ public:
 
 	int entindex() { return m_pEntity->m_EHandle.GetEntryIndex(); }
 
-	void SetParent2(CEntityInstance* newParent)
-	{
-		if (newParent)
-			AcceptInput("SetParent", "!activator", newParent);
-		else
-			AcceptInput("ClearParent");
-	}
-
 	string GetName() {
 		return m_iGlobalname->String();
 	}

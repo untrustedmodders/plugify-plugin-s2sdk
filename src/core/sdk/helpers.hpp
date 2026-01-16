@@ -270,13 +270,16 @@ public:
 	}
 
 	~ParamScope() {
-		for (auto& instance : m_instances) {
+		for (const auto& instance : m_instances) {
 			if (instance) {
 				g_pScriptVM->RemoveInstance(instance);
 			}
 		}
 	}
 
+	HSCRIPT operator()(const size_t i) const { return m_instances[i]; }
+
+private:
 	void AddEntity(CEntityInstance* entity) {
 		if (!entity) {
 			m_instances.emplace_back(nullptr);
@@ -291,8 +294,5 @@ public:
 		m_instances.emplace_back(instance);
 	}
 
-	HSCRIPT GetInstance(size_t index) const { return m_instances[index]; }
-
-private:
-	plg::inplace_vector<HSCRIPT, 7> m_instances;
+	plg::inplace_vector<HSCRIPT, 3> m_instances;
 };

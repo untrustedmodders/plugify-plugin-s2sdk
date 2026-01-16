@@ -813,8 +813,8 @@ extern "C" PLUGIN_API void SetEntityOwner(int entityHandle, int ownerHandle) {
 	if (!entity) return;
 	auto* owner = helpers::GetEntity(ownerHandle);
 	if (!owner) return;
-	ParamScope scope(owner);
-	entity->SetOwner(scope.GetInstance(0));
+	ParamScope params(owner);
+	entity->SetOwner(params(0));
 }
 
 /**
@@ -846,8 +846,10 @@ extern "C" PLUGIN_API int GetEntityParent(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	CEntityInstance* parent = parentHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(parentHandle)) : nullptr;
-	entity->SetParent2(parent);
+	CEntityInstance* parent = helpers::GetEntity(parentHandle);
+	if (!parent) return;
+	ParamScope params(parent);
+	entity->SetParent(params(0), "");
 }
 
 /**
@@ -865,8 +867,8 @@ extern "C" PLUGIN_API void SetEntityParentAttachment(int entityHandle, int paren
 	if (!entity) return;
 	auto* parent = helpers::GetEntity(parentHandle);
 	if (!parent) return;
-	ParamScope scope(parent);
-	entity->SetParent(scope.GetInstance(0), attachmentName.c_str());
+	ParamScope params(parent);
+	entity->SetParent(params(0), attachmentName.c_str());
 }
 
 /**
@@ -1577,8 +1579,8 @@ extern "C" PLUGIN_API void DisconnectEntityRedirectedOutput(int entityHandle, co
 	if (!entity) return;
 	auto* target = helpers::GetEntity(targetHandle);
 	if (!target) return;
-	ParamScope scope(target);
-	entity->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), scope.GetInstance(0));
+	ParamScope params(target);
+	entity->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), params(0));
 }
 
 /**
@@ -1600,8 +1602,8 @@ extern "C" PLUGIN_API void FireEntityOutput(int entityHandle, const plg::string&
 	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
-	ParamScope scope(activator, caller);
-	entity->FireOutput(outputName.c_str(), scope.GetInstance(0), scope.GetInstance(1), variant, delay);
+	ParamScope params(activator, caller);
+	entity->FireOutput(outputName.c_str(), params(0), params(1), variant, delay);
 }
 
 /**
@@ -1617,8 +1619,8 @@ extern "C" PLUGIN_API void RedirectEntityOutput(int entityHandle, const plg::str
 	if (!entity) return;
 	auto* target = helpers::GetEntity(targetHandle);
 	if (!target) return;
-	ParamScope scope(target);
-	entity->RedirectOutput(output.c_str(), functionName.c_str(), scope.GetInstance(0));
+	ParamScope params(target);
+	entity->RedirectOutput(output.c_str(), functionName.c_str(), params(0));
 }
 
 /**
@@ -1633,8 +1635,8 @@ extern "C" PLUGIN_API void FollowEntity(int entityHandle, int attachmentHandle, 
 	if (!entity) return;
 	auto* attach = helpers::GetEntity(attachmentHandle);
 	if (!attach) return;
-	ParamScope scope(attach);
-	entity->FollowEntity(scope.GetInstance(0), boneMerge);
+	ParamScope params(attach);
+	entity->FollowEntity(params(0), boneMerge);
 }
 
 /**
@@ -1649,8 +1651,8 @@ extern "C" PLUGIN_API void FollowEntityMerge(int entityHandle, int attachmentHan
 	if (!entity) return;
 	auto* attach = helpers::GetEntity(attachmentHandle);
 	if (!attach) return;
-	ParamScope scope(attach);
-	entity->FollowEntity(scope.GetInstance(0), boneOrAttachName.c_str());
+	ParamScope params(attach);
+	entity->FollowEntity(params(0), boneOrAttachName.c_str());
 }
 
 /**
@@ -1674,8 +1676,8 @@ extern "C" PLUGIN_API int TakeEntityDamage(int entityHandle, int inflictorHandle
 	if (!inflictor) return {};
 	auto* attacker = helpers::GetEntity(attackerHandle);
 	if (!attacker) return {};
-	ParamScope scope(inflictor, attacker);
-	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(scope.GetInstance(0), scope.GetInstance(1), std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
+	ParamScope params(inflictor, attacker);
+	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(params(0), params(1), std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
 	int applied = entity->TakeDamage(takeDamageInfo);
 	CTakeDamage{}.DestroyDamageInfo(takeDamageInfo);
 	return applied;
