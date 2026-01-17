@@ -21,12 +21,15 @@
 
 #include "cbasegamerules.h"
 
+enum CCitadelRoundEndReason {
+	// TODO
+};
+
 class CCitadelGameRules : public CGameRules {
 public:
     DECLARE_SCHEMA_CLASS(CCitadelGameRules)
 
-    void TerminateRound(float delay, int reason) {
-    }
+    void TerminateRound(float delay, int reason) {}
 };
 
 class CCitadelGameRulesProxy : public CBaseEntity {

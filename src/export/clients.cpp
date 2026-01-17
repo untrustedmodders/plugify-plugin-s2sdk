@@ -1810,7 +1810,7 @@ extern "C" PLUGIN_API uint64_t GetClientButtons(int playerSlot, int buttonIndex)
 extern "C" PLUGIN_API int GetClientArmor(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	return pawn->m_ArmorValue;
+	return pawn->GetArmor();
 }
 
 /**
@@ -1822,7 +1822,7 @@ extern "C" PLUGIN_API int GetClientArmor(int playerSlot) {
 extern "C" PLUGIN_API void SetClientArmor(int playerSlot, int armor) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->m_ArmorValue = armor;
+	pawn->SetArmor(armor);
 }
 
 
@@ -1835,7 +1835,7 @@ extern "C" PLUGIN_API void SetClientArmor(int playerSlot, int armor) {
 extern "C" PLUGIN_API float GetClientSpeed(int playerSlot) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return {};
-	return pawn->m_flVelocityModifier;
+	return pawn->GetSpeed();
 }
 
 /**
@@ -1847,7 +1847,7 @@ extern "C" PLUGIN_API float GetClientSpeed(int playerSlot) {
 extern "C" PLUGIN_API void SetClientSpeed(int playerSlot, float speed) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->m_flVelocityModifier = speed;
+	pawn->SetSpeed(speed);
 }
 
 /**
@@ -1857,9 +1857,13 @@ extern "C" PLUGIN_API void SetClientSpeed(int playerSlot, float speed) {
  * @return The amount of money the client has, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientMoney(int playerSlot) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_InGameMoneyServices>(playerSlot, &CPlayerController::m_pInGameMoneyServices);
 	if (!service) return {};
 	return service->m_iAccount;
+#else
+	return 0.0;
+#endif
 }
 
 /**
@@ -1869,9 +1873,11 @@ extern "C" PLUGIN_API int GetClientMoney(int playerSlot) {
  * @param money The amount of money to set.
  */
 extern "C" PLUGIN_API void SetClientMoney(int playerSlot, int money) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_InGameMoneyServices>(playerSlot, &CPlayerController::m_pInGameMoneyServices);
 	if (!service) return;
 	service->m_iAccount = money;
+#endif
 }
 
 /**
@@ -1881,9 +1887,13 @@ extern "C" PLUGIN_API void SetClientMoney(int playerSlot, int money) {
  * @return The number of kills the client has, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientKills(int playerSlot) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
 	if (!service) return {};
 	return service->m_matchStats->m_iKills;
+#else
+	return 0;
+#endif
 }
 
 /**
@@ -1893,9 +1903,11 @@ extern "C" PLUGIN_API int GetClientKills(int playerSlot) {
  * @param kills The number of kills to set.
  */
 extern "C" PLUGIN_API void SetClientKills(int playerSlot, int kills) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
 	if (!service) return;
 	service->m_matchStats->m_iKills = kills;
+#endif
 }
 
 /**
@@ -1905,9 +1917,13 @@ extern "C" PLUGIN_API void SetClientKills(int playerSlot, int kills) {
  * @return The number of deaths the client has, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientDeaths(int playerSlot) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
 	if (!service) return {};
 	return service->m_matchStats->m_iDeaths;
+#else
+	return 0;
+#endif
 }
 
 /**
@@ -1917,9 +1933,11 @@ extern "C" PLUGIN_API int GetClientDeaths(int playerSlot) {
  * @param deaths The number of deaths to set.
  */
 extern "C" PLUGIN_API void SetClientDeaths(int playerSlot, int deaths) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
 	if (!service) return;
 	service->m_matchStats->m_iDeaths = deaths;
+#endif
 }
 
 /**
@@ -1929,9 +1947,13 @@ extern "C" PLUGIN_API void SetClientDeaths(int playerSlot, int deaths) {
  * @return The number of assists the client has, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientAssists(int playerSlot) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
 	if (!service) return {};
 	return service->m_matchStats->m_iAssists;
+#else
+	return 0;
+#endif
 }
 
 /**
@@ -1941,9 +1963,11 @@ extern "C" PLUGIN_API int GetClientAssists(int playerSlot) {
  * @param assists The number of assists to set.
  */
 extern "C" PLUGIN_API void SetClientAssists(int playerSlot, int assists) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
 	if (!service) return;
 	service->m_matchStats->m_iAssists = assists;
+#endif
 }
 
 /**
@@ -1953,9 +1977,13 @@ extern "C" PLUGIN_API void SetClientAssists(int playerSlot, int assists) {
  * @return The total damage dealt by the client, or 0 if the player slot is invalid.
  */
 extern "C" PLUGIN_API int GetClientDamage(int playerSlot) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
 	if (!service) return {};
 	return service->m_matchStats->m_iDamage;
+#else
+	return 0;
+#endif
 }
 
 /**
@@ -1965,7 +1993,9 @@ extern "C" PLUGIN_API int GetClientDamage(int playerSlot) {
  * @param damage The amount of damage to set.
  */
 extern "C" PLUGIN_API void SetClientDamage(int playerSlot, int damage) {
+#if defined (CS2)
 	auto service = helpers::GetService<CCSPlayerController_ActionTrackingServices>(playerSlot, &CPlayerController::m_pActionTrackingServices);
 	if (!service) return;
 	service->m_matchStats->m_iDamage = damage;
+#endif
 }

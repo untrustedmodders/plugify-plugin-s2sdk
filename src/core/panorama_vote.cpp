@@ -7,8 +7,10 @@
 #include <engine/igameeventsystem.h>
 #include <networksystem/inetworkmessages.h>
 #include <recipientfilter.h>
+#if defined (CS2)
 #include <cstrike15_usermessages.pb.h>
 #include <cstrike15/usermessages.h>
+#endif
 
 void PanoramaVoteHandler::Reset() {
 	m_voteInProgress = false;
@@ -162,6 +164,7 @@ bool PanoramaVoteHandler::SendYesNoVote(double duration, int caller,
 }
 
 void PanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
+#if defined (CS2)
 	INetworkMessageInternal *netMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteStart");
 	auto data = netMsg->AllocateMessage()->As<CCSUsrMsg_VoteStart_t>();
 
@@ -175,6 +178,7 @@ void PanoramaVoteHandler::SendVoteStartUM(IRecipientFilter* filter) {
 	UNUSED(data->Send(filter->GetRecipients()));
 
 	delete data;
+#endif
 }
 
 void PanoramaVoteHandler::InitVoters(IRecipientFilter* filter) {
@@ -274,6 +278,7 @@ void PanoramaVoteHandler::EndVote(VoteEndReason reason) {
 }
 
 void PanoramaVoteHandler::SendVoteFailed() const {
+#if defined (CS2)
 	INetworkMessageInternal *netMsg = g_pNetworkMessages->FindNetworkMessagePartial("VoteFailed");
 
 	auto data = netMsg->AllocateMessage()->As<CCSUsrMsg_VoteFailed_t>();
@@ -290,9 +295,11 @@ void PanoramaVoteHandler::SendVoteFailed() const {
 	UNUSED(data->Send(filter.GetRecipients()));
 
 	delete data;
+#endif
 }
 
 void PanoramaVoteHandler::SendVotePassed() const {
+#if defined (CS2)
 	INetworkMessageInternal *netMsg = g_pNetworkMessages->FindNetworkMessagePartial("VotePass");
 
 	auto data = netMsg->AllocateMessage()->As<CCSUsrMsg_VotePass_t>();
@@ -311,6 +318,7 @@ void PanoramaVoteHandler::SendVotePassed() const {
 	UNUSED(data->Send(filter.GetRecipients()));
 
 	delete data;
+#endif
 }
 
 GAME_EVENT_F(vote_cast) {

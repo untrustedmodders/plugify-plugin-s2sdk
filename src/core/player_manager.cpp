@@ -388,6 +388,7 @@ Player* PlayerManager::ToPlayer(CSteamID steamid, bool validate) const {
 }
 
 std::optional<CSTeam> PlayerManager::GetTeamForTargetType(TargetType targetType) {
+#if defined (CS2)
     switch (targetType) {
         case TargetType::T:
         case TargetType::RANDOM_T:
@@ -400,6 +401,9 @@ std::optional<CSTeam> PlayerManager::GetTeamForTargetType(TargetType targetType)
         default:
             return std::nullopt;
     }
+#else
+	return std::nullopt;
+#endif
 }
 
 plg::vector<int> PlayerManager::CollectAllPlayers() const {

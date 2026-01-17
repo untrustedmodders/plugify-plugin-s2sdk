@@ -1,6 +1,7 @@
-#include <core/sdk/entity/ccsteam.h>
 #include <core/sdk/entity/cgamerules.h>
 #include <core/sdk/entity/cteam.h>
+
+#include "core/sdk/entity/ccsteam.h"
 
 PLUGIFY_WARN_PUSH()
 
@@ -95,6 +96,7 @@ extern "C" PLUGIN_API int GetGamePlayerCount(CSTeam team) {
 		return -1;
 	}
 
+#if defined (CS2)
 	switch (team) {
 		case CSTeam::T:
 			return g_pGameRules->m_iNumTerrorist;
@@ -105,6 +107,9 @@ extern "C" PLUGIN_API int GetGamePlayerCount(CSTeam team) {
 		default:
 			return 0;
 	}
+#else
+	return 0;
+#endif
 }
 
 /**
@@ -122,7 +127,11 @@ extern "C" PLUGIN_API int GetGameTotalRoundsPlayed() {
 		return -1;
 	}
 
+#if defined (CS2)
 	return g_pGameRules->m_totalRoundsPlayed;
+#else
+	return 0;
+#endif
 }
 
 /**
@@ -134,9 +143,9 @@ extern "C" PLUGIN_API int GetGameTotalRoundsPlayed() {
  * request is ignored and a warning is logged.
  *
  * @param delay Time in seconds to wait before the next round starts.
- * @param reason The reason for ending the round, as defined by the CSRoundEndReason enum.
+ * @param reason The reason for ending the round, as defined by the CRoundEndReason enum.
  */
-extern "C" PLUGIN_API void TerminateRound(float delay, CSRoundEndReason reason) {
+extern "C" PLUGIN_API void TerminateRound(float delay, CRoundEndReason reason) {
 	if (g_pGameRules == nullptr) {
 		plg::print(LS_WARNING, "cs_gamerules not instantiated yet.\n");
 		return;

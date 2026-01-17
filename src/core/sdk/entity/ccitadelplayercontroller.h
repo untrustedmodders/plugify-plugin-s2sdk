@@ -57,7 +57,7 @@ public:
 		// TODO:
 	}
 
-	void SwitchTeam(int iTeam) {
+	void SwitchTeam(CSTeam iTeam) {
 		// TODO:
 	}
 

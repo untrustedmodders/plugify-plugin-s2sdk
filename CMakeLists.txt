@@ -124,9 +124,20 @@ set(SOURCESDK_LINK_STEAMWORKS ON CACHE INTERNAL "")
 set(SOURCESDK_MALLOC_OVERRIDE ON CACHE INTERNAL "")
 set(SOURCESDK_CONFIGURE_EXPORT_MAP OFF CACHE INTERNAL "")
 
-set(SOURCESDK_GAME_TARGET "cs2" CACHE INTERNAL "Set game library name to start after")
+set(SOURCESDK_GAME_TARGET "cs2" CACHE STRING "Set game library name to start after")
 if(SOURCESDK_GAME_TARGET STREQUAL "deadlock")
-    set(SOURCESDK_PROTOS gcsdk_gcmessages networkbasetypes network_connection CACHE INTERNAL "")
+    set(SOURCESDK_PROTOS
+            networksystem_protomessages
+            gameevents
+            usermessages
+            gcsdk_gcmessages
+            networkbasetypes
+            netmessages
+            steammessages_steamlearn.steamworkssdk
+            steammessages_unified_base.steamworkssdk
+            network_connection
+            valveextensions
+            steammessages CACHE INTERNAL "")
 endif()
 
 add_subdirectory(external/sourcesdk)

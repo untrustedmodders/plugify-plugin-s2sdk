@@ -50,4 +50,20 @@ public:
 	void Respawn() {
 		// TODO:
 	}
+
+	void SetSpeed(float speed) {
+		// TODO:
+	}
+
+	float GetSpeed() const {
+		return 0.0;
+	}
+
+	void SetArmor(int speed) {
+		// TODO:
+	}
+
+	int GetArmor() const {
+		return 0;
+	}
 };

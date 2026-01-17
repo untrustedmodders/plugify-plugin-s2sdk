@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/listener_manager.hpp"
-#include <core/sdk/entity/ccsgamerules.h>
+#include <core/sdk/entity/cgamerules.h>
 
 #define X(name, ret, ...) \
 	using name##Callback = ret (*)(__VA_ARGS__);     \
@@ -21,7 +21,7 @@ using Manager = ListenerManager<Fn, std::shared_mutex>;
 	X(OnClientFullyConnect, void, int playerSlot) \
 	X(OnClientSettingsChanged, void, int playerSlot) \
 	X(OnClientAuthenticated, void, int playerSlot, uint64 steamID) \
-	X(OnRoundTerminated, void, float delay, CSRoundEndReason reason) \
+	X(OnRoundTerminated, void, float delay, CRoundEndReason reason) \
 	X(OnEntityCreated, void, int entityHandle) \
 	X(OnEntityDeleted, void, int entityHandle) \
 	X(OnEntityParentChanged, void, int entityHandle, int parentHandle) \

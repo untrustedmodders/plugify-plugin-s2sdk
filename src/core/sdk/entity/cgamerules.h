@@ -23,11 +23,10 @@
 #include "ccsgamerules.h"
 using CBaseGameRules = CCSGameRules;
 using CBaseGameRulesProxy = CCSGameRulesProxy;
+using CRoundEndReason = CSRoundEndReason;
 #elif defined(DEADLOCK)
 #include "ccitadelgamerules.h"
 using CBaseGameRules = CCitadelGameRules;
 using CBaseGameRulesProxy = CCitadelGameRulesProxy;
-enum CSRoundEndReason
-{
-};
+using CRoundEndReason = CCitadelRoundEndReason;
 #endif

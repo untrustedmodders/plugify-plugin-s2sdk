@@ -81,9 +81,8 @@ polyhook::ResultType Hook_DisconnectGameNow(void* hook, void* params, int count,
 	}
 
 	if (reason == NETWORK_DISCONNECT_REQUEST_HOSTSTATE_IDLE) {
-		ExecuteOnce( {
-			g_OnServerStartedListenerManager();
-		});
+		static std::once_flag flag;
+		std::call_once(flag, g_OnServerStartedListenerManager);
 	}
 
 	return polyhook::ResultType::Ignored;
@@ -444,7 +443,7 @@ polyhook::ResultType Hook_FireOutputInternal(void* hook, void* params, int count
 polyhook::ResultType Hook_TerminateRound(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
 	//auto pGameRules = polyhook::GetArgument<CCSGameRules*>(params, 0);
 	auto delay = polyhook::GetArgument<float>(params, 1);
-	auto reason = static_cast<CSRoundEndReason>(polyhook::GetArgument<uint32_t>(params, 2));
+	auto reason = static_cast<CRoundEndReason>(polyhook::GetArgument<uint32_t>(params, 2));
 
 	if (g_pCoreConfig->FixFlashAlertMessage) {
 		g_pGameRules->m_bGameRestart = false;

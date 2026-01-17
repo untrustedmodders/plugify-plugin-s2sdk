@@ -70,4 +70,20 @@ public:
 		TRY_GET_OFFSET(g_pGameConfig, "CBasePlayerController::RoundRespawn", offset);
 		CALL_VIRTUAL(void, *offset, this);
 	}
+
+	void SetSpeed(float speed) {
+		m_flVelocityModifier = speed;
+	}
+
+	float GetSpeed() const {
+		return m_flVelocityModifier;
+	}
+
+	void SetArmor(int speed) {
+		m_ArmorValue = speed;
+	}
+
+	int GetArmor() const {
+		return m_ArmorValue;
+	}
 };
