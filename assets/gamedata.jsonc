@@ -13,12 +13,6 @@
         "win64": "48 89 54 24 ? 48 89 4C 24 ? 55 53 56 57 41 55 41 56 48 8D AC 24",
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 49 89 F6 41 55 41 54 53 48 89 FB 48 81 EC ? ? ? ? 48 89 B5"
       },
-      // String: "ApplicationInfo"
-      "AppSystemCreateInterfaceFn": {
-        "library": "engine2",
-        "win64": "40 53 48 83 EC ? 48 8B DA 48 8B D1 48 8B 0D",
-        "linuxsteamrt64": "55 48 89 E5 41 55 49 89 FD 41 54 48 8D 7D"
-      },
       // String: "CCSPlayerPawnBase::SwitchTeam", just keep in mind this is actually CCSPlayerController::SwitchTeam
       "CCSPlayerController::SwitchTeam": {
         "library": "server",
@@ -283,26 +277,6 @@
           }
         ]
       },
-      "&s_pCurrentAppSystem": {
-        // Can be found inside Source2Main
-        "signature": "AppSystemCreateInterfaceFn",
-        "win64": [
-          {
-            "read_offs32": 15
-          },
-          {
-            "read": 0
-          }
-        ],
-        "linuxsteamrt64": [
-          {
-            "read_offs32": 29
-          },
-          {
-            "read": 0
-          }
-        ]
-      },
       // String: look for UtlVector in if before "Unexpected module request."
       // (int)s_pScripts > 0 && (v15 = ptrScript, (v16 = *(_BYTE **)(ptrScript + 8LL * ((int)s_pScripts - 1))) != 0LL) )
       "&s_pScripts": {
@@ -358,7 +332,7 @@
         ]
       }
     },
-	"Patches": {
+    "Patches": {
       "VScriptPatch": {
         "signature": "VScriptInitialization",
         "win64": "BE 02",
@@ -394,8 +368,8 @@
         "win64": "41 B9 E9 54 60 BD",
         "linuxsteamrt64": "B8 E9 54 60 BD"
       }
-	},
-	"VTables": {
+    },
+    "VTables": {
       "CServerSideClient": {
         "library": "engine2",
         "table": "CServerSideClient"
@@ -412,7 +386,7 @@
         "library": "server",
         "table": "CPointEntity"
       }
-	}
+    }
   },
   "citadel": {
     "Signatures": {
@@ -420,12 +394,6 @@
       "PreloadLibrary": {
         "library": "engine2",
         "win64": "48 89 4C 24 08 53 56 57 48 83 EC 60"
-      },
-      // String: "ApplicationInfo"
-      "AppSystemCreateInterfaceFn": {
-        "library": "engine2",
-        "win64": "40 53 48 83 EC ? 48 8B DA 48 8B D1 48 8B 0D",
-        "linuxsteamrt64": "55 48 89 E5 41 55 49 89 FD 41 54 48 8D 7D DE"
       },
       // String: "Discarding pending request '%s, %u'\n"
       "CHostStateMgr::StartNewRequest": {
@@ -442,13 +410,13 @@
       // String: "controller" (2 occurrences) at bottom func with 5 params (v12, a1, 0LL, 0, 0)
       "CBasePlayerController::SetPawn": {
         "library": "server",
-        "win64": "48 89 5C 24 18 57 41 54 41 55 41 56 41 57 48 83 EC 30",
+        "win64": "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 40 48 8B D9 48 8B FA 48 81 C1 50 06 00 00",
         "linuxsteamrt64": "TODO"
       },
       // String: "CSource2GameClients::StartHLTVServer: game event %s not found.\n" Function right before the first virtual function call
       "LegacyGameEventListener": {
         "library": "server",
-        "win64": "48 8B 15 11 1D 90 01",
+        "win64": "48 8B 15 ? ? ? ? 48 85 D2 74 ? 83 F9 20 77 ? 48 63 C1 48 C1 E0 04",
         "linuxsteamrt64": "TODO"
       },
       // String: "-pressdemo",
@@ -463,7 +431,7 @@
       //          "ok"
       "CSource2Server::Init": {
         "library": "server",
-        "win64": "48 83 EC 28 48 83 3D A4 90 90 01 00",
+        "win64": "48 83 EC 28 48 83 3D ? ? ? ? 00 74 ? 33 C9 E8 ? ? ? ? FF 15",
         "linuxsteamrt64": "TODO"
       },
       // "InPass" is passed to this
@@ -481,7 +449,7 @@
       // String: "Attempted to create unknown entity classname" inside
       "CGameEntitySystem::CreateEntityByName": {
         "library": "server",
-        "win64": "48 83 EC 48 48 8B 0D AD C2 97 01",
+        "win64": "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC 50 49 8B F8",
         "linuxsteamrt64": "TODO"
       },
       // String: "Inconsistent treatment of '%s' (existing key is %s)!\n"
@@ -498,9 +466,10 @@
         "linuxsteamrt64": "TODO"
       },
       // "models/dev/error.vmdl", SetMoveType(a1, v4, 0) at the bottom
+      // "Attempting to precache model for entity %d [%s] at %.2f %.2f % .2f, but model name is NULL\n" inside
       "CBaseEntity::SetMoveType": {
         "library": "server",
-        "win64": "40 55 53 56 57 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 45 33 FF",
+        "win64": "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC 90 00 00 00 48 8B FA",
         "linuxsteamrt64": "TODO"
       }
     },
@@ -526,38 +495,34 @@
       }
     },
     "Addresses": {
-      // Signature-based address for game event manager "gameeventmanager->Init()"
+      // Signature-based address for game event manager after "gameeventmanager->Init()"
       "&s_GameEventManager": {
         "signature": "CSource2Server::Init",
         "win64": [
           {
             "read_offs32": 98
+          },
+          {
+            "read": 0
           }
         ],
         "linuxsteamrt64": [
           {
-            "read_offs32": 0 // TODO
-          }
-        ]
-      },
-      "&s_pCurrentAppSystem": {
-        // Can be found inside Source2Main
-        "signature": "AppSystemCreateInterfaceFn",
-        "win64": [
+            "read_offs32": 106
+          },
           {
-            "read_offs32": 15
-          }
-        ],
-        "linuxsteamrt64": [
-          {
-            "read_offs32": 29
+            "read": 0
           }
         ]
       }
     },
-	"Patches": {
-	},
-	"VTables": {
-	}
+    "Patches": {
+    },
+    "VTables": {
+      "CLuaVM": {
+        "library": "vscript",
+        "table": "CLuaVM"
+      }
+    }
   }
 }

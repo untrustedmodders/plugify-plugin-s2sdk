@@ -11,6 +11,7 @@ constexpr auto MaxPlayers = 64;
 constexpr auto MaxEdicts = 32768;
 
 class CAppSystemDict;
+class CTier2Application;
 class IAppSystem;
 class IGameEventSystem;
 class IGameEventManager2;
@@ -44,7 +45,6 @@ using CBaseGameRulesProxy = CCitadelGameRulesProxy;
 inline IGameEventSystem* g_pGameEventSystem = nullptr;
 inline IGameEventManager2* g_pGameEventManager = nullptr;
 inline CUtlVector<void*>* g_pScripts = nullptr;
-inline CAppSystemDict* g_pCurrentAppSystem = nullptr;
 inline CNetworkGameServerBase* g_pNetworkGameServer = nullptr;
 inline CGlobalVars* gpGlobals = nullptr;
 inline CGameEntitySystem* g_pGameEntitySystem = nullptr;

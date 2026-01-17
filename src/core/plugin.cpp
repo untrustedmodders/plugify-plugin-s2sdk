@@ -104,6 +104,10 @@ polyhook::ResultType Hook_Release(void* hook, void* params, int count, void* ret
 }
 
 void LoadMOTDFile() {
+	if (!g_pNetworkStringTableServer) {
+		return;
+	}
+
 	INetworkStringTable* table = g_pNetworkStringTableServer->FindTable("InfoPanel");
 	if (table == nullptr) {
 		plg::print(LS_WARNING, "Failed to find table InfoPanel\n");

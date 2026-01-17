@@ -50,7 +50,6 @@ namespace globals {
 			}
 		}
 
-		TRY_GET_ADDRESS(g_pGameConfig, "&s_pCurrentAppSystem", g_pCurrentAppSystem);
 		TRY_GET_ADDRESS(g_pGameConfig, "&s_GameEventManager", g_pGameEventManager);
 #if defined (CS2)
 		TRY_GET_ADDRESS(g_pGameConfig, "&s_pScripts", g_pScripts);
@@ -64,9 +63,9 @@ namespace globals {
 		TRY_GET_SIGNATURE(g_pGameConfig, "CEntityInstance::AcceptInput", addresses::CEntityInstance_AcceptInput);
 		//TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::EmitSoundFilter", addresses::CBaseEntity_EmitSoundFilter);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CBaseEntity::SetMoveType", addresses::CBaseEntity_SetMoveType);
-		TRY_GET_SIGNATURE(g_pGameConfig, "CSScript::ResolveModule", addresses::CSScript_ResolveModule);
 
 #if defined (CS2)
+		TRY_GET_SIGNATURE(g_pGameConfig, "CSScript::ResolveModule", addresses::CSScript_ResolveModule);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CCSPlayer_WeaponServices::RemoveItem", addresses::CCSPlayer_WeaponServices_RemoveItem);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CCSPlayerController::SwitchTeam", addresses::CCSPlayerController_SwitchTeam);
 		TRY_GET_SIGNATURE(g_pGameConfig, "CGameRules::TerminateRound", addresses::CGameRules_TerminateRound);
@@ -82,13 +81,15 @@ namespace globals {
 		g_pEngineServiceMgr = static_cast<IEngineServiceMgr*>(QueryInterface("engine2", ENGINESERVICEMGR_INTERFACE_VERSION));
 
 		g_pEngineServer = static_cast<IVEngineServer2*>(QueryInterface("engine2", SOURCE2ENGINETOSERVER_INTERFACE_VERSION));
-		g_pFullFileSystem = static_cast<IFileSystem*>(QueryInterface("filesystem", FILESYSTEM_INTERFACE_VERSION));
+		g_pFullFileSystem = static_cast<IFileSystem*>(QueryInterface("filesystem_stdio", FILESYSTEM_INTERFACE_VERSION));
 		g_pGameEventSystem = static_cast<IGameEventSystem*>(QueryInterface("engine2", GAMEEVENTSYSTEM_INTERFACE_VERSION));
-		g_pNetworkServerService = static_cast<INetworkServerService*>(QueryInterface("engine", NETWORKSERVERSERVICE_INTERFACE_VERSION));
+		g_pNetworkServerService = static_cast<INetworkServerService*>(QueryInterface("engine2", NETWORKSERVERSERVICE_INTERFACE_VERSION));
 		g_pNetworkMessages = static_cast<INetworkMessages*>(QueryInterface("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
 		g_pNetworkSystem = static_cast<INetworkSystem*>(QueryInterface("networksystem", NETWORKSYSTEM_INTERFACE_VERSION));
-		g_pNetworkStringTableServer = static_cast<INetworkStringTableContainer*>(QueryInterface("networksystem", INTERFACENAME_NETWORKSTRINGTABLESERVER));
 		g_pScriptManager = static_cast<IScriptManager*>(QueryInterface("vscript", VSCRIPT_INTERFACE_VERSION));
+#if defined (CS2)
+		g_pNetworkStringTableServer = static_cast<INetworkStringTableContainer*>(QueryInterface("networksystem", INTERFACENAME_NETWORKSTRINGTABLESERVER));
+#endif
 
 		ConVarManager::Init();
 	}
@@ -100,33 +101,41 @@ namespace globals {
 	}
 
 	PlatModule_t FindModule(std::string_view name) {
-		for (const auto& module : g_pCurrentAppSystem->m_Modules) {
+		/*for (const auto& module : pAppSystemDict->m_pDict->m_Modules) {
 			if (module.m_pModuleName == name) {
 				return module.m_hModule;
 			}
-		}
+		}*/
 		plg::print(LS_ERROR, "Could not find module at \"{}\"\n", name);
 		return {};
 	}
 	
 	IAppSystem* FindInterface(std::string_view name) {
-		for (const auto& system : g_pCurrentAppSystem->m_Systems) {
+		/*for (const auto& system : pAppSystemDict->m_pDict->m_Systems) {
 			if (system.m_pInterfaceName && system.m_pInterfaceName == name) {
 				return system.m_pSystem;
 			}
-		}
+		}*/
 		plg::print(LS_ERROR, "Could not find interface at \"{}\"\n", name);
 		return {};
 	}
 
 	void* QueryInterface(std::string_view module, std::string_view name) {
-		for (const auto& system : g_pCurrentAppSystem->m_Systems) {
+		/*for (const auto& system : pAppSystemDict->m_pDict->m_Systems) {
 			if (system.m_pInterfaceName && system.m_pInterfaceName == name) {
 				return system.m_pSystem;
 			}
 
 			if (system.m_pModuleName && system.m_pModuleName == module) {
 				if (auto* interface = system.m_pSystem->QueryInterface(name.data())) {
+					return interface;
+				}
+			}
+		}*/
+
+		if (const Module moduleLib(module); moduleLib.IsValid()) {
+			if (auto createInterface = moduleLib.GetFunctionByName("CreateInterface").RCast<CreateInterfaceFn>()) {
+				if (auto* interface = createInterface(name.data(), nullptr)) {
 					return interface;
 				}
 			}
