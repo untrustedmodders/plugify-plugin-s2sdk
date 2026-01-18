@@ -190,43 +190,6 @@ extern "C" PLUGIN_API void UserMessageSetRecipientMask(UserMessage* userMessage,
 }
 
 /**
- * @brief Gets a nested message from a field in the UserMessage.
- *
- * @param userMessage The UserMessage instance.
- * @param fieldName The name of the field.
- * @param message A pointer to store the retrieved message.
- * @return True if the message was successfully retrieved, false otherwise.
- */
-extern "C" PLUGIN_API bool UserMessageGetMessage(UserMessage* userMessage, const plg::string& fieldName, pb::Message*& message) {
-	return userMessage ? userMessage->GetMessage(fieldName, message) : false;
-}
-
-/**
- * @brief Gets a repeated nested message from a field in the UserMessage.
- *
- * @param userMessage The UserMessage instance.
- * @param fieldName The name of the field.
- * @param index The index of the repeated field.
- * @param message A pointer to store the retrieved message.
- * @return True if the message was successfully retrieved, false otherwise.
- */
-extern "C" PLUGIN_API bool UserMessageGetRepeatedMessage(UserMessage* userMessage, const plg::string& fieldName, int index, pb::Message*& message) {
-	return userMessage ? userMessage->GetRepeatedMessage(fieldName, index, message) : false;
-}
-
-/**
- * @brief Adds a nested message to a repeated field in the UserMessage.
- *
- * @param userMessage The UserMessage instance.
- * @param fieldName The name of the field.
- * @param message A pointer to the message to add.
- * @return True if the message was successfully added, false otherwise.
- */
-extern "C" PLUGIN_API bool UserMessageAddMessage(UserMessage* userMessage, const plg::string& fieldName, const pb::Message* message) {
-	return userMessage ? userMessage->AddMessage(fieldName, message) : false;
-}
-
-/**
  * @brief Gets the count of repeated fields in a field of the UserMessage.
  *
  * @param userMessage The UserMessage instance.
@@ -610,7 +573,32 @@ extern "C" PLUGIN_API plg::vec3 PbReadQAngle(UserMessage* userMessage, const plg
 }
 
 /**
- * @brief Gets a enum value from a field in the UserMessage.
+ * @brief Reads a nested message from a UserMessage.
+ *
+ * @param userMessage Pointer to the UserMessage object.
+ * @param fieldName Name of the field to read.
+ * @param index Index of the repeated field (use -1 for non-repeated fields).
+ * @return The Message value read, or an empty value if invalid.
+ */
+extern "C" PLUGIN_API pb::Message* PbReadMessage(UserMessage* userMessage, const plg::string& fieldName, int index) {
+	if (!userMessage) return {};
+	pb::Message* returnValue;
+	if (index < 0) {
+		if (!userMessage->GetMessage(fieldName, returnValue)) {
+			plg::print(LS_WARNING, "Invalid field {} for message {}", fieldName, userMessage->GetProtobufMessage()->GetTypeName());
+			return {};
+		}
+	} else {
+		if (!userMessage->GetRepeatedMessage(fieldName, index, returnValue)) {
+			plg::print(LS_WARNING, "Invalid field {}[{}] for message {}", fieldName, index, userMessage->GetProtobufMessage()->GetTypeName());
+			return {};
+		}
+	}
+	return returnValue;
+}
+
+/**
+ * @brief Gets an enum value from a field in the UserMessage.
  *
  * @param userMessage The UserMessage instance.
  * @param fieldName The name of the field.
@@ -926,7 +914,7 @@ extern "C" PLUGIN_API bool PbSetVector4(UserMessage* userMessage, const plg::str
  *
  * @param userMessage The UserMessage instance.
  * @param fieldName The name of the field.
- * @param out The output string.
+ * @param out The output vector.
  * @return True if the field was successfully retrieved, false otherwise.
  */
 extern "C" PLUGIN_API bool PbGetQAngle(UserMessage* userMessage, const plg::string& fieldName, plg::vec3& out) {
@@ -943,6 +931,30 @@ extern "C" PLUGIN_API bool PbGetQAngle(UserMessage* userMessage, const plg::stri
  */
 extern "C" PLUGIN_API bool PbSetQAngle(UserMessage* userMessage, const plg::string& fieldName, const plg::vec3& value) {
 	return userMessage ? userMessage->SetQAngle(fieldName, value) : false;
+}
+
+/**
+ * @brief Gets a nested message value from a field in the UserMessage.
+ *
+ * @param userMessage The UserMessage instance.
+ * @param fieldName The name of the field.
+ * @param out The output string.
+ * @return True if the field was successfully retrieved, false otherwise.
+ */
+extern "C" PLUGIN_API bool PbGetMessage(UserMessage* userMessage, const plg::string& fieldName, pb::Message*& out) {
+	return userMessage ? userMessage->GetMessage(fieldName, out) : false;
+}
+
+/**
+ * @brief Sets a nested message value for a field in the UserMessage.
+ *
+ * @param userMessage The UserMessage instance.
+ * @param fieldName The name of the field.
+ * @param value The value to set.
+ * @return True if the field was successfully set, false otherwise.
+ */
+extern "C" PLUGIN_API bool PbSetMessage(UserMessage* userMessage, const plg::string& fieldName, const pb::Message* value) {
+	return userMessage ? userMessage->SetMessage(fieldName, value) : false;
 }
 
 /**
@@ -1475,6 +1487,44 @@ extern "C" PLUGIN_API bool PbSetRepeatedQAngle(UserMessage* userMessage, const p
  */
 extern "C" PLUGIN_API bool PbAddQAngle(UserMessage* userMessage, const plg::string& fieldName, const plg::vec3& value) {
 	return userMessage ? userMessage->AddQAngle(fieldName, value) : false;
+}
+
+/**
+ * @brief Gets a repeated nested message value from a field in the UserMessage.
+ *
+ * @param userMessage The UserMessage instance.
+ * @param fieldName The name of the field.
+ * @param index The index of the repeated field.
+ * @param out The output message.
+ * @return True if the field was successfully retrieved, false otherwise.
+ */
+extern "C" PLUGIN_API bool PbGetRepeatedMessage(UserMessage* userMessage, const plg::string& fieldName, int index, pb::Message*& out) {
+	return userMessage ? userMessage->GetRepeatedMessage(fieldName, index, out) : false;
+}
+
+/**
+ * @brief Sets a repeated nested message value for a field in the UserMessage.
+ *
+ * @param userMessage The UserMessage instance.
+ * @param fieldName The name of the field.
+ * @param index The index of the repeated field.
+ * @param value The value to set.
+ * @return True if the field was successfully set, false otherwise.
+ */
+extern "C" PLUGIN_API bool PbSetRepeatedMessage(UserMessage* userMessage, const plg::string& fieldName, int index, const pb::Message* value) {
+	return userMessage ? userMessage->SetRepeatedMessage(fieldName, index, value) : false;
+}
+
+/**
+ * @brief Adds a nested message value to a repeated field in the UserMessage.
+ *
+ * @param userMessage The UserMessage instance.
+ * @param fieldName The name of the field.
+ * @param value The value to add.
+ * @return True if the value was successfully added, false otherwise.
+ */
+extern "C" PLUGIN_API bool PbAddMessage(UserMessage* userMessage, const plg::string& fieldName, const pb::Message* value) {
+	return userMessage ? userMessage->AddMessage(fieldName, value) : false;
 }
 
 PLUGIFY_WARN_POP()

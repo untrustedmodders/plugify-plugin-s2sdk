@@ -22977,6 +22977,7 @@
       "name": "GetEventPlayerIndex",
       "group": "Events",
       "description": "Retrieves the player index of a game event's key.",
+      "deprecated": "Use GetEventPlayerSlot instead. Will be removed soon",
       "funcName": "GetEventPlayerIndex",
       "paramTypes": [
         {
@@ -32228,102 +32229,6 @@
       }
     },
     {
-      "name": "UserMessageGetMessage",
-      "group": "Protobuf",
-      "description": "Gets a nested message from a field in the UserMessage.",
-      "funcName": "UserMessageGetMessage",
-      "paramTypes": [
-        {
-          "name": "userMessage",
-          "type": "ptr64",
-          "ref": false,
-          "description": "The UserMessage instance."
-        },
-        {
-          "name": "fieldName",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the field."
-        },
-        {
-          "name": "message",
-          "type": "ptr64",
-          "ref": true,
-          "description": "A pointer to store the retrieved message."
-        }
-      ],
-      "retType": {
-        "type": "bool",
-        "description": "True if the message was successfully retrieved, false otherwise."
-      }
-    },
-    {
-      "name": "UserMessageGetRepeatedMessage",
-      "group": "Protobuf",
-      "description": "Gets a repeated nested message from a field in the UserMessage.",
-      "funcName": "UserMessageGetRepeatedMessage",
-      "paramTypes": [
-        {
-          "name": "userMessage",
-          "type": "ptr64",
-          "ref": false,
-          "description": "The UserMessage instance."
-        },
-        {
-          "name": "fieldName",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the field."
-        },
-        {
-          "name": "index",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the repeated field."
-        },
-        {
-          "name": "message",
-          "type": "ptr64",
-          "ref": true,
-          "description": "A pointer to store the retrieved message."
-        }
-      ],
-      "retType": {
-        "type": "bool",
-        "description": "True if the message was successfully retrieved, false otherwise."
-      }
-    },
-    {
-      "name": "UserMessageAddMessage",
-      "group": "Protobuf",
-      "description": "Adds a nested message to a repeated field in the UserMessage.",
-      "funcName": "UserMessageAddMessage",
-      "paramTypes": [
-        {
-          "name": "userMessage",
-          "type": "ptr64",
-          "ref": false,
-          "description": "The UserMessage instance."
-        },
-        {
-          "name": "fieldName",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the field."
-        },
-        {
-          "name": "message",
-          "type": "ptr64",
-          "ref": false,
-          "description": "A pointer to the message to add."
-        }
-      ],
-      "retType": {
-        "type": "bool",
-        "description": "True if the message was successfully added, false otherwise."
-      }
-    },
-    {
       "name": "UserMessageGetRepeatedFieldCount",
       "group": "Protobuf",
       "description": "Gets the count of repeated fields in a field of the UserMessage.",
@@ -32813,6 +32718,36 @@
       "retType": {
         "type": "vec3",
         "description": "The QAngle value read, or an empty value if invalid."
+      }
+    },
+    {
+      "name": "PbReadMessage",
+      "group": "Protobuf",
+      "description": "Reads a Message from a UserMessage.",
+      "funcName": "PbReadMessage",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the UserMessage object."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "Name of the field to read."
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "Index of the repeated field (use -1 for non-repeated fields)."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "The Message value read, or an empty value if invalid."
       }
     },
     {
@@ -33617,7 +33552,7 @@
           "name": "out",
           "type": "vec3",
           "ref": true,
-          "description": "The output string."
+          "description": "The output vector."
         }
       ],
       "retType": {
@@ -33646,6 +33581,66 @@
         {
           "name": "value",
           "type": "vec3",
+          "ref": false,
+          "description": "The value to set."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the field was successfully set, false otherwise."
+      }
+    },
+    {
+      "name": "PbGetMessage",
+      "group": "Protobuf",
+      "description": "Gets a Message value from a field in the UserMessage.",
+      "funcName": "PbGetMessage",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "out",
+          "type": "ptr64",
+          "ref": true,
+          "description": "The output message."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the field was successfully retrieved, false otherwise."
+      }
+    },
+    {
+      "name": "PbSetMessage",
+      "group": "Protobuf",
+      "description": "Sets a Message value for a field in the UserMessage.",
+      "funcName": "PbSetMessage",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "value",
+          "type": "ptr64",
           "ref": false,
           "description": "The value to set."
         }
@@ -35074,6 +35069,108 @@
         {
           "name": "value",
           "type": "vec3",
+          "ref": false,
+          "description": "The value to add."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the value was successfully added, false otherwise."
+      }
+    },
+    {
+      "name": "PbGetRepeatedMessage",
+      "group": "Protobuf",
+      "description": "Gets a repeated Message value from a field in the UserMessage.",
+      "funcName": "PbGetRepeatedMessage",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the repeated field."
+        },
+        {
+          "name": "out",
+          "type": "ptr64",
+          "ref": true,
+          "description": "The output message."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the field was successfully retrieved, false otherwise."
+      }
+    },
+    {
+      "name": "PbSetRepeatedMessage",
+      "group": "Protobuf",
+      "description": "Sets a repeated Message value for a field in the UserMessage.",
+      "funcName": "PbSetRepeatedMessage",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the repeated field."
+        },
+        {
+          "name": "value",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The value to set."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the field was successfully set, false otherwise."
+      }
+    },
+    {
+      "name": "PbAddMessage",
+      "group": "Protobuf",
+      "description": "Adds a Message value to a repeated field in the UserMessage.",
+      "funcName": "PbAddMessage",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        },
+        {
+          "name": "fieldName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the field."
+        },
+        {
+          "name": "value",
+          "type": "ptr64",
           "ref": false,
           "description": "The value to add."
         }

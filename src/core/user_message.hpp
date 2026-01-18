@@ -930,6 +930,16 @@ public:
 		return true;
 	}
 
+	bool SetMessage(std::string_view fieldName, const pb::Message* message) {
+		GETCHECK_FIELD();
+		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_NOT_REPEATED();
+
+		m_msg->GetReflection()->MutableMessage(m_msg, field)->CopyFrom(*message);
+
+		return true;
+	}
+
 	bool GetRepeatedMessage(std::string_view fieldName, int index, pb::Message*& message) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
@@ -937,6 +947,17 @@ public:
 		CHECK_REPEATED_ELEMENT(index);
 
 		message = const_cast<pb::Message*>(&m_msg->GetReflection()->GetRepeatedMessage(*m_msg, field, index));
+
+		return true;
+	}
+
+	bool SetRepeatedMessage(std::string_view fieldName, int index, const pb::Message* message) {
+		GETCHECK_FIELD();
+		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_REPEATED();
+		CHECK_REPEATED_ELEMENT(index);
+
+		m_msg->GetReflection()->MutableRepeatedMessage(m_msg, field, index)->CopyFrom(*message);
 
 		return true;
 	}
