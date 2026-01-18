@@ -1,5 +1,5 @@
 #pragma once
-
+#if defined (CS2)
 #include <igameevents.h>
 #include <utlqueue.h>
 #include <utlvector.h>
@@ -73,3 +73,4 @@ private:
 };
 inline MultiAddonManager& g_MultiAddonManager = MultiAddonManager::Instance();
 
+#endif

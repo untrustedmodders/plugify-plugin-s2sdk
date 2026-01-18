@@ -219,9 +219,11 @@ polyhook::ResultType Hook_PostEvent(void* hook, void* params, int count, void* r
 
 	//plg::print(LS_DETAILED, "[PostEvent] = {}, {}, {}, {}\n", slot, localOnly, clientCount, static_cast<void*>(clients) );
 
+#if defined (CS2)
 	if (type == polyhook::CallbackType::Pre) {
 		g_MultiAddonManager.OnPostEvent(message, pData, clients);
 	}
+#endif
 
 	auto result = g_UserMessageManager.ExecuteMessageCallbacks(message, pData, clients, static_cast<HookMode>(type));
 	if (result >= ResultType::Handled) {
@@ -237,7 +239,9 @@ polyhook::ResultType Hook_GameFrame(void* hook, void* params, int count, void* r
 	auto bFirstTick = polyhook::GetArgument<bool>(params, 2);
 	auto bLastTick = polyhook::GetArgument<bool>(params, 3);
 
+#if defined (CS2)
 	g_MultiAddonManager.OnGameFrame();
+#endif
 	g_ServerManager.OnGameFrame();
 	g_PlayerManager.OnGameFrame();
 	g_TimerSystem.OnGameFrame(simulating);
@@ -255,7 +259,9 @@ polyhook::ResultType Hook_ClientActive(void* hook, void* params, int count, void
 
 	plg::print(LS_DETAILED, "[OnClientActive] = {}, {}, {}\n", slot, name, steamID64);
 
+#if defined (CS2)
 	g_MultiAddonManager.OnClientActive(slot, bLoadGame, name, steamID64);
+#endif
 	g_PlayerManager.OnClientActive(slot, bLoadGame);
 
 	g_OnClientActiveListenerManager(slot, bLoadGame);
@@ -273,7 +279,9 @@ polyhook::ResultType Hook_ClientDisconnect(void* hook, void* params, int count, 
 	plg::print(LS_DETAILED, "[ClientDisconnect] = {}, {}, {}, {}, {}\n", slot,  static_cast<int>(reason), name, steamID64, networkID);
 
 	if (type == polyhook::CallbackType::Pre) {
+#if defined (CS2)
 		g_MultiAddonManager.OnClientDisconnect(slot, name, steamID64, networkID);
+#endif
 		g_PlayerManager.OnClientDisconnect(slot, reason);
 	} else {
 		g_PlayerManager.OnClientDisconnect_Post(slot, reason);
@@ -343,7 +351,9 @@ polyhook::ResultType Hook_ClientConnect(void* hook, void* params, int count, voi
 	plg::print(LS_DETAILED, "[ClientConnect] = {}, {}, {}, {}, {}, {} \n", slot, name, steamID64, networkID, unk1, pRejectReason->Get());
 
 	if (type == polyhook::CallbackType::Pre) {
+#if defined (CS2)
 		g_MultiAddonManager.OnClientConnect(slot, name, steamID64, networkID);
+#endif
 		g_PlayerManager.OnClientConnect(slot, name, steamID64, networkID);
 	} else {
 		bool origRet = polyhook::GetReturn<bool>(ret);
@@ -389,7 +399,9 @@ polyhook::ResultType Hook_GameServerSteamAPIActivated(void* hook, void* params, 
 	}
 
 	g_PlayerManager.OnSteamAPIActivated();
+#if defined (CS2)
 	g_MultiAddonManager.OnSteamAPIActivated();
+#endif
 
 	//g_OnGameServerSteamAPIActivatedListenerManager();
 	return polyhook::ResultType::Ignored;
@@ -399,7 +411,9 @@ polyhook::ResultType Hook_GameServerSteamAPIDeactivated(void* hook, void* params
 	plg::print(LS_DETAILED, "[GameServerSteamAPIDeactivated]\n");
 
 	g_PlayerManager.OnSteamAPIDeactivated();
+#if defined (CS2)
 	g_MultiAddonManager.OnSteamAPIDeactivated();
+#endif
 
 	//g_OnGameServerSteamAPIDeactivatedListenerManager();
 	return polyhook::ResultType::Ignored;
@@ -495,24 +509,29 @@ polyhook::ResultType Hook_CallGlobalChangeCallbacks(void* hook, void* params, in
 }
 
 polyhook::ResultType Hook_HostStateRequest(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+#if defined (CS2)
 	auto mgr = polyhook::GetArgument<CHostStateMgr*>(params, 0);
 	auto request = polyhook::GetArgument<CHostStateRequest*>(params, 1);
 
 	g_MultiAddonManager.OnHostStateRequest(mgr, request);
+#endif
 
 	return polyhook::ResultType::Ignored;
 }
 
 polyhook::ResultType Hook_ReplyConnection(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+#if defined (CS2)
 	auto server = polyhook::GetArgument<CNetworkGameServerBase*>(params, 0);
 	auto client = polyhook::GetArgument<CServerSideClient*>(params, 1);
 
 	type == polyhook::CallbackType::Post ? g_MultiAddonManager.OnReplyConnection_Post(server, client) : g_MultiAddonManager.OnReplyConnection(server, client);
+#endif
 
 	return polyhook::ResultType::Ignored;
 }
 
 polyhook::ResultType Hook_SendNetMessage(void* hook, void* params, int count, void* ret, polyhook::CallbackType type) {
+#if defined (CS2)
 	auto client = polyhook::GetArgument<CServerSideClient*>(params, 0);
 	auto data = polyhook::GetArgument<CNetMessage*>(params, 1);
 	auto bufType = (NetChannelBufType_t) polyhook::GetArgument<int8_t>(params, 2);
@@ -523,6 +542,7 @@ polyhook::ResultType Hook_SendNetMessage(void* hook, void* params, int count, vo
 	}
 
 	g_MultiAddonManager.OnSendNetMessage(client, data, bufType);
+#endif
 	return polyhook::ResultType::Ignored;
 }
 
@@ -870,7 +890,9 @@ void Source2SDK::OnPluginEnd() {
 	globals::Terminate();
 	g_HookManager.UnhookAll();
 	g_PlayerManager.OnSteamAPIDeactivated();
+#if defined (CS2)
 	g_MultiAddonManager.OnSteamAPIDeactivated();
+#endif
 	UnregisterEventListeners();
 
 	plg::print(LS_DETAILED, "[OnPluginEnd] = Source2SDK!\n");
@@ -900,7 +922,9 @@ void Source2SDK::OnServerStartup() {
 		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem, Hook_OnEntityParentChanged, polyhook::CallbackType::Post);
 	}
 
+#if defined (CS2)
 	g_MultiAddonManager.OnStartupServer();
+#endif
 
 	RegisterEventListeners();
 }

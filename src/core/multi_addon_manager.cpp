@@ -1,3 +1,4 @@
+#if defined (CS2)
 #include "multi_addon_manager.hpp"
 #include "con_var_manager.hpp"
 
@@ -763,3 +764,4 @@ void MultiAddonManager::OnClientActive(CPlayerSlot slot, bool loadGame, const ch
 		g_ClientAddons[steamID64].downloadedAddons.clear();
 	}
 }
+#endif
