@@ -683,9 +683,6 @@
         UserMessageAddRecipient;
         UserMessageAddAllPlayers;
         UserMessageSetRecipientMask;
-        UserMessageGetMessage;
-        UserMessageGetRepeatedMessage;
-        UserMessageAddMessage;
         UserMessageGetRepeatedFieldCount;
         UserMessageRemoveRepeatedFieldValue;
         UserMessageGetDebugString;
@@ -703,6 +700,7 @@
         PbReadVector3;
         PbReadVector4;
         PbReadQAngle;
+        PbReadMessage;
         PbGetEnum;
         PbSetEnum;
         PbGetInt32;
@@ -731,6 +729,8 @@
         PbSetVector4;
         PbGetQAngle;
         PbSetQAngle;
+        PbGetMessage;
+        PbSetMessage;
         PbGetRepeatedEnum;
         PbSetRepeatedEnum;
         PbAddEnum;
@@ -773,6 +773,9 @@
         PbGetRepeatedQAngle;
         PbSetRepeatedQAngle;
         PbAddQAngle;
+        PbGetRepeatedMessage;
+        PbSetRepeatedMessage;
+        PbAddMessage;
 
         AnglesDiff;
         AnglesToVector;
