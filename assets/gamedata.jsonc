@@ -31,16 +31,16 @@
         "win64": "48 8B C4 55 41 55 41 56",
         "linuxsteamrt64": "55 48 8D 05 ? ? ? ? 66 0F EF C0 48 89 E5 41 57 41 56 41 55 41 54 49 89 FC"
       },
-      // String: "controller" (2 occurrences) at bottom func with 6 params (v12, a1, 0LL, 0, 0, 0)
+      // String: "player_disconnect" at bottom func with 6 params (v12, a1, 0LL, 0, 0, 0)
       "CBasePlayerController::SetPawn": {
         "library": "server",
         "win64": "44 88 4C 24 ? 53 57",
-        "linuxsteamrt64": "55 48 8D 87 ? ? ? ? 48 89 E5 41 57 41 56 41 89 CE 41 55 45 89 CD"
+        "linuxsteamrt64": "55 48 8D 87 ? ? ? ? 48 89 E5 41 57 41 89 CF"
       },
       // String: "CSource2GameClients::StartHLTVServer: game event %s not found.\n"Function right before the first virtual function call
       "LegacyGameEventListener": {
         "library": "server",
-        "win64": "48 8B 15 ? ? ? ? 48 85 D2 74 ? 83 F9 ? 77 ? 48 63 C1 48 C1 E0",
+        "win64": "48 8B 15 ? ? ? ? 48 85 D2 74 ? 83 F9 ? 77",
         "linuxsteamrt64": "48 8B 05 ? ? ? ? 48 85 C0 74 ? 83 FF ? 77 ? 48 63 FF 48 C1 E7 ? 48 8D 44 38"
       },
       // String: "-pressdemo",
@@ -95,19 +95,17 @@
         "win64": "40 53 48 83 EC ? 4C 89 4C 24 ? 48 8B D9 45 8B C8",
         "linuxsteamrt64": "55 48 89 E5 53 48 89 FB 48 83 EC ? E8 ? ? ? ? 48 89 D8 48 8B 5D ? C9 C3 CC CC CC CC CC CC 48 B8"
       },
-      // String: "Empty %s (%s) at %.2f, %.2f, %.2f\n"
+      // String: "info_player_logo"
       "CBaseEntity::SetMoveType": {
         "library": "server",
         "win64": "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 41 0F B6 F0",
-        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 89 D5 41 54 53 48 89 FB 48 83 EC 48"
+        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 41 89 D4 53 48 89 FB 48 81 EC ? ? ? ? 40 38 B7"
       },
-      // Can be found in function with "item_assaultsuit", "item_kevlar", "weapon_knife", "weapon_knife_t", "weapon_taser"
-      // for ( ; v8; v8 = sub_180843710(v3, 2LL, 0xFFFFFFFFLL) )
-      //   RemoveItem(v3, v8);
+      // String: "DestroyWeapon"
       "CCSPlayer_WeaponServices::RemoveItem": {
         "library": "server",
         "win64": "48 85 D2 0F 84 ? ? ? ? 48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 8B F9 E8",
-        "linuxsteamrt64": "48 85 F6 0F 84 ? ? ? ? 55 48 89 E5 41 54 49 89 FC 53 48 89 F3 E8"
+        "linuxsteamrt64": "55 48 89 E5 41 54 49 89 FC 53 48 89 F3 E8 ? ? ? ? 48 39 C3"
       },
       // String: "item_pickup_failed" is called right after checking the result of this function
       // Call: the function is called with 4 parameters, the third is always 0, the fourth is a pointer to a structure/array
@@ -124,7 +122,7 @@
       "GetCSWeaponDataFromKey": {
         "library": "server",
         "win64": "48 89 5C 24 ? 57 48 83 EC ? 33 FF 4C 8B CA 8B D9",
-        "linuxsteamrt64": "55 31 D2 48 89 E5 41 56 41 55 41 54"
+        "linuxsteamrt64": "55 31 D2 48 89 E5 41 57 41 56 41 55 41 54 41 89 FC"
       },
 
       // patches
@@ -142,16 +140,13 @@
       // jmp     short loc_18072BE63
       "CheckJumpButtonWater": {
         "library": "server",
-        "win64": "C8 42 EB ? 4C 39 67 30",
-        "linuxsteamrt64": "C8 42 41 C7 85 ? ? ? ? ? ? ? ? 41 C7 85 ? ? ? ? ? ? ? ? E9"
+        "win64": "C8 42 EB ? 4C 8B 77 ? 4D 39 6E",
+        "linuxsteamrt64": "C8 42 41 C7 84 24 ? ? ? ? ? ? ? ? 41 C7 84 24 ? ? ? ? ? ? ? ? E9 ? ? ? ? 66 90"
       },
       // Some virtual function inside CPhysBox table
-      // patching 42C80000h
-      // mov     dword ptr [rsi+40h], 42C80000h
-      // jmp     short loc_18072BE63
       "CPhysBox_Use": {
         "library": "server",
-        "win64": "4C 8B 43 ? 48 8D 8F ? ? ? ? 48 8B 13 E8 ? ? ? ? 48 8B 5C 24 ? 48 83 C4 ? 5F C3 CC CC CC CC 40 53",
+        "win64": "4C 8B 43 ? 48 8D 8F ? ? ? ? 48 8B 13 E8 ? ? ? ? 48 8B 5C 24 ? 48 83 C4 ? 5F C3 CC CC CC CC 48 89 5C 24",
         "linuxsteamrt64": "49 8B 54 24 ? 45 31 C9 45 31 C0 C7 45 ? ? ? ? ? 49 8B 34 24 48 8D 4D ? 66 0F EF C0 48 C7 45 ? ? ? ? ? 48 8D BB ? ? ? ? E8 ? ? ? ? F6 45 ? ? 74 ? 48 8B 05 ? ? ? ? 48 8B 75 ? 48 8B 38 48 8B 07 FF 50 ? 48 83 C4"
       },
       // "Error - cannot add bots after game is over.\n"
@@ -168,7 +163,7 @@
         "win64": "0F 84 ? ? ? ? 80 B8 ? ? ? ? 00 0F 84 ? ? ? ? 80 3D ? ? ? ? 00 74 15",
         "linuxsteamrt64": "0F 84 ? ? ? ? 44 0F B6 B0 ? ? ? ? 45 84 F6 0F 84"
       },
-      // Function to which "FullWalkMovePreMove" passed
+      // Function after function where "FullWalkMovePreMove" passed
       // patching jbe
       // 45 0F C6 C0 55          shufps  xmm8, xmm8, 55h ; 'U'
       // F3 41 0F 59 E1          mulss   xmm4, xmm9
@@ -183,8 +178,8 @@
       // 0F 86 B0 00 00 00       jbe     loc_18074A7E5
       "ServerMovementUnlock": {
         "library": "server",
-        "win64": "0F 86 B0 ? ? ? F3 0F 58 D3",
-        "linuxsteamrt64": "0F 87 ? ? ? ? F3 0F 10 35 ? ? ? ? F3 0F 11 B5 ? ? ? ? 4C 89 EE"
+        "win64": "0F 86 ? ? ? ? 0F 57 C0 0F 2E C2",
+        "linuxsteamrt64": "0F 87 ? ? ? ? F3 0F 12 C2"
       },
       // "Tried to set the source soundscape on positionless sound event %s\n" where 763651247
       "EmitSoundVolume": {
