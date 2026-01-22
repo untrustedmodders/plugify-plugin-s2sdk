@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.3.25](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.24...v2.3.25) (2026-01-22)
+
+
+### Bug Fixes
+
+* add missing nested messages protobufs ([800f60f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/800f60f86c2384bc677df9e9a9c7916f5ecdbedc))
+* deadlock build issues ([0631854](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/063185402c7dfda054c35b35424dab95a41dd84a))
+* deadlock build issues (2) ([8042ac9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8042ac9164e72c4331421d8e7748dc60c15c4c9f))
+* temp disable addon manager for deadlock ([d3cf560](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d3cf5605701696dfc8904a143d78210c2c67560f))
+* update s2sdk ([d04c485](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d04c4853e62513ad9785bda2fe303e65ffedbd98))
+* update sdk ([61acbec](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/61acbecf71cad401b7ec4a71a99e73a63d0c8609))
+* update sigs ([0e2b313](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0e2b313f7a6fc773132bc6636298754611cf22f1))
+* update syms ([ccb7681](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ccb7681ce85ecbe74da14aee1a19e3d531f88a2d))
+
 ## [2.3.24](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.23...v2.3.24) (2026-01-16)
 
 
