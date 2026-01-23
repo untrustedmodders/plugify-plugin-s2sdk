@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.26](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.25...v2.3.26) (2026-01-23)
+
+
+### Bug Fixes
+
+* replace `CKeyValues3Context` with new `CKV3Arena` & replace `networksystem` with `engine2` ([42ac962](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/42ac962135bcfb59fc0b76b4218249e5e65d8ead))
+* update sdk ([a8f42f3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a8f42f3b1645e461b5333a4a60f0964f33b25c84))
+
 ## [2.3.25](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.24...v2.3.25) (2026-01-22)
 
 
