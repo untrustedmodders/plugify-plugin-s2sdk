@@ -88,7 +88,7 @@ namespace globals {
 		g_pNetworkSystem = static_cast<INetworkSystem*>(QueryInterface("networksystem", NETWORKSYSTEM_INTERFACE_VERSION));
 		g_pScriptManager = static_cast<IScriptManager*>(QueryInterface("vscript", VSCRIPT_INTERFACE_VERSION));
 #if defined (CS2)
-		g_pNetworkStringTableServer = static_cast<INetworkStringTableContainer*>(QueryInterface("networksystem", INTERFACENAME_NETWORKSTRINGTABLESERVER));
+		g_pNetworkStringTableServer = static_cast<INetworkStringTableContainer*>(QueryInterface("engine2", INTERFACENAME_NETWORKSTRINGTABLESERVER));
 #endif
 
 		ConVarManager::Init();

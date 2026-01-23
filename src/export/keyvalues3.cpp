@@ -80,9 +80,9 @@ extern "C" PLUGIN_API void Kv3OverlayKeysFrom(KeyValues3* kv, const KeyValues3* 
 /**
  * @brief Gets the context associated with a KeyValues3 object
  * @param kv Pointer to the KeyValues3 object
- * @return Pointer to the CKeyValues3Context, or nullptr if kv is null
+ * @return Pointer to the CKV3Arena, or nullptr if kv is null
  */
-extern "C" PLUGIN_API CKeyValues3Context* Kv3GetContext(const KeyValues3* kv) {
+extern "C" PLUGIN_API CKV3Arena* Kv3GetContext(const KeyValues3* kv) {
     return kv ? kv->GetContext() : nullptr;
 }
 
@@ -92,7 +92,7 @@ extern "C" PLUGIN_API CKeyValues3Context* Kv3GetContext(const KeyValues3* kv) {
  * @param ppCtx Pointer to store the context pointer
  * @return Pointer to the KV3MetaData_t structure, or nullptr if kv is null
  */
-extern "C" PLUGIN_API KV3MetaData_t* Kv3GetMetaData(const KeyValues3* kv, CKeyValues3Context** ppCtx) {
+extern "C" PLUGIN_API KV3MetaData_t* Kv3GetMetaData(const KeyValues3* kv, CKV3Arena** ppCtx) {
     return kv ? kv->GetMetaData(ppCtx) : nullptr;
 }
 
@@ -1668,7 +1668,7 @@ extern "C" PLUGIN_API void Kv3DebugPrint(const KeyValues3* kv) {
  * @param flags Loading flags
  * @return true if successful, false otherwise
  */
-extern "C" PLUGIN_API bool Kv3LoadFromBuffer(CKeyValues3Context* context, plg::string& error, const plg::vector<uint8_t>& input, const plg::string& kv_name, uint32_t flags) {
+extern "C" PLUGIN_API bool Kv3LoadFromBuffer(CKV3Arena* context, plg::string& error, const plg::vector<uint8_t>& input, const plg::string& kv_name, uint32_t flags) {
     CUtlBuffer buffer = utils::CreateUtlBufferFromVector(input);
     CUtlString err;
     bool result = LoadKV3(context, &err, &buffer, g_KV3Format_Generic, kv_name.c_str(), flags);
@@ -1720,7 +1720,7 @@ extern "C" PLUGIN_API bool Kv3LoadFromText(KeyValues3* kv, plg::string& error, c
  * @param flags Loading flags
  * @return true if successful, false otherwise
  */
-extern "C" PLUGIN_API bool Kv3LoadFromFileToContext(CKeyValues3Context* context, plg::string& error, const plg::string& filename, const plg::string& path, uint32_t flags) {
+extern "C" PLUGIN_API bool Kv3LoadFromFileToContext(CKV3Arena* context, plg::string& error, const plg::string& filename, const plg::string& path, uint32_t flags) {
     CUtlString err;
     bool result = LoadKV3FromFile(context, &err, filename.c_str(), path.c_str(), g_KV3Format_Generic, flags);
     utils::ConvertUtlStringToPlgString(&err, error);

@@ -812,7 +812,7 @@
       ],
       "retType": {
         "type": "ptr64",
-        "description": "Pointer to the CKeyValues3Context, or nullptr if kv is null"
+        "description": "Pointer to the CKV3Arena, or nullptr if kv is null"
       }
     },
     {

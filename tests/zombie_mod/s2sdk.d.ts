@@ -1351,7 +1351,7 @@ declare module ":s2sdk" {
    * Gets the context associated with a KeyValues3 object
    *
    * @param {ptr64} kv - Pointer to the KeyValues3 object
-   * @returns {ptr64} - Pointer to the CKeyValues3Context, or nullptr if kv is null
+   * @returns {ptr64} - Pointer to the CKV3Arena, or nullptr if kv is null
    */
   export function Kv3GetContext(kv: bigint): bigint;
   /**
