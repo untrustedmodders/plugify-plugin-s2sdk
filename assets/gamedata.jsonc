@@ -196,8 +196,8 @@
       },
       // 2 functions after one with "targethealthfrac"
       "CBaseEntity::CollisionRulesChanged": {
-        "win64": 191,
-        "linuxsteamrt64": 191
+        "win64": 185,
+        "linuxsteamrt64": 184
       },
       // StringL "item_pickup_failed"
       "CBaseEntity::IsWeapon": {
@@ -206,8 +206,8 @@
       },
       // String "can't teleport object (%s) as it has a parent (%s)!" The vfunc call this
       "CBaseEntity::Teleport": {
-        "win64": 168,
-        "linuxsteamrt64": 167
+        "win64": 162,
+        "linuxsteamrt64": 161
       },
       // Player controller respawn function offset
       "CBasePlayerController::RoundRespawn": {
@@ -218,20 +218,20 @@
       // return (*(*v9 + 2976LL))(v9, v27, 0LL);
       // 2976 (372 * 8) is the offset
       "CBasePlayerPawn::CommitSuicide": {
-        "win64": 408,
-        "linuxsteamrt64": 410
+        "win64": 400,
+        "linuxsteamrt64": 400
       },
       "CCSPlayer_WeaponServices::CanUse": {
         "win64": 22,
         "linuxsteamrt64": 23
       },
       "CCSPlayer_WeaponServices::DropWeapon": {
-        "win64": 23,
-        "linuxsteamrt64": 24
+        "win64": 24,
+        "linuxsteamrt64": 25
       },
       "CCSPlayer_WeaponServices::SelectItem": {
-        "win64": 25,
-        "linuxsteamrt64": 26
+        "win64": 26,
+        "linuxsteamrt64": 27
       },
       "CCSPlayer_WeaponServices::SwitchWeapon": {
         "win64": 19,
