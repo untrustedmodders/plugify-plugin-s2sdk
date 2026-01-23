@@ -217,6 +217,10 @@ polyhook::ResultType Hook_PostEvent(void* hook, void* params, int count, void* r
 	auto message = polyhook::GetArgument<INetworkMessageInternal*>(params, 5);
 	auto pData = polyhook::GetArgument<CNetMessage*>(params, 6);
 
+	if (clients == nullptr) {
+		return polyhook::ResultType::Ignored;
+	}
+
 	//plg::print(LS_DETAILED, "[PostEvent] = {}, {}, {}, {}\n", slot, localOnly, clientCount, static_cast<void*>(clients) );
 
 #if defined (CS2)
