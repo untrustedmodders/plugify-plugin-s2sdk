@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.3.27](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.26...v2.3.27) (2026-01-23)
+
+
+### Bug Fixes
+
+* revert cs2 macro for networktable ([4a8131c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4a8131c0d68efb29cb8f20cb3beb8a14a61d0d03))
+* update offsets ([4bfd26d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4bfd26d23df6cbcca214b748eab2261249be550c))
+* user message crash ([e3f7704](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e3f77049c03fd448b5e1ee6734502b3e67332f58))
+
 ## [2.3.26](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.25...v2.3.26) (2026-01-23)
 
 
