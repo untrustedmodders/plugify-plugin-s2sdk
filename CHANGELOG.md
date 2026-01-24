@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.28](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.27...v2.3.28) (2026-01-24)
+
+
+### Bug Fixes
+
+* update config ([5ac6d7b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5ac6d7bcee32108b2052499cfcf3d2bd552add14))
+
 ## [2.3.27](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.26...v2.3.27) (2026-01-23)
 
 
