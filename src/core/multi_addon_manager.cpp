@@ -108,7 +108,7 @@ bool MultiAddonManager::MountAddon(PublishedFileId_t addon, bool addToTail) {
 
 	plg::print(LS_MESSAGE, "Adding search path: {}\n", path);
 
-	g_pFullFileSystem->AddSearchPath(path.c_str(), "GAME", addToTail ? PATH_ADD_TO_TAIL : PATH_ADD_TO_HEAD);
+	g_pFullFileSystem->AddSearchPath(path.c_str(), "GAME", addToTail ? PATH_ADD_TO_TAIL : PATH_ADD_TO_HEAD, SEARCH_PATH_PRIORITY_VPK);
 	m_mountedAddons.push_back(addon);
 
 	return true;
@@ -220,6 +220,9 @@ void MultiAddonManager::RefreshAddons(bool reloadMap) {
 void MultiAddonManager::ClearAddons() {
 	m_extraAddons.clear();
 
+	// Update the convar to reflect the new addon list, but don't trigger the callback
+	s2_extra_addons.GetConVarData()->Value(0)->m_StringValue = "";
+
 	for (const auto& addon : m_mountedAddons) {
 		UnmountAddon(addon, false);
 	}
@@ -270,7 +273,7 @@ bool MultiAddonManager::AddAddon(PublishedFileId_t addon, bool refresh) {
 	m_extraAddons.push_back(addon);
 
 	// Update the convar to reflect the new addon list, but don't trigger the callback
-	s2_extra_addons.Set(CUtlString(plg::join(m_extraAddons, " ")));
+	s2_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_extraAddons, " ");
 	plg::print(LS_MESSAGE, "Clearing client cache due to addons changing");
 
 	if (refresh) {
@@ -289,7 +292,7 @@ bool MultiAddonManager::RemoveAddon(PublishedFileId_t addon, bool refresh) {
 	}
 
 	// Update the convar to reflect the new addon list, but don't trigger the callback
-	s2_extra_addons.Set(CUtlString(plg::join(m_extraAddons, " ")));
+	s2_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_extraAddons, " ");
 
 	plg::print(LS_MESSAGE, "Clearing client cache due to addons changing");
 
@@ -373,7 +376,7 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 		}
 
 		m_globalClientAddons.push_back(addon);
-		s2_client_extra_addons.Set(CUtlString(plg::join(m_globalClientAddons, " ")));
+		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_globalClientAddons, " ");
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 
@@ -430,7 +433,7 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 void MultiAddonManager::RemoveClientAddon(PublishedFileId_t addon, uint64 steamID64) {
 	if (!steamID64) {
 		plg::erase(m_globalClientAddons, addon);
-		s2_client_extra_addons.Set(CUtlString(plg::join(m_globalClientAddons, " ")));
+		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = CUtlString(plg::join(m_globalClientAddons, " "));
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 		plg::erase(clientInfo.addonsToLoad, addon);
@@ -440,7 +443,7 @@ void MultiAddonManager::RemoveClientAddon(PublishedFileId_t addon, uint64 steamI
 void MultiAddonManager::ClearClientAddons(uint64 steamID64) {
 	if (!steamID64) {
 		m_globalClientAddons.clear();
-		s2_client_extra_addons.Set(CUtlString(plg::join(m_globalClientAddons, " ")));
+		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = CUtlString(plg::join(m_globalClientAddons, " "));
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 		clientInfo.addonsToLoad.clear();
