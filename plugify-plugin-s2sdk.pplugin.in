@@ -37180,21 +37180,6 @@
           "bindSelf": true
         },
         {
-          "name": "GetMessage",
-          "method": "UserMessageGetMessage",
-          "bindSelf": true
-        },
-        {
-          "name": "GetRepeatedMessage",
-          "method": "UserMessageGetRepeatedMessage",
-          "bindSelf": true
-        },
-        {
-          "name": "AddMessage",
-          "method": "UserMessageAddMessage",
-          "bindSelf": true
-        },
-        {
           "name": "GetRepeatedFieldCount",
           "method": "UserMessageGetRepeatedFieldCount",
           "bindSelf": true
@@ -37277,6 +37262,11 @@
         {
           "name": "ReadQAngle",
           "method": "PbReadQAngle",
+          "bindSelf": true
+        },
+        {
+          "name": "ReadMessage",
+          "method": "PbReadMessage",
           "bindSelf": true
         },
         {
@@ -37417,6 +37407,16 @@
         {
           "name": "SetQAngle",
           "method": "PbSetQAngle",
+          "bindSelf": true
+        },
+        {
+          "name": "GetMessage",
+          "method": "PbGetMessage",
+          "bindSelf": true
+        },
+        {
+          "name": "SetMessage",
+          "method": "PbSetMessage",
           "bindSelf": true
         },
         {
@@ -37627,6 +37627,21 @@
         {
           "name": "AddQAngle",
           "method": "PbAddQAngle",
+          "bindSelf": true
+        },
+        {
+          "name": "GetRepeatedMessage",
+          "method": "PbGetRepeatedMessage",
+          "bindSelf": true
+        },
+        {
+          "name": "SetRepeatedMessage",
+          "method": "PbSetRepeatedMessage",
+          "bindSelf": true
+        },
+        {
+          "name": "AddMessage",
+          "method": "PbAddMessage",
           "bindSelf": true
         }
       ]

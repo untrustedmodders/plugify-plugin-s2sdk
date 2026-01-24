@@ -150,16 +150,14 @@ namespace cvars {
 					plg::visit([&](const auto& v) {
 						using T = std::decay_t<decltype(v)>;
 						if constexpr (std::is_same_v<T, plg::string>)
-							SetConVar(*conVar, CUtlString(v.c_str(), static_cast<int>(v.size())), replicate, notify);
+							SetConVar(*conVar, CUtlString(v), replicate, notify);
 					}, value);
 					break;
 				case EConVarType_Color:
 					plg::visit([&](const auto& v) {
 						using T = std::decay_t<decltype(v)>;
-						if constexpr (std::is_arithmetic_v<T>) {
-							int color = static_cast<int>(v);
-							SetConVar(*conVar, *reinterpret_cast<Color*>(&color), replicate, notify);
-						}
+						if constexpr (std::is_arithmetic_v<T>)
+							SetConVar(*conVar, std::bit_cast<Color>(static_cast<int>(v)), replicate, notify);
 						else if constexpr (std::is_same_v<T, plg::vec4>)
 							SetConVar<Color>(*conVar, NewColor(v), replicate, notify);
 						else if constexpr (std::is_same_v<T, plg::vec3>)
@@ -255,25 +253,18 @@ namespace cvars {
 					return GetConVarValue<float>(*conVar);
 				case EConVarType_Float64:
 					return GetConVarValue<double>(*conVar);
-				case EConVarType_String: {
-					const auto& str = GetConVarValue<CUtlString>(*conVar);
-					return plg::string(str.Get(), static_cast<size_t>(str.Length()));
-				}
-				case EConVarType_Color: {
+				case EConVarType_String:
+					return plg::string(static_cast<std::string_view>(GetConVarValue<CUtlString>(*conVar)));
+				case EConVarType_Color:
 					return std::bit_cast<plg::vec4>(GetConVarValue<Color>(*conVar).ToVector4D());
-				}
-				case EConVarType_Vector2: {
+				case EConVarType_Vector2:
 					return std::bit_cast<plg::vec2>(GetConVarValue<Vector2D>(*conVar));
-				}
-				case EConVarType_Vector3: {
+				case EConVarType_Vector3:
 					return std::bit_cast<plg::vec3>(GetConVarValue<Vector>(*conVar));
-				}
-				case EConVarType_Vector4: {
+				case EConVarType_Vector4:
 					return std::bit_cast<plg::vec4>(GetConVarValue<Vector4D>(*conVar));
-				}
-				case EConVarType_Qangle: {
+				case EConVarType_Qangle:
 					return std::bit_cast<plg::vec3>(GetConVarValue<QAngle>(*conVar));
-				}
 				case EConVarType_Invalid:
 				case EConVarType_MAX:
 				default:
