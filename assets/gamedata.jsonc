@@ -211,8 +211,8 @@
       },
       // Player controller respawn function offset
       "CBasePlayerController::RoundRespawn": {
-        "win64": 277,
-        "linuxsteamrt64": 279
+        "win64": 272,
+        "linuxsteamrt64": 274
       },
       // Look for the kill command, go through its callback and you should a find call like this, with v9 being a pawn pointer:
       // return (*(*v9 + 2976LL))(v9, v27, 0LL);
@@ -222,8 +222,8 @@
         "linuxsteamrt64": 400
       },
       "CCSPlayer_WeaponServices::CanUse": {
-        "win64": 22,
-        "linuxsteamrt64": 23
+        "win64": 23,
+        "linuxsteamrt64": 24
       },
       "CCSPlayer_WeaponServices::DropWeapon": {
         "win64": 24,
@@ -234,16 +234,16 @@
         "linuxsteamrt64": 27
       },
       "CCSPlayer_WeaponServices::SwitchWeapon": {
+        "win64": 20,
+        "linuxsteamrt64": 21
+      },
+      "CCSPlayer_ItemServices::GiveNamedItem": {
         "win64": 19,
         "linuxsteamrt64": 20
       },
-      "CCSPlayer_ItemServices::GiveNamedItem": {
-        "win64": 18,
-        "linuxsteamrt64": 19
-      },
       "CCSPlayer_ItemServices::RemoveAllItems": {
-        "win64": 22,
-        "linuxsteamrt64": 23
+        "win64": 23,
+        "linuxsteamrt64": 24
       },
       // "InitialActivate" and "OnActivate"
       "CCSScript_EntityScript": {
