@@ -38,14 +38,14 @@ plg::parallel_node_hash_map_m<uint64, ClientAddonInfo> g_ClientAddons;
 CConVar<CUtlString> s2_extra_addons("s2_extra_addons", FCVAR_NONE, "The workshop IDs of extra addons separated by commas, addons will be downloaded (if not present) and mounted", CUtlString(""),
 	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
 	{
-		g_MultiAddonManager.m_extraAddons = plg::parse<PublishedFileId_t>(*new_val, " ");
+		g_MultiAddonManager.m_extraAddons = plg::parse<PublishedFileId_t>(*new_val, ",");
 		g_MultiAddonManager.RefreshAddons();
 	});
 
 CConVar<CUtlString> s2_client_extra_addons("s2_client_extra_addons", FCVAR_NONE, "The workshop IDs of extra client addons that will be applied to all clients, separated by commas", CUtlString(""),
 	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
 	{
-		g_MultiAddonManager.m_globalClientAddons = plg::parse<PublishedFileId_t>(*new_val, " ");
+		g_MultiAddonManager.m_globalClientAddons = plg::parse<PublishedFileId_t>(*new_val, ",");
 	});
 
 std::string MultiAddonManager::BuildAddonPath(PublishedFileId_t addon) {
@@ -273,7 +273,7 @@ bool MultiAddonManager::AddAddon(PublishedFileId_t addon, bool refresh) {
 	m_extraAddons.push_back(addon);
 
 	// Update the convar to reflect the new addon list, but don't trigger the callback
-	s2_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_extraAddons, " ");
+	s2_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_extraAddons, ",");
 	plg::print(LS_MESSAGE, "Clearing client cache due to addons changing");
 
 	if (refresh) {
@@ -292,7 +292,7 @@ bool MultiAddonManager::RemoveAddon(PublishedFileId_t addon, bool refresh) {
 	}
 
 	// Update the convar to reflect the new addon list, but don't trigger the callback
-	s2_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_extraAddons, " ");
+	s2_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_extraAddons, ",");
 
 	plg::print(LS_MESSAGE, "Clearing client cache due to addons changing");
 
@@ -376,7 +376,7 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 		}
 
 		m_globalClientAddons.push_back(addon);
-		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_globalClientAddons, " ");
+		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_globalClientAddons, ",");
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 
@@ -433,7 +433,7 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 void MultiAddonManager::RemoveClientAddon(PublishedFileId_t addon, uint64 steamID64) {
 	if (!steamID64) {
 		plg::erase(m_globalClientAddons, addon);
-		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = CUtlString(plg::join(m_globalClientAddons, " "));
+		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = CUtlString(plg::join(m_globalClientAddons, ","));
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 		plg::erase(clientInfo.addonsToLoad, addon);
@@ -443,7 +443,7 @@ void MultiAddonManager::RemoveClientAddon(PublishedFileId_t addon, uint64 steamI
 void MultiAddonManager::ClearClientAddons(uint64 steamID64) {
 	if (!steamID64) {
 		m_globalClientAddons.clear();
-		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = CUtlString(plg::join(m_globalClientAddons, " "));
+		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = CUtlString(plg::join(m_globalClientAddons, ","));
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 		clientInfo.addonsToLoad.clear();
@@ -567,8 +567,7 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 			m_currentWorkshopMap = 0;
 		}
 	} else {
-		std::string_view name = request->m_pKV->GetName();
-		if (name == "ChangeLevel") {
+		if (std::string_view name = request->m_pKV->GetName(); name != "ChangeLevel") {
 			if (name == "map_workshop") {
 				if (auto addon = plg::cast_to<PublishedFileId_t>(request->m_pKV->GetString("customgamemode", ""))) {
 					m_currentWorkshopMap = *addon;
@@ -596,7 +595,7 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 
 	// Rebuild the addon list. We always start with the original addon.
 	if (m_currentWorkshopMap == 0) {
-		request->m_Addons = plg::join(g_MultiAddonManager.m_extraAddons, " ");
+		request->m_Addons = plg::join(g_MultiAddonManager.m_extraAddons, ",");
 	} else {
 		// Don't add the same addon twice. Hopefully no server owner is diabolical enough to do things like `map de_dust2 customgamemode=1234,5678`.
 		plg::vector<PublishedFileId_t> newAddons = g_MultiAddonManager.m_extraAddons;
@@ -608,7 +607,7 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 			std::rotate(it, it + 1, newAddons.end());
 		}
 
-		request->m_Addons = plg::join(newAddons, " ");
+		request->m_Addons = plg::join(newAddons, ",");
 	}
 }
 
@@ -627,7 +626,7 @@ void MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServe
 	clientInfo.lastActiveTime = Plat_FloatTime();
 
 	// Server copies the CUtlString from CNetworkGameServer to this client.
-	CUtlString& addon = server->m_szAddons;
+	CUtlString& addon = server->m_szMapname;
 	originalAddons = addon;
 
 	// Figure out which addons the client should be loading.
@@ -645,7 +644,7 @@ void MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServe
 		clientInfo.currentPendingAddon = clientAddons[0];
 	}
 
-	addon = plg::join(clientAddons, " ");
+	addon = plg::join(clientAddons, ",");
 
 	plg::print(LS_MESSAGE, "{}: Sending addons {} to steamID64 {}\n", __func__, *addon, steamID64);
 }
@@ -673,7 +672,7 @@ void MultiAddonManager::OnSendNetMessage(CServerSideClient* client, CNetMessage*
 	if (msg->signon_state() == SIGNONSTATE_CHANGELEVEL) {
 		// When switching to another map, the signon message might contain more than 1 addon.
 		// This puts the client in limbo because client doesn't know how to handle multiple addons at the same time.
-		plg::vector<PublishedFileId_t> addonsList = plg::parse<PublishedFileId_t>(msg->addons(), " ");
+		plg::vector<PublishedFileId_t> addonsList = plg::parse<PublishedFileId_t>(msg->addons(), ",");
 		if (addonsList.size() > 1) {
 			// If there's more than one addon, ensure that it takes the first addon (which should be the workshop map or the first custom addon)
 			msg->set_addons(std::to_string(addonsList.front()));
