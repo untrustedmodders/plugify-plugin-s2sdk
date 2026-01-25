@@ -11,7 +11,7 @@ namespace polyhook
 	// Abstract base class with common functionality
 	class IHook {
 	protected:
-		IHook(void* pHook) : m_hook(pHook) {}
+		IHook(HookHandle pHook) : m_hook(pHook) {}
 
 	public:
 		virtual ~IHook() = default;
@@ -48,7 +48,7 @@ namespace polyhook
 	// Detour hook implementation
 	class DetourHook : public IHook {
 	private:
-		DetourHook(void* pHook, void* pFunc) : IHook(pHook), m_func(pFunc) {}
+		DetourHook(HookHandle pHook, void* pFunc) : IHook(pHook), m_func(pFunc) {}
 
 	public:
 		~DetourHook() override
@@ -58,14 +58,21 @@ namespace polyhook
 
 		static std::unique_ptr<IHook> Create(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
 		{
-			void* pHook = __polyhook_HookDetour(pFunc, returnType, arguments, varIndex);
+			HookHandle pHook = __polyhook_HookDetour(pFunc, returnType, arguments, varIndex);
+			if (pHook == nullptr) return nullptr;
+			return std::unique_ptr<IHook>(new DetourHook(pHook, pFunc));
+		}
+
+		static std::unique_ptr<IHook> Create(void* pFunc)
+		{
+			HookHandle pHook = __polyhook_HookDetour2(pFunc);
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new DetourHook(pHook, pFunc));
 		}
 
 		static std::unique_ptr<IHook> Find(void* pFunc)
 		{
-			void* pHook = __polyhook_FindDetour(pFunc);
+			HookHandle pHook = __polyhook_FindDetour(pFunc);
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new DetourHook(pHook, pFunc));
 		}
@@ -78,7 +85,7 @@ namespace polyhook
 	template<auto _Hook, auto _Unhook, auto _Find>
 	class VirtualHookByIndexBase : public IHook {
 	protected:
-		VirtualHookByIndexBase(void* pHook, void* pClass, int index) 
+		VirtualHookByIndexBase(HookHandle pHook, void* pClass, int index) 
 			: IHook(pHook), m_class(pClass), m_index(index) {}
 
 	public:
@@ -89,14 +96,14 @@ namespace polyhook
 
 		static std::unique_ptr<IHook> Create(void* pClass, int index, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
 		{
-			void* pHook = _Hook(pClass, index, returnType, arguments, varIndex);
+			HookHandle pHook = _Hook(pClass, index, returnType, arguments, varIndex);
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByIndexBase(pHook, pClass, index));
 		}
 
 		static std::unique_ptr<IHook> Find(void* pClass, int index)
 		{
-			void* pHook = _Find(pClass, index);
+			HookHandle pHook = _Find(pClass, index);
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByIndexBase(pHook, pClass, index));
 		}
@@ -110,7 +117,7 @@ namespace polyhook
 	template<auto _Hook, auto _Unhook, auto _Find>
 	class VirtualHookByFuncBase : public IHook {
 	protected:
-		VirtualHookByFuncBase(void* pHook, void* pClass, void* pFunc) 
+		VirtualHookByFuncBase(HookHandle pHook, void* pClass, void* pFunc) 
 			: IHook(pHook), m_class(pClass), m_func(pFunc) {}
 
 	public:
@@ -121,14 +128,14 @@ namespace polyhook
 
 		static std::unique_ptr<IHook> Create(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
 		{
-			void* pHook = _Hook(pClass, pFunc, returnType, arguments, varIndex);
+			HookHandle pHook = _Hook(pClass, pFunc, returnType, arguments, varIndex);
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByFuncBase(pHook, pClass, pFunc));
 		}
 
 		static std::unique_ptr<IHook> Find(void* pClass, void* pFunc)
 		{
-			void* pHook = _Find(pClass, pFunc);
+			HookHandle pHook = _Find(pClass, pFunc);
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByFuncBase(pHook, pClass, pFunc));
 		}
@@ -172,339 +179,507 @@ namespace polyhook
 	}
 
 	template <typename T> requires (std::is_pointer_v<T>)
-	inline T GetArgument(void* params, size_t index)
+	inline T GetArgument(ParametersHandle params, size_t index)
 	{
 		return reinterpret_cast<T>(__polyhook_GetArgumentPointer(params, index));
 	}
 
 	template <typename T>
-	inline T GetArgument(void* params, size_t index)
+	inline T GetArgument(ParametersHandle params, size_t index)
 	{
 		static_assert(always_false_v<T>, "GetArgument specialization required");
 	}
 
 	template <>
-	inline bool GetArgument(void* params, size_t index)
+	inline bool GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentBool(params, index);
 	}
 
 	template <>
-	inline int8_t GetArgument(void* params, size_t index)
+	inline int8_t GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentInt8(params, index);
 	}
 
 	template <>
-	inline uint8_t GetArgument(void* params, size_t index)
+	inline uint8_t GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentUInt8(params, index);
 	}
 
 	template <>
-	inline int16_t GetArgument(void* params, size_t index)
+	inline int16_t GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentInt16(params, index);
 	}
 
 	template <>
-	inline uint16_t GetArgument(void* params, size_t index)
+	inline uint16_t GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentUInt16(params, index);
 	}
 
 	template <>
-	inline int32_t GetArgument(void* params, size_t index)
+	inline int32_t GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentInt32(params, index);
 	}
 
 	template <>
-	inline uint32_t GetArgument(void* params, size_t index)
+	inline uint32_t GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentUInt32(params, index);
 	}
 
 	template <>
-	inline int64_t GetArgument(void* params, size_t index)
+	inline int64_t GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentInt64(params, index);
 	}
 
 	template <>
-	inline uint64_t GetArgument(void* params, size_t index)
+	inline uint64_t GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentUInt64(params, index);
 	}
 
 	template <>
-	inline float GetArgument(void* params, size_t index)
+	inline float GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentFloat(params, index);
 	}
 
 	template <>
-	inline double GetArgument(void* params, size_t index)
+	inline double GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentDouble(params, index);
 	}
 
 	template <>
-	inline plg::string GetArgument(void* params, size_t index)
+	inline plg::string GetArgument(ParametersHandle params, size_t index)
 	{
 		return __polyhook_GetArgumentString(params, index);
 	}
 
 	template <typename T> requires(std::is_pointer_v<T>)
-	inline void SetArgument(void* params, size_t index, T value)
+	inline void SetArgument(ParametersHandle params, size_t index, T value)
 	{
 		__polyhook_SetArgumentPointer(params, index, value);
 	}
 
 	template <typename T>
-	inline void SetArgument(void* params, size_t index, T value)
+	inline void SetArgument(ParametersHandle params, size_t index, T value)
 	{
 		static_assert(always_false_v<T>, "SetArgument specialization required");
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, bool value)
+	inline void SetArgument(ParametersHandle params, size_t index, bool value)
 	{
 		__polyhook_SetArgumentBool(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, int8_t value)
+	inline void SetArgument(ParametersHandle params, size_t index, int8_t value)
 	{
 		__polyhook_SetArgumentInt8(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, uint8_t value)
+	inline void SetArgument(ParametersHandle params, size_t index, uint8_t value)
 	{
 		__polyhook_SetArgumentUInt8(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, int16_t value)
+	inline void SetArgument(ParametersHandle params, size_t index, int16_t value)
 	{
 		__polyhook_SetArgumentInt16(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, uint16_t value)
+	inline void SetArgument(ParametersHandle params, size_t index, uint16_t value)
 	{
 		__polyhook_SetArgumentUInt16(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, int32_t value)
+	inline void SetArgument(ParametersHandle params, size_t index, int32_t value)
 	{
 		__polyhook_SetArgumentInt32(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, uint32_t value)
+	inline void SetArgument(ParametersHandle params, size_t index, uint32_t value)
 	{
 		__polyhook_SetArgumentUInt32(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, int64_t value)
+	inline void SetArgument(ParametersHandle params, size_t index, int64_t value)
 	{
 		__polyhook_SetArgumentInt64(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, uint64_t value)
+	inline void SetArgument(ParametersHandle params, size_t index, uint64_t value)
 	{
 		__polyhook_SetArgumentUInt64(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, float value)
+	inline void SetArgument(ParametersHandle params, size_t index, float value)
 	{
 		__polyhook_SetArgumentFloat(params, index, value);
 	}
 
 	template <>
-	inline void SetArgument(void* params, size_t index, double value)
+	inline void SetArgument(ParametersHandle params, size_t index, double value)
 	{
 		__polyhook_SetArgumentDouble(params, index, value);
 	}
 
 	/*template <>
-	inline void SetArgument(CHook& hook, void* params, size_t index, const plg::string& value)
+	inline void SetArgument(CHook& hook, ParametersHandle params, size_t index, const plg::string& value)
 	{
 		__polyhook_SetArgumentString(&hook, params, index, value);
 	}*/
 
 	template <typename T> requires(std::is_pointer_v<T>)
-	inline T GetReturn(void* ret)
+	inline T GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnPointer(ret);
 	}
 
 	template <typename T>
-	inline T GetReturn(void* ret)
+	inline T GetReturn(ReturnHandle ret)
 	{
 		static_assert(always_false_v<T>, "GetReturn specialization required");
 	}
 
 	template <>
-	inline bool GetReturn(void* ret)
+	inline bool GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnBool(ret);
 	}
 
 	template <>
-	inline int8_t GetReturn(void* ret)
+	inline int8_t GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnInt8(ret);
 	}
 
 	template <>
-	inline uint8_t GetReturn(void* ret)
+	inline uint8_t GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnUInt8(ret);
 	}
 
 	template <>
-	inline int16_t GetReturn(void* ret)
+	inline int16_t GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnInt16(ret);
 	}
 
 	template <>
-	inline uint16_t GetReturn(void* ret)
+	inline uint16_t GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnUInt16(ret);
 	}
 
 	template <>
-	inline int32_t GetReturn(void* ret)
+	inline int32_t GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnInt32(ret);
 	}
 
 	template <>
-	inline uint32_t GetReturn(void* ret)
+	inline uint32_t GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnUInt32(ret);
 	}
 
 	template <>
-	inline int64_t GetReturn(void* ret)
+	inline int64_t GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnInt64(ret);
 	}
 
 	template <>
-	inline uint64_t GetReturn(void* ret)
+	inline uint64_t GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnUInt64(ret);
 	}
 
 	template <>
-	inline float GetReturn(void* ret)
+	inline float GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnFloat(ret);
 	}
 
 	template <>
-	inline double GetReturn(void* ret)
+	inline double GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnDouble(ret);
 	}
 
 	template <>
-	inline plg::string GetReturn(void* ret)
+	inline plg::string GetReturn(ReturnHandle ret)
 	{
 		return __polyhook_GetReturnString(ret);
 	}
 
 	template <typename T> requires(std::is_pointer_v<T>)
-	inline void SetReturn(void* ret, T value)
+	inline void SetReturn(ReturnHandle ret, T value)
 	{
 		__polyhook_SetReturnPointer(ret, value);
 	}
 
 	template <typename T>
-	inline void SetReturn(void* ret, T value)
+	inline void SetReturn(ReturnHandle ret, T value)
 	{
 		static_assert(always_false_v<T>, "SetReturn specialization required");
 	}
 
 	template <>
-	inline void SetReturn(void* ret, bool value)
+	inline void SetReturn(ReturnHandle ret, bool value)
 	{
 		__polyhook_SetReturnBool(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, int8_t value)
+	inline void SetReturn(ReturnHandle ret, int8_t value)
 	{
 		__polyhook_SetReturnInt8(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, uint8_t value)
+	inline void SetReturn(ReturnHandle ret, uint8_t value)
 	{
 		__polyhook_SetReturnUInt8(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, int16_t value)
+	inline void SetReturn(ReturnHandle ret, int16_t value)
 	{
 		__polyhook_SetReturnInt16(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, uint16_t value)
+	inline void SetReturn(ReturnHandle ret, uint16_t value)
 	{
 		__polyhook_SetReturnUInt16(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, int32_t value)
+	inline void SetReturn(ReturnHandle ret, int32_t value)
 	{
 		__polyhook_SetReturnInt32(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, uint32_t value)
+	inline void SetReturn(ReturnHandle ret, uint32_t value)
 	{
 		__polyhook_SetReturnUInt32(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, int64_t value)
+	inline void SetReturn(ReturnHandle ret, int64_t value)
 	{
 		__polyhook_SetReturnInt64(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, uint64_t value)
+	inline void SetReturn(ReturnHandle ret, uint64_t value)
 	{
 		__polyhook_SetReturnUInt64(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, float value)
+	inline void SetReturn(ReturnHandle ret, float value)
 	{
 		__polyhook_SetReturnFloat(ret, value);
 	}
 
 	template <>
-	inline void SetReturn(void* ret, double value)
+	inline void SetReturn(ReturnHandle ret, double value)
 	{
 		__polyhook_SetReturnDouble(ret, value);
 	}
 
 	/*template <>
-	inline void SetReturn(CHook& hook, void* ret, const plg::string& value)
+	inline void SetReturn(CHook& hook, ReturnHandle ret, const plg::string& value)
 	{
 		__polyhook_SetReturnString(&hook, ret, value);
+	}*/
+
+	template <typename T> requires (std::is_pointer_v<T>)
+	inline T GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return reinterpret_cast<T>(__polyhook_GetRegisterPointer(registers, reg));
+	}
+
+	template <typename T>
+	inline T GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		static_assert(always_false_v<T>, "GetRegister specialization required");
+	}
+
+	template <>
+	inline bool GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterBool(registers, reg);
+	}
+
+	template <>
+	inline int8_t GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterInt8(registers, reg);
+	}
+
+	template <>
+	inline uint8_t GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterUInt8(registers, reg);
+	}
+
+	template <>
+	inline int16_t GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterInt16(registers, reg);
+	}
+
+	template <>
+	inline uint16_t GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterUInt16(registers, reg);
+	}
+
+	template <>
+	inline int32_t GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterInt32(registers, reg);
+	}
+
+	template <>
+	inline uint32_t GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterUInt32(registers, reg);
+	}
+
+	template <>
+	inline int64_t GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterInt64(registers, reg);
+	}
+
+	template <>
+	inline uint64_t GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterUInt64(registers, reg);
+	}
+
+	template <>
+	inline float GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterFloat(registers, reg);
+	}
+
+	template <>
+	inline double GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterDouble(registers, reg);
+	}
+
+	template <>
+	inline plg::string GetRegister(RegistersHandle registers, RegisterType reg)
+	{
+		return __polyhook_GetRegisterString(registers, reg);
+	}
+
+	template <typename T> requires(std::is_pointer_v<T>)
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, T value)
+	{
+		__polyhook_SetRegisterPointer(registers, reg, value);
+	}
+
+	template <typename T>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, T value)
+	{
+		static_assert(always_false_v<T>, "SetRegister specialization required");
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, bool value)
+	{
+		__polyhook_SetRegisterBool(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, int8_t value)
+	{
+		__polyhook_SetRegisterInt8(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, uint8_t value)
+	{
+		__polyhook_SetRegisterUInt8(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, int16_t value)
+	{
+		__polyhook_SetRegisterInt16(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, uint16_t value)
+	{
+		__polyhook_SetRegisterUInt16(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, int32_t value)
+	{
+		__polyhook_SetRegisterInt32(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, uint32_t value)
+	{
+		__polyhook_SetRegisterUInt32(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, int64_t value)
+	{
+		__polyhook_SetRegisterInt64(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, uint64_t value)
+	{
+		__polyhook_SetRegisterUInt64(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, float value)
+	{
+		__polyhook_SetRegisterFloat(registers, reg, value);
+	}
+
+	template <>
+	inline void SetRegister(RegistersHandle registers, RegisterType reg, double value)
+	{
+		__polyhook_SetRegisterDouble(registers, reg, value);
+	}
+
+	/*template <>
+	inline void SetRegister(CHook& hook, RegistersHandle registers, RegisterType reg, const plg::string& value)
+	{
+		__polyhook_SetRegisterString(&hook, registers, reg, value);
 	}*/
 
 	namespace details
