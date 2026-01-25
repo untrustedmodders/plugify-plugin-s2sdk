@@ -99,38 +99,22 @@ namespace globals {
 	}
 
 	PlatModule_t FindModule(std::string_view name) {
-		/*for (const auto& module : pAppSystemDict->m_pDict->m_Modules) {
-			if (module.m_pModuleName == name) {
-				return module.m_hModule;
-			}
+		/*auto& provider = g_GameConfigManager.GetModuleProvider();
+		if (auto module = provider.GetModule(name)) {
+			return module;
 		}*/
+
 		plg::print(LS_ERROR, "Could not find module at \"{}\"\n", name);
 		return {};
 	}
 	
 	IAppSystem* FindInterface(std::string_view name) {
-		/*for (const auto& system : pAppSystemDict->m_pDict->m_Systems) {
-			if (system.m_pInterfaceName && system.m_pInterfaceName == name) {
-				return system.m_pSystem;
-			}
-		}*/
+
 		plg::print(LS_ERROR, "Could not find interface at \"{}\"\n", name);
 		return {};
 	}
 
 	void* QueryInterface(std::string_view module, std::string_view name) {
-		/*for (const auto& system : pAppSystemDict->m_pDict->m_Systems) {
-			if (system.m_pInterfaceName && system.m_pInterfaceName == name) {
-				return system.m_pSystem;
-			}
-
-			if (system.m_pModuleName && system.m_pModuleName == module) {
-				if (auto* interface = system.m_pSystem->QueryInterface(name.data())) {
-					return interface;
-				}
-			}
-		}*/
-
 		if (const Module moduleLib(module); moduleLib.IsValid()) {
 			if (auto createInterface = moduleLib.GetFunctionByName("CreateInterface").RCast<CreateInterfaceFn>()) {
 				if (auto* interface = createInterface(name.data(), nullptr)) {

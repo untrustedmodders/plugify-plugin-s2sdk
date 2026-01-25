@@ -1,6 +1,7 @@
 #pragma once
 
 #include "enums.hpp"
+#include "aliases.hpp"
 #include "delegates.hpp"
 #include <plugin_export.h>
 
@@ -8,7 +9,7 @@
 
 namespace polyhook {
 
-  using _FindDetour = void* (*)(void*);
+  using _FindDetour = HookHandle (*)(void*);
 }
 extern "C" PLUGIN_API polyhook::_FindDetour __polyhook_FindDetour;
 namespace polyhook {
@@ -17,7 +18,7 @@ namespace polyhook {
    * @param pFunc (ptr64): Function address
    * @return ptr64: Returns hook pointer
    */
-  inline void* FindDetour(void* pFunc) {
+  inline HookHandle FindDetour(void* pFunc) {
     return __polyhook_FindDetour(pFunc);
   }
 
@@ -28,14 +29,14 @@ namespace polyhook {
   /**
    * @brief Attempts to find existing virtual hook
    * @param pClass (ptr64): Object pointer
-   * @param index (int32): Value to set
+   * @param index (int32): Virtual table index
    * @return ptr64: Returns hook pointer
    */
   inline void* FindVirtual(void* pClass, int32_t index) {
     return __polyhook_FindVirtual(pClass, index);
   }
 
-  using _FindVirtual2 = void* (*)(void*, void*);
+  using _FindVirtual2 = HookHandle (*)(void*, void*);
 }
 extern "C" PLUGIN_API polyhook::_FindVirtual2 __polyhook_FindVirtual2;
 namespace polyhook {
@@ -45,7 +46,7 @@ namespace polyhook {
    * @param pFunc (ptr64): Function address
    * @return ptr64: Returns hook pointer
    */
-  inline void* FindVirtual2(void* pClass, void* pFunc) {
+  inline HookHandle FindVirtual2(void* pClass, void* pFunc) {
     return __polyhook_FindVirtual2(pClass, pFunc);
   }
 

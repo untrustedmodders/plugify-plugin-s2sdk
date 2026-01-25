@@ -2,6 +2,8 @@
 
 polyhook::_HookDetour __polyhook_HookDetour = nullptr;
 
+polyhook::_HookDetour2 __polyhook_HookDetour2 = nullptr;
+
 polyhook::_HookVirtualTable __polyhook_HookVirtualTable = nullptr;
 
 polyhook::_HookVirtualTable2 __polyhook_HookVirtualTable2 = nullptr;
@@ -157,4 +159,60 @@ polyhook::_SetReturnPointer __polyhook_SetReturnPointer = nullptr;
 polyhook::_SetReturnString __polyhook_SetReturnString = nullptr;
 
 polyhook::_SetReturn __polyhook_SetReturn = nullptr;
+
+polyhook::_GetRegisterBool __polyhook_GetRegisterBool = nullptr;
+
+polyhook::_GetRegisterInt8 __polyhook_GetRegisterInt8 = nullptr;
+
+polyhook::_GetRegisterUInt8 __polyhook_GetRegisterUInt8 = nullptr;
+
+polyhook::_GetRegisterInt16 __polyhook_GetRegisterInt16 = nullptr;
+
+polyhook::_GetRegisterUInt16 __polyhook_GetRegisterUInt16 = nullptr;
+
+polyhook::_GetRegisterInt32 __polyhook_GetRegisterInt32 = nullptr;
+
+polyhook::_GetRegisterUInt32 __polyhook_GetRegisterUInt32 = nullptr;
+
+polyhook::_GetRegisterInt64 __polyhook_GetRegisterInt64 = nullptr;
+
+polyhook::_GetRegisterUInt64 __polyhook_GetRegisterUInt64 = nullptr;
+
+polyhook::_GetRegisterFloat __polyhook_GetRegisterFloat = nullptr;
+
+polyhook::_GetRegisterDouble __polyhook_GetRegisterDouble = nullptr;
+
+polyhook::_GetRegisterPointer __polyhook_GetRegisterPointer = nullptr;
+
+polyhook::_GetRegisterString __polyhook_GetRegisterString = nullptr;
+
+polyhook::_GetRegister __polyhook_GetRegister = nullptr;
+
+polyhook::_SetRegisterBool __polyhook_SetRegisterBool = nullptr;
+
+polyhook::_SetRegisterInt8 __polyhook_SetRegisterInt8 = nullptr;
+
+polyhook::_SetRegisterUInt8 __polyhook_SetRegisterUInt8 = nullptr;
+
+polyhook::_SetRegisterInt16 __polyhook_SetRegisterInt16 = nullptr;
+
+polyhook::_SetRegisterUInt16 __polyhook_SetRegisterUInt16 = nullptr;
+
+polyhook::_SetRegisterInt32 __polyhook_SetRegisterInt32 = nullptr;
+
+polyhook::_SetRegisterUInt32 __polyhook_SetRegisterUInt32 = nullptr;
+
+polyhook::_SetRegisterInt64 __polyhook_SetRegisterInt64 = nullptr;
+
+polyhook::_SetRegisterUInt64 __polyhook_SetRegisterUInt64 = nullptr;
+
+polyhook::_SetRegisterFloat __polyhook_SetRegisterFloat = nullptr;
+
+polyhook::_SetRegisterDouble __polyhook_SetRegisterDouble = nullptr;
+
+polyhook::_SetRegisterPointer __polyhook_SetRegisterPointer = nullptr;
+
+polyhook::_SetRegisterString __polyhook_SetRegisterString = nullptr;
+
+polyhook::_SetRegister __polyhook_SetRegister = nullptr;
 

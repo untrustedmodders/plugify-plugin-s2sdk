@@ -1,6 +1,7 @@
 #pragma once
 
 #include "enums.hpp"
+#include "aliases.hpp"
 #include "delegates.hpp"
 #include <plugin_export.h>
 
@@ -8,7 +9,7 @@
 
 namespace polyhook {
 
-  using _HookDetour = void* (*)(void*, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookDetour = HookHandle (*)(void*, DataType, const plg::vector<DataType>&, int32_t);
 }
 extern "C" PLUGIN_API polyhook::_HookDetour __polyhook_HookDetour;
 namespace polyhook {
@@ -20,11 +21,24 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline void* HookDetour(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookDetour(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
     return __polyhook_HookDetour(pFunc, returnType, arguments, varIndex);
   }
 
-  using _HookVirtualTable = void* (*)(void*, int32_t, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookDetour2 = HookHandle (*)(void*);
+}
+extern "C" PLUGIN_API polyhook::_HookDetour2 __polyhook_HookDetour2;
+namespace polyhook {
+  /**
+   * @brief Sets a mid hook
+   * @param pFunc (ptr64): Function address
+   * @return ptr64: Returns hook pointer
+   */
+  inline HookHandle HookDetour2(void* pFunc) {
+    return __polyhook_HookDetour2(pFunc);
+  }
+
+  using _HookVirtualTable = HookHandle (*)(void*, int32_t, DataType, const plg::vector<DataType>&, int32_t);
 }
 extern "C" PLUGIN_API polyhook::_HookVirtualTable __polyhook_HookVirtualTable;
 namespace polyhook {
@@ -37,11 +51,11 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline void* HookVirtualTable(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookVirtualTable(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
     return __polyhook_HookVirtualTable(pClass, index, returnType, arguments, varIndex);
   }
 
-  using _HookVirtualTable2 = void* (*)(void*, void*, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookVirtualTable2 = HookHandle (*)(void*, void*, DataType, const plg::vector<DataType>&, int32_t);
 }
 extern "C" PLUGIN_API polyhook::_HookVirtualTable2 __polyhook_HookVirtualTable2;
 namespace polyhook {
@@ -54,11 +68,11 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline void* HookVirtualTable2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookVirtualTable2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
     return __polyhook_HookVirtualTable2(pClass, pFunc, returnType, arguments, varIndex);
   }
 
-  using _HookVirtualFunc = void* (*)(void*, int32_t, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookVirtualFunc = HookHandle (*)(void*, int32_t, DataType, const plg::vector<DataType>&, int32_t);
 }
 extern "C" PLUGIN_API polyhook::_HookVirtualFunc __polyhook_HookVirtualFunc;
 namespace polyhook {
@@ -71,11 +85,11 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline void* HookVirtualFunc(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookVirtualFunc(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
     return __polyhook_HookVirtualFunc(pClass, index, returnType, arguments, varIndex);
   }
 
-  using _HookVirtualFunc2 = void* (*)(void*, void*, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookVirtualFunc2 = HookHandle (*)(void*, void*, DataType, const plg::vector<DataType>&, int32_t);
 }
 extern "C" PLUGIN_API polyhook::_HookVirtualFunc2 __polyhook_HookVirtualFunc2;
 namespace polyhook {
@@ -88,7 +102,7 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline void* HookVirtualFunc2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookVirtualFunc2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
     return __polyhook_HookVirtualFunc2(pClass, pFunc, returnType, arguments, varIndex);
   }
 
@@ -112,7 +126,7 @@ namespace polyhook {
   /**
    * @brief Removes a virtual hook table
    * @param pClass (ptr64): Object pointer
-   * @param index (int32): Value to set
+   * @param index (int32): Virtual table index
    * @return bool: Returns true on success, false otherwise
    */
   inline bool UnhookVirtualTable(void* pClass, int32_t index) {
@@ -140,7 +154,7 @@ namespace polyhook {
   /**
    * @brief Removes a virtual function table
    * @param pClass (ptr64): Object pointer
-   * @param index (int32): Value to set
+   * @param index (int32): Virtual table index
    * @return bool: Returns true on success, false otherwise
    */
   inline bool UnhookVirtualFunc(void* pClass, int32_t index) {
@@ -184,7 +198,7 @@ namespace polyhook {
     return __polyhook_UnhookAllVirtual(pClass);
   }
 
-  using _AddCallback = bool (*)(void*, CallbackType, CallbackHandler);
+  using _AddCallback = bool (*)(HookHandle, CallbackType, CallbackHandler);
 }
 extern "C" PLUGIN_API polyhook::_AddCallback __polyhook_AddCallback;
 namespace polyhook {
@@ -195,11 +209,11 @@ namespace polyhook {
    * @param handler (function): Callback function which trigger by hook.
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool AddCallback(void* hook, CallbackType type, CallbackHandler handler) {
+  inline bool AddCallback(HookHandle hook, CallbackType type, CallbackHandler handler) {
     return __polyhook_AddCallback(hook, type, handler);
   }
 
-  using _AddCallback2 = bool (*)(void*, CallbackType, CallbackHandler, int32_t);
+  using _AddCallback2 = bool (*)(HookHandle, CallbackType, CallbackHandler, int32_t);
 }
 extern "C" PLUGIN_API polyhook::_AddCallback2 __polyhook_AddCallback2;
 namespace polyhook {
@@ -211,11 +225,11 @@ namespace polyhook {
    * @param priority (int32): Priority of callback among others
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool AddCallback2(void* hook, CallbackType type, CallbackHandler handler, int32_t priority) {
+  inline bool AddCallback2(HookHandle hook, CallbackType type, CallbackHandler handler, int32_t priority) {
     return __polyhook_AddCallback2(hook, type, handler, priority);
   }
 
-  using _RemoveCallback = bool (*)(void*, CallbackType, CallbackHandler);
+  using _RemoveCallback = bool (*)(HookHandle, CallbackType, CallbackHandler);
 }
 extern "C" PLUGIN_API polyhook::_RemoveCallback __polyhook_RemoveCallback;
 namespace polyhook {
@@ -226,11 +240,11 @@ namespace polyhook {
    * @param handler (function): Callback function which trigger by hook.
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool RemoveCallback(void* hook, CallbackType type, CallbackHandler handler) {
+  inline bool RemoveCallback(HookHandle hook, CallbackType type, CallbackHandler handler) {
     return __polyhook_RemoveCallback(hook, type, handler);
   }
 
-  using _IsCallbackRegistered = bool (*)(void*, CallbackType, CallbackHandler);
+  using _IsCallbackRegistered = bool (*)(HookHandle, CallbackType, CallbackHandler);
 }
 extern "C" PLUGIN_API polyhook::_IsCallbackRegistered __polyhook_IsCallbackRegistered;
 namespace polyhook {
@@ -241,11 +255,11 @@ namespace polyhook {
    * @param handler (function): Callback function which trigger by hook.
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool IsCallbackRegistered(void* hook, CallbackType type, CallbackHandler handler) {
+  inline bool IsCallbackRegistered(HookHandle hook, CallbackType type, CallbackHandler handler) {
     return __polyhook_IsCallbackRegistered(hook, type, handler);
   }
 
-  using _AreCallbacksRegistered = bool (*)(void*);
+  using _AreCallbacksRegistered = bool (*)(HookHandle);
 }
 extern "C" PLUGIN_API polyhook::_AreCallbacksRegistered __polyhook_AreCallbacksRegistered;
 namespace polyhook {
@@ -254,7 +268,7 @@ namespace polyhook {
    * @param hook (ptr64): Hook pointer
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool AreCallbacksRegistered(void* hook) {
+  inline bool AreCallbacksRegistered(HookHandle hook) {
     return __polyhook_AreCallbacksRegistered(hook);
   }
 

@@ -156,11 +156,71 @@ public:
 		return orig;
 	}
 
+	template<typename C>
+	void* AddHookMidFunc(std::string_view name, const C& callback) {
+		auto it = m_dhooks.find(name);
+		if (it != m_dhooks.end()) {
+			callback(*it->second);
+			return it->second->GetAddress();
+		}
+
+		auto addr = g_pGameConfig->GetSignature(name);
+		if (!addr) {
+			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
+			return nullptr;
+		}
+
+		auto ihook = polyhook::DetourHook::Find(*addr);
+		if (ihook != nullptr) {
+			callback(*ihook);
+			return ihook->GetAddress();
+		}
+
+		ihook = polyhook::DetourHook::Create(*addr);
+		if (ihook == nullptr) {
+			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
+			return nullptr;
+		}
+
+		callback(*ihook);
+		void* orig = ihook->GetAddress();
+		m_dhooks.emplace(name, std::move(ihook));
+		return orig;
+	}
+
+	template<typename C>
+	void* AddHookMidFunc(uintptr_t addr, const C& callback) {
+		plg::string name = std::format("0x{:x}", addr);
+
+		auto it = m_dhooks.find(name);
+		if (it != m_dhooks.end()) {
+			callback(*it->second);
+			return it->second->GetAddress();
+		}
+
+		auto ihook = polyhook::DetourHook::Find(reinterpret_cast<void*>(addr));
+		if (ihook != nullptr) {
+			callback(*ihook);
+			return ihook->GetAddress();
+		}
+
+		ihook = polyhook::DetourHook::Create(reinterpret_cast<void*>(addr));
+		if (ihook == nullptr) {
+			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
+			return nullptr;
+		}
+
+		callback(*ihook);
+		void* orig = ihook->GetAddress();
+		m_dhooks.emplace(std::move(name), std::move(ihook));
+		return orig;
+	}
+
 	template<typename F, int V = -1, typename C, typename... T>
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookVTableFunc(F func, void* ptr, C callback, T... types) {
 		return AddHookVTableFunc<F>(func, ptr, [&](const polyhook::IHook& hook) {
-			([&]() { hook.AddCallback(types, callback); }(), ...);
+			([&] { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
 
@@ -168,7 +228,7 @@ public:
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookVFuncFunc(F func, void* ptr, C callback, T... types) {
 		return AddHookVFuncFunc<F>(func, ptr, [&](const polyhook::IHook& hook) {
-			([&]() { hook.AddCallback(types, callback); }(), ...);
+			([&] { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
 
@@ -176,7 +236,7 @@ public:
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookDetourFunc(std::string_view name, C callback, T... types) {
 		return AddHookDetourFunc<F>(name, [&](const polyhook::IHook& hook) {
-			([&]() { hook.AddCallback(types, callback); }(), ...);
+			([&] { hook.AddCallback(types, callback); }(), ...);
 		}, V);
 	}
 
@@ -184,8 +244,24 @@ public:
 		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
 	void* AddHookDetourFunc(uintptr_t addr, C callback, T... types) {
 		return AddHookDetourFunc<F>(addr, [&](const polyhook::IHook& hook) {
-			([&]() { hook.AddCallback(types, callback); }(), ...);
+			([&] { hook.AddCallback(types, callback); }(), ...);
 		}, V);
+	}
+
+	template<typename C, typename... T>
+		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
+	void* AddHookMidFunc(std::string_view name, C callback, T... types) {
+		return AddHookMidFunc(name, [&](const polyhook::IHook& hook) {
+			([&] { hook.AddCallback(types, callback); }(), ...);
+		});
+	}
+
+	template<typename C, typename... T>
+		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
+	void* AddHookMidFunc(uintptr_t addr, C callback, T... types) {
+		return AddHookMidFunc(addr, [&](const polyhook::IHook& hook) {
+			([&] { hook.AddCallback(types, callback); }(), ...);
+		});
 	}
 
 	bool RemoveHookDetourFunc(std::string_view name) {
