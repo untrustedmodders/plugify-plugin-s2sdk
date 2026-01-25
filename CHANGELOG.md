@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.29](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.28...v2.3.29) (2026-01-25)
+
+
+### Bug Fixes
+
+* multi addon manager ([5785851](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/578585157c3de5c0a3452f98a12883d498a6d354))
+* update multi addon manager ([576dbb7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/576dbb708d60fdb421c928e72f98222b2adb6a8f))
+* update offsets ([be367ec](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/be367ec72be400807c59ff6dc0cd106170a844f6))
+* update polyhook headers ([35ef4d2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/35ef4d26f6b73936c25bc7c830153f9a0a1d81a1))
+* update utils for polyhook ([13774d2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/13774d26e8b4d3bd9a6a722d019770e25f7be189))
+
 ## [2.3.28](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.27...v2.3.28) (2026-01-24)
 
 
