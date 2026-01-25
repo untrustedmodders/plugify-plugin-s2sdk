@@ -125,12 +125,12 @@ Result<void> ConfigLoader::ParseConfigFile(std::string_view gameName) {
 	};
 
 	bool hasErrors = false;
-	for (const auto& section : loaders) {
-		if (auto result = (this->*section.loader)(config.get()); !result) {
+	for (const auto& [name, loader] : loaders) {
+		if (auto result = (this->*loader)(config.get()); !result) {
 			if (m_options.strictMode) {
 				return result;
 			}
-			plg::print(LS_WARNING, "{} loading failed: {}\n", section.name, result.error());
+			plg::print(LS_WARNING, "{} loading failed: {}\n", name, result.error());
 			hasErrors = true;
 		}
 	}
