@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.3.30](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.29...v2.3.30) (2026-01-28)
+
+
+### Bug Fixes
+
+* add event listener `OnBuildGameSessionManifest` ([2dc5a35](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2dc5a358c380314a74175ee780f808d3eedce179))
+* multi addon offset ([eaaab92](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/eaaab92075b381b56bfd2991c4f0db1c9f3aa027))
+* precache ([e0cfad1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e0cfad1b69cc538050f8190a4b655eaa8b37d50e))
+* small refactor ([381faff](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/381faff96acb627300bffa2341b3afacc68eed90))
+
 ## [2.3.29](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.28...v2.3.29) (2026-01-25)
 
 
