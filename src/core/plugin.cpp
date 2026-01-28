@@ -77,6 +77,8 @@ polyhook::ResultType Hook_DisconnectGameNow(polyhook::HookHandle hook, polyhook:
 
 		g_TimerSystem.OnMapEnd();
 
+		g_Precached.clear();
+
 		g_OnMapEndListenerManager();
 	}
 
@@ -171,8 +173,6 @@ polyhook::ResultType Hook_ActivateServer(polyhook::HookHandle hook, polyhook::Pa
 	if (g_pCoreConfig->FixLoadMotd) {
 		LoadMOTDFile();
 	}
-
-	g_Precached.clear();
 
 	g_OnServerActivateListenerManager();
 	g_OnMapStartListenerManager();
@@ -552,13 +552,13 @@ polyhook::ResultType Hook_SendNetMessage(polyhook::HookHandle hook, polyhook::Pa
 
 polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
-#if defined (CS2)
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
-	if (name == "cs_gamerules") {
+	if (name.ends_with("gamerules")) {
 		g_pGameRulesProxy = static_cast<CBaseGameRulesProxy *>(entity);
 		g_pGameRules = g_pGameRulesProxy->m_pGameRules;
 
+#if defined (CS2)
 		v8::Isolate* isolate = v8::Isolate::TryGetCurrent();
 		v8::Locker locker(isolate);
 		v8::Isolate::Scope isolateScope(isolate);
@@ -570,12 +570,12 @@ polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::Param
 			{"target_name", "script_main"},
 			{"cs_script", CS_SCRIPT_PATH}
 		});
+#endif
 		TRY_GET_OFFSET(g_pGameConfig, "CCSScript_EntityScript", offset);
 		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pPointScript) + *offset);
-	} else if (name == "cs_team_manager") {
+	} else if (name.ends_with("team_manager")) {
 		g_pTeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
 	}
-#endif
 
 	g_OnEntityCreatedListenerManager(handle.ToInt());
 	return polyhook::ResultType::Ignored;
@@ -583,16 +583,14 @@ polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::Param
 
 polyhook::ResultType Hook_OnRemoveEntity(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
-#if defined (CS2)
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
-	if (name == "cs_gamerules") {
+	if (name.ends_with("gamerules")) {
 		g_pGameRulesProxy = nullptr;
 		g_pGameRules = nullptr;
-	} else if (name == "cs_team_manager") {
+	} else if (name.ends_with("team_manager")) {
 		g_pTeamManagers.erase(entity->m_iTeamNum);
 	}
-#endif
 
 	g_OnEntityDeletedListenerManager(handle.ToInt());
 	return polyhook::ResultType::Ignored;
