@@ -616,6 +616,8 @@ polyhook::ResultType Hook_BuildGameSessionManifest(polyhook::HookHandle hook, po
 	//auto pSystem = polyhook::GetArgument<IGameSystem*>(params, 0);
 	auto pMsg = polyhook::GetArgument<EventBuildGameSessionManifest_t*>(params, 1);
 
+	g_OnBuildGameSessionManifestListenerManager();
+
 	pMsg->m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
 	for (const auto& resource : g_Precached) {
 		pMsg->m_pResourceManifest->AddResource(resource.c_str());

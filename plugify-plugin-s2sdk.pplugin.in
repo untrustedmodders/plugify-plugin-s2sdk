@@ -31042,6 +31042,60 @@
       }
     },
     {
+      "name": "OnBuildGameSessionManifest_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnBuildGameSessionManifest_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnBuildGameSessionManifestCallback",
+            "funcName": "OnBuildGameSessionManifestCallback",
+            "description": "Called before server activation to build game session manifest.",
+            "paramTypes": [],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnBuildGameSessionManifest_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnBuildGameSessionManifest_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnBuildGameSessionManifestCallback",
+            "funcName": "OnBuildGameSessionManifestCallback",
+            "description": "Called before server activation to build game session manifest.",
+            "paramTypes": [],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnServerActivate_Register",
       "group": "Listeners",
       "description": "Register callback to event.",
