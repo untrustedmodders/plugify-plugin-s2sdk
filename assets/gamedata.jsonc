@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/untrustedmodders/plugify-source-2/refs/heads/main/schemas/gamedata.schema.json",
+  "$schema": "https://raw.githubusercontent.com/untrustedmodders/plugify-plugin-s2sdk/refs/heads/main/schemas/gamedata.schema.json",
   "csgo": {
     "Signatures": {
       // PreloadLibrary signature for engine2

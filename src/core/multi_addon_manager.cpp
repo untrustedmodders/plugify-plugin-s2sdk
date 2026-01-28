@@ -161,7 +161,7 @@ bool MultiAddonManager::DownloadAddon(PublishedFileId_t addon, bool important, b
 		return false;
 	}
 
-	if (addon == 0) {
+	if (addon == k_PublishedFileIdInvalid) {
 		plg::print(LS_WARNING, "{}: Invalid addon {}\n", __func__, addon);
 		return false;
 	}
@@ -233,7 +233,7 @@ void MultiAddonManager::ReloadMap() {
 	std::string cmd;
 
 	// Using the concommand here as g_pEngineServer->ChangeLevel somehow doesn't unmount workshop maps and we wanna be clean
-	if (m_currentWorkshopMap == k_PublishedFileIdInvalid)
+	if (m_currentWorkshopMap == k_PublishedFileIdInvalid || g_pFullFileSystem->IsDirectory(std::to_string(m_currentWorkshopMap).c_str(), "OFFICIAL_ADDONS"))
 		cmd = std::format("changelevel {}", gpGlobals->mapname.ToCStr());
 	else
 		cmd = std::format("host_workshop_map {}", m_currentWorkshopMap);
@@ -454,7 +454,7 @@ plg::vector<PublishedFileId_t> MultiAddonManager::GetClientAddons(uint64 steamID
 	// The list of mounted addons should never contain the workshop map.
 	auto addons = m_mountedAddons;
 
-	if (m_currentWorkshopMap) {
+	if (m_currentWorkshopMap != k_PublishedFileIdInvalid) {
 		addons.insert(addons.begin(), m_currentWorkshopMap);
 	}
 
@@ -567,7 +567,8 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 			m_currentWorkshopMap = 0;
 		}
 	} else {
-		if (std::string_view name = request->m_pKV->GetName(); name != "ChangeLevel") {
+		std::string_view name = request->m_pKV->GetName();
+		if (name != "ChangeLevel") {
 			if (name == "map_workshop") {
 				if (auto addon = plg::cast_to<PublishedFileId_t>(request->m_pKV->GetString("customgamemode", ""))) {
 					m_currentWorkshopMap = *addon;
@@ -594,19 +595,13 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 	}
 
 	// Rebuild the addon list. We always start with the original addon.
-	if (m_currentWorkshopMap == 0) {
+	if (m_currentWorkshopMap == k_PublishedFileIdInvalid) {
 		request->m_Addons = plg::join(g_MultiAddonManager.m_extraAddons, ",");
 	} else {
 		// Don't add the same addon twice. Hopefully no server owner is diabolical enough to do things like `map de_dust2 customgamemode=1234,5678`.
 		plg::vector<PublishedFileId_t> newAddons = g_MultiAddonManager.m_extraAddons;
-		auto it = std::find(newAddons.begin(), newAddons.end(), m_currentWorkshopMap);
-
-		// If the element is found and is not already at the end
-		if (it != newAddons.end() && it != newAddons.begin() + static_cast<ptrdiff_t>(newAddons.size() - 1)) {
-			// Rotate the elements such that the found element moves to the end
-			std::rotate(it, it + 1, newAddons.end());
-		}
-
+		plg::erase(newAddons, m_currentWorkshopMap);
+		newAddons.insert(newAddons.begin(), m_currentWorkshopMap);
 		request->m_Addons = plg::join(newAddons, ",");
 	}
 }
