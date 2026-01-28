@@ -621,7 +621,7 @@ void MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServe
 	clientInfo.lastActiveTime = Plat_FloatTime();
 
 	// Server copies the CUtlString from CNetworkGameServer to this client.
-	CUtlString& addon = server->m_szMapname;
+	CUtlString& addon = server->m_szAddons;
 	originalAddons = addon;
 
 	// Figure out which addons the client should be loading.
