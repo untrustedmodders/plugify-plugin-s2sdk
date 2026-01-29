@@ -1013,6 +1013,9 @@
         Kv3SaveTextToString;
         Kv3SaveToFile;
 
+        ReadFileVPK;
+        FindFileAbsoluteList;
+
         *_Register;
         *_Register2;
         *_Unregister;
