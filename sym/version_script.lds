@@ -1014,6 +1014,7 @@
         Kv3SaveToFile;
 
         ReadFileVPK;
+        FindFileAbsoluteList;
 
         *_Register;
         *_Register2;
