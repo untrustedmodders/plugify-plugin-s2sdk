@@ -18682,7 +18682,7 @@
     },
     {
       "name": "ReadFileVPK",
-      "group": "Engine",
+      "group": "Filesystem",
       "description": "Reads a file and returns its contents as a string.",
       "funcName": "ReadFileVPK",
       "paramTypes": [
@@ -18702,6 +18702,30 @@
       "retType": {
         "type": "string",
         "description": "The file contents, or an empty string on failure."
+      }
+    },
+    {
+      "name": "FindFileAbsoluteList",
+      "group": "Filesystem",
+      "description": "Finds all files matching the given wildcard and path ID.",
+      "funcName": "FindFileAbsoluteList",
+      "paramTypes": [
+        {
+          "name": "wildcard",
+          "type": "string",
+          "ref": false,
+          "description": "The wildcard pattern to match."
+        },
+        {
+          "name": "pathId",
+          "type": "string",
+          "ref": false,
+          "description": "The filesystem search path ID (e.g., \"GAME\"). If empty, uses \"GAME\"."
+        }
+      ],
+      "retType": {
+        "type": "string[]",
+        "description": "The list of absolute file paths matching the wildcard."
       }
     },
     {
