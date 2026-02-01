@@ -49,7 +49,7 @@ public:
 #else
 		if (!binding.funcaddr) {
 			// Virtual function - vtable lookup
-			void** vtable = *static_cast<void***>(instance);
+			void** vtable = *reinterpret_cast<void***>(instance);
 			auto func = MemberCast<MemberFunc>(vtable[binding.vtable_index]);
 			return (instance->*func)(std::forward<Args>(args)...);
 		} else {

@@ -17,7 +17,7 @@ T GetVMethod(size_t index, void* klass) {
 		return T{};
 	}
 
-	void** table = *static_cast<void***>(klass);
+	void** table = *reinterpret_cast<void***>(klass);
 	if (!table) {
 		return T{};
 	}
