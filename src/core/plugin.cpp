@@ -40,9 +40,6 @@ CGameEntitySystem* GameEntitySystem() {
 }
 
 namespace {
-void* string_S_empty_rep_storage = nullptr;
-void* wstring_S_empty_rep_storage = nullptr;
-
 constexpr char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
 
 polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
@@ -118,7 +115,7 @@ void LoadMOTDFile() {
 	
 	using namespace std::literals;
 	auto motdCvar = g_pCVar->FindConVar("motdfile");
-	auto motdFile = std::string(motdCvar.IsValidRef() ? cvars::GetConVarValue<CUtlString>(motdCvar) : "motd.txt"sv);
+	auto motdFile = motdCvar.IsValidRef() ? cvars::GetConVarValue<CUtlString>(motdCvar) : "motd.txt"sv;
 	auto motdPath = utils::GameDirectory() / S2SDK_GAME_NAME / motdFile;
 
 	if (!fs::exists(motdPath)) {
@@ -158,7 +155,7 @@ polyhook::ResultType Hook_ActivateServer(polyhook::HookHandle hook, polyhook::Pa
 #if defined (CS2)
 	if (g_pCoreConfig->FixFlashAlertMessage) {
 		g_TimerSystem.CreateTimer(0.5f, [](uint32_t, const plg::vector<plg::any>& data) {
-			auto gameRules = *(CBaseGameRules**)plg::get<void*>(data[0]);
+			auto gameRules = *reinterpret_cast<CBaseGameRules**>(plg::get<void*>(data[0]));
 
 			if (gameRules == nullptr || gameRules->m_bWarmupPeriod || gameRules->m_iRoundWinStatus > 0) {
 				return;
@@ -760,31 +757,6 @@ polyhook::ResultType Hook_PreloadLibrary(polyhook::HookHandle hook, polyhook::Pa
 }
 #else
 #include <dlfcn.h>
-/*using GetRepStorageFn = void*(*)();
-extern "C" {
-	void* __wrap__ZNSs12_S_empty_repEv() {
-		if (string_S_empty_rep_storage == nullptr) {
-			char path[MAX_PATH]{};
-			strcpy(path, Plat_GetGameDirectory());
-			strcat(path, "/bin/linuxsteamrt64/libtier0.so");
-			void* tier0 = dlopen(path, RTLD_LAZY | RTLD_NOLOAD);
-			string_S_empty_rep_storage = reinterpret_cast<GetRepStorageFn>(dlsym(tier0, "_ZNSs4_Rep12_S_empty_repEv"))();
-			dlclose(tier0);
-		}
-		return string_S_empty_rep_storage;
-	}
-	void* __wrap__ZNSbIwSt11char_traitsIwESaIwEE12_S_empty_repEv() {
-		if (wstring_S_empty_rep_storage == nullptr) {
-			char path[MAX_PATH]{};
-			strcpy(path, Plat_GetGameDirectory());
-			strcat(path, "/bin/linuxsteamrt64/libtier0.so");
-			void* tier0 = dlopen(path, RTLD_LAZY | RTLD_NOLOAD);
-			wstring_S_empty_rep_storage = reinterpret_cast<GetRepStorageFn>(dlsym(tier0, "_ZNSbIwSt11char_traitsIwESaIwEE4_Rep12_S_empty_repEv"))();
-			dlclose(tier0);
-		}
-		return wstring_S_empty_rep_storage;
-	}
-}*/
 #endif
 }
 
