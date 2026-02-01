@@ -146,7 +146,7 @@ void utils::PlaySoundToClient(CPlayerSlot player, int channel, const char* sound
 	soundParams.m_SoundLevel = soundLevel;
 	soundParams.m_nFlags = flags;
 	soundParams.m_nPitch = pitch;
-	soundParams.m_pOrigin = &origin;
+	soundParams.m_pOrigin = origin.IsValid() ? &origin : nullptr;
 	soundParams.m_flSoundTime = soundTime;
 	addresses::CBaseEntity_EmitSoundFilter(filter, player.Get() + 1, soundParams);
 }
