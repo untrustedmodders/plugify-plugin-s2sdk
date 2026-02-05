@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.3.30](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.29...v2.3.30) (2026-02-01)
+
+
+### Bug Fixes
+
+* add event listener `OnBuildGameSessionManifest` ([2dc5a35](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2dc5a358c380314a74175ee780f808d3eedce179))
+* add rcast ([4f706b6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4f706b6571fbb49c4b06517ac0def8b3090c6bd5))
+* allow origin be null ([22c36f6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/22c36f6d7d029788bc47659d3ac158be4a05bc0d))
+* lin build ([72af98d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/72af98d9578417e87ff35be526a3eb64303119be))
+* multi addon offset ([eaaab92](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/eaaab92075b381b56bfd2991c4f0db1c9f3aa027))
+* precache ([e0cfad1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e0cfad1b69cc538050f8190a4b655eaa8b37d50e))
+* small refactor ([381faff](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/381faff96acb627300bffa2341b3afacc68eed90))
+* vfunc member calls rework ([54f6895](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/54f689573a6359a4d113d1877a0d7840464caac2))
+
 ## [2.3.29](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.28...v2.3.29) (2026-01-25)
 
 
