@@ -305,7 +305,7 @@ public:
 #define SCHEMA_FIELD_OFFSET(type, name, extra) \
 private: \
 	static constexpr const char name##_str[] = #name; \
-	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+	static PLUGIN_API size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
     PLUGIFY_NO_UNIQUE_ADDRESS SchemaField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 
@@ -315,7 +315,7 @@ public: \
 #define SCHEMA_FIELD_POINTER_OFFSET(type, name, extra) \
 private: \
 	static constexpr const char name##_str[] = #name; \
-	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+	static PLUGIN_API size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
 	PLUGIFY_NO_UNIQUE_ADDRESS SchemaPointerField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 

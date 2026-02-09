@@ -95,7 +95,7 @@ public: \
 #define VSCRIPT_MEMBER_FUNCTION(name, ret, ...) \
 private: \
 	static constexpr const char name##_str[] = #name; \
-	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+	static PLUGIN_API size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
     PLUGIFY_NO_UNIQUE_ADDRESS VScriptMemberFunction<ThisClass, name##_str, name##_offset, ret __VA_OPT__(,) __VA_ARGS__> name;
 
