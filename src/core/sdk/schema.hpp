@@ -132,6 +132,10 @@ class SchemaField {
 	// Compact internal helpers
 	[[nodiscard]] auto Key(this auto&& self) {
 		static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
+		static const bool done = []{
+			if (key.size != sizeof(T)) plg::print(LS_WARNING, "Schema field '{}' mismatсhed in class '{}': expected {}, got {}!\n", ThisClass::m_className, MemberName, key.size, sizeof(T));
+			return true;
+		}();
 		return key;
 	}
 	[[nodiscard]] auto Chain(this auto&& self) {
@@ -262,6 +266,10 @@ class SchemaPointerField {
     // Compact internal helpers
     [[nodiscard]] auto Key(this auto&& self) {
         static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
+    	/*static const bool done = []{
+    		if (key.size != sizeof(T)) plg::print(LS_WARNING, "Schema pointer field '{}' mismatсhed in class '{}': expected {}, got {}!\n", ThisClass::m_className, MemberName, key.size, sizeof(T));
+    		return true;
+    	}();*/
         return key;
     }
     [[nodiscard]] auto Chain(this auto&& self) {
