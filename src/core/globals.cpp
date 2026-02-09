@@ -98,22 +98,6 @@ namespace globals {
 		g_pGameConfig = nullptr;
 	}
 
-	PlatModule_t FindModule(std::string_view name) {
-		/*auto& provider = g_GameConfigManager.GetModuleProvider();
-		if (auto module = provider.GetModule(name)) {
-			return module;
-		}*/
-
-		plg::print(LS_ERROR, "Could not find module at \"{}\"\n", name);
-		return {};
-	}
-	
-	IAppSystem* FindInterface(std::string_view name) {
-
-		plg::print(LS_ERROR, "Could not find interface at \"{}\"\n", name);
-		return {};
-	}
-
 	void* QueryInterface(std::string_view module, std::string_view name) {
 		if (const Module moduleLib(module); moduleLib.IsValid()) {
 			if (auto createInterface = moduleLib.GetFunctionByName("CreateInterface").RCast<CreateInterfaceFn>()) {

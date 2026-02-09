@@ -15,26 +15,6 @@ PLUGIFY_WARN_IGNORE(4190)
 #endif
 
 /**
- * @brief Finds a module by name.
- *
- * @param name The name of the module to find.
- * @return A pointer to the specified module.
- */
-extern "C" PLUGIN_API void* FindModule(const plg::string& name) {
-	return globals::FindModule(name);
-}
-
-/**
- * @brief Finds an interface by name.
- *
- * @param name The name of the interface to find.
- * @return A pointer to the interface.
- */
-extern "C" PLUGIN_API void* FindInterface(const plg::string& name) {
-	return globals::FindInterface(name);
-}
-
-/**
  * @brief Queries an interface from a specified module.
  *
  * @param module The name of the module to query the interface from.

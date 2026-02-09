@@ -270,8 +270,6 @@
         GetServerLanguage;
         GetAllConVars;
 
-        FindModule;
-        FindInterface;
         QueryInterface;
         GetGameDirectory;
         GetCurrentMap;
