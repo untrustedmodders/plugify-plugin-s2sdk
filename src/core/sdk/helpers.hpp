@@ -277,7 +277,7 @@ public:
 		}
 	}
 
-	HSCRIPT operator()(const size_t i) const { return m_instances[i]; }
+	HSCRIPT operator[](const size_t i) const { return m_instances[i]; }
 
 private:
 	void AddEntity(CEntityInstance* entity) {

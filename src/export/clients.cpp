@@ -1369,10 +1369,10 @@ extern "C" PLUGIN_API plg::vec3 GetClientCenter(int playerSlot) {
  * @param angles A pointer to a QAngle representing the new orientation. Use nan vector to not set.
  * @param velocity A pointer to a Vector representing the new velocity. Use nan vector to not set.
  */
-extern "C" PLUGIN_API void TeleportClient(int playerSlot, const Vector& origin, const QAngle& angles, const Vector& velocity) {
+extern "C" PLUGIN_API void TeleportClient(int playerSlot, const plg::vec3& origin, const plg::vec3& angles, const plg::vec3& velocity) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->Teleport(origin, angles, velocity);
+	pawn->Teleport(std::bit_cast<Vector>(origin), std::bit_cast<QAngle>(velocity), std::bit_cast<Vector>(velocity));
 }
 
 /**
@@ -1471,7 +1471,7 @@ extern "C" PLUGIN_API void DisconnectClientRedirectedOutput(int playerSlot, cons
 	auto* target = helpers::GetEntity(targetHandle);
 	if (!target) return;
 	ParamScope params(target);
-	reinterpret_cast<CEntityInstance2*>(pawn)->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), params(0));
+	reinterpret_cast<CEntityInstance2*>(pawn)->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), params[0]);
 }
 
 /**
@@ -1494,7 +1494,7 @@ extern "C" PLUGIN_API void FireClientOutput(int playerSlot, const plg::string& o
 	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
 	ParamScope params(activator, caller);
-	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), params(0), params(1), variant, delay);
+	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), params[0], params[1], variant, delay);
 }
 
 /**

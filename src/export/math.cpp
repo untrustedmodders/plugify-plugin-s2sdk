@@ -48,7 +48,7 @@ extern "C" PLUGIN_API Vector CalcClosestPointOnEntityOBB(int entityHandle, const
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return vec3_origin;
 	ParamScope params(entity);
-	return Math{}.CalcClosestPointOnEntityOBB(params(0), position);
+	return Math{}.CalcClosestPointOnEntityOBB(params[0], position);
 }
 
 /**
@@ -62,7 +62,7 @@ extern "C" PLUGIN_API float CalcDistanceBetweenEntityOBB(int entityHandle1, int 
 	auto* ent2 = helpers::GetEntity(entityHandle2);
 	if (!ent1 || !ent2) return -1.0f;
 	ParamScope params(ent1, ent2);
-	return Math{}.CalcDistanceBetweenEntityOBB(params(0), params(1));
+	return Math{}.CalcDistanceBetweenEntityOBB(params[0], params[1]);
 }
 
 /**

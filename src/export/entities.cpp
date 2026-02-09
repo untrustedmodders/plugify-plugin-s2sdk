@@ -814,7 +814,7 @@ extern "C" PLUGIN_API void SetEntityOwner(int entityHandle, int ownerHandle) {
 	auto* owner = helpers::GetEntity(ownerHandle);
 	if (!owner) return;
 	ParamScope params(owner);
-	entity->SetOwner(params(0));
+	entity->SetOwner(params[0]);
 }
 
 /**
@@ -849,7 +849,7 @@ extern "C" PLUGIN_API void SetEntityParent(int entityHandle, int parentHandle) {
 	CEntityInstance* parent = helpers::GetEntity(parentHandle);
 	if (!parent) return;
 	ParamScope params(parent);
-	entity->SetParent(params(0), "");
+	entity->SetParent(params[0], "");
 }
 
 /**
@@ -868,7 +868,7 @@ extern "C" PLUGIN_API void SetEntityParentAttachment(int entityHandle, int paren
 	auto* parent = helpers::GetEntity(parentHandle);
 	if (!parent) return;
 	ParamScope params(parent);
-	entity->SetParent(params(0), attachmentName.c_str());
+	entity->SetParent(params[0], attachmentName.c_str());
 }
 
 /**
@@ -1478,10 +1478,10 @@ extern "C" PLUGIN_API plg::vec3 GetEntityCenter(int entityHandle) {
  * @param angles A pointer to a QAngle representing the new orientation. Use nan vector to not set.
  * @param velocity A pointer to a Vector representing the new velocity. Use nan vector to not set.
  */
-extern "C" PLUGIN_API void TeleportEntity(int entityHandle, const Vector& origin, const QAngle& angles, const Vector& velocity) {
+extern "C" PLUGIN_API void TeleportEntity(int entityHandle, const plg::vec3& origin, const plg::vec3& angles, const plg::vec3& velocity) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->Teleport(origin, angles, velocity);
+	entity->Teleport(std::bit_cast<Vector>(origin), std::bit_cast<QAngle>(velocity), std::bit_cast<Vector>(velocity));
 }
 
 /**
@@ -1580,7 +1580,7 @@ extern "C" PLUGIN_API void DisconnectEntityRedirectedOutput(int entityHandle, co
 	auto* target = helpers::GetEntity(targetHandle);
 	if (!target) return;
 	ParamScope params(target);
-	entity->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), params(0));
+	entity->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), params[0]);
 }
 
 /**
@@ -1603,7 +1603,7 @@ extern "C" PLUGIN_API void FireEntityOutput(int entityHandle, const plg::string&
 	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
 	ParamScope params(activator, caller);
-	entity->FireOutput(outputName.c_str(), params(0), params(1), variant, delay);
+	entity->FireOutput(outputName.c_str(), params[0], params[1], variant, delay);
 }
 
 /**
@@ -1620,7 +1620,7 @@ extern "C" PLUGIN_API void RedirectEntityOutput(int entityHandle, const plg::str
 	auto* target = helpers::GetEntity(targetHandle);
 	if (!target) return;
 	ParamScope params(target);
-	entity->RedirectOutput(output.c_str(), functionName.c_str(), params(0));
+	entity->RedirectOutput(output.c_str(), functionName.c_str(), params[0]);
 }
 
 /**
@@ -1636,7 +1636,7 @@ extern "C" PLUGIN_API void FollowEntity(int entityHandle, int attachmentHandle, 
 	auto* attach = helpers::GetEntity(attachmentHandle);
 	if (!attach) return;
 	ParamScope params(attach);
-	entity->FollowEntity(params(0), boneMerge);
+	entity->FollowEntity(params[0], boneMerge);
 }
 
 /**
@@ -1652,7 +1652,7 @@ extern "C" PLUGIN_API void FollowEntityMerge(int entityHandle, int attachmentHan
 	auto* attach = helpers::GetEntity(attachmentHandle);
 	if (!attach) return;
 	ParamScope params(attach);
-	entity->FollowEntity(params(0), boneOrAttachName.c_str());
+	entity->FollowEntity(params[0], boneOrAttachName.c_str());
 }
 
 /**
@@ -1677,7 +1677,7 @@ extern "C" PLUGIN_API int TakeEntityDamage(int entityHandle, int inflictorHandle
 	auto* attacker = helpers::GetEntity(attackerHandle);
 	if (!attacker) return {};
 	ParamScope params(inflictor, attacker);
-	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(params(0), params(1), std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
+	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(params[0], params[1], std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
 	int applied = entity->TakeDamage(takeDamageInfo);
 	CTakeDamage{}.DestroyDamageInfo(takeDamageInfo);
 	return applied;
