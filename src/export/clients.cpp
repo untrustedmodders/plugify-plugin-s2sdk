@@ -200,7 +200,7 @@ extern "C" PLUGIN_API uint32_t GetClientAccountId(int playerSlot) {
 }
 
 /**
- * @brief Returns the client's SteamID64 — a unique 64-bit identifier of a Steam account.
+ * @brief Returns the client's SteamID64 - a unique 64-bit identifier of a Steam account.
  *
  * @param playerSlot The index of the player's slot.
  * @return uint64_t The client's SteamID64.
