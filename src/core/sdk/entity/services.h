@@ -110,7 +110,7 @@ class CPlayer_CameraServices : public CPlayerPawnComponent {
 public:
 	DECLARE_SCHEMA_CLASS(CPlayer_CameraServices);
 
-	SCHEMA_FIELD_POINTER(CHandle<CBaseEntity>, m_hViewEntity);
+	SCHEMA_FIELD(CHandle<CBaseEntity>, m_hViewEntity);
 	SCHEMA_FIELD(float, m_flOldPlayerViewOffsetZ);
 };
 
@@ -125,7 +125,7 @@ class CPlayer_WeaponServices : public CPlayerPawnComponent {
 public:
 	DECLARE_SCHEMA_CLASS(CPlayer_WeaponServices);
 
-	SCHEMA_FIELD_POINTER(CUtlVector<CHandle<CBasePlayerWeapon>>, m_hMyWeapons)
+	SCHEMA_FIELD(CUtlVector<CHandle<CBasePlayerWeapon>>, m_hMyWeapons)
 	SCHEMA_FIELD(CHandle<CBasePlayerWeapon>, m_hActiveWeapon)
 
 	bool CanUse(CBasePlayerWeapon* weapon) {
@@ -209,7 +209,7 @@ class CCSPlayer_ViewModelServices : public CPlayer_ViewModelServices {
 public:
 	DECLARE_SCHEMA_CLASS(CCSPlayer_ViewModelServices);
 
-	SCHEMA_FIELD_POINTER(CHandle<CBaseViewModel>, m_hViewModel);
+	SCHEMA_FIELD(CHandle<CBaseViewModel>, m_hViewModel);
 
 	CBaseViewModel* GetViewModel(int iIndex = 0);
 	void SetViewModel(int iIndex, CBaseViewModel* pViewModel);
@@ -235,7 +235,7 @@ struct WeaponPurchaseTracker_t {
 public:
 	DECLARE_SCHEMA_CLASS_INLINE(WeaponPurchaseTracker_t)
 
-	SCHEMA_FIELD_POINTER(CUtlVector<WeaponPurchaseCount_t>, m_weaponPurchases)
+	SCHEMA_FIELD(CUtlVector<WeaponPurchaseCount_t>, m_weaponPurchases)
 };
 
 class CCSPlayer_ActionTrackingServices {

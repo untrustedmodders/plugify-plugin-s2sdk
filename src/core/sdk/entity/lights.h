@@ -39,7 +39,7 @@ public:
 
 	SCHEMA_FIELD(bool, m_bEnabled)
 	SCHEMA_FIELD(int, m_nColorMode)// 0 = color, 1 = color temperature
-	SCHEMA_FIELD_POINTER(Color, m_Color)
+	SCHEMA_FIELD(Color, m_Color)
 	SCHEMA_FIELD(float, m_flColorTemperature)// default 6500
 	SCHEMA_FIELD(float, m_flBrightness)
 	SCHEMA_FIELD(float, m_flBrightnessScale)
@@ -53,7 +53,7 @@ public:
 	SCHEMA_FIELD(float, m_flSkirtNear)// Falloff from the source
 	SCHEMA_FIELD(float, m_flSoftX)
 	SCHEMA_FIELD(float, m_flSoftY)
-	SCHEMA_FIELD_POINTER(Vector, m_vSizeParams)
+	SCHEMA_FIELD(Vector, m_vSizeParams)
 
 	// Artificially softens direct specular (0.0 to 1.0)
 	SCHEMA_FIELD(float, m_flMinRoughness)

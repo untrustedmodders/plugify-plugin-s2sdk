@@ -160,7 +160,7 @@ public:
 	[[nodiscard]] auto operator->(this auto&& self) requires (!std::is_pointer_v<T>) { return std::addressof(self.Get()); }
     [[nodiscard]] auto operator*(this auto&& self) requires (std::is_pointer_v<T>) { return *self.Get(); }
     [[nodiscard]] auto operator*(this auto&& self) requires (!std::is_pointer_v<T>) { return self.Get(); }
-    [[nodiscard]] auto operator[](this auto&& self, auto idx) { return self.Get()[idx]; }
+    [[nodiscard]] decltype(auto) operator[](this auto&& self, auto idx) { return self.Get()[idx]; }
     [[nodiscard]] auto operator+(this auto&& self, auto v) { return self.Get() + v; }
     [[nodiscard]] auto operator-(this auto&& self, auto v) { return self.Get() - v; }
     [[nodiscard]] bool operator==(this auto&& self, const auto& v) { return self.Get() == v; }

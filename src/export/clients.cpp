@@ -1690,14 +1690,13 @@ extern "C" PLUGIN_API plg::vector<int> GetClientWeapons(int playerSlot) {
 	auto service = helpers::GetService2<CCSPlayer_WeaponServices>(playerSlot, &CPlayerPawn::m_pWeaponServices);
 	if (!service) return {};
 
-	CUtlVector<CHandle<CBasePlayerWeapon>>* weapons = service->m_hMyWeapons;
-	if (!weapons) return {};
+	CUtlVector<CHandle<CBasePlayerWeapon>>& weapons = service->m_hMyWeapons;
 
 	plg::vector<int> handles;
-	handles.reserve(static_cast<size_t>(weapons->Count()));
+	handles.reserve(static_cast<size_t>(weapons.Count()));
 
-	FOR_EACH_VEC(*weapons, i) {
-		handles.emplace_back((*weapons)[i].ToInt());
+	FOR_EACH_VEC(weapons, i) {
+		handles.emplace_back(weapons[i].ToInt());
 	}
 
 	return handles;

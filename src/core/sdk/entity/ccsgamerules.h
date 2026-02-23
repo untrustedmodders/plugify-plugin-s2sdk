@@ -56,7 +56,7 @@ public:
 	SCHEMA_FIELD(int, m_iRoundWinStatus)
 	SCHEMA_FIELD(GameTime_t, m_fRoundStartTime)
 	SCHEMA_FIELD(GameTime_t, m_flRestartRoundTime)
-	SCHEMA_FIELD_POINTER(int, m_nEndMatchMapGroupVoteOptions)
+	SCHEMA_FIELD(int[10], m_nEndMatchMapGroupVoteOptions)
 	SCHEMA_FIELD(int, m_nEndMatchMapVoteWinner)
 	SCHEMA_FIELD(int, m_iRoundTime)
 	SCHEMA_FIELD(int, m_iNumCT)
@@ -64,8 +64,8 @@ public:
 	SCHEMA_FIELD(int, m_iSpectatorSlotCount)
 	SCHEMA_FIELD(bool, m_bWarmupPeriod)
 	SCHEMA_FIELD(bool, m_bGameRestart)
-	SCHEMA_FIELD_POINTER(CUtlVector<SpawnPoint*>, m_CTSpawnPoints)
-	SCHEMA_FIELD_POINTER(CUtlVector<SpawnPoint*>, m_TerroristSpawnPoints)
+	SCHEMA_FIELD(CUtlVector<SpawnPoint*>, m_CTSpawnPoints)
+	SCHEMA_FIELD(CUtlVector<SpawnPoint*>, m_TerroristSpawnPoints)
 
 	void TerminateRound(float delay, CSRoundEndReason reason) {
 		addresses::CGameRules_TerminateRound(this, delay, reason, 0, 0);

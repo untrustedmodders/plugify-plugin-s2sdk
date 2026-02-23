@@ -145,7 +145,7 @@ public:
 	SCHEMA_FIELD(CBodyComponent*, m_CBodyComponent)
 	SCHEMA_FIELD(CBitVec<64>, m_isSteadyState)
 	SCHEMA_FIELD(float, m_lastNetworkChange)
-	SCHEMA_FIELD_POINTER(CNetworkTransmitComponent, m_NetworkTransmitComponent)
+	SCHEMA_FIELD(CNetworkTransmitComponent*, m_NetworkTransmitComponent)
 	SCHEMA_FIELD(int, m_iHealth)
 	SCHEMA_FIELD(int, m_iMaxHealth)
 	SCHEMA_FIELD(CSTeam, m_iTeamNum)
@@ -163,7 +163,7 @@ public:
 	SCHEMA_FIELD(float, m_flDamageAccumulator)
 	SCHEMA_FIELD(bool, m_bTakesDamage)
 	SCHEMA_FIELD(TakeDamageFlags_t, m_nTakeDamageFlags)
-	SCHEMA_FIELD_POINTER(CUtlStringToken, m_nSubclassID)
+	SCHEMA_FIELD(CUtlStringToken, m_nSubclassID)
 	SCHEMA_FIELD(float, m_flFriction)
 	SCHEMA_FIELD(float, m_flGravityScale)
 	SCHEMA_FIELD(bool, m_bGravityDisabled)
@@ -302,8 +302,8 @@ public:
 
 	// A double pointer to entity VData is available 4 bytes past m_nSubclassID, if applicable
 	CEntitySubclassVDataBase* GetVData() {
-		CUtlStringToken* subclassID = m_nSubclassID;
-		return *reinterpret_cast<CEntitySubclassVDataBase**>(reinterpret_cast<uint8*>(subclassID) + 4);
+		CUtlStringToken& subclassID = m_nSubclassID;
+		return *reinterpret_cast<CEntitySubclassVDataBase**>(reinterpret_cast<uint8*>(std::addressof(subclassID)) + 4);
 	}
 
 	void DispatchSpawn(CEntityKeyValues* kv = nullptr) {
