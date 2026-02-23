@@ -145,7 +145,7 @@ public:
 	SCHEMA_FIELD(CBodyComponent*, m_CBodyComponent)
 	SCHEMA_FIELD(CBitVec<64>, m_isSteadyState)
 	SCHEMA_FIELD(float, m_lastNetworkChange)
-	SCHEMA_FIELD(CNetworkTransmitComponent*, m_NetworkTransmitComponent)
+	SCHEMA_FIELD(CNetworkTransmitComponent, m_NetworkTransmitComponent)
 	SCHEMA_FIELD(int, m_iHealth)
 	SCHEMA_FIELD(int, m_iMaxHealth)
 	SCHEMA_FIELD(CSTeam, m_iTeamNum)

@@ -151,8 +151,8 @@ public:
 	}
 
 	void Set(this auto&& self, const T& val) {
-		self.NotifyNetworkChange();
 		*reinterpret_cast<ptr_t>(self.ThisPtr() + self.Offset()) = val;
+		self.NotifyNetworkChange();
 	}
 
 	[[nodiscard]] operator ref_t(this auto&& self) { return self.Get(); }
