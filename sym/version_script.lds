@@ -1019,5 +1019,6 @@
         *_Unregister;
 
         __polyhook_*;
+        *_offset;
     local: *;
 };
