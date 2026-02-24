@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.4.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.29...v2.4.0) (2026-02-15)
+
+
+### Features
+
+* remove FindModule & FindInterface ([6adca06](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6adca06c374e1df3b393445d36b88e8a6d2d457d))
+
+
+### Bug Fixes
+
+* add event listener `OnBuildGameSessionManifest` ([2dc5a35](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2dc5a358c380314a74175ee780f808d3eedce179))
+* add rcast ([4f706b6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4f706b6571fbb49c4b06517ac0def8b3090c6bd5))
+* add schema size validation ([03bdbe3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/03bdbe3047ec56ad7240379058f365e1c7b62ad3))
+* allow origin be null ([22c36f6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/22c36f6d7d029788bc47659d3ac158be4a05bc0d))
+* multi addon offset ([eaaab92](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/eaaab92075b381b56bfd2991c4f0db1c9f3aa027))
+* precache ([e0cfad1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e0cfad1b69cc538050f8190a4b655eaa8b37d50e))
+* small refactor ([381faff](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/381faff96acb627300bffa2341b3afacc68eed90))
+* some schema improvements ([b1f00eb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b1f00ebc0e6bffafd0392aea807185c9d06f8687))
+* string parsing correction ([7b9a571](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7b9a571400f2d757d1fa0408899c5d02886b753b))
+* update formatters for MSVC ([525eae7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/525eae73419377da6daa4e25f885cf116f5ba76c))
+* update vfunc hooks for new polyhook ([8644ec3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8644ec347805f40506842052722a49aba5b266ab))
+* use `CPrintChat` for `ReplyToCommand` color support ([2a9b978](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2a9b9788caa723c438c6f7380036a9bd5f570afe))
+
 ## [2.3.29](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.28...v2.3.29) (2026-01-25)
 
 

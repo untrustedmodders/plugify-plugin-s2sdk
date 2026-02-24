@@ -204,7 +204,13 @@ public:
 		std::string line;
 
 		while (std::getline(file, line)) {
-			std::string_view buffer = trim(line);
+			std::string_view buffer = line;
+
+			if (auto cpos = buffer.find("//"); cpos != std::string_view::npos) {
+				buffer = buffer.substr(0, cpos);
+			}
+
+			buffer = trim(buffer);
 
 			if (buffer.empty() || buffer.starts_with("//")) {
 				continue;

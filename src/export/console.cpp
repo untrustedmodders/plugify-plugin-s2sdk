@@ -139,7 +139,7 @@ extern "C" PLUGIN_API void ReplyToCommand(CommandCallingContext context, int pla
 			utils::PrintConsole(playerSlot, message);
 			return;
 		case CommandCallingContext::Chat:
-			utils::PrintChat(playerSlot, message);
+			utils::CPrintChat(playerSlot, message);
 			return;
 	}
 }

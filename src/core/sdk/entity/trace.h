@@ -56,7 +56,7 @@ public:
 		// Populate input table with parameters
 		g_pScriptVM->SetValue(table, "start", start);
 		g_pScriptVM->SetValue(table, "end", end);
-		g_pScriptVM->SetValue(table, "ent", params(0));
+		g_pScriptVM->SetValue(table, "ent", params[0]);
 		if (mins) {
 			g_pScriptVM->SetValue(table, "mins", *mins);
 		}
@@ -128,7 +128,7 @@ public:
 		g_pScriptVM->SetValue(table, "min", min);
 		g_pScriptVM->SetValue(table, "max", max);
 		g_pScriptVM->SetValue(table, "mask", mask);
-		g_pScriptVM->SetValue(table, "ignore", params(0));
+		g_pScriptVM->SetValue(table, "ignore", params[0]);
 
 		// Call the original Trace method with the table
 		bool result = TraceHull(table);
@@ -189,7 +189,7 @@ public:
 		g_pScriptVM->SetValue(table, "startpos", startPos);
 		g_pScriptVM->SetValue(table, "endpos", endPos);
 		g_pScriptVM->SetValue(table, "mask", mask);
-		g_pScriptVM->SetValue(table, "ignore", params(0));
+		g_pScriptVM->SetValue(table, "ignore", params[0]);
 
 		// Call the original Trace method with the table
 		bool result = TraceLine(table);

@@ -98,22 +98,6 @@ namespace globals {
 		g_pGameConfig = nullptr;
 	}
 
-	PlatModule_t FindModule(std::string_view name) {
-		/*auto& provider = g_GameConfigManager.GetModuleProvider();
-		if (auto module = provider.GetModule(name)) {
-			return module;
-		}*/
-
-		plg::print(LS_ERROR, "Could not find module at \"{}\"\n", name);
-		return {};
-	}
-	
-	IAppSystem* FindInterface(std::string_view name) {
-
-		plg::print(LS_ERROR, "Could not find interface at \"{}\"\n", name);
-		return {};
-	}
-
 	void* QueryInterface(std::string_view module, std::string_view name) {
 		if (const Module moduleLib(module); moduleLib.IsValid()) {
 			if (auto createInterface = moduleLib.GetFunctionByName("CreateInterface").RCast<CreateInterfaceFn>()) {
@@ -136,7 +120,7 @@ namespace entities {
 
 	CEntityInstance* FindEntityByName(CEntityInstance* startEntity, const char* name) {
 		ParamScope params(startEntity);
-		auto handle = CEntities{}.FindByName(params(0), name);
+		auto handle = CEntities{}.FindByName(params[0], name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
@@ -147,13 +131,13 @@ namespace entities {
 
 	CEntityInstance* FindByNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
 		ParamScope params(startEntity);
-		auto handle = CEntities{}.FindByNameWithin(params(0), name, origin, maxRadius);
+		auto handle = CEntities{}.FindByNameWithin(params[0], name, origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindEntityByClassName(CEntityInstance* startEntity, const char* name) {
 		ParamScope params(startEntity);
-		auto handle = CEntities{}.FindByClassname(params(0), name);
+		auto handle = CEntities{}.FindByClassname(params[0], name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
@@ -164,31 +148,31 @@ namespace entities {
 
 	CEntityInstance* FindEntityByClassNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
 		ParamScope params(startEntity);
-		auto handle = CEntities{}.FindByClassnameWithin(params(0), name, origin, maxRadius);
+		auto handle = CEntities{}.FindByClassnameWithin(params[0], name, origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name) {
 		ParamScope params(startEntity);
-		auto handle = CEntities{}.FindByModel(params(0), name);
+		auto handle = CEntities{}.FindByModel(params[0], name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
 		ParamScope params(startEntity);
-		auto handle = CEntities{}.FindByModelWithin(params(0), name, origin, maxRadius);
+		auto handle = CEntities{}.FindByModelWithin(params[0], name, origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindByTarget(CEntityInstance* startEntity, const char* name) {
 		ParamScope params(startEntity);
-		auto handle = CEntities{}.FindByTarget(params(0), name);
+		auto handle = CEntities{}.FindByTarget(params[0], name);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
 	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
 		ParamScope params(startEntity);
-		auto handle = CEntities{}.FindInSphere(params(0), name, origin, maxRadius);
+		auto handle = CEntities{}.FindInSphere(params[0], name, origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 }// namespace entities

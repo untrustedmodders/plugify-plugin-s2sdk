@@ -33,7 +33,7 @@ void cvars::ReplicateConVar(ConVarRefAbstract conVar, std::string_view value) {
 		return;
 
 	for (int i = 0; i < gpGlobals->maxClients; ++i) {
-		SendConVarValue(CPlayerSlot(i), conVar.GetName(), value);
+		SendConVarValue(i, conVar.GetName(), value);
 	}
 }
 

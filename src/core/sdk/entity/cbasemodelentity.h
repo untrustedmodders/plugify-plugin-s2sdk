@@ -83,7 +83,7 @@ class CPointWorldText : public CModelPointEntity {
 public:
 	DECLARE_SCHEMA_CLASS(CPointWorldText);
 
-	SCHEMA_FIELD_POINTER(char, m_messageText);
+	SCHEMA_FIELD(char[512], m_messageText);
 
 	void SetText(const char* msg) {
 		AcceptInput("SetMessage", msg);

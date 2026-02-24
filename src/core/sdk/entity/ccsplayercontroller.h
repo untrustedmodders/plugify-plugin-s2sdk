@@ -32,7 +32,7 @@ public:
 	SCHEMA_FIELD(CCSPlayerController_ActionTrackingServices*, m_pActionTrackingServices)
 	SCHEMA_FIELD(uint32_t, m_iPing)
 	SCHEMA_FIELD(CUtlSymbolLarge, m_szClan)
-	SCHEMA_FIELD_POINTER(char, m_szClanName)// char m_szClanName[32]
+	SCHEMA_FIELD(char[32], m_szClanName)
 	SCHEMA_FIELD(bool, m_bEverFullyConnected)
 	SCHEMA_FIELD(bool, m_bPawnIsAlive)
 	SCHEMA_FIELD(int32_t, m_nDisconnectionTick)

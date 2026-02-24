@@ -270,8 +270,6 @@
         GetServerLanguage;
         GetAllConVars;
 
-        FindModule;
-        FindInterface;
         QueryInterface;
         GetGameDirectory;
         GetCurrentMap;
@@ -1021,5 +1019,6 @@
         *_Unregister;
 
         __polyhook_*;
+        *_offset;
     local: *;
 };

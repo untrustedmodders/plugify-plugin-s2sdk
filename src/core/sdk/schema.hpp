@@ -132,6 +132,10 @@ class SchemaField {
 	// Compact internal helpers
 	[[nodiscard]] auto Key(this auto&& self) {
 		static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
+		static const bool done = []{
+			if (key.size != sizeof(T)) plg::print(LS_WARNING, "Schema field '{}' mismatсhed in class '{}': expected {}, got {}!\n", ThisClass::m_className, MemberName, key.size, sizeof(T));
+			return true;
+		}();
 		return key;
 	}
 	[[nodiscard]] auto Chain(this auto&& self) {
@@ -147,8 +151,8 @@ public:
 	}
 
 	void Set(this auto&& self, const T& val) {
-		self.NotifyNetworkChange();
 		*reinterpret_cast<ptr_t>(self.ThisPtr() + self.Offset()) = val;
+		self.NotifyNetworkChange();
 	}
 
 	[[nodiscard]] operator ref_t(this auto&& self) { return self.Get(); }
@@ -156,7 +160,7 @@ public:
 	[[nodiscard]] auto operator->(this auto&& self) requires (!std::is_pointer_v<T>) { return std::addressof(self.Get()); }
     [[nodiscard]] auto operator*(this auto&& self) requires (std::is_pointer_v<T>) { return *self.Get(); }
     [[nodiscard]] auto operator*(this auto&& self) requires (!std::is_pointer_v<T>) { return self.Get(); }
-    [[nodiscard]] auto operator[](this auto&& self, auto idx) { return self.Get()[idx]; }
+    [[nodiscard]] decltype(auto) operator[](this auto&& self, auto idx) { return self.Get()[idx]; }
     [[nodiscard]] auto operator+(this auto&& self, auto v) { return self.Get() + v; }
     [[nodiscard]] auto operator-(this auto&& self, auto v) { return self.Get() - v; }
     [[nodiscard]] bool operator==(this auto&& self, const auto& v) { return self.Get() == v; }
@@ -262,6 +266,10 @@ class SchemaPointerField {
     // Compact internal helpers
     [[nodiscard]] auto Key(this auto&& self) {
         static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
+    	/*static const bool done = []{
+    		if (key.size != sizeof(T)) plg::print(LS_WARNING, "Schema pointer field '{}' mismatсhed in class '{}': expected {}, got {}!\n", ThisClass::m_className, MemberName, key.size, sizeof(T));
+    		return true;
+    	}();*/
         return key;
     }
     [[nodiscard]] auto Chain(this auto&& self) {
@@ -305,7 +313,7 @@ public:
 #define SCHEMA_FIELD_OFFSET(type, name, extra) \
 private: \
 	static constexpr const char name##_str[] = #name; \
-	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+	static PLUGIN_API size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
     PLUGIFY_NO_UNIQUE_ADDRESS SchemaField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 
@@ -315,7 +323,7 @@ public: \
 #define SCHEMA_FIELD_POINTER_OFFSET(type, name, extra) \
 private: \
 	static constexpr const char name##_str[] = #name; \
-	static constexpr size_t name##_offset() { return offsetof(ThisClass, name); }; \
+	static PLUGIN_API size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
 	PLUGIFY_NO_UNIQUE_ADDRESS SchemaPointerField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 

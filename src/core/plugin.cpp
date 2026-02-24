@@ -798,10 +798,10 @@ void Source2SDK::OnPluginStart() {
 	//g_HookManager.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, Pre);
 
 	TRY_GET_VTABLE(g_pGameConfig, "CLuaVM", CLuaVM);
-	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterFunction, &CLuaVM, Hook_RegisterFunction, Pre);
-	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, &CLuaVM, Hook_RegisterScriptClass, Pre);
+	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterFunction, CLuaVM, Hook_RegisterFunction, Pre);
+	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, CLuaVM, Hook_RegisterScriptClass, Pre);
 	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
-	g_HookManager.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, &CLuaVM, Hook_RegisterInstance, Pre);
+	g_HookManager.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, CLuaVM, Hook_RegisterInstance, Pre);
 	//using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
 	//g_HookManager.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);
 	//g_HookManager.AddHookVFuncFunc(&IScriptVM::LookupFunction, &*table3, Hook_LookupFunction, Post);
@@ -817,11 +817,11 @@ void Source2SDK::OnPluginStart() {
 	g_HookManager.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
 	TRY_GET_VTABLE(g_pGameConfig, "CServerSideClient", CServerSideClient);
-	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, &CServerSideClient, Hook_ProcessRespondCvarValue, Pre);
-	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, &CServerSideClient, Hook_SendNetMessage, Pre);
+	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, CServerSideClient, Hook_ProcessRespondCvarValue, Pre);
+	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, CServerSideClient, Hook_SendNetMessage, Pre);
 
 	TRY_GET_VTABLE(g_pGameConfig, "CGameRulesGameSystem", CGameRulesGameSystem);
-	g_HookManager.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, &CGameRulesGameSystem, Hook_BuildGameSessionManifest, Pre);
+	g_HookManager.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, CGameRulesGameSystem, Hook_BuildGameSessionManifest, Pre);
 
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
 	g_HookManager.AddHookDetourFunc<TerminateRoundFn>("CGameRules::TerminateRound", Hook_TerminateRound, Pre);
