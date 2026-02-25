@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.4.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.4.0...v2.4.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* add offset methods ([6a9f6c6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6a9f6c6d0756c79c9a0676adc84d58e036557eda))
+* collect base classes for schemas ([ba71450](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ba71450d1b1712a45ef023988dd5e553db5bba3c))
+* make invalid offset -1 ([4da9db4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4da9db47d937d29a6122ad0a7affc8e78e2c15fb))
+* move notify after change ([324b75e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/324b75e71cac4a6b9f6b7bc4a89a62a83d455841))
+* prevent symbols to optimize from schema if unused ([85af6e5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/85af6e5e54ca325bf733b05fe0b6079d83b5d0c6))
+* remove SCHEMA_FIELD_POINTER ([14a75dc](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/14a75dc544230ad8e42da93ccf1e6d3467b60fd5))
+* small typo ([045d306](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/045d306d8cf5b6148032f09349be5e3fa2c3cd4a))
+* update CPlayerControllerComponent ([952ea8e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/952ea8e776b37feee58a4654cb93a0a08234e165))
+
 ## [2.4.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.3.29...v2.4.0) (2026-02-15)
 
 
