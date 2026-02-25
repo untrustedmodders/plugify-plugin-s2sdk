@@ -28,10 +28,10 @@
 #include <utldelegate.h>
 
 struct SchemaKey {
-	ptrdiff_t offset;
-	size_t networked;
-	size_t size;
-	CSchemaType* type;
+	int32_t offset{-1};
+	bool networked{};
+	size_t size{};
+	CSchemaType* type{};
 };
 
 namespace schema {
@@ -84,7 +84,7 @@ namespace schema {
 
 	struct ElementSizedType {
 		ElementType type;
-		int size;
+		int32_t size;
 	};
 
     int32_t FindChainOffset(std::string_view className);
@@ -115,7 +115,7 @@ template<
     typename ThisClass,
     char const* MemberName,
     size_t(*MemberOffset)(),
-    std::size_t ExtraOffset = 0
+    int ExtraOffset = 0
 >
 class SchemaField {
 	using ptr_t = std::conditional_t<
@@ -249,7 +249,7 @@ template<
     typename ThisClass,
     char const* MemberName,
     size_t(*MemberOffset)(),
-    std::size_t ExtraOffset = 0
+    int ExtraOffset = 0
 >
 class SchemaPointerField {
 	using ptr_t = std::conditional_t<
