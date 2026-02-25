@@ -21,11 +21,10 @@ PLUGIFY_WARN_IGNORE(4190)
  *
  * @param className The name of the class.
  * @param memberName The name of the member whose offset is to be retrieved.
- * @return The offset of the member in the class.
+ * @return The offset of the member in the class, or -1 if the offset is not found.
  */
 extern "C" PLUGIN_API int32_t GetSchemaOffset(const plg::string& className, const plg::string& memberName) {
-	const auto schemaKey = schema::GetOffset(className, memberName);
-	return schemaKey.offset;
+	return schema::GetOffset(className, memberName).offset;
 }
 
 /**
@@ -34,7 +33,7 @@ extern "C" PLUGIN_API int32_t GetSchemaOffset(const plg::string& className, cons
  * This function retrieves the offset of a chain in the specified class.
  *
  * @param className The name of the class.
- * @return The offset of the chain entity in the class.
+ * @return The offset of the chain entity in the class, or -1 if the offset is not found.
  */
 extern "C" PLUGIN_API int32_t GetSchemaChainOffset(const plg::string& className) {
 	return schema::FindChainOffset(className);
@@ -50,8 +49,7 @@ extern "C" PLUGIN_API int32_t GetSchemaChainOffset(const plg::string& className)
  * @return True if the member is networked, false otherwise.
  */
 extern "C" PLUGIN_API bool IsSchemaFieldNetworked(const plg::string& className, const plg::string& memberName) {
-	const auto schemaKey = schema::GetOffset(className, memberName);
-	return schemaKey.networked;
+	return schema::GetOffset(className, memberName).networked;
 }
 
 /**
@@ -63,13 +61,17 @@ extern "C" PLUGIN_API bool IsSchemaFieldNetworked(const plg::string& className, 
  * @return The size of the class in bytes, or -1 if the class is not found.
  */
 extern "C" PLUGIN_API int32_t GetSchemaClassSize(const plg::string& className) {
-	CSchemaSystemTypeScope* type = g_pSchemaSystem->FindTypeScopeForModule(S2SDK_LIBRARY_PREFIX "server" S2SDK_LIBRARY_SUFFIX);
-	SchemaMetaInfoHandle_t<CSchemaClassInfo> classInfo = type->FindDeclaredClass(className.c_str());
-	if (!classInfo) {
+	auto* scope = g_pSchemaSystem->FindTypeScopeForModule(schema::moduleName.data());
+	if (!scope) {
+		plg::print(LS_WARNING, "'{}' module was not found!\n", schema::moduleName);
+		return {};
+	}
+	auto cls = scope->FindDeclaredClass(className.c_str());
+	if (!cls) {
+		plg::print(LS_WARNING, "'{}' class was not found!\n", className);
 		return -1;
 	}
-
-	return classInfo->m_nSize;
+	return cls->m_nSize;
 }
 
 //
@@ -582,7 +584,7 @@ extern "C" PLUGIN_API int GetEntSchemaArraySize2(CEntityInstance* entity, const 
 		return {};
 	}
 
-	auto elementType = schema::GetElementType(type);
+	const auto elementType = schema::GetElementType(type);
 	switch (elementType) {
 		case schema::ElementType::Array:
 			return static_cast<const CSchemaType_FixedArray*>(type)->m_nElementCount;

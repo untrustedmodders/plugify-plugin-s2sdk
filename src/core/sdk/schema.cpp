@@ -106,13 +106,13 @@ namespace {
 	SchemaValueMap InitSchemaFieldsForClass(std::string_view moduleName, std::string_view className) {
 		auto* scope = g_pSchemaSystem->FindTypeScopeForModule(moduleName.data());
 		if (!scope) {
-			plg::print(LS_WARNING, "InitSchemaFieldsForClass(): '{}' module was not found!\n", moduleName);
+			plg::print(LS_WARNING, "'{}' module was not found!\n", moduleName);
 			return {};
 		}
 
 		auto cls = scope->FindDeclaredClass(className.data());
 		if (!cls) {
-			plg::print(LS_WARNING, "InitSchemaFieldsForClass(): '{}' class was not found!\n", className);
+			plg::print(LS_WARNING, "'{}' class was not found!\n", className);
 			return {};
 		}
 
@@ -126,9 +126,6 @@ namespace {
 }// namespace
 
 namespace schema {
-	static constexpr std::string_view moduleName = S2SDK_LIBRARY_PREFIX "server" S2SDK_LIBRARY_SUFFIX;
-	static constexpr std::string_view chainKey = "__m_pChainEntity";
-
 	int32_t FindChainOffset(std::string_view className) {
 		return GetOffset(className, chainKey).offset;
 	}
@@ -146,7 +143,7 @@ namespace schema {
 				if (chainKey != memberName) {
 					plg::print(
 						LS_WARNING,
-						"schema::GetOffset(): '{}' was not found in '{}'!\n",
+						"'{}' was not found in '{}'!\n",
 						memberName,
 						className
 					);

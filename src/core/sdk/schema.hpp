@@ -35,7 +35,10 @@ struct SchemaKey {
 };
 
 namespace schema {
-	static plg::flat_hash_set<plg::string> CS2BadList = {
+	constexpr inline std::string_view moduleName = S2SDK_LIBRARY_PREFIX "server" S2SDK_LIBRARY_SUFFIX;
+	constexpr inline std::string_view chainKey = "__m_pChainEntity";
+
+	static inline plg::flat_hash_set<plg::string> CS2BadList = {
 			"m_bIsValveDS",
 			"m_bIsQuestEligible",
 			"m_iItemDefinitionIndex",// in unmanaged this cannot be set.
@@ -74,7 +77,7 @@ namespace schema {
 			"m_nMusicID",
 	};
 
-	enum ElementType : int {
+	enum ElementType : int32_t {
 		Invalid,
 		Single,
 		Array,
@@ -102,7 +105,7 @@ namespace schema {
 	ElementType IsPlainType(CSchemaType* type, size_t size);
 	ElementType IsAtomicType(CSchemaType* type, size_t size);
 
-}// namespace schema
+} // namespace schema
 
 void EntityNetworkStateChanged(uintptr_t entity, uint32_t offset);
 void ChainNetworkStateChanged(uintptr_t networkVarChainer, uint32_t offset);
@@ -234,7 +237,7 @@ public:
 		const auto thisPtr = self.ThisPtr();
 		const auto offset = self.Offset();
 
-		if (const auto chain = self.Chain(); chain != 0) {
+		if (const auto chain = self.Chain(); chain != -1) {
 			::ChainNetworkStateChanged(thisPtr + chain, offset);
 		} else if constexpr (ThisClass::m_networkStateChangedOffset) {
 			::NetworkVarStateChanged(thisPtr, offset, ThisClass::m_networkStateChangedOffset);
@@ -296,10 +299,13 @@ public:
     //[[nodiscard]] auto operator<=>(this auto&& self, auto ptr) { return self.Get() <=> ptr; }
 
     void NetworkStateChanged(this auto&& self) {
-        if (!self.Key().networked) return;
+        if (!self.Key().networked)
+        	return;
+
         const auto thisPtr = self.ThisPtr();
         const auto offset = self.Offset();
-        if (const auto chain = self.Chain(); chain != 0) {
+
+        if (const auto chain = self.Chain(); chain != -1) {
             ::ChainNetworkStateChanged(thisPtr + chain, offset);
         } else if constexpr (ThisClass::m_networkStateChangedOffset) {
             ::NetworkVarStateChanged(thisPtr, offset, ThisClass::m_networkStateChangedOffset);
