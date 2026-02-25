@@ -72,16 +72,16 @@ void Logger::Log(std::string_view message, LoggingSeverity_t severity, std::sour
 	std::unique_lock lock(m_mutex);
 	switch (severity) {
 		case LS_ERROR:
-			LoggingSystem_Log(m_channelID, LS_ERROR, RED, message.data());
+			LoggingSystem_LogDirect(m_channelID, LS_ERROR, RED, message.data());
 		break;
 		case LS_WARNING:
-			LoggingSystem_Log(m_channelID, LS_WARNING, YELLOW, message.data());
+			LoggingSystem_LogDirect(m_channelID, LS_WARNING, YELLOW, message.data());
 		break;
 		case LS_MESSAGE:
-			LoggingSystem_Log(m_channelID, LS_MESSAGE, WHITE, message.data());
+			LoggingSystem_LogDirect(m_channelID, LS_MESSAGE, WHITE, message.data());
 		break;
 		case LS_DETAILED:
-			LoggingSystem_Log(m_channelID, LS_MESSAGE, GREEN, message.data());
+			LoggingSystem_LogDirect(m_channelID, LS_MESSAGE, GREEN, message.data());
 		break;
 		default:
 			break;
