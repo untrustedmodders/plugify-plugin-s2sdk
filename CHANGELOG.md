@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.4.1...v2.4.2) (2026-02-26)
+
+
+### Bug Fixes
+
+* change `LoggingSystem_Log` with `LoggingSystem_LogDirect` ([f10dcb0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f10dcb0fdc8bd7a48e82ed8cacc5d425d0ee9f53))
+* rework SafeNetworkStateChanged for new invalid offset ([e089b6e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e089b6e624a7c43fb7e25a5a38808ec3a56a8138))
+
 ## [2.4.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.4.0...v2.4.1) (2026-02-25)
 
 
