@@ -39,13 +39,13 @@ void ChainNetworkStateChanged(uintptr_t networkVarChainer, uint32_t localOffset)
 }
 
 void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset) {
-	if (chainOffset > 0) {
+	if (chainOffset >= 0) {
 		ChainNetworkStateChanged(entity + chainOffset, offset);
 	} else {
-		if (chainOffset == 0)
+		if (chainOffset == -1)
 			EntityNetworkStateChanged(entity, offset);
 		else
-			NetworkVarStateChanged(entity, offset, -chainOffset);
+			NetworkVarStateChanged(entity, offset, 1);
 	}
 }
 
@@ -69,7 +69,7 @@ namespace {
 		std::string_view derivedName
 	) {
 		for (uint8 i = 0; i < cls.m_nBaseClassCount; ++i) {
-			SchemaBaseClassInfoData_t& base = cls.m_pBaseClasses[i];
+			const SchemaBaseClassInfoData_t& base = cls.m_pBaseClasses[i];
 			CollectSchemaFields(*base.m_pClass, out, derivedName);
 		}
 
