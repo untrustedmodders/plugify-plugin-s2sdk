@@ -190,6 +190,15 @@ extern "C" PLUGIN_API void UserMessageSetRecipientMask(UserMessage* userMessage,
 }
 
 /**
+ * @brief Sets the recipient mask for the UserMessage.
+ *
+ * @param userMessage The UserMessage instance.
+ */
+extern "C" PLUGIN_API void UserMessageRemoveAllRecipient(UserMessage* userMessage) {
+	if (userMessage) userMessage->GetRecipientFilter().Reset();
+}
+
+/**
  * @brief Gets the count of repeated fields in a field of the UserMessage.
  *
  * @param userMessage The UserMessage instance.
