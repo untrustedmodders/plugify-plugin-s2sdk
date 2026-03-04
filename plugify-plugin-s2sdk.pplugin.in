@@ -32297,6 +32297,23 @@
       }
     },
     {
+      "name": "UserMessageRemoveAllRecipient",
+      "group": "Protobuf",
+      "description": "Remove all players UserMessage.",
+      "funcName": "UserMessageRemoveAllRecipient",
+      "paramTypes": [
+        {
+          "name": "userMessage",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The UserMessage instance."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "UserMessageGetRepeatedFieldCount",
       "group": "Protobuf",
       "description": "Gets the count of repeated fields in a field of the UserMessage.",

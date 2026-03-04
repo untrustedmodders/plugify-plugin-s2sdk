@@ -681,6 +681,7 @@
         UserMessageAddRecipient;
         UserMessageAddAllPlayers;
         UserMessageSetRecipientMask;
+        UserMessageRemoveAllRecipient;
         UserMessageGetRepeatedFieldCount;
         UserMessageRemoveRepeatedFieldValue;
         UserMessageGetDebugString;
