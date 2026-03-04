@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.4.2...v2.5.0) (2026-03-04)
+
+
+### Features
+
+* add UserMessageRemoveAllRecipient export ([96aaa11](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/96aaa11f9011b81288bc0811a8924c57e5e2b841))
+
 ## [2.4.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.4.1...v2.4.2) (2026-02-26)
 
 
