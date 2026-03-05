@@ -28,14 +28,17 @@
 #include <utldelegate.h>
 
 struct SchemaKey {
-	ptrdiff_t offset;
-	size_t networked;
-	size_t size;
-	CSchemaType* type;
+	int32_t offset{-1};
+	bool networked{};
+	size_t size{};
+	CSchemaType* type{};
 };
 
 namespace schema {
-	static plg::flat_hash_set<plg::string> CS2BadList = {
+	constexpr inline std::string_view moduleName = S2SDK_LIBRARY_PREFIX "server" S2SDK_LIBRARY_SUFFIX;
+	constexpr inline std::string_view chainKey = "__m_pChainEntity";
+
+	static inline plg::flat_hash_set<plg::string> CS2BadList = {
 			"m_bIsValveDS",
 			"m_bIsQuestEligible",
 			"m_iItemDefinitionIndex",// in unmanaged this cannot be set.
@@ -74,7 +77,7 @@ namespace schema {
 			"m_nMusicID",
 	};
 
-	enum ElementType : int {
+	enum ElementType : int32_t {
 		Invalid,
 		Single,
 		Array,
@@ -84,7 +87,7 @@ namespace schema {
 
 	struct ElementSizedType {
 		ElementType type;
-		int size;
+		int32_t size;
 	};
 
     int32_t FindChainOffset(std::string_view className);
@@ -102,7 +105,7 @@ namespace schema {
 	ElementType IsPlainType(CSchemaType* type, size_t size);
 	ElementType IsAtomicType(CSchemaType* type, size_t size);
 
-}// namespace schema
+} // namespace schema
 
 void EntityNetworkStateChanged(uintptr_t entity, uint32_t offset);
 void ChainNetworkStateChanged(uintptr_t networkVarChainer, uint32_t offset);
@@ -115,7 +118,7 @@ template<
     typename ThisClass,
     char const* MemberName,
     size_t(*MemberOffset)(),
-    std::size_t ExtraOffset = 0
+    int ExtraOffset = 0
 >
 class SchemaField {
 	using ptr_t = std::conditional_t<
@@ -234,7 +237,7 @@ public:
 		const auto thisPtr = self.ThisPtr();
 		const auto offset = self.Offset();
 
-		if (const auto chain = self.Chain(); chain != 0) {
+		if (const auto chain = self.Chain(); chain != -1) {
 			::ChainNetworkStateChanged(thisPtr + chain, offset);
 		} else if constexpr (ThisClass::m_networkStateChangedOffset) {
 			::NetworkVarStateChanged(thisPtr, offset, ThisClass::m_networkStateChangedOffset);
@@ -249,7 +252,7 @@ template<
     typename ThisClass,
     char const* MemberName,
     size_t(*MemberOffset)(),
-    std::size_t ExtraOffset = 0
+    int ExtraOffset = 0
 >
 class SchemaPointerField {
 	using ptr_t = std::conditional_t<
@@ -296,10 +299,13 @@ public:
     //[[nodiscard]] auto operator<=>(this auto&& self, auto ptr) { return self.Get() <=> ptr; }
 
     void NetworkStateChanged(this auto&& self) {
-        if (!self.Key().networked) return;
+        if (!self.Key().networked)
+        	return;
+
         const auto thisPtr = self.ThisPtr();
         const auto offset = self.Offset();
-        if (const auto chain = self.Chain(); chain != 0) {
+
+        if (const auto chain = self.Chain(); chain != -1) {
             ::ChainNetworkStateChanged(thisPtr + chain, offset);
         } else if constexpr (ThisClass::m_networkStateChangedOffset) {
             ::NetworkVarStateChanged(thisPtr, offset, ThisClass::m_networkStateChangedOffset);
@@ -313,7 +319,7 @@ public:
 #define SCHEMA_FIELD_OFFSET(type, name, extra) \
 private: \
 	static constexpr const char name##_str[] = #name; \
-	static PLUGIN_API size_t name##_offset() { return offsetof(ThisClass, name); }; \
+	PLUGIFY_USED static size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
     PLUGIFY_NO_UNIQUE_ADDRESS SchemaField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 
@@ -323,7 +329,7 @@ public: \
 #define SCHEMA_FIELD_POINTER_OFFSET(type, name, extra) \
 private: \
 	static constexpr const char name##_str[] = #name; \
-	static PLUGIN_API size_t name##_offset() { return offsetof(ThisClass, name); }; \
+	PLUGIFY_USED static size_t name##_offset() { return offsetof(ThisClass, name); }; \
 public: \
 	PLUGIFY_NO_UNIQUE_ADDRESS SchemaPointerField<type, ThisClass, name##_str, name##_offset, (extra)> name;
 

@@ -39,13 +39,13 @@ void ChainNetworkStateChanged(uintptr_t networkVarChainer, uint32_t localOffset)
 }
 
 void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset) {
-	if (chainOffset > 0) {
+	if (chainOffset >= 0) {
 		ChainNetworkStateChanged(entity + chainOffset, offset);
 	} else {
-		if (chainOffset == 0)
+		if (chainOffset == -1)
 			EntityNetworkStateChanged(entity, offset);
 		else
-			NetworkVarStateChanged(entity, offset, -chainOffset);
+			NetworkVarStateChanged(entity, offset, 1);
 	}
 }
 
@@ -63,35 +63,62 @@ namespace {
 		return false;
 	}
 
-	SchemaValueMap InitSchemaFieldsForClass(std::string_view className) {
-		CSchemaSystemTypeScope* pType = g_pSchemaSystem->FindTypeScopeForModule(S2SDK_LIBRARY_PREFIX "server" S2SDK_LIBRARY_SUFFIX);
-		if (!pType)
-			return {};
-
-		SchemaMetaInfoHandle_t<CSchemaClassInfo> pClassInfo = pType->FindDeclaredClass(className.data());
-		if (!pClassInfo) {
-			plg::print(LS_ERROR, "InitSchemaFieldsForClass(): '{}' was not found!\n", className);
-			return {};
+	void CollectSchemaFields(
+		CSchemaClassInfo& cls,
+		SchemaValueMap& out,
+		std::string_view derivedName
+	) {
+		for (uint8 i = 0; i < cls.m_nBaseClassCount; ++i) {
+			const SchemaBaseClassInfoData_t& base = cls.m_pBaseClasses[i];
+			CollectSchemaFields(*base.m_pClass, out, derivedName);
 		}
 
-		size_t fieldsSize = pClassInfo->m_nFieldCount;
-		SchemaClassFieldData_t* fields = pClassInfo->m_pFields;
+		out.reserve(cls.m_nFieldCount);
 
-		SchemaValueMap valueMap;
-		valueMap.reserve(fieldsSize);
-
-		for (size_t i = 0; i < fieldsSize; ++i) {
-			const SchemaClassFieldData_t& field = fields[i];
+		for (uint16 i = 0; i < cls.m_nFieldCount; ++i) {
+			const SchemaClassFieldData_t& field = cls.m_pFields[i];
 
 			int size = 0;
 			uint8 alignment = 0;
 			field.m_pType->GetSizeAndAlignment(size, alignment);
-			valueMap.emplace(field.m_pszName, SchemaKey{field.m_nSingleInheritanceOffset, IsFieldNetworked(field), static_cast<size_t>(size), field.m_pType});
 
-			plg::print(LS_DETAILED, "{}::{} found at -> 0x{:x} - {}\n", className, field.m_pszName, field.m_nSingleInheritanceOffset, static_cast<const void*>(&field));
+			out.emplace(
+				field.m_pszName,
+				SchemaKey{
+					field.m_nSingleInheritanceOffset,
+					IsFieldNetworked(field),
+					static_cast<size_t>(size),
+					field.m_pType
+				}
+			);
+
+			plg::print(
+				LS_DETAILED,
+				"{}::{} found at -> 0x{:x} - {}\n",
+				derivedName,
+				field.m_pszName,
+				field.m_nSingleInheritanceOffset,
+				static_cast<const void*>(&field)
+			);
+		}
+	}
+
+	SchemaValueMap InitSchemaFieldsForClass(std::string_view moduleName, std::string_view className) {
+		auto* scope = g_pSchemaSystem->FindTypeScopeForModule(moduleName.data());
+		if (!scope) {
+			plg::print(LS_WARNING, "'{}' module was not found!\n", moduleName);
+			return {};
 		}
 
-		return valueMap;
+		auto cls = scope->FindDeclaredClass(className.data());
+		if (!cls) {
+			plg::print(LS_WARNING, "'{}' class was not found!\n", className);
+			return {};
+		}
+
+		SchemaValueMap map;
+		CollectSchemaFields(*cls, map, className);
+		return map;
 	}
 
 	SchemaTableMap schemaTableMap;
@@ -99,10 +126,8 @@ namespace {
 }// namespace
 
 namespace schema {
-	static constexpr std::string_view g_ChainKey = "__m_pChainEntity";
-
 	int32_t FindChainOffset(std::string_view className) {
-		return GetOffset(className, g_ChainKey).offset;
+		return GetOffset(className, chainKey).offset;
 	}
 
 	SchemaKey GetOffset(std::string_view className, std::string_view memberName) {
@@ -110,15 +135,15 @@ namespace schema {
 			std::shared_lock lock(schemaMutex);
 			auto it = schemaTableMap.find(className);
 			if (it != schemaTableMap.end()) {
-				auto& table = it->second;
+				const auto& table = it->second;
 				auto it2 = table.find(memberName);
 				if (it2 != table.end()) {
 					return it2->second;
 				}
-				if (g_ChainKey != memberName) {
+				if (chainKey != memberName) {
 					plg::print(
-						LS_ERROR,
-						"schema::GetOffset(): '{}' was not found in '{}'!\n",
+						LS_WARNING,
+						"'{}' was not found in '{}'!\n",
 						memberName,
 						className
 					);
@@ -129,14 +154,14 @@ namespace schema {
 
 		{
 			std::unique_lock lock(schemaMutex);
-			schemaTableMap.emplace(className, InitSchemaFieldsForClass(className));
+			schemaTableMap.emplace(className, InitSchemaFieldsForClass(moduleName, className));
 		}
 
 		return GetOffset(className, memberName);
 	}
 
 	int32_t FindChainOffset(const char* className) {
-		return GetOffset(className, g_ChainKey).offset;
+		return GetOffset(className, chainKey).offset;
 	}
 
 	SchemaKey GetOffset(const char* className, const char* memberName) {
@@ -280,7 +305,7 @@ namespace schema {
 					case SCHEMA_BUILTIN_TYPE_INT64:
 						return {Single, static_cast<int>(sizeof(int64))};
 					case SCHEMA_BUILTIN_TYPE_UINT64:
-						return {Single, static_cast<int>(sizeof(uint64_t))};
+						return {Single, static_cast<int>(sizeof(uint64))};
 					case SCHEMA_BUILTIN_TYPE_COUNT:
 						return {Single, static_cast<int>(sizeof(size_t))};
 					default:

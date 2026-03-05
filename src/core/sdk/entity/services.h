@@ -58,6 +58,15 @@ public:
 	CBasePlayerPawn* GetPawn() { return __m_pChainEntity; }
 };
 
+class CPlayerControllerComponent {
+public:
+	DECLARE_SCHEMA_CLASS(CPlayerControllerComponent);
+
+	SCHEMA_FIELD(CBasePlayerController*, __m_pChainEntity)
+
+	CBasePlayerController* GetController() { return __m_pChainEntity; }
+};
+
 class CPlayer_MovementServices : public CPlayerPawnComponent {
 public:
 	DECLARE_SCHEMA_CLASS(CPlayer_MovementServices);
@@ -171,7 +180,7 @@ public:
 	}
 };
 
-class CCSPlayerController_InGameMoneyServices {
+class CCSPlayerController_InGameMoneyServices : public CPlayerControllerComponent {
 public:
 	DECLARE_SCHEMA_CLASS(CCSPlayerController_InGameMoneyServices);
 
