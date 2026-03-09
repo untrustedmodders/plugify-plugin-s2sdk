@@ -587,6 +587,8 @@
         SetEntSchemaVector4D2;
         GetEntSchemaEnt2;
         SetEntSchemaEnt2;
+        PushEntSchemaEnt2;
+        EraseEntSchemaEnt2;
         NetworkStateChanged2;
         GetEntSchemaArraySize;
         GetEntSchema;
@@ -605,6 +607,8 @@
         SetEntSchemaVector4D;
         GetEntSchemaEnt;
         SetEntSchemaEnt;
+        PushEntSchemaEnt;
+        EraseEntSchemaEnt;
         NetworkStateChanged;
 
         DebugBreak;
