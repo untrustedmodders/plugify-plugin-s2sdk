@@ -1492,6 +1492,116 @@ extern "C" PLUGIN_API void SetEntSchemaEnt2(CEntityInstance* entity, const plg::
 	}
 }
 
+/***
+ * @brief Pushes an entity handle into an entity's schema collection.
+ *
+ * This function appends a new entity handle to a collection-typed schema field
+ * (for example, a `CUtlVector<CEntityHandle>`). It performs strict offset and
+ * type checking and optionally notifies the network system about the change.
+ *
+ * @note This will only work on offsets that are stored as "entity handles" in collections
+ *       (which usually looks like m_h* in properties and use `CUtlVector<CEntityHandle>`).
+ *
+ * @param entity Pointer to the instance of the class where the value is to be pushed.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param value The entity handle to push.
+ * @param changeState If true, change will be sent over the network.
+ */
+extern "C" PLUGIN_API void PushEntSchemaEnt2(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, int value, bool changeState) {
+	if (g_pCoreConfig->FollowCS2ServerGuidelines && schema::CS2BadList.contains(memberName)) {
+		plg::print(LS_WARNING, "Cannot push into '{}::{}' with \"FollowCS2ServerGuidelines\" option enabled.\n", className, memberName);
+		return;
+	}
+
+	const auto [offset, networked, size, type] = schema::GetOffset(className, memberName);
+	if (offset == -1) {
+		plg::print(LS_WARNING, "Cannot find offset for '{}::{}' with entity pointer: {}\n", className, memberName, static_cast<const void*>(entity));
+		return;
+	}
+
+	if (changeState) {
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className);
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			plg::print(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
+	}
+
+	switch (schema::IsAtomicType(type, sizeof(CEntityHandle))) {
+		case schema::ElementType::Collection: {
+			auto* vec = reinterpret_cast<CUtlVector<CEntityHandle>*>(reinterpret_cast<intptr_t>(entity) + offset);
+			vec->AddToTail(CEntityHandle(value));
+			break;
+		}
+		case schema::ElementType::Array:
+		case schema::ElementType::Single:
+			plg::print(LS_WARNING, "Schema field '{}::{}' is not a collection of entity handles and cannot be pushed into.\n", className, memberName);
+			break;
+		default:
+			plg::print(LS_WARNING, "Schema field '{}::{}' is not a entity handle, but '{}'\n", className, memberName, type->m_sTypeName.Get());
+			break;
+	}
+}
+
+/**
+ * @brief Erases an entity handle from an entity's schema collection by index.
+ *
+ * This function removes an entity handle at the given index from a collection-typed
+ * schema field (for example, a `CUtlVector<CEntityHandle>`). It performs strict offset
+ * and type checking and optionally notifies the network system about the change.
+ *
+ * @note This will only work on offsets that are stored as "entity handles" in collections
+ *       (which usually looks like m_h* in properties and use `CUtlVector<CEntityHandle>`).
+ *
+ * @param entity Pointer to the instance of the class where the value is to be erased.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param element Element index to erase (starting from 0).
+ * @param changeState If true, change will be sent over the network.
+ */
+extern "C" PLUGIN_API void EraseEntSchemaEnt2(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, int element, bool changeState) {
+	if (g_pCoreConfig->FollowCS2ServerGuidelines && schema::CS2BadList.contains(memberName)) {
+		plg::print(LS_WARNING, "Cannot erase from '{}::{}' with \"FollowCS2ServerGuidelines\" option enabled.\n", className, memberName);
+		return;
+	}
+
+	const auto [offset, networked, size, type] = schema::GetOffset(className, memberName);
+	if (offset == -1) {
+		plg::print(LS_WARNING, "Cannot find offset for '{}::{}' with entity pointer: {}\n", className, memberName, static_cast<const void*>(entity));
+		return;
+	}
+
+	if (changeState) {
+		if (networked) {
+			const auto chainOffset = schema::FindChainOffset(className);
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		} else {
+			plg::print(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
+	}
+
+	switch (schema::IsAtomicType(type, sizeof(CEntityHandle))) {
+		case schema::ElementType::Collection: {
+			auto* vec = reinterpret_cast<CUtlVector<CEntityHandle>*>(reinterpret_cast<intptr_t>(entity) + offset);
+			if (element < 0 || element >= vec->Count()) {
+				plg::print(LS_WARNING, "Index '{}' is out of range for schema collection '{}::{}' (size = {}).\n", element, className, memberName, vec->Count());
+				return;
+			}
+			vec->Remove(element);
+			break;
+		}
+		case schema::ElementType::Array:
+		case schema::ElementType::Single:
+			plg::print(LS_WARNING, "Schema field '{}::{}' is not a collection of entity handles and cannot erase by index.\n", className, memberName);
+			break;
+		default:
+			plg::print(LS_WARNING, "Schema field '{}::{}' is not a entity handle, but '{}'\n", className, memberName, type->m_sTypeName.Get());
+			break;
+	}
+}
+
 //
 
 /**
@@ -1913,6 +2023,52 @@ extern "C" PLUGIN_API void SetEntSchemaEnt(int entityHandle, const plg::string& 
 	}
 
 	SetEntSchemaEnt2(entity, className, memberName, value, changeState, element);
+}
+
+/**
+ * @brief Pushes an entity handle into an entity's schema collection.
+ *
+ * This is a convenience wrapper over PushEntSchemaEnt2 that resolves the entity
+ * from its handle and appends a new entity handle value to the target schema
+ * collection field.
+ *
+ * @param entityHandle The handle of the entity whose schema collection is modified.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param value The entity handle to push.
+ * @param changeState If true, change will be sent over the network.
+ */
+extern "C" PLUGIN_API void PushEntSchemaEnt(int entityHandle, const plg::string& className, const plg::string& memberName, int value, bool changeState) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot push into '{}::{}' with invalid entity handle: {}\n", className, memberName, entityHandle);
+		return;
+	}
+
+	PushEntSchemaEnt2(entity, className, memberName, value, changeState);
+}
+
+/**
+ * @brief Erases an entity handle from an entity's schema collection by index.
+ *
+ * This is a convenience wrapper over EraseEntSchemaEnt2 that resolves the entity
+ * from its handle and removes an entity handle value at the given index from the
+ * target schema collection field.
+ *
+ * @param entityHandle The handle of the entity whose schema collection is modified.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param element Element index to erase (starting from 0).
+ * @param changeState If true, change will be sent over the network.
+ */
+extern "C" PLUGIN_API void EraseEntSchemaEnt(int entityHandle, const plg::string& className, const plg::string& memberName, int element, bool changeState) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot erase from '{}::{}' with invalid entity handle: {}\n", className, memberName, entityHandle);
+		return;
+	}
+
+	EraseEntSchemaEnt2(entity, className, memberName, element, changeState);
 }
 
 //

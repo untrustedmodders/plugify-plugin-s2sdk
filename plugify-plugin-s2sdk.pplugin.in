@@ -27583,6 +27583,90 @@
       }
     },
     {
+      "name": "PushEntSchemaEnt2",
+      "group": "Schema",
+      "description": "Pushes an entity handle into an entity's schema collection.",
+      "funcName": "PushEntSchemaEnt2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be pushed."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "value",
+          "type": "int32",
+          "ref": false,
+          "description": "The entity handle to push."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
+      }
+    },
+    {
+      "name": "EraseEntSchemaEnt2",
+      "group": "Schema",
+      "description": "Erases an entity handle from an entity's schema collection by index.",
+      "funcName": "EraseEntSchemaEnt2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be erased."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "element",
+          "type": "int32",
+          "ref": false,
+          "description": "Element index to erase (starting from 0)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
+      }
+    },
+    {
       "name": "NetworkStateChanged2",
       "group": "Schema",
       "description": "Updates the networked state of a schema field for a given entity pointer.",
@@ -28311,6 +28395,90 @@
       "retType": {
         "type": "void",
         "description": "An entity handle at the given schema offset."
+      }
+    },
+    {
+      "name": "PushEntSchemaEnt",
+      "group": "Schema",
+      "description": "Pushes an entity handle into an entity's schema collection.",
+      "funcName": "PushEntSchemaEnt",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose schema collection is modified."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "value",
+          "type": "int32",
+          "ref": false,
+          "description": "The entity handle to push."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
+      }
+    },
+    {
+      "name": "EraseEntSchemaEnt",
+      "group": "Schema",
+      "description": "Erases an entity handle from an entity's schema collection by index.",
+      "funcName": "EraseEntSchemaEnt",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity whose schema collection is modified."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "element",
+          "type": "int32",
+          "ref": false,
+          "description": "Element index to erase (starting from 0)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": "No return value."
       }
     },
     {
