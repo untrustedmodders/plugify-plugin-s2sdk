@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.5.0...v2.5.1) (2026-03-10)
+
+
+### Bug Fixes
+
+* rework logging severity ([b5632e2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b5632e2e50395db57b54cc6d6dcd4b9ccd26bb57))
+
 ## [2.5.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.4.2...v2.5.0) (2026-03-10)
 
 
