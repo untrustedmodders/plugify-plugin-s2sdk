@@ -12,16 +12,20 @@
 
 #include "plg/any.hpp"
 #include "plg/version.hpp"
+#include "plg/source_location.hpp"
 #include "plg/api.hpp"
 
 namespace plg {
+	enum class Severity { Unknown, Trace, Debug, Info, Warning, Error, Fatal };
+
 	using GetBaseDirFn = plg::string (*)();
 	using GetExtensionsDirFn = plg::string (*)();
 	using GetConfigsDirFn = plg::string (*)();
 	using GetDataDirFn = plg::string (*)();
 	using GetLogsDirFn = plg::string (*)();
 	using GetCacheDirFn = plg::string (*)();
-	using IsExtensionLoadedFn = bool (*)(std::string_view, std::optional<plg::range_set<>>);
+	using IsExtensionLoadedFn = bool (*)(std::string_view name, std::optional<plg::range_set<>> constraints);
+	using LogFn = void (*)(std::string_view message, Severity severity, const plg::source_location& location);
 
 	extern GetBaseDirFn GetBaseDir;
 	extern GetExtensionsDirFn GetExtensionsDir;
@@ -30,6 +34,7 @@ namespace plg {
 	extern GetLogsDirFn GetLogsDir;
 	extern GetCacheDirFn GetCacheDir;
 	extern IsExtensionLoadedFn IsExtensionLoaded;
+	extern LogFn Log;
 
 	struct Dependency {
 		plg::string name;
@@ -94,6 +99,7 @@ namespace plg {
 		GetLogsDirFn GetLogsDir{nullptr}; \
 		GetCacheDirFn GetCacheDir{nullptr}; \
         IsExtensionLoadedFn IsExtensionLoaded{nullptr}; \
+        LogFn Log{nullptr}; \
         namespace plugin { \
             void* handle{nullptr}; \
             GetIdFn GetId{nullptr}; \
@@ -119,6 +125,7 @@ namespace plg {
             GetLogsDir = reinterpret_cast<GetLogsDirFn>(api[i++]); \
             GetCacheDir = reinterpret_cast<GetCacheDirFn>(api[i++]); \
             IsExtensionLoaded = reinterpret_cast<IsExtensionLoadedFn>(api[i++]); \
+            Log = reinterpret_cast<LogFn>(api[i++]); \
             plugin::GetId = reinterpret_cast<plugin::GetIdFn>(api[i++]); \
             plugin::GetName = reinterpret_cast<plugin::GetNameFn>(api[i++]); \
             plugin::GetDescription = reinterpret_cast<plugin::GetDescriptionFn>(api[i++]); \

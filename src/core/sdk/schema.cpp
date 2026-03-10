@@ -73,7 +73,7 @@ namespace {
 			CollectSchemaFields(*base.m_pClass, out, derivedName);
 		}
 
-		out.reserve(cls.m_nFieldCount);
+		//out.reserve(cls.m_nFieldCount);
 
 		for (uint16 i = 0; i < cls.m_nFieldCount; ++i) {
 			const SchemaClassFieldData_t& field = cls.m_pFields[i];
