@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.5.1...v2.6.0) (2026-03-10)
+
+
+### Features
+
+* add schema entity handle push erase ([c0d8c22](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c0d8c22689f727f0f60d6e7757a63606f0d49f97))
+
 ## [2.5.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.5.0...v2.5.1) (2026-03-10)
 
 
