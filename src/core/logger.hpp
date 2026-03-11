@@ -40,7 +40,7 @@ public:
 	static inline const Color YELLOW = Color(255, 255, 0, 255);
 	static inline const Color GREEN = Color(0, 255, 0, 255);
 
-	void Log(std::string_view message, LoggingSeverity_t severity, std::source_location loc = std::source_location::current()) const;
+	void Log(std::string_view message, LoggingSeverity_t severity, const std::source_location& location = std::source_location::current()) const;
 	LoggingResponse_t Log(LoggingSeverity_t severity, const char* content) const;
 	LoggingResponse_t Log(LoggingSeverity_t severity, const Color& color, const char* content) const;
 	LoggingResponse_t Log(LoggingSeverity_t severity, const LoggingRareOptions_t& code, const char* content) const;
@@ -58,9 +58,9 @@ private:
 inline Logger& g_Logger = Logger::Instance();
 
 namespace plg {
-	class Severity {
+	class Level {
 	public:
-		Severity(LoggingSeverity_t severity, std::source_location location = std::source_location::current()) :
+		Level(LoggingSeverity_t severity, std::source_location location = std::source_location::current()) :
 			m_severity(severity), m_location(location) {
 		}
 
@@ -71,22 +71,22 @@ namespace plg {
 	};
 
 	template <string_like First>
-	void print(Severity severity, First&& first) {
+	void print(Level level, First&& first) {
 #ifdef NDEBUG
-		if (severity <= LS_DETAILED)
+		if (level <= LS_DETAILED)
 			return;
 #endif
-		g_Logger.Log(std::forward<First>(first), severity.m_severity, severity.m_location);
+		g_Logger.Log(std::forward<First>(first), level.m_severity, level.m_location);
 	}
 
 	template <typename... Args>
-	void print(Severity severity, std::format_string<Args...> fmt, Args&&... args) {
+	void print(Level level, std::format_string<Args...> fmt, Args&&... args) {
 #ifdef NDEBUG
-		if (severity <= LS_DETAILED)
+		if (level <= LS_DETAILED)
 			return;
 #endif
 		try {
-			g_Logger.Log(std::format(fmt, std::forward<Args>(args)...), severity.m_severity, severity.m_location);
+			g_Logger.Log(std::format(fmt, std::forward<Args>(args)...), level.m_severity, level.m_location);
 		}
 		catch (...) {
 		}

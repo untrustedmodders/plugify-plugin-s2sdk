@@ -63,7 +63,6 @@ void EventManager::FireEventToClient(IGameEvent* event, CPlayerSlot slot) {
 	}
 
 	listener->FireGameEvent(event);
-	g_pGameEventManager->FreeEvent(event);
 }
 
 void EventManager::CancelCreatedEvent(IGameEvent* event) {

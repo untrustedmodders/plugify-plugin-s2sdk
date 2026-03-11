@@ -63,7 +63,7 @@ void Logger::SetChannelFlags(LoggingChannelFlags_t flags) const {
 	LoggingSystem_SetChannelFlags(m_channelID, flags);
 }
 
-void Logger::Log(std::string_view message, LoggingSeverity_t severity, std::source_location loc) const  {
+void Logger::Log(std::string_view message, LoggingSeverity_t severity, const std::source_location& location) const  {
 	/*LoggingRareOptions_t options {
 		.m_File = loc.file_name(),
 		.m_Line = static_cast<int>(loc.line()),

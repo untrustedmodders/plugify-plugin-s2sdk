@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.5.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.5.0...v2.5.1) (2026-03-10)
+
+
+### Bug Fixes
+
+* rework logging severity ([b5632e2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b5632e2e50395db57b54cc6d6dcd4b9ccd26bb57))
+
+## [2.5.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.4.2...v2.5.0) (2026-03-10)
+
+
+### Features
+
+* add UserMessageRemoveAllRecipient export ([96aaa11](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/96aaa11f9011b81288bc0811a8924c57e5e2b841))
+
+
+### Bug Fixes
+
+* remove FreeEvent call in FireEventToClient ([fa92032](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fa92032a0ac2e4d5af124a9e450c11edc7633c39))
+* update plugify ([d4df211](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d4df21104378160e3942fd5aec099cbdee0537b4))
+
 ## [2.4.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.4.1...v2.4.2) (2026-02-26)
 
 
