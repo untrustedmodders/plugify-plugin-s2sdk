@@ -240,6 +240,8 @@ extern "C" PLUGIN_API void SetEntDataString2(CEntityInstance* entity, int offset
 	*reinterpret_cast<CUtlString*>(reinterpret_cast<intptr_t>(entity) + offset) = value;
 }
 
+//
+
 /**
  * @brief Peeks into an entity's object schema and retrieves the string value at the given offset.
  *
@@ -284,7 +286,7 @@ extern "C" PLUGIN_API void SetEntDataCString2(CEntityInstance* entity, int offse
  * @param offset The offset of the schema to use.
  * @return The vector value at the given memory location.
  */
-extern "C" PLUGIN_API plg::vec3 GetEntDataVector2(CEntityInstance* entity, int offset) {
+extern "C" PLUGIN_API plg::vec3 GetEntDataVector3D2(CEntityInstance* entity, int offset) {
 	return *reinterpret_cast<plg::vec3*>(reinterpret_cast<intptr_t>(entity) + offset);
 }
 
@@ -297,12 +299,72 @@ extern "C" PLUGIN_API plg::vec3 GetEntDataVector2(CEntityInstance* entity, int o
  * @param changeState If true, change will be sent over the network.
  * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
  */
-extern "C" PLUGIN_API void SetEntDataVector2(CEntityInstance* entity, int offset, const plg::vec3& value, bool changeState, int chainOffset) {
+extern "C" PLUGIN_API void SetEntDataVector3D2(CEntityInstance* entity, int offset, const plg::vec3& value, bool changeState, int chainOffset) {
 	if (changeState) {
 		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
 	}
 
 	*reinterpret_cast<plg::vec3*>(reinterpret_cast<intptr_t>(entity) + offset) = value;
+}
+
+//
+
+/**
+ * @brief Peeks into an entity's object schema and retrieves the vector value at the given offset.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param offset The offset of the schema to use.
+ * @return The vector value at the given memory location.
+ */
+extern "C" PLUGIN_API plg::vec4 GetEntDataVector4D2(CEntityInstance* entity, int offset) {
+	return *reinterpret_cast<plg::vec4*>(reinterpret_cast<intptr_t>(entity) + offset);
+}
+
+/**
+ * @brief Peeks into an entity's object data and sets the vector at the given offset.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param offset The offset of the schema to use.
+ * @param value The vector value to set.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataVector4D2(CEntityInstance* entity, int offset, const plg::vec4& value, bool changeState, int chainOffset) {
+	if (changeState) {
+		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+	}
+
+	*reinterpret_cast<plg::vec4*>(reinterpret_cast<intptr_t>(entity) + offset) = value;
+}
+
+//
+
+/**
+ * @brief Peeks into an entity's object schema and retrieves the vector value at the given offset.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param offset The offset of the schema to use.
+ * @return The vector value at the given memory location.
+ */
+extern "C" PLUGIN_API plg::vec2 GetEntDataVector2D2(CEntityInstance* entity, int offset) {
+	return *reinterpret_cast<plg::vec2*>(reinterpret_cast<intptr_t>(entity) + offset);
+}
+
+/**
+ * @brief Peeks into an entity's object data and sets the vector at the given offset.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param offset The offset of the schema to use.
+ * @param value The vector value to set.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataVector2D2(CEntityInstance* entity, int offset, const plg::vec2& value, bool changeState, int chainOffset) {
+	if (changeState) {
+		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+	}
+
+	*reinterpret_cast<plg::vec2*>(reinterpret_cast<intptr_t>(entity) + offset) = value;
 }
 
 //
@@ -552,14 +614,14 @@ extern "C" PLUGIN_API void SetEntDataCString(int entityHandle, int offset, const
  * @param offset The offset of the schema to use.
  * @return The vector value at the given memory location.
  */
-extern "C" PLUGIN_API plg::vec3 GetEntDataVector(int entityHandle, int offset) {
+extern "C" PLUGIN_API plg::vec3 GetEntDataVector3D(int entityHandle, int offset) {
 	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
 	if (!entity) {
 		plg::print(LS_WARNING, "Cannot get '{}' with invalid entity handle: {}\n", offset, entityHandle);
 		return {};
 	}
 
-	return GetEntDataVector2(entity, offset);
+	return GetEntDataVector3D2(entity, offset);
 }
 
 /**
@@ -571,14 +633,92 @@ extern "C" PLUGIN_API plg::vec3 GetEntDataVector(int entityHandle, int offset) {
  * @param changeState If true, change will be sent over the network.
  * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
  */
-extern "C" PLUGIN_API void SetEntDataVector(int entityHandle, int offset, const plg::vec3& value, bool changeState, int chainOffset) {
+extern "C" PLUGIN_API void SetEntDataVector3D(int entityHandle, int offset, const plg::vec3& value, bool changeState, int chainOffset) {
 	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
 	if (!entity) {
 		plg::print(LS_WARNING, "Cannot set '{}' with invalid entity handle: {}\n", offset, entityHandle);
 		return;
 	}
 
-	SetEntDataVector2(entity, offset, value, changeState, chainOffset);
+	SetEntDataVector3D2(entity, offset, value, changeState, chainOffset);
+}
+
+//
+
+/**
+ * @brief Peeks into an entity's object schema and retrieves the vector value at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @return The vector value at the given memory location.
+ */
+extern "C" PLUGIN_API plg::vec4 GetEntDataVector4D(int entityHandle, int offset) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot get '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return {};
+	}
+
+	return GetEntDataVector4D2(entity, offset);
+}
+
+/**
+ * @brief Peeks into an entity's object data and sets the vector at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @param value The vector value to set.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataVector4D(int entityHandle, int offset, const plg::vec4& value, bool changeState, int chainOffset) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot set '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return;
+	}
+
+	SetEntDataVector4D2(entity, offset, value, changeState, chainOffset);
+}
+
+//
+
+//
+
+/**
+ * @brief Peeks into an entity's object schema and retrieves the vector value at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @return The vector value at the given memory location.
+ */
+extern "C" PLUGIN_API plg::vec2 GetEntDataVector2D(int entityHandle, int offset) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot get '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return {};
+	}
+
+	return GetEntDataVector2D2(entity, offset);
+}
+
+/**
+ * @brief Peeks into an entity's object data and sets the vector at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @param value The vector value to set.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataVector2D(int entityHandle, int offset, const plg::vec2& value, bool changeState, int chainOffset) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot set '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return;
+	}
+
+	SetEntDataVector2D2(entity, offset, value, changeState, chainOffset);
 }
 
 //

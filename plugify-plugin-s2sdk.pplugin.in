@@ -26356,10 +26356,10 @@
       }
     },
     {
-      "name": "GetEntDataVector2",
+      "name": "GetEntDataVector3D2",
       "group": "Schema",
       "description": "Peeks into an entity's object schema and retrieves the vector value at the given offset.",
-      "funcName": "GetEntDataVector2",
+      "funcName": "GetEntDataVector3D2",
       "paramTypes": [
         {
           "name": "entity",
@@ -26380,10 +26380,10 @@
       }
     },
     {
-      "name": "SetEntDataVector2",
+      "name": "SetEntDataVector3D2",
       "group": "Schema",
       "description": "Peeks into an entity's object data and sets the vector at the given offset.",
-      "funcName": "SetEntDataVector2",
+      "funcName": "SetEntDataVector3D2",
       "paramTypes": [
         {
           "name": "entity",
@@ -26400,6 +26400,136 @@
         {
           "name": "value",
           "type": "vec3",
+          "ref": false,
+          "description": "The vector value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataVector4D2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object schema and retrieves the vector value at the given offset.",
+      "funcName": "GetEntDataVector4D2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        }
+      ],
+      "retType": {
+        "type": "vec4",
+        "description": "The vector value at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataVector4D2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the vector at the given offset.",
+      "funcName": "SetEntDataVector4D2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "vec4",
+          "ref": false,
+          "description": "The vector value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataVector2D2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object schema and retrieves the vector value at the given offset.",
+      "funcName": "GetEntDataVector2D2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        }
+      ],
+      "retType": {
+        "type": "vec2",
+        "description": "The vector value at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataVector2D2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the vector at the given offset.",
+      "funcName": "SetEntDataVector2D2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "vec2",
           "ref": false,
           "description": "The vector value to set."
         },
@@ -26876,10 +27006,10 @@
       }
     },
     {
-      "name": "GetEntDataVector",
+      "name": "GetEntDataVector3D",
       "group": "Schema",
       "description": "Peeks into an entity's object schema and retrieves the vector value at the given offset.",
-      "funcName": "GetEntDataVector",
+      "funcName": "GetEntDataVector3D",
       "paramTypes": [
         {
           "name": "entityHandle",
@@ -26900,10 +27030,10 @@
       }
     },
     {
-      "name": "SetEntDataVector",
+      "name": "SetEntDataVector3D",
       "group": "Schema",
       "description": "Peeks into an entity's object data and sets the vector at the given offset.",
-      "funcName": "SetEntDataVector",
+      "funcName": "SetEntDataVector3D",
       "paramTypes": [
         {
           "name": "entityHandle",
@@ -26920,6 +27050,136 @@
         {
           "name": "value",
           "type": "vec3",
+          "ref": false,
+          "description": "The vector value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataVector4D",
+      "group": "Schema",
+      "description": "Peeks into an entity's object schema and retrieves the vector value at the given offset.",
+      "funcName": "GetEntDataVector4D",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        }
+      ],
+      "retType": {
+        "type": "vec4",
+        "description": "The vector value at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataVector4D",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the vector at the given offset.",
+      "funcName": "SetEntDataVector4D",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "vec4",
+          "ref": false,
+          "description": "The vector value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataVector2D",
+      "group": "Schema",
+      "description": "Peeks into an entity's object schema and retrieves the vector value at the given offset.",
+      "funcName": "GetEntDataVector2D",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        }
+      ],
+      "retType": {
+        "type": "vec2",
+        "description": "The vector value at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataVector2D",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the vector at the given offset.",
+      "funcName": "SetEntDataVector2D",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "vec2",
           "ref": false,
           "description": "The vector value to set."
         },
