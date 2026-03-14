@@ -552,6 +552,8 @@
         SetEntDataColor2;
         GetEntDataString2;
         SetEntDataString2;
+        GetEntDataCString2;
+        SetEntDataCString2;
         GetEntDataVector2;
         SetEntDataVector2;
         GetEntDataEnt2;
@@ -565,6 +567,8 @@
         SetEntDataColor;
         GetEntDataString;
         SetEntDataString;
+        GetEntDataCString;
+        SetEntDataCString;
         GetEntDataVector;
         SetEntDataVector;
         GetEntDataEnt;

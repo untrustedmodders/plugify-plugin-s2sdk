@@ -81,7 +81,7 @@ extern "C" PLUGIN_API int32_t GetSchemaClassSize(const plg::string& className) {
  *
  * @param entity Pointer to the instance of the class where the value is to be set.
  * @param offset The offset of the schema to use.
- * @param size Number of bytes to write (valid values are 1, 2, 4 or 8).
+ * @param size Number of bytes to read (valid values are 1, 2, 4 or 8).
  * @return The integer value at the given memory location.
  */
 extern "C" PLUGIN_API int64_t GetEntData2(CEntityInstance* entity, int offset, int size) {
@@ -139,7 +139,7 @@ extern "C" PLUGIN_API void SetEntData2(CEntityInstance* entity, int offset, int6
  *
  * @param entity Pointer to the instance of the class where the value is to be set.
  * @param offset The offset of the schema to use.
- * @param size Number of bytes to write (valid values are 1, 2, 4 or 8).
+ * @param size Number of bytes to read (valid values are 1, 2, 4 or 8).
  * @return The float value at the given memory location.
  */
 extern "C" PLUGIN_API double GetEntDataFloat2(CEntityInstance* entity, int offset, int size) {
@@ -240,6 +240,41 @@ extern "C" PLUGIN_API void SetEntDataString2(CEntityInstance* entity, int offset
 	*reinterpret_cast<CUtlString*>(reinterpret_cast<intptr_t>(entity) + offset) = value;
 }
 
+/**
+ * @brief Peeks into an entity's object schema and retrieves the string value at the given offset.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param offset The offset of the schema to use.
+ * @param size Number of bytes to read.
+ * @return The string value at the given memory location.
+ */
+extern "C" PLUGIN_API plg::string GetEntDataCString2(CEntityInstance* entity, int offset, int size) {
+	const char* src = reinterpret_cast<const char*>(reinterpret_cast<intptr_t>(entity) + offset);
+	const std::size_t len = strnlen(src, size);
+	return plg::string(src, len);
+}
+
+/**
+ * @brief Peeks into an entity's object data and sets the string at the given offset.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param offset The offset of the schema to use.
+ * @param value The string value to set.
+ * @param size Number of bytes to write.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataCString2(CEntityInstance* entity, int offset, const plg::string& value, int size, bool changeState, int chainOffset) {
+	if (changeState) {
+		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+	}
+
+	char* dst = reinterpret_cast<char*>(reinterpret_cast<intptr_t>(entity) + offset);
+	const size_t n = std::min(value.size(), static_cast<size_t>(size - 1));
+	value.copy(dst, n);
+	dst[n] = '\0';
+}
+
 //
 
 /**
@@ -321,7 +356,7 @@ extern "C" PLUGIN_API void ChangeEntityState2(CEntityInstance* entity, int offse
  *
  * @param entityHandle The handle of the entity from which the value is to be retrieved.
  * @param offset The offset of the schema to use.
- * @param size Number of bytes to write (valid values are 1, 2, 4 or 8).
+ * @param size Number of bytes to read (valid values are 1, 2, 4 or 8).
  * @return The integer value at the given memory location.
  */
 extern "C" PLUGIN_API int64_t GetEntData(int entityHandle, int offset, int size) {
@@ -361,7 +396,7 @@ extern "C" PLUGIN_API void SetEntData(int entityHandle, int offset, int64_t valu
  *
  * @param entityHandle The handle of the entity from which the value is to be retrieved.
  * @param offset The offset of the schema to use.
- * @param size Number of bytes to write (valid values are 1, 2, 4 or 8).
+ * @param size Number of bytes to read (valid values are 1, 2, 4 or 8).
  * @return The float value at the given memory location.
  */
 extern "C" PLUGIN_API double GetEntDataFloat(int entityHandle, int offset, int size) {
@@ -468,6 +503,44 @@ extern "C" PLUGIN_API void SetEntDataString(int entityHandle, int offset, const 
 	}
 
 	SetEntDataString2(entity, offset, value, changeState, chainOffset);
+}
+
+/**
+ * @brief Peeks into an entity's object schema and retrieves the string value at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @param size Number of bytes to read.
+ * @return The string value at the given memory location.
+ */
+extern "C" PLUGIN_API plg::string GetEntDataCString(int entityHandle, int offset, int size) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot get '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return {};
+	}
+
+	return GetEntDataCString2(entity, offset, size);
+}
+
+/**
+ * @brief Peeks into an entity's object data and sets the string at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @param value The string value to set.
+ * @param size Number of bytes to write.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataCString(int entityHandle, int offset, const plg::string& value, int size, bool changeState, int chainOffset) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot set '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return;
+	}
+
+	SetEntDataCString2(entity, offset, value, size, changeState, chainOffset);
 }
 
 //

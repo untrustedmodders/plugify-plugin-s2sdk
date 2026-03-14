@@ -26016,7 +26016,7 @@
           "name": "size",
           "type": "int32",
           "ref": false,
-          "description": "Number of bytes to write (valid values are 1, 2, 4 or 8)."
+          "description": "Number of bytes to read (valid values are 1, 2, 4 or 8)."
         }
       ],
       "retType": {
@@ -26093,7 +26093,7 @@
           "name": "size",
           "type": "int32",
           "ref": false,
-          "description": "Number of bytes to write (valid values are 1, 2, 4 or 8)."
+          "description": "Number of bytes to read (valid values are 1, 2, 4 or 8)."
         }
       ],
       "retType": {
@@ -26260,6 +26260,83 @@
           "type": "string",
           "ref": false,
           "description": "The string value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataCString2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object schema and retrieves the string value at the given offset.",
+      "funcName": "GetEntDataCString2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "size",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of bytes to read."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The string value at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataCString2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the string at the given offset.",
+      "funcName": "SetEntDataCString2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "ref": false,
+          "description": "The string value to set."
+        },
+        {
+          "name": "size",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of bytes to write."
         },
         {
           "name": "changeState",
@@ -26459,7 +26536,7 @@
           "name": "size",
           "type": "int32",
           "ref": false,
-          "description": "Number of bytes to write (valid values are 1, 2, 4 or 8)."
+          "description": "Number of bytes to read (valid values are 1, 2, 4 or 8)."
         }
       ],
       "retType": {
@@ -26536,7 +26613,7 @@
           "name": "size",
           "type": "int32",
           "ref": false,
-          "description": "Number of bytes to write (valid values are 1, 2, 4 or 8)."
+          "description": "Number of bytes to read (valid values are 1, 2, 4 or 8)."
         }
       ],
       "retType": {
@@ -26703,6 +26780,83 @@
           "type": "string",
           "ref": false,
           "description": "The string value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataCString",
+      "group": "Schema",
+      "description": "Peeks into an entity's object schema and retrieves the string value at the given offset.",
+      "funcName": "GetEntDataCString",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "size",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of bytes to read."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The string value at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataCString",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the string at the given offset.",
+      "funcName": "SetEntDataCString",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "ref": false,
+          "description": "The string value to set."
+        },
+        {
+          "name": "size",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of bytes to write."
         },
         {
           "name": "changeState",
