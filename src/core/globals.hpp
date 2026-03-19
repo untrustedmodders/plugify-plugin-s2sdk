@@ -111,7 +111,7 @@ namespace addresses {
 
 	inline void (*CCSPlayerController_SwitchTeam)(CBasePlayerController* controller, CSTeam team);
 
-	inline void (*CGameRules_TerminateRound)(CGameRules* gameRules, float delay, unsigned int reason, int64 a4, unsigned int a5);
+	inline void (*CGameRules_TerminateRound)(CGameRules* gameRules, float delay, unsigned int reason, int64 a4);
 
 	inline CCSWeaponBaseVData* (*GetCSWeaponDataFromKey)(int, const char*);
 
