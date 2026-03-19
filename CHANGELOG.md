@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.0...v2.7.1) (2026-03-19)
+
+
+### Bug Fixes
+
+* update TerminateRound ([011e8fc](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/011e8fc628e8c96dd22d139871c2b6d187b23b12))
+
 ## [2.7.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.6.0...v2.7.0) (2026-03-15)
 
 
