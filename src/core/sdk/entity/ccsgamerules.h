@@ -68,7 +68,7 @@ public:
 	SCHEMA_FIELD(CUtlVector<SpawnPoint*>, m_TerroristSpawnPoints)
 
 	void TerminateRound(float delay, CSRoundEndReason reason) {
-		addresses::CGameRules_TerminateRound(this, delay, reason, 0, 0);
+		addresses::CGameRules_TerminateRound(this, delay, reason, 0);
 	}
 };
 

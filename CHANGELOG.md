@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.7.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.0...v2.7.1) (2026-03-19)
+
+
+### Bug Fixes
+
+* update TerminateRound ([011e8fc](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/011e8fc628e8c96dd22d139871c2b6d187b23b12))
+
+## [2.7.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.6.0...v2.7.0) (2026-03-15)
+
+
+### Features
+
+* add CString methods for schema ([0066037](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/00660379f08b77d547e36918afae31e5ff9a245c))
+* rework Get/Set for schema vector and add new methods ([61f1b2d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/61f1b2df148f3f9b377df28c45ddc5353ad1724e))
+
+## [2.6.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.5.1...v2.6.0) (2026-03-10)
+
+
+### Features
+
+* add schema entity handle push erase ([c0d8c22](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c0d8c22689f727f0f60d6e7757a63606f0d49f97))
+
 ## [2.5.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.5.0...v2.5.1) (2026-03-10)
 
 
