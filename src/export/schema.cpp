@@ -4,6 +4,7 @@
 #include <core/sdk/utils.hpp>
 #include <schemasystem/schemasystem.h>
 #include <tier0/utlstring.h>
+#include <tier1/utlsymbollarge.h>
 #include <string.h>
 
 PLUGIFY_WARN_PUSH()
@@ -262,7 +263,7 @@ extern "C" PLUGIN_API plg::string GetEntDataCString2(CEntityInstance* entity, in
  * @param entity Pointer to the instance of the class where the value is to be set.
  * @param offset The offset of the schema to use.
  * @param value The string value to set.
- * @param size Number of bytes to write.
+ * @param size Number of bytes to write. If size -1 it's CUtlSymbolLarge.
  * @param changeState If true, change will be sent over the network.
  * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
  */
@@ -271,10 +272,22 @@ extern "C" PLUGIN_API void SetEntDataCString2(CEntityInstance* entity, int offse
 		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
 	}
 
-	char* dst = reinterpret_cast<char*>(reinterpret_cast<intptr_t>(entity) + offset);
-	const size_t n = std::min(value.size(), static_cast<size_t>(size - 1));
-	value.copy(dst, n);
-	dst[n] = '\0';
+	switch (size) {
+		case -1: {
+			const CUtlSymbolLarge pooled = g_pGameEntitySystem->AllocPooledString(value.c_str());
+			*reinterpret_cast<CUtlSymbolLarge*>(reinterpret_cast<intptr_t>(entity) + offset) = pooled;
+
+			break;
+		}
+		default: {
+			char* dst = reinterpret_cast<char*>(reinterpret_cast<intptr_t>(entity) + offset);
+			const size_t n = std::min(value.size(), static_cast<size_t>(size - 1));
+			value.copy(dst, n);
+			dst[n] = '\0';
+
+			break;
+		}
+	}
 }
 
 //
