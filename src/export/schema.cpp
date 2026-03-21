@@ -4,6 +4,7 @@
 #include <core/sdk/utils.hpp>
 #include <schemasystem/schemasystem.h>
 #include <tier0/utlstring.h>
+#include <tier1/utlsymbollarge.h>
 #include <string.h>
 
 PLUGIFY_WARN_PUSH()
@@ -238,6 +239,27 @@ extern "C" PLUGIN_API void SetEntDataString2(CEntityInstance* entity, int offset
 	}
 
 	*reinterpret_cast<CUtlString*>(reinterpret_cast<intptr_t>(entity) + offset) = value;
+}
+
+/**
+ * @brief Peeks into an entity's object data and sets a CUtlSymbolLarge at the given offset.
+ *
+ * The string is pooled via the entity system (AllocPooledString), then written to memory as
+ * CUtlSymbolLarge. Use only on offsets that actually store CUtlSymbolLarge (e.g. designer/filter names).
+ *
+ * @param entity Pointer to the instance of the class where the value is to be set.
+ * @param offset The byte offset from the entity pointer.
+ * @param value The string whose pooled symbol is assigned to the field.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataStringLarge2(CEntityInstance* entity, int offset, const plg::string& value, bool changeState, int chainOffset) {
+	if (changeState) {
+		SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+	}
+
+	const CUtlSymbolLarge pooled = g_pGameEntitySystem->AllocPooledString(value.c_str());
+	*reinterpret_cast<CUtlSymbolLarge*>(reinterpret_cast<intptr_t>(entity) + offset) = pooled;
 }
 
 //
@@ -568,6 +590,25 @@ extern "C" PLUGIN_API void SetEntDataString(int entityHandle, int offset, const 
 }
 
 /**
+ * @brief Peeks into an entity's object data and sets a CUtlSymbolLarge at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @param value The string whose pooled symbol is assigned to the field.
+ * @param changeState If true, change will be sent over the network.
+ * @param chainOffset The offset of the chain entity in the class (-2 for non-entity classes).
+ */
+extern "C" PLUGIN_API void SetEntDataStringLarge(int entityHandle, int offset, const plg::string& value, bool changeState, int chainOffset) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot set '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return;
+	}
+
+	SetEntDataStringLarge2(entity, offset, value, changeState, chainOffset);
+}
+
+/**
  * @brief Peeks into an entity's object schema and retrieves the string value at the given offset.
  *
  * @param entityHandle The handle of the entity from which the value is to be retrieved.
@@ -808,7 +849,53 @@ extern "C" PLUGIN_API int GetEntSchemaArraySize2(CEntityInstance* entity, const 
 	}
 }
 
-//
+extern "C" PLUGIN_API void SetEntSchemaSymbolLarge(
+	int32_t entityHandle,
+	const plg::string& className,
+	const plg::string& memberName,
+	const plg::string& value,
+	bool changeState)
+{
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity)
+	{
+		plg::print(LS_WARNING, "SetEntSchemaSymbolLarge: invalid handle {}\n", entityHandle);
+		return;
+	}
+	const auto [offset, networked, size, type] = schema::GetOffset(className, memberName);
+	if (offset == -1)
+	{
+		plg::print(LS_WARNING, "SetEntSchemaSymbolLarge: no offset for '{}::{}'\n", className, memberName);
+		return;
+	}
+	// По желанию: жёстко проверить тип из схемы, чтобы не испортить CUtlString.
+	if (type && type->m_sTypeName.Get())
+	{
+		const char* tn = type->m_sTypeName.Get();
+		if (std::strstr(tn, "CUtlSymbolLarge") == nullptr)
+		{
+			plg::print(LS_WARNING, "SetEntSchemaSymbolLarge: '{}::{}' is '{}', not CUtlSymbolLarge\n",
+				className, memberName, tn);
+			return;
+		}
+	}
+	// Как в твоём AddOutput: пул + присвоение в поле-символ.
+	const auto& pooled = g_pGameEntitySystem->AllocPooledString(value.c_str());
+	auto* pSym = reinterpret_cast<CUtlSymbolLarge*>(reinterpret_cast<intptr_t>(entity) + offset);
+	*pSym = pooled;
+	if (changeState)
+	{
+		if (networked)
+		{
+			const auto chainOffset = schema::FindChainOffset(className);
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		}
+		else
+		{
+			plg::print(LS_WARNING, "SetEntSchemaSymbolLarge: '{}::{}' is not networked\n", className, memberName);
+		}
+	}
+}
 
 /**
  * @brief Retrieves an integer value from an entity's schema.

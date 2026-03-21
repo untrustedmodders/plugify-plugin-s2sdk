@@ -26279,6 +26279,47 @@
       }
     },
     {
+      "name": "SetEntDataStringLarge2",
+      "group": "Schema",
+      "description": "Sets a CUtlSymbolLarge at the given offset using a pooled string (AllocPooledString).",
+      "funcName": "SetEntDataStringLarge2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The byte offset from the entity pointer."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "ref": false,
+          "description": "The string to pool and assign as CUtlSymbolLarge."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "GetEntDataCString2",
       "group": "Schema",
       "description": "Peeks into an entity's object schema and retrieves the string value at the given offset.",
@@ -26910,6 +26951,47 @@
           "type": "string",
           "ref": false,
           "description": "The string value to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetEntDataStringLarge",
+      "group": "Schema",
+      "description": "Sets a CUtlSymbolLarge at the given offset using a pooled string (AllocPooledString).",
+      "funcName": "SetEntDataStringLarge",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "ref": false,
+          "description": "The string to pool and assign as CUtlSymbolLarge."
         },
         {
           "name": "changeState",
