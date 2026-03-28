@@ -25931,7 +25931,7 @@
       ],
       "retType": {
         "type": "int32",
-        "description": "The offset of the member in the class."
+        "description": "The offset of the member in the class, or -1 if the offset is not found."
       }
     },
     {
@@ -25949,7 +25949,7 @@
       ],
       "retType": {
         "type": "int32",
-        "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        "description": "The offset of the chain entity in the class, or -1 if the offset is not found."
       }
     },
     {
