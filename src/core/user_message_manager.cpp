@@ -44,6 +44,10 @@ bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallbac
 ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 
+	if (m_global.callbacks[mode].Empty() && m_hookMap.empty()) {
+		return ResultType::Continue;
+	}
+
 	UserMessage message(msgSerializable, msgData, *clients);
 
 	int16_t messageId = message.GetMessageID();
@@ -59,7 +63,8 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 			auto thisResult = func(&message);
 			if (thisResult >= ResultType::Stop) {
 				if (mode == HookMode::Pre) {
-					*clients = static_cast<uint64_t>(*message.GetRecipientFilter().GetRecipients().Base());
+					auto base = message.GetRecipientFilter().GetRecipients().Base();
+					*clients = static_cast<uint64_t>(base[0]) | (static_cast<uint64_t>(base[1]) << 32);
 					return ResultType::Stop;
 				}
 				result = thisResult;
@@ -80,7 +85,8 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 			auto thisResult = func(&message);
 			if (thisResult >= ResultType::Handled) {
 				if (mode == HookMode::Pre) {
-					*clients = static_cast<uint64_t>(*message.GetRecipientFilter().GetRecipients().Base());
+					auto base = message.GetRecipientFilter().GetRecipients().Base();
+					*clients = static_cast<uint64_t>(base[0]) | (static_cast<uint64_t>(base[1]) << 32);
 				}
 				return thisResult;
 			} else if (thisResult > result) {
@@ -90,7 +96,8 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 	}
 
 	if (mode == HookMode::Pre) {
-		*clients = static_cast<uint64_t>(*message.GetRecipientFilter().GetRecipients().Base());
+		auto base = message.GetRecipientFilter().GetRecipients().Base();
+		*clients = static_cast<uint64_t>(base[0]) | (static_cast<uint64_t>(base[1]) << 32);
 	}
 
 	return result;
