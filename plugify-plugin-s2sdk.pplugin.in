@@ -7655,7 +7655,7 @@
     {
       "name": "GetClientSteamID64",
       "group": "Clients",
-      "description": "Returns the client's SteamID64 \u00e2\u20ac\u201d a unique 64-bit identifier of a Steam account.",
+      "description": "Returns the client's SteamID64 - a unique 64-bit identifier of a Steam account.",
       "funcName": "GetClientSteamID64",
       "paramTypes": [
         {
@@ -24996,7 +24996,7 @@
           "name": "alpha",
           "type": "int32",
           "ref": false,
-          "description": "The new alpha value (0\u00e2\u20ac\u201c255)."
+          "description": "The new alpha value (0-255)."
         }
       ],
       "retType": {
@@ -25019,19 +25019,19 @@
           "name": "r",
           "type": "int32",
           "ref": false,
-          "description": "The red component (0\u00e2\u20ac\u201c255)."
+          "description": "The red component (0-255)."
         },
         {
           "name": "g",
           "type": "int32",
           "ref": false,
-          "description": "The green component (0\u00e2\u20ac\u201c255)."
+          "description": "The green component (0-255)."
         },
         {
           "name": "b",
           "type": "int32",
           "ref": false,
-          "description": "The blue component (0\u00e2\u20ac\u201c255)."
+          "description": "The blue component (0-255)."
         }
       ],
       "retType": {

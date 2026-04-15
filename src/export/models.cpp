@@ -258,7 +258,7 @@ extern "C" PLUGIN_API void SetEntityModelScale(int entityHandle, float scale) {
  * This function modifies the alpha transparency of the entity for rendering.
  *
  * @param entityHandle The handle of the entity.
- * @param alpha The new alpha value (0–255).
+ * @param alpha The new alpha value (0-255).
  */
 extern "C" PLUGIN_API void SetEntityRenderAlpha(int entityHandle, int alpha) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
@@ -270,9 +270,9 @@ extern "C" PLUGIN_API void SetEntityRenderAlpha(int entityHandle, int alpha) {
  * @brief Sets the render color of an entity.
  *
  * @param entityHandle The handle of the entity.
- * @param r The red component (0–255).
- * @param g The green component (0–255).
- * @param b The blue component (0–255).
+ * @param r The red component (0-255).
+ * @param g The green component (0-255).
+ * @param b The blue component (0-255).
  */
 extern "C" PLUGIN_API void SetEntityRenderColor2(int entityHandle, int r, int g, int b) {
 	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
