@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.2...v2.7.3) (2026-04-19)
+
+
+### Bug Fixes
+
+* remove commented log ([251bc46](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/251bc46145234fd341762ebb88e951a59e895482))
+
 ## [2.7.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.1...v2.7.2) (2026-04-19)
 
 
