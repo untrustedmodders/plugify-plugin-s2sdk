@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.5...v2.7.6) (2026-04-20)
+
+
+### Bug Fixes
+
+* force build ([40ca043](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/40ca04353591bfb01fb9f63c279c3d48c31da00b))
+
 ## [2.7.5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.4...v2.7.5) (2026-04-20)
 
 
