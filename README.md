@@ -139,7 +139,7 @@ Happy coding and enjoy creating amazing plugins for Source 2!
 
 Generated from: plugify-plugin-s2sdk.pplugin.in
 
-Total methods: 508
+Total methods: 510
 
 ### Clients
 
