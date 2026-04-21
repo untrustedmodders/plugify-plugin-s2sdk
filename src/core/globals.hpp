@@ -48,6 +48,7 @@ inline CUtlVector<void*>* g_pScripts = nullptr;
 inline CNetworkGameServerBase* g_pNetworkGameServer = nullptr;
 inline CGlobalVars* gpGlobals = nullptr;
 inline CGameEntitySystem* g_pGameEntitySystem = nullptr;
+inline CNetworkSerializerCodeGenDatabase* g_pEntityNetworkSerializerInfo = nullptr;
 inline CBaseGameRules* g_pGameRules = nullptr;
 inline CBaseGameRulesProxy* g_pGameRulesProxy = nullptr;
 inline CBaseEntity* g_pPointScript = nullptr;

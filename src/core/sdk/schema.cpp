@@ -54,16 +54,6 @@ namespace {
 	using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey, plg::string_hash, std::equal_to<>>;
 	using SchemaTableMap = plg::flat_hash_map<plg::string, SchemaValueMap, plg::string_hash, std::equal_to<>>;
 
-	bool IsFieldNetworked(const SchemaClassFieldData_t& field) {
-		for (int i = 0; i < field.m_nStaticMetadataCount; ++i) {
-			std::string_view fieldName(field.m_pStaticMetadata[i].m_pszName);
-			if (fieldName == "MNetworkEnable")
-				return true;
-		}
-
-		return false;
-	}
-
 	void CollectSchemaFields(
 		CSchemaClassInfo& cls,
 		SchemaValueMap& out,
@@ -74,7 +64,9 @@ namespace {
 			CollectSchemaFields(*base.m_pClass, out, derivedName);
 		}
 
-		//out.reserve(cls.m_nFieldCount);
+		auto& cli = g_pEntityNetworkSerializerInfo->m_ClassInfos;
+		int index = cli.Find(cls.m_pszName);
+		bool found = index != cli.InvalidIndex()
 
 		for (uint16 i = 0; i < cls.m_nFieldCount; ++i) {
 			const SchemaClassFieldData_t& field = cls.m_pFields[i];
@@ -87,7 +79,7 @@ namespace {
 				field.m_pszName,
 				SchemaKey{
 					field.m_nSingleInheritanceOffset,
-					IsFieldNetworked(field),
+					found && cli[index]->FindField(field.m_pszName),
 					static_cast<size_t>(size),
 					field.m_pType
 				}
