@@ -39,7 +39,7 @@ The project is actively developed and will continue to expand its feature set.
 - Inspect and interact with **entity schemas** (networked properties, data tables)  
   → [Guide: Entity Schemas](https://plugify.net/plugins/s2sdk/guides/entity-schemas)
 
-- Send and handle **user messages** for client–server communication  
+- Send and handle **user messages** for client-server communication  
   → [Guide: User Messages](https://plugify.net/plugins/s2sdk/guides/user-messages)
 
 - How to integrate Valve's [CS_Script](https://developer.valvesoftware.com/wiki/Counter-Strike_2_Workshop_Tools/Scripting) system with Plugify plugins.  
@@ -93,10 +93,10 @@ csgo/
                     └── libplugify-plugin-s2sdk.so  # Linux build of the SDK
 ```
 
-- **bin/** – contains build outputs and other runtime files  
-- **plugify-plugin-s2sdk.dll** – dynamic library for Windows environments  
-- **libplugify-plugin-s2sdk.so** – shared object library for Linux environments  
-- **plugify-plugin-s2sdk.pplugin** – metadata file that defines the plugin for Plugify  
+- **bin/** - contains build outputs and other runtime files  
+- **plugify-plugin-s2sdk.dll** - dynamic library for Windows environments  
+- **libplugify-plugin-s2sdk.so** - shared object library for Linux environments  
+- **plugify-plugin-s2sdk.pplugin** - metadata file that defines the plugin for Plugify  
 
 ### Building
 
@@ -139,7 +139,7 @@ Happy coding and enjoy creating amazing plugins for Source 2!
 
 Generated from: plugify-plugin-s2sdk.pplugin.in
 
-Total methods: 508
+Total methods: 510
 
 ### Clients
 

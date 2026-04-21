@@ -1,5 +1,45 @@
 # Changelog
 
+## [2.7.6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.5...v2.7.6) (2026-04-20)
+
+
+### Bug Fixes
+
+* force build ([40ca043](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/40ca04353591bfb01fb9f63c279c3d48c31da00b))
+
+## [2.7.5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.4...v2.7.5) (2026-04-20)
+
+
+### Bug Fixes
+
+* remove comments ([b6aa7e9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b6aa7e9736f26251a4c6c63ef7959a5decf5afb3))
+* update readme ([d59923a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d59923a865758295c6425a774859ae93ec666420))
+
+## [2.7.4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.3...v2.7.4) (2026-04-19)
+
+
+### Bug Fixes
+
+* revert commented log ([fee302c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fee302cf93fb02a4360339f0b938f0c0284e5730))
+
+## [2.7.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.2...v2.7.3) (2026-04-19)
+
+
+### Bug Fixes
+
+* remove commented log ([251bc46](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/251bc46145234fd341762ebb88e951a59e895482))
+
+## [2.7.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.1...v2.7.2) (2026-04-19)
+
+
+### Bug Fixes
+
+* description `GetSchemaOffset` & `GetSchemaChainOffset` in manifest ([125b4a8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/125b4a831e01309f52072bf42f38dfd30e5b9d72))
+* recipient filter 64-bit readback + early return when no hooks ([#99](https://github.com/untrustedmodders/plugify-plugin-s2sdk/issues/99)) ([ea6029a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ea6029aeab91f1d34be0807358d0c5523026f86e))
+* remove several patches from s2sdk ([cf56b5c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/cf56b5c67ecc76f79d0745011614cc1e50233cc4))
+* support CUtlSymbolLarge in SetEntDataCString2 ([52927d4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/52927d40d4c0f3d3490c326b304f0b95ae667b13))
+* symbols for api hub ([5499f78](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5499f78dd1d915d6a4590d92430c0ff8671b95e3))
+
 ## [2.7.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.0...v2.7.1) (2026-03-19)
 
 

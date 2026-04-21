@@ -41,8 +41,9 @@ namespace plg {
 	using flat_map = std::flat_map<Key, T, Compare>;
 #else
 	template<typename Key, typename T, typename Compare = std::less<Key>>
-	using flat_map = std::map<Key, T, Compare>; // Temporary fallback
+	using flat_map = std::map<Key, T, Compare>;
 #endif
+
 	using namespace phmap;
 
 	template <typename K> using HashEqual = priv::hash_default_eq<K>;
