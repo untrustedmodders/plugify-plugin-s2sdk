@@ -68,12 +68,12 @@
       "CEntityIOOutput::FireOutputInternal": {
         "library": "server",
         "win64": "4C 89 4C 24 ? 48 89 4C 24 ? 53 56",
-        "linuxsteamrt64": "55 48 89 E5 41 57 49 89 FF 41 56 41 55 41 54 49 89 D4 53 48 89 F3"
+        "linuxsteamrt64": "55 48 89 E5 41 57 49 89 FF 41 56 41 55 41 54 49 89 D4 53 48 89 F3 48 83 EC ? 48 8D 05"
       },
       // String: "TerminateRound"
       "CGameRules::TerminateRound": {
         "library": "server",
-        "win64": "48 8B C4 4C 89 48 ? 48 89 48 ? 55 56 41 56",
+        "win64": "48 8B C4 4C 89 48 ? 48 89 48 ? 55 56",
         "linuxsteamrt64": "55 48 89 E5 41 57 49 89 FF 41 56 41 55 41 54 53 48 81 EC ? ? ? ? 48 8D 05 ? ? ? ? F3 0F 11 85"
       },
       // "chicken" is passed to this
@@ -86,7 +86,7 @@
       "CGameEntitySystem::DispatchSpawn": {
         "library": "server",
         "win64": "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 8B F9 48 85 C9 0F 84 ? ? ? ? 48 85 D2",
-        "linuxsteamrt64": "48 85 FF 74 ? 55 48 89 E5 41 55 49 89 FD"
+        "linuxsteamrt64": "48 85 FF 74 ? 55 48 89 E5 41 55 41 54 49 89 FC 53 48 89 F3 48 83 EC ? 48 85 F6 74 ? 4C 8D 2D"
       },
       // search for "land_%s", this is called after that string is referenced (the one with 4 parameters).
       // (function that calls it also contains "Gear.JumpLand.").
@@ -99,7 +99,7 @@
       "CBaseEntity::SetMoveType": {
         "library": "server",
         "win64": "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 41 0F B6 F0",
-        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 41 89 D4 53 48 89 FB 48 81 EC ? ? ? ? 40 38 B7"
+        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 41 89 D4 53 48 89 FB 48 81 EC ? ? ? ? E8 ? ? ? ? 48 8D BB ? ? ? ? 44 89 E6 E8"
       },
       // String: "DestroyWeapon"
       "CCSPlayer_WeaponServices::RemoveItem": {
@@ -114,6 +114,11 @@
         "win64": "44 89 44 24 ? 48 89 54 24 ? 48 89 4C 24 ? 55 53 56 57 41 55 41 56 41 57 48 8B EC",
         "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 49 89 CD 41 54 49 89 FC 53 48 89 F3 48 83 EC"
       },
+      "CCSPlayer_WeaponServices::Weapon_Equip": {
+        "library": "server",
+        "win64": "48 89 5C 24 2A 57 48 83 EC 2A 48 83 79 2A 2A 48 8B FA 48 8B D9 75 2A E8 2A 2A 2A 2A 48 8B",
+        "linuxsteamrt64": "55 48 89 E5 41 55 41 54 49 89 FC 53 48 89 F3 48 83 EC ? 48 8B 77"
+      },
       // String: "Weapon_Taser.Single"
       // sub_141AAD0(&v67[0].m128i_i64[1], (__int64)v76, v7, "Weapon_Taser.Single", 0LL, 0LL, 0.0, 1.0);
       //  v8 = sub_149AC70(a1);
@@ -122,7 +127,7 @@
       "GetCSWeaponDataFromKey": {
         "library": "server",
         "win64": "48 89 5C 24 ? 57 48 83 EC ? 33 FF 4C 8B CA 8B D9",
-        "linuxsteamrt64": "55 31 D2 48 89 E5 41 57 41 56 41 55 41 54 41 89 FC"
+        "linuxsteamrt64": "48 85 F6 0F 84 ? ? ? ? 55 48 89 E5 41 57 41 56 41 55 49 89 F5 41 54 53 48 81 EC ? ? ? ? 80 3E ? 75 ? 31 C0 48 81 C4 ? ? ? ? 5B 41 5C 41 5D 41 5E 41 5F 5D C3 0F 1F 80 ? ? ? ? 4C 8D A5"
       },
 
       // patches
@@ -132,7 +137,60 @@
       "VScriptInitialization": {
         "library": "vscript",
         "win64": "BE ? ? ? ? 2B D6",
-        "linuxsteamrt64": "83 FE 01 0F 84 67"
+        "linuxsteamrt64": "83 FE 01 0F 84 ? ? ? ? 83 FE 02 0F 85 ? ? ? ? BF ? ? ? ? E8"
+      },
+      // String: "Player.Swim" and "player_jump"
+      // patching 42C80000h
+      // mov     dword ptr [rsi+40h], 42C80000h
+      // jmp     short loc_18072BE63
+      "CheckJumpButtonWater": {
+        "library": "server",
+        "win64": "C8 42 EB ? 4C 8B 77 ? 4D 39 6E",
+        "linuxsteamrt64": "C8 42 41 C7 85 ? ? ? ? 00 00 00 00 41 C7 85 ? ? ? ? 00 00 00 00 E9"
+      },
+      // Some virtual function inside CPhysBox table
+      "CPhysBox_Use": {
+        "library": "server",
+        "win64": "4C 8B 43 ? 48 8D 8F ? ? ? ? 48 8B 13 E8 ? ? ? ? 48 8B 5C 24 ? 48 83 C4 ? 5F C3 CC CC CC CC 48 89 5C 24",
+        "linuxsteamrt64": "49 8B 54 24 ? 45 31 C9 45 31 C0 C7 45 ? ? ? ? ? 49 8B 34 24 48 8D 4D ? 66 0F EF C0 48 C7 45 ? ? ? ? ? 48 8D BB ? ? ? ? E8 ? ? ? ? F6 45 ? ? 74 ? 48 8B 05 ? ? ? ? 48 8B 75 ? 48 8B 38 48 8B 07 FF 50 ? 48 83 C4"
+      },
+      // "Error - cannot add bots after game is over.\n"
+      // patching jz
+      // 48 83 EC 30             sub     rsp, 30h
+      // 48 8B 05 B5 D7 91 01    mov     rax, cs:qword_181B303C8
+      // 4D 8B E1                mov     r12, r9
+      // 45 8B F8                mov     r15d, r8d
+      // 8B EA                   mov     ebp, edx
+      // 48 85 C0                test    rax, rax
+      // 0F 84 61 04 00 00       jz      loc_180213085
+      "BotNavIgnore": {
+        "library": "server",
+        "win64": "0F 84 ? ? ? ? 80 B8 ? ? ? ? 00 0F 84 ? ? ? ? 80 3D ? ? ? ? 00 74 15",
+        "linuxsteamrt64": "0F 84 ? ? ? ? 44 0F B6 B0 ? ? ? ? 45 84 F6 0F 84"
+      },
+      // Function after function where "FullWalkMovePreMove" passed
+      // patching jbe
+      // 45 0F C6 C0 55          shufps  xmm8, xmm8, 55h ; 'U'
+      // F3 41 0F 59 E1          mulss   xmm4, xmm9
+      // 41 0F 28 D8             movaps  xmm3, xmm8
+      // F3 41 0F 59 D8          mulss   xmm3, xmm8
+      // 0F 28 CC                movaps  xmm1, xmm4
+      // F3 41 0F 59 D2          mulss   xmm2, xmm10
+      // F3 0F 58 CB             addss   xmm1, xmm3
+      // F3 0F 59 C6             mulss   xmm0, xmm6
+      // F3 0F 58 CA             addss   xmm1, xmm2
+      // 0F 2F C8                comiss  xmm1, xmm0
+      // 0F 86 B0 00 00 00       jbe     loc_18074A7E5
+      "ServerMovementUnlock": {
+        "library": "server",
+        "win64": "0F 86 ? ? ? ? 0F 57 C0 0F 2E C2",
+        "linuxsteamrt64": "0F 87 ? ? ? ? F3 0F 12 C2"
+      },
+      // "Tried to set the source soundscape on positionless sound event %s\n" where 763651247
+      "EmitSoundVolume": {
+        "library": "server",
+        "win64": "41 B9 ? ? ? ? 48 89 5C 24 ? 49 8B D5",
+        "linuxsteamrt64": "E8 ? ? ? ? F3 0F 6F 03 48 83 EC ? 45 31 C9 89 C2 45 31 C0 4C 89 FE 0F 11 04 24 8B 43 ? 4C 89 E7"
       }
     },
     "Offsets": {
@@ -143,46 +201,46 @@
       },
       // 2 functions after one with "targethealthfrac"
       "CBaseEntity::CollisionRulesChanged": {
-        "win64": 185,
-        "linuxsteamrt64": 184
+        "win64": 186,
+        "linuxsteamrt64": 185
       },
       // StringL "item_pickup_failed"
       "CBaseEntity::IsWeapon": {
-        "win64": 180,
-        "linuxsteamrt64": 179
+        "win64": 181,
+        "linuxsteamrt64": 180
       },
       // String "can't teleport object (%s) as it has a parent (%s)!" The vfunc call this
       "CBaseEntity::Teleport": {
-        "win64": 162,
-        "linuxsteamrt64": 161
+        "win64": 163,
+        "linuxsteamrt64": 162
       },
       // Player controller respawn function offset
       "CBasePlayerController::RoundRespawn": {
-        "win64": 272,
-        "linuxsteamrt64": 274
+        "win64": 273,
+        "linuxsteamrt64": 275
       },
       // Look for the kill command, go through its callback and you should a find call like this, with v9 being a pawn pointer:
       // return (*(*v9 + 2976LL))(v9, v27, 0LL);
       // 2976 (372 * 8) is the offset
       "CBasePlayerPawn::CommitSuicide": {
-        "win64": 400,
-        "linuxsteamrt64": 400
+        "win64": 390,
+        "linuxsteamrt64": 390
       },
       "CCSPlayer_WeaponServices::CanUse": {
-        "win64": 23,
-        "linuxsteamrt64": 24
-      },
-      "CCSPlayer_WeaponServices::DropWeapon": {
         "win64": 24,
         "linuxsteamrt64": 25
       },
+      "CCSPlayer_WeaponServices::DropWeapon": {
+        "win64": 25,
+        "linuxsteamrt64": 25
+      },
       "CCSPlayer_WeaponServices::SelectItem": {
-        "win64": 26,
-        "linuxsteamrt64": 27
+        "win64": 27,
+        "linuxsteamrt64": 28
       },
       "CCSPlayer_WeaponServices::SwitchWeapon": {
-        "win64": 20,
-        "linuxsteamrt64": 21
+        "win64": 21,
+        "linuxsteamrt64": 22
       },
       "CCSPlayer_ItemServices::GiveNamedItem": {
         "win64": 19,
@@ -269,7 +327,7 @@
         ],
         "linuxsteamrt64": [
           {
-            "index": 117
+            "index": 110
           }
         ]
       }
@@ -284,6 +342,31 @@
         "address": "GetHammerUniqueId",
         "win64": "B0 01",
         "linuxsteamrt64": "B0 01"
+      },
+      "FixWaterFloorJumpPatch": {
+        "signature": "CheckJumpButtonWater",
+        "win64": "11 43",
+        "linuxsteamrt64": "11 43"
+      },
+      "CPhysBoxUsePatch": {
+        "signature": "CPhysBox_Use",
+        "win64": "49 89 F8 90",
+        "linuxsteamrt64": "48 89 DA 90 90"
+      },
+      "ServerMovementUnlockPatch": {
+        "signature": "ServerMovementUnlock",
+        "win64": "E9 B1 00 00 00 90",
+        "linuxsteamrt64": "90 90 90 90 90 90"
+      },
+      "BotNavIgnorePatch": {
+        "signature": "BotNavIgnore",
+        "win64": "E9 2C 00 00 00 90",
+        "linuxsteamrt64": "E9 25 00 00 00 90"
+      },
+      "EmitSoundVolumePatch": {
+        "signature": "EmitSoundVolume",
+        "win64": "41 B9 E9 54 60 BD",
+        "linuxsteamrt64": "B8 E9 54 60 BD"
       }
     },
     "VTables": {
