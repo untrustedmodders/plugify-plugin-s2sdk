@@ -21,6 +21,7 @@
 #include "utils.hpp"
 
 #include <schemasystem/schemasystem.h>
+#include <entity2/entitynetwork.h>
 
 void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32_t networkStateChangedOffset) {
 	NetworkStateChanged_t data(offset);
