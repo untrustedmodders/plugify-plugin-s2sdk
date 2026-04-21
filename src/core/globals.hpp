@@ -18,6 +18,7 @@ class IGameEventManager2;
 class CNetworkGameServerBase;
 class CGlobalVars;
 class CGameEntitySystem;
+class CNetworkSerializerCodeGenDatabase;
 class IGameEventListener2;
 class IScriptVM;
 class CEntitySystem;

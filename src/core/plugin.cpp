@@ -898,7 +898,7 @@ void Source2SDK::OnServerStartup() {
 		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem, Hook_OnRemoveEntity, polyhook::CallbackType::Post);
 		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem, Hook_OnEntityParentChanged, polyhook::CallbackType::Post);
 
-		g_pEntityNetworkSerializerInfo = g_pGameEntitySystem->FindClassByName("CBaseEntity")->m_NetworkSerializerInfo->m_pDatabase;
+		g_pEntityNetworkSerializerInfo = g_pGameEntitySystem->FindClassByName("CBaseEntity")->m_pNetworkSerializerInfo->m_pDatabase;
 	}
 
 #if defined (CS2)

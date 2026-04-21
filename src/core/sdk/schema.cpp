@@ -64,9 +64,8 @@ namespace {
 			CollectSchemaFields(*base.m_pClass, out, derivedName);
 		}
 
-		auto& cli = g_pEntityNetworkSerializerInfo->m_ClassInfos;
-		int index = cli.Find(cls.m_pszName);
-		bool found = index != cli.InvalidIndex()
+		const auto& cli = g_pEntityNetworkSerializerInfo->m_ClassInfos;
+		const int index = cli.Find(cls.m_pszName);
 
 		for (uint16 i = 0; i < cls.m_nFieldCount; ++i) {
 			const SchemaClassFieldData_t& field = cls.m_pFields[i];
@@ -79,7 +78,7 @@ namespace {
 				field.m_pszName,
 				SchemaKey{
 					field.m_nSingleInheritanceOffset,
-					found && cli[index]->FindField(field.m_pszName),
+					index != cli.InvalidIndex() && cli[index]->FindField(field.m_pszName),
 					static_cast<size_t>(size),
 					field.m_pType
 				}
