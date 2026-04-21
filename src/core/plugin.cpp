@@ -7,6 +7,7 @@
 #include <eiface.h>
 #include <engine/igameeventsystem.h>
 #include <entity2/entitysystem.h>
+#include <entity2/entityclass.h>
 #include <igameevents.h>
 #include <iserver.h>
 #include <netmessages.h>
@@ -896,6 +897,8 @@ void Source2SDK::OnServerStartup() {
 		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnAddEntity, g_pGameEntitySystem, Hook_OnAddEntity, polyhook::CallbackType::Post);
 		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem, Hook_OnRemoveEntity, polyhook::CallbackType::Post);
 		g_HookManager.AddHookVTableFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem, Hook_OnEntityParentChanged, polyhook::CallbackType::Post);
+
+		g_pEntityNetworkSerializerInfo = g_pGameEntitySystem->FindClassByName("CBaseEntity")->m_pNetworkSerializerInfo->m_pDatabase;
 	}
 
 #if defined (CS2)

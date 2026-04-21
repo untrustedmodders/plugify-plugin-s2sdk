@@ -6936,10 +6936,10 @@
       }
     },
     {
-      "name": "SetTransmitInfoAlways",
+      "name": "SetTransmitInfoOutOfPVS",
       "group": "Transmit",
-      "description": "Sets a bit in the TransmitAlways bitvec, marking an entity to always transmit.",
-      "funcName": "SetTransmitInfoAlways",
+      "description": "Sets a bit in the TransmitOutOfPVS bitvec, marking an entity to always transmit.",
+      "funcName": "SetTransmitInfoOutOfPVS",
       "paramTypes": [
         {
           "name": "info",
@@ -6959,10 +6959,10 @@
       }
     },
     {
-      "name": "ClearTransmitInfoAlways",
+      "name": "ClearTransmitInfoOutOfPVS",
       "group": "Transmit",
-      "description": "Clears a bit in the TransmitAlways bitvec, unmarking an entity from always transmit.",
-      "funcName": "ClearTransmitInfoAlways",
+      "description": "Clears a bit in the TransmitOutOfPVS bitvec, unmarking an entity from always transmit.",
+      "funcName": "ClearTransmitInfoOutOfPVS",
       "paramTypes": [
         {
           "name": "info",
@@ -6982,10 +6982,10 @@
       }
     },
     {
-      "name": "IsTransmitInfoAlwaysSet",
+      "name": "IsTransmitInfoOutOfPVSSet",
       "group": "Transmit",
-      "description": "Checks if a bit is set in the TransmitAlways bitvec.",
-      "funcName": "IsTransmitInfoAlwaysSet",
+      "description": "Checks if a bit is set in the TransmitOutOfPVS bitvec.",
+      "funcName": "IsTransmitInfoOutOfPVSSet",
       "paramTypes": [
         {
           "name": "info",
@@ -7006,10 +7006,10 @@
       }
     },
     {
-      "name": "SetTransmitInfoAlwaysAll",
+      "name": "SetTransmitInfoOutOfPVSAll",
       "group": "Transmit",
-      "description": "Sets all bits in the TransmitAlways bitvec, marking all entities to always transmit.",
-      "funcName": "SetTransmitInfoAlwaysAll",
+      "description": "Sets all bits in the TransmitOutOfPVS bitvec, marking all entities to always transmit.",
+      "funcName": "SetTransmitInfoOutOfPVSAll",
       "paramTypes": [
         {
           "name": "info",
@@ -7023,10 +7023,114 @@
       }
     },
     {
-      "name": "ClearTransmitInfoAlwaysAll",
+      "name": "ClearTransmitInfoOutOfPVSAll",
       "group": "Transmit",
-      "description": "Clears all bits in the TransmitAlways bitvec, unmarking all entities from always transmit.",
-      "funcName": "ClearTransmitInfoAlwaysAll",
+      "description": "Clears all bits in the TransmitOutOfPVS bitvec, unmarking all entities from always transmit.",
+      "funcName": "ClearTransmitInfoOutOfPVSAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "SetTransmitInfoHLTV",
+      "group": "Transmit",
+      "description": "Sets a bit in the TransmitHLTV bitvec, marking an entity to always transmit.",
+      "funcName": "SetTransmitInfoHLTV",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to mark as always transmittable."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ClearTransmitInfoHLTV",
+      "group": "Transmit",
+      "description": "Clears a bit in the TransmitHLTV bitvec, unmarking an entity from always transmit.",
+      "funcName": "ClearTransmitInfoHLTV",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to unmark from always transmit."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "IsTransmitInfoHLTVSet",
+      "group": "Transmit",
+      "description": "Checks if a bit is set in the TransmitHLTV bitvec.",
+      "funcName": "IsTransmitInfoHLTVSet",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity to check."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the entity is marked to always transmit, false otherwise."
+      }
+    },
+    {
+      "name": "SetTransmitInfoHLTVAll",
+      "group": "Transmit",
+      "description": "Sets all bits in the TransmitHLTV bitvec, marking all entities to always transmit.",
+      "funcName": "SetTransmitInfoHLTVAll",
+      "paramTypes": [
+        {
+          "name": "info",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the CCheckTransmitInfo structure."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ClearTransmitInfoHLTVAll",
+      "group": "Transmit",
+      "description": "Clears all bits in the TransmitHLTV bitvec, unmarking all entities from always transmit.",
+      "funcName": "ClearTransmitInfoHLTVAll",
       "paramTypes": [
         {
           "name": "info",
@@ -38534,27 +38638,27 @@
         },
         {
           "name": "SetAlways",
-          "method": "SetTransmitInfoAlways",
+          "method": "SetTransmitInfoOutOfPVS",
           "bindSelf": true
         },
         {
           "name": "ClearAlways",
-          "method": "ClearTransmitInfoAlways",
+          "method": "ClearTransmitInfoOutOfPVS",
           "bindSelf": true
         },
         {
           "name": "IsAlwaysSet",
-          "method": "IsTransmitInfoAlwaysSet",
+          "method": "IsTransmitInfoOutOfPVSSet",
           "bindSelf": true
         },
         {
           "name": "SetAlwaysAll",
-          "method": "SetTransmitInfoAlwaysAll",
+          "method": "SetTransmitInfoOutOfPVSAll",
           "bindSelf": true
         },
         {
           "name": "ClearAlwaysAll",
-          "method": "ClearTransmitInfoAlwaysAll",
+          "method": "ClearTransmitInfoOutOfPVSAll",
           "bindSelf": true
         },
         {

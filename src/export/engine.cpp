@@ -5,6 +5,7 @@
 #include <core/timer_system.hpp>
 #include <engine/IEngineSound.h>
 #include <entity2/entitysystem.h>
+#include <networksystem/inetworksystem.h>
 
 PLUGIFY_WARN_PUSH()
 

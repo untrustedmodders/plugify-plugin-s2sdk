@@ -160,77 +160,151 @@ extern "C" PLUGIN_API void ClearTransmitInfoNonPlayerAll(CCheckTransmitInfo* inf
 }
 
 // ============================================================================
-// CCheckTransmitInfo - BitVec TransmitAlways Methods
+// CCheckTransmitInfo - BitVec OutOfPVS Methods
 // ============================================================================
 
 /**
- * @brief Sets a bit in the TransmitAlways bitvec, marking an entity to always transmit.
+ * @brief Sets a bit in the TransmitOutOfPVS bitvec, marking an entity to always transmit.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
  * @param entityHandle The handle of the entity to mark as always transmittable.
  */
-extern "C" PLUGIN_API void SetTransmitInfoAlways(CCheckTransmitInfo* info, int entityHandle) {
-	if (!info || !info->m_pTransmitAlways) {
+extern "C" PLUGIN_API void SetTransmitInfoOutOfPVS(CCheckTransmitInfo* info, int entityHandle) {
+	if (!info || !info->m_pTransmitOutOfPVS) {
 		return;
 	}
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	info->m_pTransmitAlways->Set(entity->entindex());
+	info->m_pTransmitOutOfPVS->Set(entity->entindex());
 }
 
 /**
- * @brief Clears a bit in the TransmitAlways bitvec, unmarking an entity from always transmit.
+ * @brief Clears a bit in the TransmitOutOfPVS bitvec, unmarking an entity from always transmit.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
  * @param entityHandle The handle of the entity to unmark from always transmit.
  */
-extern "C" PLUGIN_API void ClearTransmitInfoAlways(CCheckTransmitInfo* info, int entityHandle) {
-	if (!info || !info->m_pTransmitAlways) {
+extern "C" PLUGIN_API void ClearTransmitInfoOutOfPVS(CCheckTransmitInfo* info, int entityHandle) {
+	if (!info || !info->m_pTransmitOutOfPVS) {
 		return;
 	}
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	info->m_pTransmitAlways->Clear(entity->entindex());
+	info->m_pTransmitOutOfPVS->Clear(entity->entindex());
 }
 
 /**
- * @brief Checks if a bit is set in the TransmitAlways bitvec.
+ * @brief Checks if a bit is set in the TransmitOutOfPVS bitvec.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
  * @param entityHandle The handle of the entity to check.
  * @return True if the entity is marked to always transmit, false otherwise.
  */
-extern "C" PLUGIN_API bool IsTransmitInfoAlwaysSet(CCheckTransmitInfo* info, int entityHandle) {
-	if (!info || !info->m_pTransmitAlways) {
+extern "C" PLUGIN_API bool IsTransmitInfoOutOfPVSSet(CCheckTransmitInfo* info, int entityHandle) {
+	if (!info || !info->m_pTransmitOutOfPVS) {
 		return false;
 	}
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return false;
-	return info->m_pTransmitAlways->IsBitSet(entity->entindex());
+	return info->m_pTransmitOutOfPVS->IsBitSet(entity->entindex());
 }
 
 /**
- * @brief Sets all bits in the TransmitAlways bitvec, marking all entities to always transmit.
+ * @brief Sets all bits in the TransmitOutOfPVS bitvec, marking all entities to always transmit.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
  */
-extern "C" PLUGIN_API void SetTransmitInfoAlwaysAll(CCheckTransmitInfo* info) {
-	if (!info || !info->m_pTransmitAlways) {
+extern "C" PLUGIN_API void SetTransmitInfoOutOfPVSAll(CCheckTransmitInfo* info) {
+	if (!info || !info->m_pTransmitOutOfPVS) {
 		return;
 	}
-	info->m_pTransmitAlways->SetAll();
+	info->m_pTransmitOutOfPVS->SetAll();
 }
 
 /**
- * @brief Clears all bits in the TransmitAlways bitvec, unmarking all entities from always transmit.
+ * @brief Clears all bits in the TransmitOutOfPVS bitvec, unmarking all entities from always transmit.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
  */
-extern "C" PLUGIN_API void ClearTransmitInfoAlwaysAll(CCheckTransmitInfo* info) {
-	if (!info || !info->m_pTransmitAlways) {
+extern "C" PLUGIN_API void ClearTransmitInfoOutOfPVSAll(CCheckTransmitInfo* info) {
+	if (!info || !info->m_pTransmitOutOfPVS) {
 		return;
 	}
-	info->m_pTransmitAlways->ClearAll();
+	info->m_pTransmitOutOfPVS->ClearAll();
+}
+
+// ============================================================================
+// CCheckTransmitInfo - BitVec HLTV Methods
+// ============================================================================
+
+/**
+ * @brief Sets a bit in the TransmitHLTV bitvec, marking an entity to always transmit.
+ *
+ * @param info Pointer to the CCheckTransmitInfo structure.
+ * @param entityHandle The handle of the entity to mark as always transmittable.
+ */
+extern "C" PLUGIN_API void SetTransmitInfoHLTV(CCheckTransmitInfo* info, int entityHandle) {
+	if (!info || !info->m_pTransmitHLTV) {
+		return;
+	}
+	auto* entity = helpers::GetEntity(entityHandle);
+	if (!entity) return;
+	info->m_pTransmitHLTV->Set(entity->entindex());
+}
+
+/**
+ * @brief Clears a bit in the TransmitHLTV bitvec, unmarking an entity from always transmit.
+ *
+ * @param info Pointer to the CCheckTransmitInfo structure.
+ * @param entityHandle The handle of the entity to unmark from always transmit.
+ */
+extern "C" PLUGIN_API void ClearTransmitInfoHLTV(CCheckTransmitInfo* info, int entityHandle) {
+	if (!info || !info->m_pTransmitHLTV) {
+		return;
+	}
+	auto* entity = helpers::GetEntity(entityHandle);
+	if (!entity) return;
+	info->m_pTransmitHLTV->Clear(entity->entindex());
+}
+
+/**
+ * @brief Checks if a bit is set in the TransmitHLTV bitvec.
+ *
+ * @param info Pointer to the CCheckTransmitInfo structure.
+ * @param entityHandle The handle of the entity to check.
+ * @return True if the entity is marked to always transmit, false otherwise.
+ */
+extern "C" PLUGIN_API bool IsTransmitInfoHLTVSet(CCheckTransmitInfo* info, int entityHandle) {
+	if (!info || !info->m_pTransmitHLTV) {
+		return false;
+	}
+	auto* entity = helpers::GetEntity(entityHandle);
+	if (!entity) return false;
+	return info->m_pTransmitHLTV->IsBitSet(entity->entindex());
+}
+
+/**
+ * @brief Sets all bits in the TransmitHLTV bitvec, marking all entities to always transmit.
+ *
+ * @param info Pointer to the CCheckTransmitInfo structure.
+ */
+extern "C" PLUGIN_API void SetTransmitInfoHLTVAll(CCheckTransmitInfo* info) {
+	if (!info || !info->m_pTransmitHLTV) {
+		return;
+	}
+	info->m_pTransmitHLTV->SetAll();
+}
+
+/**
+ * @brief Clears all bits in the TransmitHLTV bitvec, unmarking all entities from always transmit.
+ *
+ * @param info Pointer to the CCheckTransmitInfo structure.
+ */
+extern "C" PLUGIN_API void ClearTransmitInfoHLTVAll(CCheckTransmitInfo* info) {
+	if (!info || !info->m_pTransmitHLTV) {
+		return;
+	}
+	info->m_pTransmitHLTV->ClearAll();
 }
 
 // ============================================================================
