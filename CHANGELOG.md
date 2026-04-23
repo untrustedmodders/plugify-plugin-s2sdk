@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.8.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.6...v2.8.0) (2026-04-23)
+
+
+### Features
+
+* update for new sourcesdk ([fb9e645](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fb9e64513e4b80bba64caef482ac889f9aaf9d96))
+
+
+### Bug Fixes
+
+* typo in symbols ([0c3d8ae](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0c3d8ae5fa0a1ceb84b6d212e586addb37ef4b4c))
+* update linux gamedata ([d7fcaf2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d7fcaf2896c892dd362dfdce036d53754bcc7efc))
+* update network field detection ([d6cf843](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d6cf8439448c0d44ecd7431ce9438b3f31c97507))
+* update offsets ([37d145c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/37d145cf463199c5be8d91ea4920a77e52d7f839))
+* update win sigs and lin build ([300f566](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/300f56673a3f5fed872b1a636576218bcb695f39))
+
 ## [2.7.6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.5...v2.7.6) (2026-04-20)
 
 
