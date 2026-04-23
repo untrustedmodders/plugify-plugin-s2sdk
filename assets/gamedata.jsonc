@@ -232,7 +232,7 @@
       },
       "CCSPlayer_WeaponServices::DropWeapon": {
         "win64": 25,
-        "linuxsteamrt64": 25
+        "linuxsteamrt64": 26
       },
       "CCSPlayer_WeaponServices::SelectItem": {
         "win64": 27,
@@ -243,12 +243,12 @@
         "linuxsteamrt64": 22
       },
       "CCSPlayer_ItemServices::GiveNamedItem": {
-        "win64": 19,
-        "linuxsteamrt64": 20
+        "win64": 20,
+        "linuxsteamrt64": 21
       },
       "CCSPlayer_ItemServices::RemoveAllItems": {
-        "win64": 23,
-        "linuxsteamrt64": 24
+        "win64": 24,
+        "linuxsteamrt64": 25
       },
       // "InitialActivate" and "OnActivate"
       "CCSScript_EntityScript": {
