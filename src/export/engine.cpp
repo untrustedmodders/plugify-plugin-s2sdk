@@ -220,18 +220,13 @@ extern "C" PLUGIN_API void StopSound(int entityHandle, const plg::string& sound)
 /**
  * @brief Emits a sound to a specific client.
  *
- * @param playerSlot The index of the player's slot to whom the sound will be emitted.
- * @param channel The channel through which the sound will be played.
+ * @param entityHandle The handle of the entity that will emit the sound.
  * @param sound The name of the sound to emit.
- * @param volume The volume of the sound.
- * @param soundLevel The level of the sound.
- * @param flags Additional flags for sound playback.
- * @param pitch The pitch of the sound.
- * @param origin The origin of the sound in 3D space.
- * @param soundTime The time at which the sound should be played.
  */
-extern "C" PLUGIN_API void EmitSoundToClient(int playerSlot, int channel, const plg::string& sound, float volume, int soundLevel, int flags, int pitch, const Vector& origin, float soundTime) {
-	utils::PlaySoundToClient(playerSlot, channel, sound.c_str(), volume, static_cast<soundlevel_t>(soundLevel), flags, pitch, origin, soundTime);
+extern "C" PLUGIN_API void EmitSoundToClient(int entityHandle, const plg::string& sound) {
+	auto* entity = helpers::GetEntity<CBaseEntity>(entityHandle);
+	if (!entity) return;
+	entity->EmitSound(sound.c_str());
 }
 
 /**
