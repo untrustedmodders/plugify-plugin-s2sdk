@@ -19105,58 +19105,16 @@
       "funcName": "EmitSoundToClient",
       "paramTypes": [
         {
-          "name": "playerSlot",
+          "name": "entityHandle",
           "type": "int32",
           "ref": false,
-          "description": "The index of the client to whom the sound will be emitted."
-        },
-        {
-          "name": "channel",
-          "type": "int32",
-          "ref": false,
-          "description": "The channel through which the sound will be played."
+          "description": "The handle of the entity that will emit the sound."
         },
         {
           "name": "sound",
           "type": "string",
           "ref": false,
           "description": "The name of the sound to emit."
-        },
-        {
-          "name": "volume",
-          "type": "float",
-          "ref": false,
-          "description": "The volume of the sound."
-        },
-        {
-          "name": "soundLevel",
-          "type": "int32",
-          "ref": false,
-          "description": "The level of the sound."
-        },
-        {
-          "name": "flags",
-          "type": "int32",
-          "ref": false,
-          "description": "Additional flags for sound playback."
-        },
-        {
-          "name": "pitch",
-          "type": "int32",
-          "ref": false,
-          "description": "The pitch of the sound."
-        },
-        {
-          "name": "origin",
-          "type": "vec3",
-          "ref": false,
-          "description": "The origin of the sound in 3D space."
-        },
-        {
-          "name": "soundTime",
-          "type": "float",
-          "ref": false,
-          "description": "The time at which the sound should be played."
         }
       ],
       "retType": {
