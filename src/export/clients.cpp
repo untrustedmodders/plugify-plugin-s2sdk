@@ -37,7 +37,7 @@ extern "C" PLUGIN_API int EntPointerToPlayerSlot(CBaseEntity* entity) {
  * This function retrieves a pointer to the entity instance associated with the specified player slot index.
  * If the client list is unavailable or the slot index is invalid, it returns nullptr.
  *
- * @param playerSlot Index of the player slot.
+ * @param playerSlot The index of the player slot.
  * @return Pointer to the entity instance, or nullptr if the slot is invalid.
  */
 extern "C" PLUGIN_API CEntityInstance* PlayerSlotToEntPointer(int playerSlot) {
@@ -56,7 +56,7 @@ extern "C" PLUGIN_API CEntityInstance* PlayerSlotToEntPointer(int playerSlot) {
  * player slot index. If the client list is unavailable, the slot index is invalid,
  * or the entity cannot be resolved, it returns INVALID_EHANDLE_INDEX.
  *
- * @param playerSlot Index of the player slot.
+ * @param playerSlot The index of the player slot.
  * @return The index of the entity, or -1 if the handle is invalid.
  */
 extern "C" PLUGIN_API int PlayerSlotToEntHandle(int playerSlot) {

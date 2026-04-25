@@ -1,11 +1,12 @@
 #include <core/sdk/entity/cbaseentity.h>
-#include <core/sdk/utils.hpp>
 #include <core/sdk/helpers.hpp>
+#include <core/sdk/utils.hpp>
 #include <core/server_manager.hpp>
 #include <core/timer_system.hpp>
 #include <engine/IEngineSound.h>
 #include <entity2/entitysystem.h>
 #include <networksystem/inetworksystem.h>
+#include <core/sdk/entity/sounds.h>
 
 PLUGIFY_WARN_PUSH()
 
@@ -220,13 +221,14 @@ extern "C" PLUGIN_API void StopSound(int entityHandle, const plg::string& sound)
 /**
  * @brief Emits a sound to a specific client.
  *
- * @param entityHandle The handle of the entity that will emit the sound.
+ * @param playerSlot The index of the player's slot.
  * @param sound The name of the sound to emit.
  */
-extern "C" PLUGIN_API void EmitSoundToClient(int entityHandle, const plg::string& sound) {
-	auto* entity = helpers::GetEntity<CBaseEntity>(entityHandle);
-	if (!entity) return;
-	entity->EmitSound(sound.c_str());
+extern "C" PLUGIN_API void EmitSoundToClient(int playerSlot, const plg::string& sound) {
+	auto controller = helpers::GetController(playerSlot);
+	if (!controller) return;
+	ParamScope params(controller);
+	Sounds{}.EmitSoundOnClient(sound.c_str(), params[0]);
 }
 
 /**

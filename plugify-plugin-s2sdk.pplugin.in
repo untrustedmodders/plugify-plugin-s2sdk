@@ -19105,10 +19105,10 @@
       "funcName": "EmitSoundToClient",
       "paramTypes": [
         {
-          "name": "entityHandle",
+          "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The handle of the entity that will emit the sound."
+          "description": "The index of the player's slot."
         },
         {
           "name": "sound",
