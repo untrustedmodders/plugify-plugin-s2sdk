@@ -38595,28 +38595,53 @@
           "bindSelf": true
         },
         {
-          "name": "SetAlways",
+          "name": "SetOutOfPVS",
           "method": "SetTransmitInfoOutOfPVS",
           "bindSelf": true
         },
         {
-          "name": "ClearAlways",
+          "name": "ClearOutOfPVS",
           "method": "ClearTransmitInfoOutOfPVS",
           "bindSelf": true
         },
         {
-          "name": "IsAlwaysSet",
+          "name": "IsOutOfPVSSet",
           "method": "IsTransmitInfoOutOfPVSSet",
           "bindSelf": true
         },
         {
-          "name": "SetAlwaysAll",
+          "name": "SetOutOfPVSAll",
           "method": "SetTransmitInfoOutOfPVSAll",
           "bindSelf": true
         },
         {
-          "name": "ClearAlwaysAll",
+          "name": "ClearOutOfPVSAll",
           "method": "ClearTransmitInfoOutOfPVSAll",
+          "bindSelf": true
+        },
+        {
+          "name": "SetHLTV",
+          "method": "SetTransmitInfoHLTV",
+          "bindSelf": true
+        },
+        {
+          "name": "ClearHLTV",
+          "method": "ClearTransmitInfoHLTV",
+          "bindSelf": true
+        },
+        {
+          "name": "IsHLTVSet",
+          "method": "IsTransmitInfoHLTVSet",
+          "bindSelf": true
+        },
+        {
+          "name": "SetHLTVAll",
+          "method": "SetTransmitInfoHLTVAll",
+          "bindSelf": true
+        },
+        {
+          "name": "ClearHLTVAll",
+          "method": "ClearTransmitInfoHLTVAll",
           "bindSelf": true
         },
         {
