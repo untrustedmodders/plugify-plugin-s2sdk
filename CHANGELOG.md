@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.8.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.8.0...v2.8.1) (2026-04-25)
+
+
+### Bug Fixes
+
+* EmitSoundToClient to vscsript ([4b34219](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4b3421991f831cd5e8a857e0fd2c487de115ee63))
+* update emit sound to client ([424aaeb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/424aaeb737aafd4ddd54427c0af299286651e1fe))
+* update methods in manifest ([6902908](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/690290868e4cf0ab55ad720c0bca3905b82d6226))
+
 ## [2.8.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.7.6...v2.8.0) (2026-04-23)
 
 
