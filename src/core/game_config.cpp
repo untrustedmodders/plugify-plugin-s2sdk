@@ -1244,6 +1244,8 @@ Result<Memory> AddressResolver::ApplyStep(Memory current, const IndirectionStep&
 				.Offset(sizeof(int32_t))
 				.Offset(target.Get<int32_t>());
 		}
+		default:
+			break;
 	}
 
 	return MakeError("Unknown indirection type");

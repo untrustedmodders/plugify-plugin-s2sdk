@@ -255,9 +255,8 @@ namespace schema {
 							case sizeof(int64):
 								return {Single, static_cast<int>(sizeof(int64))};
 							default:
-								break;
+								return {Invalid, -1};
 						}
-						break;
 					case SCHEMA_ATOMIC_COLLECTION_OF_T:
 						switch (static_cast<CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize) {
 							case sizeof(int8):
@@ -269,9 +268,8 @@ namespace schema {
 							case sizeof(int64):
 								return {Collection, static_cast<int>(sizeof(int64))};
 							default:
-								break;
+								return {Invalid, -1};
 						}
-						break;
 					default:
 						return {Invalid, -1};
 				}

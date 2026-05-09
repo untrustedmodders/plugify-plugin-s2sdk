@@ -40,7 +40,7 @@ extern "C" PLUGIN_API plg::string ReadFileVPK(const plg::string& localFileName, 
 /**
  * @brief Finds all files matching a wildcard and returns absolute paths.
  *
- * @param wildcard The wildcard pattern to match (e.g., "path/*.txt").
+ * @param wildcard The wildcard pattern to match (e.g., "path\*.txt").
  * @param pathId The filesystem search path ID (e.g., "GAME"). If empty, uses "GAME".
  * @return A list of absolute file paths matching the wildcard.
  */
