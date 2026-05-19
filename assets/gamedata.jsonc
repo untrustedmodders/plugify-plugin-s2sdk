@@ -10,8 +10,8 @@
       // String: "Unexpected module request."
       "CSScript::ResolveModule": {
         "library": "server",
-        "win64": "48 89 54 24 ? 48 89 4C 24 ? 55 53 56 57 41 55 41 56 48 8D AC 24",
-        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 49 89 F6 41 55 41 54 53 48 89 FB 48 81 EC ? ? ? ? 48 89 B5"
+        "win64": "48 89 5C 24 ? 48 89 54 24 ? 48 89 4C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 49 8B F8",
+        "linuxsteamrt64": "55 48 89 E5 41 57 49 89 F7 41 56 41 55 41 54 53 48 89 FB 48 81 EC ? ? ? ? 48 89 B5 ? ? ? ? E8 ? ? ? ? 48 89 C7"
       },
       // String: "CCSPlayerPawnBase::SwitchTeam", just keep in mind this is actually CCSPlayerController::SwitchTeam
       "CCSPlayerController::SwitchTeam": {
@@ -148,12 +148,6 @@
         "win64": "C8 42 EB ? 4C 8B 77 ? 4D 39 66",
         "linuxsteamrt64": "C8 42 41 C7 85 ? ? ? ? 00 00 00 00 41 C7 85 ? ? ? ? 00 00 00 00 E9"
       },
-      // Some virtual function inside CPhysBox table
-      "CPhysBox_Use": {
-        "library": "server",
-        "win64": "4C 8B 43 ? 48 8D 8F ? ? ? ? 48 8B 13 E8 ? ? ? ? 48 8B 5C 24 ? 48 83 C4 ? 5F C3 CC CC CC CC 40 53",
-        "linuxsteamrt64": "49 8B 54 24 ? 45 31 C9 45 31 C0 C7 45 ? ? ? ? ? 49 8B 34 24 48 8D 4D ? 66 0F EF C0 48 C7 45 ? ? ? ? ? 48 8D BB ? ? ? ? E8 ? ? ? ? F6 45 ? ? 74 ? 48 8B 05 ? ? ? ? 48 8B 75 ? 48 8B 38 48 8B 07 FF 50 ? 48 83 C4"
-      },
       // "Error - cannot add bots after game is over.\n"
       // patching jz
       // 48 83 EC 30             sub     rsp, 30h
@@ -283,12 +277,12 @@
         "signature": "CSScript::ResolveModule",
         "win64": [
           {
-            "read_offs32": 272
+            "read_offs32": 296
           }
         ],
         "linuxsteamrt64": [
           {
-            "read_offs32": 320
+            "read_offs32": 383
           }
         ]
       },
@@ -296,7 +290,7 @@
         "signature": "CSScript::ResolveModule",
         "win64": [
           {
-            "read_offs32": 59
+            "read_offs32": 67
           }
         ],
         "linuxsteamrt64": [
@@ -309,12 +303,12 @@
         "signature": "CSScript::ResolveModule",
         "win64": [
           {
-            "read_offs32": 1216
+            "read_offs32": 1247
           }
         ],
         "linuxsteamrt64": [
           {
-            "read_offs32": 218
+            "read_offs32": 242
           }
         ]
       },
@@ -352,11 +346,6 @@
         "signature": "CheckJumpButtonWater",
         "win64": "11 43",
         "linuxsteamrt64": "11 43"
-      },
-      "CPhysBoxUsePatch": {
-        "signature": "CPhysBox_Use",
-        "win64": "49 89 F8 90",
-        "linuxsteamrt64": "48 89 DA 90 90"
       },
       "ServerMovementUnlockPatch": {
         "signature": "ServerMovementUnlock",
