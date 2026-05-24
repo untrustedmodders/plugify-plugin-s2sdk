@@ -138,23 +138,23 @@ public:
 	SCHEMA_FIELD(CHandle<CBasePlayerWeapon>, m_hActiveWeapon)
 
 	bool CanUse(CBasePlayerWeapon* weapon) {
-		TRY_GET_OFFSET(g_pGameConfig, "CCSPlayer_WeaponServices::CanUse", offset);
-		return CALL_VIRTUAL(bool, *offset, this, weapon);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CCSPlayer_WeaponServices::CanUse"));
+		return CALL_VIRTUAL(bool, offset, this, weapon);
 	}
 
 	void DropWeapon(CBasePlayerWeapon* weapon, const Vector* target = nullptr, const Vector* velocity = nullptr) {
-		TRY_GET_OFFSET(g_pGameConfig, "CCSPlayer_WeaponServices::DropWeapon", offset);
-		CALL_VIRTUAL(void, *offset, this, weapon, target, velocity);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CCSPlayer_WeaponServices::DropWeapon"));
+		CALL_VIRTUAL(void, offset, this, weapon, target, velocity);
 	}
 
 	int SelectItem(CBasePlayerWeapon* weapon) {
-		TRY_GET_OFFSET(g_pGameConfig, "CCSPlayer_WeaponServices::SelectItem", offset);
-		return CALL_VIRTUAL(int, *offset, this, weapon);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CCSPlayer_WeaponServices::SelectItem"));
+		return CALL_VIRTUAL(int, offset, this, weapon);
 	}
 
 	bool SwitchWeapon(CBasePlayerWeapon* weapon, int a3 = 0) {
-		TRY_GET_OFFSET(g_pGameConfig, "CCSPlayer_WeaponServices::SwitchWeapon", offset);
-		return CALL_VIRTUAL(int, *offset, this, weapon, a3);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CCSPlayer_WeaponServices::SwitchWeapon"));
+		return CALL_VIRTUAL(int, offset, this, weapon, a3);
 	}
 };
 
@@ -197,13 +197,13 @@ public:
 	DECLARE_SCHEMA_CLASS(CCSPlayer_ItemServices);
 
 	CBaseEntity* GiveNamedItem(const char* name) {
-		TRY_GET_OFFSET(g_pGameConfig, "CCSPlayer_ItemServices::GiveNamedItem", offset);
-		return CALL_VIRTUAL(CBaseEntity*, *offset, this, name);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CCSPlayer_ItemServices::GiveNamedItem"));
+		return CALL_VIRTUAL(CBaseEntity*, offset, this, name);
 	}
 
 	int RemoveWeapons(bool removeSuit = false) {
-		TRY_GET_OFFSET(g_pGameConfig, "CCSPlayer_ItemServices::RemoveAllItems", offset);
-		return CALL_VIRTUAL(int, *offset, this, removeSuit);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CCSPlayer_ItemServices::RemoveAllItems"));
+		return CALL_VIRTUAL(int, offset, this, removeSuit);
 	}
 };
 

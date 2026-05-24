@@ -33,12 +33,14 @@
 #include "user_message_manager.hpp"
 
 Source2SDK g_sdk;
-EXPOSE_PLUGIN(PLUGIN_API, Source2SDK, &g_sdk)
+PLUGIFY_PLUGIN(PLUGIN_API, &g_sdk)
 
 CGameEntitySystem* GameEntitySystem() {
-	TRY_GET_OFFSET(g_pGameConfig, "GameEntitySystem", offset);
-	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + *offset);
+	static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "GameEntitySystem"));
+	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + offset);
 }
+
+extern void ServerStartup();
 
 namespace {
 constexpr char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
@@ -50,7 +52,7 @@ polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::Par
 
 	plg::print(LS_DETAILED, "[StartupServer] = {}\n", pMapName);
 
-	g_sdk.OnServerStartup();
+	ServerStartup();
 
 	if (gpGlobals == nullptr) {
 		plg::print(LS_ERROR, "Failed to lookup gpGlobals\n");
@@ -569,8 +571,8 @@ polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::Param
 			{"cs_script", CS_SCRIPT_PATH}
 		});
 #endif
-		TRY_GET_OFFSET(g_pGameConfig, "CCSScript_EntityScript", offset);
-		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pPointScript) + *offset);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CCSScript_EntityScript"));
+		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pPointScript) + offset);
 	} else if (name.ends_with("team_manager")) {
 		g_pTeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
 	}
@@ -761,15 +763,7 @@ polyhook::ResultType Hook_PreloadLibrary(polyhook::HookHandle hook, polyhook::Pa
 #endif
 }
 
-void Source2SDK::OnPluginStart() {
-	plg::print(LS_DETAILED, "[OnPluginStart] - Source2SDK!\n");
-
-	globals::Initialize({
-		{ "base", g_sdk.GetLocation() },
-		{ "configs", plg::GetConfigsDir() },
-		{ "data", plg::GetDataDir() },
-	});
-
+Result<void> SetupHooks() {
 	using enum polyhook::CallbackType;
 
 	g_HookManager.AddHookVTableFunc(&IGameEventManager2::FireEvent, g_pGameEventManager, Hook_FireEvent, Pre, Post);
@@ -798,7 +792,8 @@ void Source2SDK::OnPluginStart() {
 	//using LogDirect = LoggingResponse_t (*)(void* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, LeafCodeInfo_t*, LoggingMetaData_t*, Color, char const*, va_list*);
 	//g_HookManager.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, Pre);
 
-	TRY_GET_VTABLE(g_pGameConfig, "CLuaVM", CLuaVM);
+	static Memory CLuaVM;
+	UNWRAP(CLuaVM, TryGetVTable(g_pGameConfig, "CLuaVM"));
 	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterFunction, CLuaVM, Hook_RegisterFunction, Pre);
 	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, CLuaVM, Hook_RegisterScriptClass, Pre);
 	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
@@ -817,11 +812,13 @@ void Source2SDK::OnPluginStart() {
 	using FireOutputInternalFn = uint64_t(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, int32_t*, int16_t*, float);
 	g_HookManager.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
-	TRY_GET_VTABLE(g_pGameConfig, "CServerSideClient", CServerSideClient);
+	static Memory CServerSideClient;
+	UNWRAP(CServerSideClient, TryGetVTable(g_pGameConfig, "CServerSideClient"));
 	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, CServerSideClient, Hook_ProcessRespondCvarValue, Pre);
 	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, CServerSideClient, Hook_SendNetMessage, Pre);
 
-	TRY_GET_VTABLE(g_pGameConfig, "CGameRulesGameSystem", CGameRulesGameSystem);
+	static Memory CGameRulesGameSystem;
+	UNWRAP(CGameRulesGameSystem, TryGetVTable(g_pGameConfig, "CGameRulesGameSystem"));
 	g_HookManager.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, CGameRulesGameSystem, Hook_BuildGameSessionManifest, Pre);
 
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
@@ -829,11 +826,11 @@ void Source2SDK::OnPluginStart() {
 
 	using v8IsolateFn = void(*)(v8::Isolate*);
 
-	void* v8IsolateEnterPtr;
-	TRY_GET_ADDRESS(g_pGameConfig, "v8::Isolate::Enter", v8IsolateEnterPtr);
+	uint8_t* v8IsolateEnterPtr;
+	uint8_t* v8IsolateExitPtr;
 
-	void* v8IsolateExitPtr;
-	TRY_GET_ADDRESS(g_pGameConfig, "v8::Isolate::Exit", v8IsolateExitPtr);
+	UNWRAP(v8IsolateEnterPtr, TryGetAddress<uint8_t*>(g_pGameConfig, "v8::Isolate::Enter"));
+	UNWRAP(v8IsolateExitPtr, TryGetAddress<uint8_t*>(g_pGameConfig, "v8::Isolate::Exit"));
 
 #if _WIN32
 	const uint8_t fix = 0;
@@ -841,15 +838,14 @@ void Source2SDK::OnPluginStart() {
 	const uint8_t fix = 6; // skip plt staff
 #endif
 
-	g_HookManager.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(static_cast<uint8_t*>(v8IsolateEnterPtr) + fix), Hook_IsolateEnter, Pre);
-	g_HookManager.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(static_cast<uint8_t*>(v8IsolateExitPtr) + fix), Hook_IsolateExit, Post);
+	g_HookManager.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(v8IsolateEnterPtr + fix), Hook_IsolateEnter, Pre);
+	g_HookManager.AddHookDetourFunc<v8IsolateFn>(reinterpret_cast<uintptr_t>(v8IsolateExitPtr + fix), Hook_IsolateExit, Post);
 
 	if (Module v8("plugify-module-v8"); v8.IsValid()) {
 		using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
 		auto resolve = v8.GetFunctionByName("SetModuleResolver").RCast<SetModuleResolverFn>();
 		if (!resolve) {
-			plg::print(LS_ERROR, "SetModuleResolver not found!\n");
-			return;
+			return MakeError("SetModuleResolver not found!");
 		}
 		resolve(addresses::CSScript_ResolveModule);
 	}
@@ -860,22 +856,10 @@ void Source2SDK::OnPluginStart() {
 	g_HookManager.AddHookDetourFunc<PreloadLibrary>("PreloadLibrary", Hook_PreloadLibrary, Pre);
 #endif
 
-	OnServerStartup();// for late load*/
+	return {};
 }
 
-void Source2SDK::OnPluginEnd() {
-	globals::Terminate();
-	g_HookManager.UnhookAll();
-	g_PlayerManager.OnSteamAPIDeactivated();
-#if defined (CS2)
-	g_MultiAddonManager.OnSteamAPIDeactivated();
-#endif
-	UnregisterEventListeners();
-
-	plg::print(LS_DETAILED, "[OnPluginEnd] = Source2SDK!\n");
-}
-
-void Source2SDK::OnServerStartup() {
+void ServerStartup() {
 	g_pNetworkGameServer = g_pNetworkServerService->GetIGameServer();
 
 	if (g_pNetworkGameServer != nullptr) {
@@ -906,4 +890,44 @@ void Source2SDK::OnServerStartup() {
 #endif
 
 	RegisterEventListeners();
+}
+
+plg::PluginResult Source2SDK::OnPluginStart() {
+	plg::print(LS_DETAILED, "[OnPluginStart] - Source2SDK!\n");
+
+	{
+		auto result = globals::Initialize({
+		   { "base", GetLocation() },
+		   { "configs", plg::GetConfigsDir() },
+		   { "data", plg::GetDataDir() },
+	   });
+		if (!result) {
+			return plg::PluginResult{ result.error() };
+		}
+	}
+
+	{
+		auto result = SetupHooks();
+		if (!result) {
+			return plg::PluginResult{ result.error() };
+		}
+	}
+
+	ServerStartup();// for late load*/
+
+	return {};
+}
+
+plg::PluginResult Source2SDK::OnPluginEnd() {
+	globals::Terminate();
+	g_HookManager.UnhookAll();
+	g_PlayerManager.OnSteamAPIDeactivated();
+#if defined (CS2)
+	g_MultiAddonManager.OnSteamAPIDeactivated();
+#endif
+	UnregisterEventListeners();
+
+	plg::print(LS_DETAILED, "[OnPluginEnd] = Source2SDK!\n");
+
+	return {};
 }

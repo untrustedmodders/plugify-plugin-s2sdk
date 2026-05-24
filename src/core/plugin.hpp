@@ -5,9 +5,8 @@
 #include <igamesystemfactory.h>
 #include <networksystem/inetworkmessages.h>
 
-class Source2SDK final : public plg::IPluginEntry {
+class Source2SDK final : public plg::Plugin {
 public:
-	void OnPluginStart() final;
-	void OnPluginEnd() final;
-	static void OnServerStartup();
+	plg::PluginResult OnPluginStart() override;
+	plg::PluginResult OnPluginEnd() override;
 };

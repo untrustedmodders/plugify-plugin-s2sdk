@@ -1,14 +1,9 @@
 #pragma once
 
 #include <core/sdk/utils.hpp>
-#include <dynlibutils/memaddr.hpp>
-#include <dynlibutils/module.hpp>
 #include <plugify-configs/plugify-configs.hpp>
 
 #include "patch_manager.hpp"
-
-using Memory = DynLibUtils::CMemory;
-using Module = DynLibUtils::CAssemblyModule<std::shared_mutex>;
 
 struct SignatureData {
 	enum class Type { Invalid, Pattern, Symbol };
@@ -512,40 +507,81 @@ private:
 };
 inline GameConfigManager& g_GameConfigManager = GameConfigManager::Instance();
 
-#define TRY_GET_SIGNATURE(gameConfig, name, variable)                                               \
-	{                                                                                               \
-		auto _result = (gameConfig) -> GetSignature(name);                                          \
-		if (!(_result)) {                                                                           \
-			plg::print(LS_ERROR, "Failed to resolve signature: " #name " - {}\n", _result.error()); \
-		}                                                                                           \
-		variable = _result->RCast<decltype(variable)>();                                            \
+template <typename T>
+[[nodiscard]]
+inline auto TryGetSignature(auto* gameConfig, std::string_view name)
+	-> Result<T>
+{
+	auto result = gameConfig->GetSignature(name);
+
+	if (!result) {
+		return MakeError("Failed to resolve signature: {} - {}", name, result.error());
 	}
 
-#define TRY_GET_ADDRESS(gameConfig, name, variable)                                                \
-	{                                                                                              \
-		auto _result = (gameConfig) -> GetAddress(name);                                           \
-		if (!(_result)) {                                                                          \
-			plg::print(LS_ERROR, "Failed to resolve address: " #name " - {}\n", _result.error());  \
-		}                                                                                          \
-		variable = _result->RCast<decltype(variable)>();                                           \
+	return result->template RCast<T>();
+}
+
+template <typename T>
+[[nodiscard]]
+inline auto TryGetAddress(auto* gameConfig, std::string_view name)
+	-> Result<T>
+{
+	auto result = gameConfig->GetAddress(name);
+
+	if (!result) {
+		return MakeError("Failed to resolve address: {} - {}", name, result.error());
 	}
 
-#define TRY_GET_OFFSET(gameConfig, name, variable)                                                 \
-	static std::optional<int> variable;                                                            \
-	if (!variable) {                                                                               \
-		auto _result = (gameConfig) -> GetOffset(name);                                            \
-		if (!(_result)) {                                                                          \
-			plg::print(LS_ERROR, "Failed to resolve offset: " #name " - {}\n", _result.error());   \
-		}                                                                                          \
-		variable = *_result;                                                                       \
+	return result->template RCast<T>();
+}
+
+[[nodiscard]]
+inline auto TryGetOffset(auto* gameConfig, std::string_view name)
+	-> Result<int>
+{
+	auto result = gameConfig->GetOffset(name);
+
+	if (!result) {
+		return MakeError("Failed to resolve offset: {} - {}", name, result.error());
 	}
 
-#define TRY_GET_VTABLE(gameConfig, name, variable)                                                 \
-	static Memory variable;                                                                        \
-	if (!variable) {                                                                               \
-		auto _result = (gameConfig) -> GetVTable(name);                                            \
-		if (!(_result)) {                                                                          \
-			plg::print(LS_ERROR, "Failed to resolve vtable: " #name " - {}\n", _result.error());   \
-		}                                                                                          \
-		variable = *_result;                                                                       \
+	return *result;
+}
+
+[[nodiscard]]
+inline auto TryGetVTable(auto* gameConfig, std::string_view name)
+	-> Result<Memory>
+{
+	auto result = gameConfig->GetVTable(name);
+
+	if (!result) {
+		return MakeError("Failed to resolve vtable: {} - {}", name, result.error());
 	}
+
+	return *result;
+}
+
+#define UNWRAP(out, expr)                                    \
+    do {                                                  \
+        auto _result = (expr);                            \
+        if (!_result)                                     \
+            return MakeError(std::move(_result.error())); \
+        (out) = std::move(*_result);                      \
+    } while(0)
+
+template <typename R>
+auto Unwrap(R&& r) {
+	using T = std::remove_cvref_t<decltype(*r)>;
+	if (!r) {
+		plg::print(LS_ERROR, "{}\n", r.error());
+		if constexpr (std::is_void_v<T>)
+			return;
+		else
+			return T{};
+	}
+
+	if constexpr (std::is_void_v<T>)
+		return;
+	else
+		return T{*r};
+}

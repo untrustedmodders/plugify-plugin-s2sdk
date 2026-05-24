@@ -67,8 +67,8 @@ public:
 	SCHEMA_FIELD(CCSPlayer_ActionTrackingServices*, m_pActionTrackingServices)
 
 	void Respawn() {
-		TRY_GET_OFFSET(g_pGameConfig, "CBasePlayerController::RoundRespawn", offset);
-		CALL_VIRTUAL(void, *offset, this);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CBasePlayerController::RoundRespawn"));
+		CALL_VIRTUAL(void, offset, this);
 	}
 
 	void SetSpeed(float speed) {

@@ -5,7 +5,7 @@ public:
 	explicit CoreConfig(plg::vector<plg::string> paths);
 	~CoreConfig();
 
-	bool Initialize();
+	Result<bool> Initialize();
 
 	const plg::vector<plg::string>& GetPaths() const;
 

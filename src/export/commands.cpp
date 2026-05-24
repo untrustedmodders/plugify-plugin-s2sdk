@@ -180,3 +180,5 @@ extern "C" PLUGIN_API plg::vector<plg::string> GetAllConCommands(ConVarFlag flag
 extern "C" PLUGIN_API plg::vector<plg::string> GetAllCommands() {
 	return g_ConCommandManager.GetAllCommands();
 }
+
+PLUGIFY_WARN_POP()

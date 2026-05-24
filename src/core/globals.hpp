@@ -66,12 +66,8 @@ extern CoreConfig* g_pCoreConfig;
 extern GameConfig* g_pGameConfig;
 
 namespace globals {
-	void Initialize(plg::flat_map<plg::string, plg::string> paths);
+	Result<void> Initialize(plg::flat_map<plg::string, plg::string> paths);
 	void Terminate();
-
-	PlatModule_t FindModule(std::string_view name);
-	IAppSystem* FindInterface(std::string_view name);
-	void* QueryInterface(std::string_view module, std::string_view name);
 }// namespace globals
 
 class CPlayer_WeaponServices;

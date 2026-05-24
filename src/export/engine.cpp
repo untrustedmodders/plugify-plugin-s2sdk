@@ -24,7 +24,12 @@ PLUGIFY_WARN_IGNORE(4190)
  * @return A pointer to the queried interface.
  */
 extern "C" PLUGIN_API void* QueryInterface(const plg::string& module, const plg::string& name) {
-	return globals::QueryInterface(module, name);
+	auto result = utils::QueryInterface<void*>(module, name);
+	if (!result) {
+		plg::print(LS_WARNING, "{}\n", result.error());
+		return nullptr;
+	}
+	return *result;
 }
 
 /**

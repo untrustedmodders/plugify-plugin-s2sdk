@@ -1998,3 +1998,5 @@ extern "C" PLUGIN_API void SetClientDamage(int playerSlot, int damage) {
 	service->m_matchStats->m_iDamage = damage;
 #endif
 }
+
+PLUGIFY_WARN_POP()

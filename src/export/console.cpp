@@ -188,3 +188,5 @@ extern "C" PLUGIN_API void UTIL_ResetMessageTextAll() {
 }
 
 #endif
+
+PLUGIFY_WARN_POP()

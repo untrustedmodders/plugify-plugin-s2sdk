@@ -289,13 +289,13 @@ public:
 	}
 
 	void CollisionRulesChanged() {
-		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::CollisionRulesChanged", offset);
-		CALL_VIRTUAL(void, *offset, this);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CBaseEntity::CollisionRulesChanged"));
+		CALL_VIRTUAL(void, offset, this);
 	}
 
 	void Teleport(const Vector& newPosition, const QAngle& newAngles, const Vector& newVelocity) {
-		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::Teleport", offset);
-		CALL_VIRTUAL(bool, *offset, this, newPosition.IsValid() ? &newPosition : nullptr, newAngles.IsValid() ? &newAngles : nullptr, newVelocity.IsValid() ? &newVelocity : nullptr);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CBaseEntity::Teleport"));
+		CALL_VIRTUAL(bool, offset, this, newPosition.IsValid() ? &newPosition : nullptr, newAngles.IsValid() ? &newAngles : nullptr, newVelocity.IsValid() ? &newVelocity : nullptr);
 	}
 
 	CHandle<CBaseEntity> GetHandle() { return m_pEntity->m_EHandle; }
@@ -373,8 +373,8 @@ public:
 	}
 
 	bool IsWeapon() {
-		TRY_GET_OFFSET(g_pGameConfig, "CBaseEntity::IsWeapon", offset);
-		return CALL_VIRTUAL(bool, *offset, this);
+		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CBaseEntity::IsWeapon"));
+		return CALL_VIRTUAL(bool, offset, this);
 	}
 
 	void Remove() {

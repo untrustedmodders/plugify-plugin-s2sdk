@@ -13,7 +13,7 @@ CoreConfig::~CoreConfig() {
 	}*/
 }
 
-bool CoreConfig::Initialize() {
+Result<bool> CoreConfig::Initialize() {
 	std::vector<std::string_view> paths;
 	paths.reserve(m_paths.size());
 	for (const auto& path : m_paths) {
@@ -21,8 +21,7 @@ bool CoreConfig::Initialize() {
 	}
 	auto config = pcf::ReadConfigs(paths);
 	if (!config) {
-		plg::print(LS_ERROR, "Failed to load configuration file: \"{}\"\n", pcf::GetError());
-		return false;
+		return MakeError(std::string(pcf::GetError()));
 	}
 
 	PublicChatTrigger.clear();
@@ -65,7 +64,7 @@ bool CoreConfig::Initialize() {
 	FixServerListPlayer = config->GetBool("FixServerListPlayer", true);
 	FixLoadMotd = config->GetBool("FixLoadMotd", true);
 
-	return true;
+	return {};
 }
 
 const plg::vector<plg::string>& CoreConfig::GetPaths() const {
