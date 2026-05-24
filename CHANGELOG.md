@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.8.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.8.1...v2.8.2) (2026-05-24)
+
+
+### Bug Fixes
+
+* update for new plugify ([f32a08c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f32a08ce703197dd837170c23484c2ad81cb2802))
+
 ## [2.8.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.8.0...v2.8.1) (2026-05-19)
 
 
