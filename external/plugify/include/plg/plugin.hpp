@@ -49,7 +49,9 @@ namespace plg {
 			Log(name, Severity::Trace, location);
 		}
 		~Scope() {
-			EndZone(handle);
+			if (handle != 0) {
+				EndZone(handle);
+			}
 		}
 
 	private:
