@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.8.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.8.2...v2.8.3) (2026-05-25)
+
+
+### Bug Fixes
+
+* add scopes check ([8cbb919](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8cbb919e179b077abe2a5ecc051b2b31da94090b))
+* update for new sourcesdk ([e576178](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e57617884c60d7f5d04427d4d5d30222b0f87dd1))
+
 ## [2.8.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.8.1...v2.8.2) (2026-05-24)
 
 
