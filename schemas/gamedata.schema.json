@@ -1,226 +1,260 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "GameData contains information that allows you to target client/server memory directly. This can be useful for exposing functionality",
+  "description": "GameData defines a structured configuration for resolving and manipulating client/server memory. It supports addresses, signatures, patches, and vtable mappings across multiple platforms for runtime introspection and modification.",
   "title": "GameConfig",
   "type": "object",
   "$defs": {
     "addressObject": {
-      "description": "A address steps",
+      "description": "Represents a single step in an address resolution chain used for memory navigation. Each step transforms or dereferences the current pointer to reach a target location.",
       "type": "object",
       "properties": {
         "offset": {
-          "description": "A offset number in bytes",
+          "description": "Adds a fixed byte offset to the current address pointer.",
           "type": "number"
         },
         "index": {
-          "description": "A index number to read a cell from",
+          "description": "Indexes into an array or structured memory layout relative to the current address.",
           "type": "number"
         },
         "read": {
-          "description": "A offset number to read a cell from",
+          "description": "Dereferences the current pointer once and applies an additional offset to the resulting address.",
           "type": "number"
         },
         "read_offs32": {
-          "description": "A offset number to 32-bit relative cell to read",
+          "description": "Performs a 32-bit relative pointer read, commonly used for RIP-relative addressing or position-independent memory layouts.",
           "type": "number"
         }
-      }
+      },
+      "additionalProperties": false
+    },
+
+    "signatureObject": {
+      "description": "Represents a single signature resolution step used in pattern-based memory scanning. Each field defines a different method of locating or resolving a target symbol.",
+      "type": "object",
+      "properties": {
+        "string": {
+          "description": "Matches a raw string pattern against memory or module contents during signature scanning.",
+          "type": "string"
+        },
+        "cvar": {
+          "description": "Resolves a console variable (cvar) used for engine-level configuration or runtime state lookup.",
+          "type": "string"
+        },
+        "vtable": {
+          "description": "Resolves a target via virtual function table (vtable) lookup for class or interface-based dispatch structures.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     }
   },
+
   "patternProperties": {
     "^(?:(?!\\$).*)$": {
-      "description": "Game folder name",
+      "description": "Game configuration entry grouped by game or application name. Contains memory resolution definitions including addresses, offsets, signatures, patches, and vtables.",
       "type": "object",
       "properties": {
         "Addresses": {
-          "description": "Addresses section",
+          "description": "Collection of named memory addresses resolved via direct references, signatures, or vtables.",
           "type": "object",
           "patternProperties": {
             "^.+$": {
-              "description": "A address name",
-              "type": "object",
-              "address": {
-                "description": "An address name from Addresses sections",
-                "type": "string"
-              },
-              "signature": {
-                "description": "An address name from Signatures sections",
-                "type": "string"
-              },
-              "vtable": {
-                "description": "An address name from VTables sections",
-                "type": "string"
-              },
-              "win64": {
-                "description": "Address actions on Windows side",
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/addressObject"
-                }
-              },
-              "linuxsteamrt64": {
-                "description": "Address actions on Linux side",
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/addressObject"
-                }
-              },
-              "osx64": {
-                "description": "Address actions on macOS side",
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/addressObject"
-                }
-              },
-              "oneOf": [
-                {"required": ["address"]},
-                {"required": ["signature"]},
-                {"required": ["vtable"]}
-              ],
-              "anyOf": [
-                {"required": ["win64"]},
-                {"required": ["linuxsteamrt64"]},
-                {"required": ["osx64"]}
-              ],
-              "additionalProperties": false
-            }
-          }
-        },
-        "Offsets": {
-          "description": "Offsets section",
-          "type": "object",
-          "patternProperties": {
-            "^.+$": {
-              "description": "A offset name",
-              "type": "object",
-              "properties": {
-                "win64": {
-                  "description": "A offset number on Windows side",
-                  "type": "number"
-                },
-                "linuxsteamrt64": {
-                  "description": "A offset number on Linux side",
-                  "type": "number"
-                },
-                "osx64": {
-                  "description": "A offset number on macOS side",
-                  "type": "number"
-                }
-              },
-              "anyOf": [
-                {"required": ["win64"]},
-                {"required": ["linuxsteamrt64"]},
-                {"required": ["osx64"]}
-              ],
-              "additionalProperties": false
-            }
-          }
-        },
-        "Signatures": {
-          "description": "Signatures section",
-          "type": "object",
-          "patternProperties": {
-            "^.+$": {
-              "description": "A signature name",
-              "type": "object",
-              "properties": {
-                "library": {
-                  "description": "The shared library name",
-                  "type": "string"
-                },
-                "win64": {
-                  "description": "A signature bytes string on Windows side. Passes ? to skip a byte",
-                  "type": "string"
-                },
-                "linuxsteamrt64": {
-                  "description": "A signature bytes string on Linux side. Passes ? to skip a byte",
-                  "type": "string"
-                },
-                "osx64": {
-                  "description": "A signature bytes string on macOS side. Passes ? to skip a byte",
-                  "type": "string"
-                }
-              },
-              "required": [
-                "library"
-              ],
-              "anyOf": [
-                {"required": ["win64"]},
-                {"required": ["linuxsteamrt64"]},
-                {"required": ["osx64"]}
-              ],
-              "additionalProperties": false
-            }
-          }
-        },
-        "Patches": {
-          "description": "Patches section",
-          "type": "object",
-          "patternProperties": {
-            "^.+$": {
-              "description": "A patch name",
+              "description": "Named address entry defining how a memory address is resolved.",
               "type": "object",
               "properties": {
                 "address": {
-                  "description": "An address name from Addresses sections",
+                  "description": "Direct reference name to another address entry in the Addresses section.",
                   "type": "string"
                 },
                 "signature": {
-                  "description": "An address name from Signatures sections",
+                  "description": "Reference to a signature entry used to locate this address via pattern scanning.",
                   "type": "string"
                 },
                 "vtable": {
-                  "description": "An address name from VTables sections",
+                  "description": "Reference to a vtable entry used to resolve this address through virtual dispatch structures.",
                   "type": "string"
                 },
                 "win64": {
-                  "description": "A patch bytes string on Windows side. Passes ? to skip a byte",
-                  "type": "string"
+                  "description": "Platform-specific address resolution steps for Windows x64.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/addressObject"
+                  }
                 },
                 "linuxsteamrt64": {
-                  "description": "A patch bytes string on Linux side. Passes ? to skip a byte",
-                  "type": "string"
+                  "description": "Platform-specific address resolution steps for Linux Steam Runtime x64.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/addressObject"
+                  }
                 },
                 "osx64": {
-                  "description": "A patch bytes string on macOS side. Passes ? to skip a byte",
-                  "type": "string"
+                  "description": "Platform-specific address resolution steps for macOS x64.",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/addressObject"
+                  }
                 }
               },
               "oneOf": [
-                {"required": ["address"]},
-                {"required": ["signature"]},
-                {"required": ["vtable"]}
+                { "required": ["address"] },
+                { "required": ["signature"] },
+                { "required": ["vtable"] }
               ],
               "anyOf": [
-                {"required": ["win64"]},
-                {"required": ["linuxsteamrt64"]},
-                {"required": ["osx64"]}
+                { "required": ["win64"] },
+                { "required": ["linuxsteamrt64"] },
+                { "required": ["osx64"] }
               ],
               "additionalProperties": false
             }
           }
         },
-        "VTables": {
-          "description": "Virtual tables section",
+
+        "Offsets": {
+          "description": "Collection of named numeric offsets used for platform-specific memory calculations.",
           "type": "object",
           "patternProperties": {
             "^.+$": {
-              "description": "A virtual table key",
+              "description": "Named offset entry containing platform-specific offset values.",
+              "type": "object",
+              "properties": {
+                "win64": {
+                  "description": "Offset value for Windows x64 platform.",
+                  "type": "number"
+                },
+                "linuxsteamrt64": {
+                  "description": "Offset value for Linux Steam Runtime x64 platform.",
+                  "type": "number"
+                },
+                "osx64": {
+                  "description": "Offset value for macOS x64 platform.",
+                  "type": "number"
+                }
+              },
+              "anyOf": [
+                { "required": ["win64"] },
+                { "required": ["linuxsteamrt64"] },
+                { "required": ["osx64"] }
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+
+        "Signatures": {
+          "description": "Collection of named signatures used for pattern-based memory scanning and symbol resolution.",
+          "type": "object",
+          "patternProperties": {
+            "^.+$": {
+              "description": "Named signature entry defining how a target symbol is located in memory.",
               "type": "object",
               "properties": {
                 "library": {
-                  "description": "The shared library name",
+                  "description": "Name of the shared library or module where the signature is searched.",
                   "type": "string"
                 },
-                "table": {
-                  "description": "A virtual table name",
+                "win64": {
+                  "description": "Signature resolution steps for Windows x64 platform.",
+                  "type": ["array", "string"],
+                  "items": {
+                    "$ref": "#/$defs/signatureObject"
+                  }
+                },
+                "linuxsteamrt64": {
+                  "description": "Signature resolution steps for Linux Steam Runtime x64 platform.",
+                  "type": ["array", "string"],
+                  "items": {
+                    "$ref": "#/$defs/signatureObject"
+                  }
+                },
+                "osx64": {
+                  "description": "Signature resolution steps for macOS x64 platform.",
+                  "type": ["array", "string"],
+                  "items": {
+                    "$ref": "#/$defs/signatureObject"
+                  }
+                }
+              },
+              "oneOf": [
+                { "required": ["library"] }
+              ],
+              "anyOf": [
+                { "required": ["win64"] },
+                { "required": ["linuxsteamrt64"] },
+                { "required": ["osx64"] }
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+
+        "Patches": {
+          "description": "Collection of named memory patches applied to modify executable code or data at runtime.",
+          "type": "object",
+          "patternProperties": {
+            "^.+$": {
+              "description": "Named patch entry defining target location and platform-specific patch data.",
+              "type": "object",
+              "properties": {
+                "address": {
+                  "description": "Reference to an address entry used as patch target.",
+                  "type": "string"
+                },
+                "signature": {
+                  "description": "Reference to a signature entry used to locate patch target dynamically.",
+                  "type": "string"
+                },
+                "vtable": {
+                  "description": "Reference to a vtable entry used to resolve patch target.",
+                  "type": "string"
+                },
+                "win64": {
+                  "description": "Patch byte string for Windows x64. '?' represents a wildcard byte.",
+                  "type": "string"
+                },
+                "linuxsteamrt64": {
+                  "description": "Patch byte string for Linux Steam Runtime x64. '?' represents a wildcard byte.",
+                  "type": "string"
+                },
+                "osx64": {
+                  "description": "Patch byte string for macOS x64. '?' represents a wildcard byte.",
                   "type": "string"
                 }
               },
-              "required": [
-                "library",
-                "table"
+              "oneOf": [
+                { "required": ["address"] },
+                { "required": ["signature"] },
+                { "required": ["vtable"] }
               ],
+              "anyOf": [
+                { "required": ["win64"] },
+                { "required": ["linuxsteamrt64"] },
+                { "required": ["osx64"] }
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+
+        "VTables": {
+          "description": "Collection of virtual function table definitions used for class and interface resolution.",
+          "type": "object",
+          "patternProperties": {
+            "^.+$": {
+              "description": "Named vtable entry mapping a class/interface to its binary location.",
+              "type": "object",
+              "properties": {
+                "library": {
+                  "description": "Name of the shared library containing the vtable.",
+                  "type": "string"
+                },
+                "table": {
+                  "description": "Name or identifier of the virtual function table.",
+                  "type": "string"
+                }
+              },
+              "required": ["library", "table"],
               "additionalProperties": false
             }
           }
