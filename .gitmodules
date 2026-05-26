@@ -10,3 +10,6 @@
 [submodule "external/parallel-hashmap"]
 	path = external/parallel-hashmap
 	url = https://github.com/greg7mdp/parallel-hashmap.git
+[submodule "external/zydis"]
+	path = external/zydis
+	url = https://github.com/zyantific/zydis.git

@@ -69,7 +69,7 @@ add_subdirectory(external/configs)
 #
 # Dynlibutils
 #
-add_subdirectory(external/dynlibutils)
+#add_subdirectory(external/dynlibutils)
 
 #
 # Maps
@@ -114,6 +114,26 @@ if(MSVC)
     target_compile_options(v8_monolith INTERFACE /wd4100 /wd4244)
 else()
     target_compile_options(v8_monolith INTERFACE -Wno-unused-parameter -Wno-conversion -Wno-template-id-cdtor -Wno-shadow)
+endif()
+
+#
+# Zydis
+#
+set(ZYDIS_BUILD_SHARED_LIB OFF CACHE BOOL "")
+set(ZYCORE_BUILD_SHARED_LIB OFF CACHE BOOL "")
+set(ZYDIS_BUILD_TOOLS OFF CACHE BOOL "")
+set(ZYDIS_BUILD_EXAMPLES OFF CACHE BOOL "")
+set(ZYDIS_BUILD_MAN OFF CACHE BOOL "")
+set(ZYDIS_BUILD_DOXYGEN OFF CACHE BOOL "")
+set(ZYDIS_FUZZ_AFL_FAST OFF CACHE BOOL "")
+set(ZYDIS_LIBFUZZER OFF CACHE BOOL "")
+
+add_subdirectory(external/zydis/dependencies/zycore)
+add_subdirectory(external/zydis)
+
+if(MSVC)
+    set_target_properties(Zycore PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    set_target_properties(Zydis PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
 #
@@ -196,7 +216,10 @@ elseif(MACOS)
     set_target_properties(${PROJECT_NAME} PROPERTIES OSX_ARCHITECTURES "x86_64")
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE sourcesdk plugify-plugin-configs cpp-memory_utils v8_monolith)
+target_link_libraries(${PROJECT_NAME} PRIVATE plugify-plugin-configs sourcesdk v8_monolith $<BUILD_INTERFACE:Zydis>)
+target_include_directories(${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external/zydis/include>)
+target_include_directories(${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external/zydis/dependencies/zycore/include>)
+target_include_directories(${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/external/zydis>)
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX /Zc:preprocessor $<$<CONFIG:Release>:/Zi>)
