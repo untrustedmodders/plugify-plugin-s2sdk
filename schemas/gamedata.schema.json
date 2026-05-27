@@ -154,36 +154,44 @@
                   "description": "Name of the shared library or module where the signature is searched.",
                   "type": "string"
                 },
+
                 "win64": {
-                  "description": "Signature resolution steps for Windows x64 platform.",
-                  "type": ["array", "string"],
-                  "items": {
-                    "$ref": "#/$defs/signatureObject"
-                  }
+                  "description": "Raw signature pattern string for Windows x64 platform.",
+                  "type": "string",
+                  "pattern": "^[0-9A-Fa-f? ]+$"
                 },
+
                 "linuxsteamrt64": {
-                  "description": "Signature resolution steps for Linux Steam Runtime x64 platform.",
-                  "type": ["array", "string"],
-                  "items": {
-                    "$ref": "#/$defs/signatureObject"
-                  }
+                  "description": "Raw signature pattern string for Linux Steam Runtime x64 platform.",
+                  "type": "string",
+                  "pattern": "^[0-9A-Fa-f? ]+$"
                 },
+
                 "osx64": {
-                  "description": "Signature resolution steps for macOS x64 platform.",
-                  "type": ["array", "string"],
+                  "description": "Raw signature pattern string for macOS x64 platform.",
+                  "type": "string",
+                  "pattern": "^[0-9A-Fa-f? ]+$"
+                },
+
+                "refs": {
+                  "description": "Ordered list of signature resolution steps applied after the base signature pattern is matched.",
+                  "type": "array",
                   "items": {
                     "$ref": "#/$defs/signatureObject"
                   }
                 }
               },
-              "oneOf": [
-                { "required": ["library"] }
+
+              "required": [
+                "library"
               ],
+
               "anyOf": [
                 { "required": ["win64"] },
                 { "required": ["linuxsteamrt64"] },
                 { "required": ["osx64"] }
               ],
+
               "additionalProperties": false
             }
           }

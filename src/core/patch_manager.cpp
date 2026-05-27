@@ -63,7 +63,7 @@ Result<PatchBytes> PatchManager::ReadOriginalBytes(Memory address, size_t size) 
 	}
 
 	plg::vector<uint8_t> bytes(size);
-	std::memcpy(bytes.data(), address.RCast<const void*>(), size);
+	std::memcpy(bytes.data(), address.As<const void*>(), size);
 	return PatchBytes(std::move(bytes));
 }
 
@@ -81,7 +81,7 @@ Result<void> PatchManager::WriteBytes(Memory address, const PatchBytes& bytes, b
 		MemoryProtection guard(
 			address,
 			bytes.Size(),
-			DynLibUtils::RWX
+			ProtFlag::RWX
 		);
 
 		// Temporarily make memory writable
@@ -95,10 +95,10 @@ Result<void> PatchManager::WriteBytes(Memory address, const PatchBytes& bytes, b
 			return MakeError("Could not unprotect memory");
 		}
 
-		std::memcpy(address.RCast<void*>(), bytes.Data(), bytes.Size());
+		std::memcpy(address.As<void*>(), bytes.Data(), bytes.Size());
 		// Guard destructor restores protection
 	} else {
-		std::memcpy(address.RCast<void*>(), bytes.Data(), bytes.Size());
+		std::memcpy(address.As<void*>(), bytes.Data(), bytes.Size());
 	}
 
 	return {};
@@ -174,7 +174,7 @@ Result<void> PatchManager::ApplyPatch(
 	applied.state = PatchState::Applied;
 	m_patches[patchName] = std::move(applied);
 
-	plg::print(LS_MESSAGE, "Applied patch '{}' at {}\n", patchName, address.RCast<void*>());
+	plg::print(LS_MESSAGE, "Applied patch '{}' at {}\n", patchName, address.As<void*>());
 
 	return {};
 }

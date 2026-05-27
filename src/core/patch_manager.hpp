@@ -1,11 +1,11 @@
 #pragma once
 
-#include <dynlibutils/vthook.hpp>
-#include <dynlibutils/memaddr.hpp>
+#include <core/memory/module.hpp>
+#include <core/memory/memprotector.hpp>
 #include <plugify-configs/plugify-configs.hpp>
 
-using Memory = DynLibUtils::CMemory;
-using MemoryProtection = DynLibUtils::CMemProtector;
+using Memory = CAddress;
+using MemoryProtection = CMemProtector;
 
 enum class PatchState {
 	NotApplied,

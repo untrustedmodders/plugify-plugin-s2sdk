@@ -21,6 +21,8 @@ GameConfig* g_pGameConfig = nullptr;
 
 namespace globals {
 	Result<void> Initialize(plg::flat_map<plg::string, plg::string> paths) {
+		g_GameConfigManager.GetModuleProvider().PreloadModules();
+
 		{
 			g_pCoreConfig = new CoreConfig(plg::vector{
 				   paths["base"] + "/settings.jsonc",
@@ -49,44 +51,44 @@ namespace globals {
 			}
 		}
 
-		UNWRAP(g_pGameEventManager, TryGetAddress<decltype(g_pGameEventManager)>(g_pGameConfig, "&s_GameEventManager"));
+		UNWRAP(g_pGameEventManager, g_pGameConfig->GetAddress("&s_GameEventManager"));
 #if defined (CS2)
-		UNWRAP(g_pScripts, TryGetAddress<decltype(g_pScripts)>(g_pGameConfig, "&s_pScripts"));
+		UNWRAP(g_pScripts, g_pGameConfig->GetAddress("&s_pScripts"));
 #endif
 
 		// load more if needed
-		UNWRAP(addresses::GetLegacyGameEventListener, TryGetSignature<decltype(addresses::GetLegacyGameEventListener)>(g_pGameConfig, "LegacyGameEventListener"));
-		UNWRAP(addresses::CBasePlayerController_SetPawn, TryGetSignature<decltype(addresses::CBasePlayerController_SetPawn)>(g_pGameConfig, "CBasePlayerController::SetPawn"));
-		UNWRAP(addresses::CreateEntityByName, TryGetSignature<decltype(addresses::CreateEntityByName)>(g_pGameConfig, "CGameEntitySystem::CreateEntityByName"));
-		UNWRAP(addresses::DispatchSpawn, TryGetSignature<decltype(addresses::DispatchSpawn)>(g_pGameConfig, "CGameEntitySystem::DispatchSpawn"));
-		UNWRAP(addresses::CEntityInstance_AcceptInput, TryGetSignature<decltype(addresses::CEntityInstance_AcceptInput)>(g_pGameConfig, "CEntityInstance::AcceptInput"));
-		//TRY(addresses::CBaseEntity_EmitSoundFilter, TryGetSignature<decltype(addresses::CBaseEntity_EmitSoundFilter)>(g_pGameConfig, "CBaseEntity::EmitSoundFilter"));
-		UNWRAP(addresses::CBaseEntity_SetMoveType, TryGetSignature<decltype(addresses::CBaseEntity_SetMoveType)>(g_pGameConfig, "CBaseEntity::SetMoveType"));
+		UNWRAP(addresses::GetLegacyGameEventListener, g_pGameConfig->GetSignature("LegacyGameEventListener"));
+		UNWRAP(addresses::CBasePlayerController_SetPawn, g_pGameConfig->GetSignature("CBasePlayerController::SetPawn"));
+		UNWRAP(addresses::CreateEntityByName, g_pGameConfig->GetSignature("CGameEntitySystem::CreateEntityByName"));
+		UNWRAP(addresses::DispatchSpawn, g_pGameConfig->GetSignature("CGameEntitySystem::DispatchSpawn"));
+		UNWRAP(addresses::CEntityInstance_AcceptInput, g_pGameConfig->GetSignature("CEntityInstance::AcceptInput"));
+		//TRY(addresses::CBaseEntity_EmitSoundFilter, g_pGameConfig->GetSignature("CBaseEntity::EmitSoundFilter"));
+		UNWRAP(addresses::CBaseEntity_SetMoveType, g_pGameConfig->GetSignature("CBaseEntity::SetMoveType"));
 
 #if defined (CS2)
-		UNWRAP(addresses::CSScript_ResolveModule, TryGetSignature<decltype(addresses::CSScript_ResolveModule)>(g_pGameConfig, "CSScript::ResolveModule"));
-		UNWRAP(addresses::CCSPlayer_WeaponServices_RemoveItem, TryGetSignature<decltype(addresses::CCSPlayer_WeaponServices_RemoveItem)>(g_pGameConfig, "CCSPlayer_WeaponServices::RemoveItem"));
-		UNWRAP(addresses::CCSPlayerController_SwitchTeam, TryGetSignature<decltype(addresses::CCSPlayerController_SwitchTeam)>(g_pGameConfig, "CCSPlayerController::SwitchTeam"));
-		UNWRAP(addresses::CGameRules_TerminateRound, TryGetSignature<decltype(addresses::CGameRules_TerminateRound)>(g_pGameConfig, "CGameRules::TerminateRound"));
-		UNWRAP(addresses::GetCSWeaponDataFromKey, TryGetSignature<decltype(addresses::GetCSWeaponDataFromKey)>(g_pGameConfig, "GetCSWeaponDataFromKey"));
+		UNWRAP(addresses::CSScript_ResolveModule, g_pGameConfig->GetSignature("CSScript::ResolveModule"));
+		UNWRAP(addresses::CCSPlayer_WeaponServices_RemoveItem, g_pGameConfig->GetSignature("CCSPlayer_WeaponServices::RemoveItem"));
+		UNWRAP(addresses::CCSPlayerController_SwitchTeam, g_pGameConfig->GetSignature("CCSPlayerController::SwitchTeam"));
+		UNWRAP(addresses::CGameRules_TerminateRound, g_pGameConfig->GetSignature("CGameRules::TerminateRound"));
+		UNWRAP(addresses::GetCSWeaponDataFromKey, g_pGameConfig->GetSignature("GetCSWeaponDataFromKey"));
 #endif
 
-		UNWRAP(g_pCVar, utils::QueryInterface<ICvar*>("tier0", CVAR_INTERFACE_VERSION));
-		UNWRAP(g_pSchemaSystem, utils::QueryInterface<ISchemaSystem*>("schemasystem", SCHEMASYSTEM_INTERFACE_VERSION));
-		UNWRAP(g_pSource2Server, utils::QueryInterface<ISource2Server*>("server", SOURCE2SERVER_INTERFACE_VERSION));
-		UNWRAP(g_pSource2GameEntities, utils::QueryInterface<ISource2GameEntities*>("server", SOURCE2GAMEENTITIES_INTERFACE_VERSION));
-		UNWRAP(g_pSource2GameClients, utils::QueryInterface<ISource2GameClients*>("server", SOURCE2GAMECLIENTS_INTERFACE_VERSION));
-		UNWRAP(g_pGameResourceServiceServer, utils::QueryInterface<IGameResourceService*>("engine2", GAMERESOURCESERVICESERVER_INTERFACE_VERSION));
-		UNWRAP(g_pEngineServiceMgr, utils::QueryInterface<IEngineServiceMgr*>("engine2", ENGINESERVICEMGR_INTERFACE_VERSION));
+		UNWRAP(g_pCVar, utils::QueryInterface("tier0", CVAR_INTERFACE_VERSION));
+		UNWRAP(g_pSchemaSystem, utils::QueryInterface("schemasystem", SCHEMASYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pSource2Server, utils::QueryInterface("server", SOURCE2SERVER_INTERFACE_VERSION));
+		UNWRAP(g_pSource2GameEntities, utils::QueryInterface("server", SOURCE2GAMEENTITIES_INTERFACE_VERSION));
+		UNWRAP(g_pSource2GameClients, utils::QueryInterface("server", SOURCE2GAMECLIENTS_INTERFACE_VERSION));
+		UNWRAP(g_pGameResourceServiceServer, utils::QueryInterface("engine2", GAMERESOURCESERVICESERVER_INTERFACE_VERSION));
+		UNWRAP(g_pEngineServiceMgr, utils::QueryInterface("engine2", ENGINESERVICEMGR_INTERFACE_VERSION));
 
-		UNWRAP(g_pEngineServer, utils::QueryInterface<IVEngineServer2*>("engine2", SOURCE2ENGINETOSERVER_INTERFACE_VERSION));
-		UNWRAP(g_pFullFileSystem, utils::QueryInterface<IFileSystem*>("filesystem_stdio", FILESYSTEM_INTERFACE_VERSION));
-		UNWRAP(g_pGameEventSystem, utils::QueryInterface<IGameEventSystem*>("engine2", GAMEEVENTSYSTEM_INTERFACE_VERSION));
-		UNWRAP(g_pNetworkServerService, utils::QueryInterface<INetworkServerService*>("engine2", NETWORKSERVERSERVICE_INTERFACE_VERSION));
-		UNWRAP(g_pNetworkMessages, utils::QueryInterface<INetworkMessages*>("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
-		UNWRAP(g_pNetworkSystem, utils::QueryInterface<INetworkSystem*>("networksystem", NETWORKSYSTEM_INTERFACE_VERSION));
-		UNWRAP(g_pScriptManager, utils::QueryInterface<IScriptManager*>("vscript", VSCRIPT_INTERFACE_VERSION));
-		UNWRAP(g_pNetworkStringTableServer, utils::QueryInterface<INetworkStringTableContainer*>("engine2", INTERFACENAME_NETWORKSTRINGTABLESERVER));
+		UNWRAP(g_pEngineServer, utils::QueryInterface("engine2", SOURCE2ENGINETOSERVER_INTERFACE_VERSION));
+		UNWRAP(g_pFullFileSystem, utils::QueryInterface("filesystem_stdio", FILESYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pGameEventSystem, utils::QueryInterface("engine2", GAMEEVENTSYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pNetworkServerService, utils::QueryInterface("engine2", NETWORKSERVERSERVICE_INTERFACE_VERSION));
+		UNWRAP(g_pNetworkMessages, utils::QueryInterface("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
+		UNWRAP(g_pNetworkSystem, utils::QueryInterface("networksystem", NETWORKSYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pScriptManager, utils::QueryInterface("vscript", VSCRIPT_INTERFACE_VERSION));
+		UNWRAP(g_pNetworkStringTableServer, utils::QueryInterface("engine2", INTERFACENAME_NETWORKSTRINGTABLESERVER));
 
 		ConVarManager::Init();
 

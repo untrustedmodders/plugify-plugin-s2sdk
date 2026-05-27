@@ -84,7 +84,7 @@ public:
 			return;
 
 		SetPawn(pawn);
-		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CBasePlayerController::RoundRespawn"));
+		static auto offset = Unwrap(g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn"));
 		CALL_VIRTUAL(void, offset, this);
 	}
 };

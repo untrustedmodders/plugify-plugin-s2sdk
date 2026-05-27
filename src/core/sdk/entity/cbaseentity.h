@@ -289,12 +289,12 @@ public:
 	}
 
 	void CollisionRulesChanged() {
-		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CBaseEntity::CollisionRulesChanged"));
+		static auto offset = Unwrap(g_pGameConfig->GetOffset("CBaseEntity::CollisionRulesChanged"));
 		CALL_VIRTUAL(void, offset, this);
 	}
 
 	void Teleport(const Vector& newPosition, const QAngle& newAngles, const Vector& newVelocity) {
-		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CBaseEntity::Teleport"));
+		static auto offset = Unwrap(g_pGameConfig->GetOffset("CBaseEntity::Teleport"));
 		CALL_VIRTUAL(bool, offset, this, newPosition.IsValid() ? &newPosition : nullptr, newAngles.IsValid() ? &newAngles : nullptr, newVelocity.IsValid() ? &newVelocity : nullptr);
 	}
 
@@ -373,7 +373,7 @@ public:
 	}
 
 	bool IsWeapon() {
-		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CBaseEntity::IsWeapon"));
+		static auto offset = Unwrap(g_pGameConfig->GetOffset("CBaseEntity::IsWeapon"));
 		return CALL_VIRTUAL(bool, offset, this);
 	}
 

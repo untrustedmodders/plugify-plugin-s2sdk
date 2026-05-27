@@ -56,6 +56,19 @@ CBaseEntity* utils::CreateBeam(const Vector& from, const Vector& to, Color color
 	return beam;
 }*/
 
+Result<CAddress> utils::QueryInterface(std::string_view library, std::string_view name) {
+	auto& provider = g_GameConfigManager.GetModuleProvider();
+	auto module = provider.GetModule(library);
+	if (!module) {
+		return MakeError("Module not found: \"{}\"", library);
+	}
+	auto interface = module->FindInterface(name);
+	if (!interface) {
+		return MakeError("Interface not found \"{}\"", name);
+	}
+	return interface;
+}
+
 CBaseEntity* utils::FindEntityByClassname(CEntityInstance* start, const char* name) {
 	if (!g_pGameEntitySystem) {
 		return nullptr;

@@ -58,8 +58,6 @@ namespace {
 	}
 
 	VScriptClassMap scriptClassMap;
-	ScriptClassDesc_t* lastClass;
-	void* lastInstance;
 
 }// namespace
 
@@ -99,7 +97,7 @@ namespace vscript {
 			return;
 		}
 
-		auto createClass = [&]() {
+		auto createClass = [&] {
 			VScriptClass scriptClass;
 			scriptClass.descriptor = pClassDesc;
 			scriptClass.instance = pInstance;

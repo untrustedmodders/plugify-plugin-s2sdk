@@ -5,29 +5,16 @@
 #include <igameevents.h>
 #include <iserver.h>
 
-#include <dynlibutils/memaddr.hpp>
-#include <dynlibutils/module.hpp>
+#include <core/memory/module.hpp>
 
-using Memory = DynLibUtils::CMemory;
-using Module = DynLibUtils::CAssemblyModule<std::shared_mutex>;
+using Memory = CAddress;
+using Module = CModule;
 
 class CBaseEntity;
 class CServerSideClientBase;
 
 namespace utils {
-	template <typename T>
-	Result<T> QueryInterface(std::string_view module, std::string_view name) {
-		if (const Module moduleLib(module); moduleLib.IsValid()) {
-			if (auto createInterface = moduleLib.GetFunctionByName("CreateInterface").RCast<CreateInterfaceFn>()) {
-				if (auto* interface = createInterface(name.data(), nullptr)) {
-					return static_cast<T>(interface);
-				}
-			}
-		}
-
-		return MakeError("Could not query interface at \"{}\"", name);
-	}
-
+	Result<CAddress> QueryInterface(std::string_view library, std::string_view name);
 	CBaseEntity* FindEntityByClassname(CEntityInstance* start, const char* name);
 
 	CBasePlayerController* GetController(CBaseEntity* entity);

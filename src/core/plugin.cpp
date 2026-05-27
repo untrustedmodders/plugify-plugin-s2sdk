@@ -1,9 +1,6 @@
 #include <core/sdk/entity/cgamerules.h>
 #include <core/sdk/entity/cteam.h>
 #include <core/sdk/cvars.hpp>
-#include <dynlibutils/module.hpp>
-#include <dynlibutils/virtual.hpp>
-#include <dynlibutils/vthook.hpp>
 #include <eiface.h>
 #include <engine/igameeventsystem.h>
 #include <entity2/entitysystem.h>
@@ -36,7 +33,7 @@ Source2SDK g_sdk;
 PLUGIFY_PLUGIN(PLUGIN_API, &g_sdk)
 
 CGameEntitySystem* GameEntitySystem() {
-	static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "GameEntitySystem"));
+	static auto offset = Unwrap(g_pGameConfig->GetOffset("GameEntitySystem"));
 	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + offset);
 }
 
@@ -571,7 +568,7 @@ polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::Param
 			{"cs_script", CS_SCRIPT_PATH}
 		});
 #endif
-		static auto offset = Unwrap(TryGetOffset(g_pGameConfig, "CCSScript_EntityScript"));
+		static auto offset = Unwrap(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
 		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pPointScript) + offset);
 	} else if (name.ends_with("team_manager")) {
 		g_pTeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
@@ -793,7 +790,7 @@ Result<void> SetupHooks() {
 	//g_HookManager.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, Pre);
 
 	static Memory CLuaVM;
-	UNWRAP(CLuaVM, TryGetVTable(g_pGameConfig, "CLuaVM"));
+	UNWRAP(CLuaVM, g_pGameConfig->GetVTable("CLuaVM"));
 	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterFunction, CLuaVM, Hook_RegisterFunction, Pre);
 	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, CLuaVM, Hook_RegisterScriptClass, Pre);
 	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
@@ -813,12 +810,12 @@ Result<void> SetupHooks() {
 	g_HookManager.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, Pre, Post);
 
 	static Memory CServerSideClient;
-	UNWRAP(CServerSideClient, TryGetVTable(g_pGameConfig, "CServerSideClient"));
+	UNWRAP(CServerSideClient, g_pGameConfig->GetVTable("CServerSideClient"));
 	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::ProcessRespondCvarValue, CServerSideClient, Hook_ProcessRespondCvarValue, Pre);
 	g_HookManager.AddHookVFuncFunc(&CServerSideClientBase::SendNetMessage, CServerSideClient, Hook_SendNetMessage, Pre);
 
 	static Memory CGameRulesGameSystem;
-	UNWRAP(CGameRulesGameSystem, TryGetVTable(g_pGameConfig, "CGameRulesGameSystem"));
+	UNWRAP(CGameRulesGameSystem, g_pGameConfig->GetVTable("CGameRulesGameSystem"));
 	g_HookManager.AddHookVFuncFunc(&IGameSystem::BuildGameSessionManifest, CGameRulesGameSystem, Hook_BuildGameSessionManifest, Pre);
 
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
@@ -829,8 +826,8 @@ Result<void> SetupHooks() {
 	uint8_t* v8IsolateEnterPtr;
 	uint8_t* v8IsolateExitPtr;
 
-	UNWRAP(v8IsolateEnterPtr, TryGetAddress<uint8_t*>(g_pGameConfig, "v8::Isolate::Enter"));
-	UNWRAP(v8IsolateExitPtr, TryGetAddress<uint8_t*>(g_pGameConfig, "v8::Isolate::Exit"));
+	UNWRAP(v8IsolateEnterPtr, g_pGameConfig->GetAddress("v8::Isolate::Enter"));
+	UNWRAP(v8IsolateExitPtr, g_pGameConfig->GetAddress("v8::Isolate::Exit"));
 
 #if _WIN32
 	const uint8_t fix = 0;
@@ -843,7 +840,7 @@ Result<void> SetupHooks() {
 
 	if (Module v8("plugify-module-v8"); v8.IsValid()) {
 		using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
-		auto resolve = v8.GetFunctionByName("SetModuleResolver").RCast<SetModuleResolverFn>();
+		auto resolve = v8.GetFunctionByName("SetModuleResolver").As<SetModuleResolverFn>();
 		if (!resolve) {
 			return MakeError("SetModuleResolver not found!");
 		}
