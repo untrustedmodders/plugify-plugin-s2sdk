@@ -131,11 +131,11 @@ void CModule::GetModuleInfo(std::string_view mod)
     _size = max_vaddr - min_vaddr;
 
     {
-        ScopedTimer timer(_module_name + "::DumpVTables");
+       [[maybe_unused]] plg::Scope scope(_module_name + "::DumpVTables");
         DumpVtables();
     }
     {
-        ScopedTimer timer(_module_name + "::BuildFunctionIndexAndReferences");
+        [[maybe_unused]] plg::Scope scope(_module_name + "::BuildFunctionIndexAndReferences");
         BuildFunctionIndexAndReferences();
     }
 }
@@ -240,7 +240,7 @@ void CModule::DumpExports(void* module_base)
     }
 
     if (auto it = _exports.find("CreateInterface"); it != _exports.end()) [[unlikely]]
-        _createInterFaceFn = reinterpret_cast<void*>(it->second);
+        _createInterFaceFn = reinterpret_cast<CreateInterfaceFn>(it->second);
 }
 
 CAddress CModule::GetFunctionByName(std::string_view proc_name) const
@@ -323,7 +323,7 @@ void CModule::DumpVtables()
 
     if (!class_typeinfo.IsValid() || !si_class_typeinfo.IsValid() || !vmi_class_typeinfo.IsValid()) [[unlikely]]
     {
-        FatalError("Failed to get typeinfo vtables");
+        plg::print(LS_ERROR, "Failed to get typeinfo vtables");
         return;
     }
 

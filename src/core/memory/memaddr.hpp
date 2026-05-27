@@ -30,7 +30,7 @@ public:
     template <typename T = void*>
     T As() noexcept
     {
-        return T(m_value);
+        return reinterpret_cast<T>(m_value);
     }
 
     template <typename T = void*>

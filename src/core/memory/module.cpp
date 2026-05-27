@@ -188,7 +188,7 @@ std::vector<std::uintptr_t> CModule::GetVFunctionsFromVTable(std::string_view vt
         return false;
     });
 
-    _vtable_functions[std::string(vtableName)] = funcs;
+    _vtable_functions.emplace(vtableName, funcs);
 
     return funcs;
 }
@@ -238,7 +238,7 @@ CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
 #ifdef PLATFORM_WINDOWS
     auto vtable_name = is_raw_name ? name : std::format(".?AV{}@@", name);
 #else
-    auto vtable_name = is_raw_name ? name : (std::to_string(name.length()) + name);
+    auto vtable_name = is_raw_name ? name : std::format("{}{}", name.length(), name);
 #endif
 
     auto it = std::ranges::find_if(_vtables, [&](const std::unique_ptr<VTable>& vtable) {
@@ -275,9 +275,8 @@ CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
     if (it == _vtables.end()) [[unlikely]]
         plg::print(LS_ERROR, "Failed to find vtable \"{}\"", name);
 
-    auto address          = it->get()->vtable_address;
-    _cached_vtables[std::string(name)] = address;
-
+    auto address = it->get()->vtable_address;
+    _cached_vtables.emplace(name, address);
     return address;
 }
 
