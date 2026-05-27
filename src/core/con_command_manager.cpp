@@ -125,12 +125,12 @@ static bool CheckCommandAccess(CPlayerSlot slot, uint64 flags) {
 		return true;
 	}
 
-	auto pPlayer = g_PlayerManager.ToPlayer(slot);
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(slot);
+	if (player == nullptr) {
 		return false;
 	}
 
-	/*if (!pPlayer->IsAdminFlagSet(flags)) {
+	/*if (!player->IsAdminFlagSet(flags)) {
 		utils::PrintChat(slot, "You don't have access to this command.");
 		return false;
 	}*/

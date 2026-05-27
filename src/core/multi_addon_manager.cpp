@@ -714,14 +714,14 @@ void MultiAddonManager::OnPostEvent(INetworkMessageInternal* message, CNetMessag
 	if (s2_block_disconnect_messages.Get() && message->GetNetMessageInfo()->m_MessageId == GE_Source1LegacyGameEvent) {
 		auto msg = data->As<CMsgSource1LegacyGameEvent_t>();
 
-		static int sDisconnectId = g_pGameEventManager->LookupEventId("player_disconnect");
+		static int disconnectId = g_pGameEventManager->LookupEventId("player_disconnect");
 
-		if (msg->eventid() == sDisconnectId) {
-			IGameEvent* pEvent = g_pGameEventManager->UnserializeEvent(*msg);
+		if (msg->eventid() == disconnectId) {
+			IGameEvent* event = g_pGameEventManager->UnserializeEvent(*msg);
 
 			// This will prevent "loop shutdown" messages in the chat when clients reconnect
 			// As far as we're aware, there are no other cases where this reason is used
-			if (pEvent->GetInt("reason") == NETWORK_DISCONNECT_LOOPSHUTDOWN) {
+			if (event->GetInt("reason") == NETWORK_DISCONNECT_LOOPSHUTDOWN) {
 				*reinterpret_cast<uint64*>(clients) = 0;
 			}
 		}

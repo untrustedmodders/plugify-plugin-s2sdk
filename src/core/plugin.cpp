@@ -44,10 +44,10 @@ constexpr char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
 
 polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	//auto config = polyhook::GetArgument<const GameSessionConfiguration_t *>(params, 1);
-	//auto pWorldSession = polyhook::GetArgument<ISource2WorldSession*>(params, 2);
-	auto pMapName = polyhook::GetArgument<const char*>(params, 3);
+	//auto worldSession = polyhook::GetArgument<ISource2WorldSession*>(params, 2);
+	auto mapName = polyhook::GetArgument<const char*>(params, 3);
 
-	plg::print(LS_DETAILED, "[StartupServer] = {}\n", pMapName);
+	plg::print(LS_DETAILED, "[StartupServer] = {}\n", mapName);
 
 	ServerStartup();
 
@@ -212,7 +212,7 @@ polyhook::ResultType Hook_PostEvent(polyhook::HookHandle hook, polyhook::Paramet
 	//auto clientCount = polyhook::GetArgument<int>(params, 3);
 	auto clients = polyhook::GetArgument<uint64_t*>(params, 4);
 	auto message = polyhook::GetArgument<INetworkMessageInternal*>(params, 5);
-	auto pData = polyhook::GetArgument<CNetMessage*>(params, 6);
+	auto data = polyhook::GetArgument<CNetMessage*>(params, 6);
 
 	if (clients == nullptr) {
 		return polyhook::ResultType::Ignored;
@@ -222,11 +222,11 @@ polyhook::ResultType Hook_PostEvent(polyhook::HookHandle hook, polyhook::Paramet
 
 #if defined (CS2)
 	if (type == polyhook::CallbackType::Pre) {
-		g_MultiAddonManager.OnPostEvent(message, pData, clients);
+		g_MultiAddonManager.OnPostEvent(message, data, clients);
 	}
 #endif
 
-	auto result = g_UserMessageManager.ExecuteMessageCallbacks(message, pData, clients, static_cast<HookMode>(type));
+	auto result = g_UserMessageManager.ExecuteMessageCallbacks(message, data, clients, static_cast<HookMode>(type));
 	if (result >= ResultType::Handled) {
 		return polyhook::ResultType::Supercede;
 	}
@@ -460,7 +460,7 @@ polyhook::ResultType Hook_FireOutputInternal(polyhook::HookHandle hook, polyhook
 
 #if defined (CS2)
 polyhook::ResultType Hook_TerminateRound(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	//auto pGameRules = polyhook::GetArgument<CCSGameRules*>(params, 0);
+	//auto gameRules = polyhook::GetArgument<CCSGameRules*>(params, 0);
 	auto delay = polyhook::GetArgument<float>(params, 1);
 	auto reason = static_cast<CRoundEndReason>(polyhook::GetArgument<uint32_t>(params, 2));
 
@@ -487,10 +487,10 @@ polyhook::ResultType Hook_DispatchConCommand(polyhook::HookHandle hook, polyhook
 }
 
 polyhook::ResultType Hook_CheckTransmit(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	auto ppInfoList = polyhook::GetArgument<CCheckTransmitInfo**>(params, 1);
-	auto nInfoCount = polyhook::GetArgument<uint32_t>(params, 2);
+	auto infoList = polyhook::GetArgument<CCheckTransmitInfo**>(params, 1);
+	auto infoCount = polyhook::GetArgument<uint32_t>(params, 2);
 
-	plg::view view(ppInfoList, nInfoCount);
+	plg::view view(infoList, infoCount);
 
 	g_OnServerCheckTransmitListenerManager(view.get());
 
@@ -561,15 +561,15 @@ polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::Param
 		v8::Isolate::Scope isolateScope(isolate);
 		v8::HandleScope handleScope(isolate);
 
-		auto pPointScript = addresses::CreateEntityByName("point_script", -1);
-		g_pPointScript = static_cast<CBaseEntity*>(pPointScript);
+		auto pointScript = addresses::CreateEntityByName("point_script", -1);
+		g_pPointScript = static_cast<CBaseEntity*>(pointScript);
 		g_pPointScript->DispatchSpawn({
 			{"target_name", "script_main"},
 			{"cs_script", CS_SCRIPT_PATH}
 		});
 #endif
 		static auto offset = Unwrap(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
-		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pPointScript) + offset);
+		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pointScript) + offset);
 	} else if (name.ends_with("team_manager")) {
 		g_pTeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
 	}
@@ -602,22 +602,22 @@ polyhook::ResultType Hook_OnEntityParentChanged(polyhook::HookHandle hook, polyh
 }
 
 polyhook::ResultType Hook_ProcessRespondCvarValue(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	auto pClient = polyhook::GetArgument<CServerSideClientBase*>(params, 0);
-	auto pMsg = polyhook::GetArgument<CCLCMsg_RespondCvarValue_t*>(params, 1);
+	auto client = polyhook::GetArgument<CServerSideClientBase*>(params, 0);
+	auto msg = polyhook::GetArgument<CCLCMsg_RespondCvarValue_t*>(params, 1);
 
-	g_PlayerManager.OnRespondCvarValue(pClient, *pMsg);
+	g_PlayerManager.OnRespondCvarValue(client, *msg);
 	return polyhook::ResultType::Ignored;
 }
 
 polyhook::ResultType Hook_BuildGameSessionManifest(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	//auto pSystem = polyhook::GetArgument<IGameSystem*>(params, 0);
-	auto pMsg = polyhook::GetArgument<EventBuildGameSessionManifest_t*>(params, 1);
+	//auto system = polyhook::GetArgument<IGameSystem*>(params, 0);
+	auto msg = polyhook::GetArgument<EventBuildGameSessionManifest_t*>(params, 1);
 
 	g_OnBuildGameSessionManifestListenerManager();
 
-	pMsg->m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
+	msg->m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
 	for (const auto& resource : g_Precached) {
-		pMsg->m_pResourceManifest->AddResource(resource.c_str());
+		msg->m_pResourceManifest->AddResource(resource.c_str());
 	}
 
 	return polyhook::ResultType::Ignored;
@@ -632,16 +632,16 @@ polyhook::ResultType Hook_RegisterFunction(polyhook::HookHandle hook, polyhook::
 
 polyhook::ResultType Hook_RegisterScriptClass(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
-	auto pClassDesc = polyhook::GetArgument<ScriptClassDesc_t*>(params, 1);
-	vscript::RegisterScriptClass(pClassDesc);
+	auto classDesc = polyhook::GetArgument<ScriptClassDesc_t*>(params, 1);
+	vscript::RegisterScriptClass(classDesc);
 	return polyhook::ResultType::Ignored;
 }
 
 polyhook::ResultType Hook_RegisterInstance(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
-	auto pClassDesc = polyhook::GetArgument<ScriptClassDesc_t*>(params, 1);
-	auto pInstance = polyhook::GetArgument<void*>(params, 2);
-	vscript::RegisterScriptClass(pClassDesc, pInstance);
+	auto classDesc = polyhook::GetArgument<ScriptClassDesc_t*>(params, 1);
+	auto instance = polyhook::GetArgument<void*>(params, 2);
+	vscript::RegisterScriptClass(classDesc, instance);
 	return polyhook::ResultType::Ignored;
 }
 /*
@@ -764,7 +764,7 @@ Result<void> SetupHooks() {
 	using enum polyhook::CallbackType;
 
 	g_HookManager.AddHookVTableFunc(&IGameEventManager2::FireEvent, g_pGameEventManager, Hook_FireEvent, Pre, Post);
-	using PostEventAbstract = void(IGameEventSystem::*)( CSplitScreenSlot slot, bool bLocalOnly, int nClientCount, const uint64 *clients, INetworkMessageInternal *pEvent, const CNetMessage *pData, unsigned long nSize, NetChannelBufType_t bufType);
+	using PostEventAbstract = void(IGameEventSystem::*)(CSplitScreenSlot slot, bool localOnly, int clientCount, const uint64 *clients, INetworkMessageInternal *event, const CNetMessage *data, unsigned long size, NetChannelBufType_t bufType);
 	g_HookManager.AddHookVTableFunc<PostEventAbstract>(&IGameEventSystem::PostEventAbstract, g_pGameEventSystem, Hook_PostEvent, Pre, Post);
 
 	g_HookManager.AddHookVTableFunc(&IServerGameClients::ClientCommand, g_pSource2GameClients, Hook_ClientCommand, Pre);
@@ -793,7 +793,7 @@ Result<void> SetupHooks() {
 	UNWRAP(CLuaVM, g_pGameConfig->GetVTable("CLuaVM"));
 	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterFunction, CLuaVM, Hook_RegisterFunction, Pre);
 	g_HookManager.AddHookVFuncFunc(&IScriptVM::RegisterScriptClass, CLuaVM, Hook_RegisterScriptClass, Pre);
-	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *pDesc, void *pInstance);
+	using RegisterInstanceFn = HSCRIPT(IScriptVM::*)(ScriptClassDesc_t *desc, void *instance);
 	g_HookManager.AddHookVFuncFunc<RegisterInstanceFn>(&IScriptVM::RegisterInstance, CLuaVM, Hook_RegisterInstance, Pre);
 	//using SetValueFn = bool(IScriptVM::*)(HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value);
 	//g_HookManager.AddHookVFuncFunc<SetValueFn>(&IScriptVM::SetValue, &*table3, Hook_SetValue, Pre);

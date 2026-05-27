@@ -176,12 +176,12 @@ extern "C" PLUGIN_API int PlayerServicesToPlayerSlot(CPlayerPawnComponent* servi
  * @return The authentication string.
  */
 extern "C" PLUGIN_API plg::string GetClientAuthId(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return {};
 	}
 
-	return pPlayer->GetSteamId().Render();
+	return player->GetSteamId().Render();
 }
 
 /**
@@ -191,12 +191,12 @@ extern "C" PLUGIN_API plg::string GetClientAuthId(int playerSlot) {
  * @return uint32_t The client's steam account ID.
  */
 extern "C" PLUGIN_API uint32_t GetClientAccountId(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return 0;
 	}
 
-	return pPlayer->GetSteamId().GetAccountID();
+	return player->GetSteamId().GetAccountID();
 }
 
 /**
@@ -206,12 +206,12 @@ extern "C" PLUGIN_API uint32_t GetClientAccountId(int playerSlot) {
  * @return uint64_t The client's SteamID64.
  */
 extern "C" PLUGIN_API uint64_t GetClientSteamID64(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return 0;
 	}
 
-	return pPlayer->GetSteamId().ConvertToUint64();
+	return player->GetSteamId().ConvertToUint64();
 }
 
 /**
@@ -221,12 +221,12 @@ extern "C" PLUGIN_API uint64_t GetClientSteamID64(int playerSlot) {
  * @return The client's IP address.
  */
 extern "C" PLUGIN_API plg::string GetClientIp(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return {};
 	}
 
-	return pPlayer->GetIpAddress();
+	return player->GetIpAddress();
 }
 
 /**
@@ -236,12 +236,12 @@ extern "C" PLUGIN_API plg::string GetClientIp(int playerSlot) {
  * @return The client's language.
  */
 extern "C" PLUGIN_API plg::string GetClientLanguage(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return {};
 	}
 
-	return pPlayer->GetLanguage();
+	return player->GetLanguage();
 }
 
 /**
@@ -251,12 +251,12 @@ extern "C" PLUGIN_API plg::string GetClientLanguage(int playerSlot) {
  * @return The client's operating system.
  */
 extern "C" PLUGIN_API plg::string GetClientOS(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return {};
 	}
 
-	return pPlayer->GetOperatingSystem();
+	return player->GetOperatingSystem();
 }
 
 /**
@@ -266,12 +266,12 @@ extern "C" PLUGIN_API plg::string GetClientOS(int playerSlot) {
  * @return The client's name.
  */
 extern "C" PLUGIN_API plg::string GetClientName(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return {};
 	}
 
-	return pPlayer->GetName();
+	return player->GetName();
 }
 
 /**
@@ -281,12 +281,12 @@ extern "C" PLUGIN_API plg::string GetClientName(int playerSlot) {
  * @return float Connection time in seconds.
  */
 extern "C" PLUGIN_API float GetClientTime(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return -1.0f;
 	}
 
-	return pPlayer->GetTimeConnected();
+	return player->GetTimeConnected();
 }
 
 /**
@@ -296,12 +296,12 @@ extern "C" PLUGIN_API float GetClientTime(int playerSlot) {
  * @return float Latency value.
  */
 extern "C" PLUGIN_API float GetClientLatency(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return 0.0f;
 	}
 
-	return pPlayer->GetLatency();
+	return player->GetLatency();
 }
 
 /**
@@ -311,12 +311,12 @@ extern "C" PLUGIN_API float GetClientLatency(int playerSlot) {
  * @return uint64 Access flags as a bitmask.
  */
 extern "C" PLUGIN_API uint64 GetUserFlagBits(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return false;
 	}
 
-	return 0;//pPlayer->GetAdminFlags();
+	return 0;//player->GetAdminFlags();
 }
 
 /**
@@ -326,12 +326,12 @@ extern "C" PLUGIN_API uint64 GetUserFlagBits(int playerSlot) {
  * @param flags Bitmask representing the flags to be set.
  */
 extern "C" PLUGIN_API void SetUserFlagBits(int playerSlot, uint64 flags) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return;
 	}
 
-	//pPlayer->SetAdminFlags(flags);
+	//player->SetAdminFlags(flags);
 }
 
 /**
@@ -343,12 +343,12 @@ extern "C" PLUGIN_API void SetUserFlagBits(int playerSlot, uint64 flags) {
  * @param flags Bitmask representing the flags to be added.
  */
 extern "C" PLUGIN_API void AddUserFlags(int playerSlot, uint64 flags) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return;
 	}
 
-	//pPlayer->SetAdminFlags(pPlayer->GetAdminFlags() | flags);
+	//player->SetAdminFlags(player->GetAdminFlags() | flags);
 }
 
 /**
@@ -360,12 +360,12 @@ extern "C" PLUGIN_API void AddUserFlags(int playerSlot, uint64 flags) {
  * @param flags Bitmask representing the flags to be removed.
  */
 extern "C" PLUGIN_API void RemoveUserFlags(int playerSlot, uint64 flags) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return;
 	}
 
-	//pPlayer->SetAdminFlags(pPlayer->GetAdminFlags() & ~flags);
+	//player->SetAdminFlags(player->GetAdminFlags() & ~flags);
 }
 
 /**
@@ -375,12 +375,12 @@ extern "C" PLUGIN_API void RemoveUserFlags(int playerSlot, uint64 flags) {
  * @return true if the player is authenticated, false otherwise.
  */
 extern "C" PLUGIN_API bool IsClientAuthorized(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return false;
 	}
 
-	return pPlayer->IsAuthenticated();
+	return player->IsAuthenticated();
 }
 
 /**
@@ -390,12 +390,12 @@ extern "C" PLUGIN_API bool IsClientAuthorized(int playerSlot) {
  * @return true if the player is connected, false otherwise.
  */
 extern "C" PLUGIN_API bool IsClientConnected(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return false;
 	}
 
-	return pPlayer->IsConnected();
+	return player->IsConnected();
 }
 
 /**
@@ -405,12 +405,12 @@ extern "C" PLUGIN_API bool IsClientConnected(int playerSlot) {
  * @return true if the player is in the game, false otherwise.
  */
 extern "C" PLUGIN_API bool IsClientInGame(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return false;
 	}
 
-	return pPlayer->IsInGame();
+	return player->IsInGame();
 }
 
 /**
@@ -420,12 +420,12 @@ extern "C" PLUGIN_API bool IsClientInGame(int playerSlot) {
  * @return true if the client is the SourceTV bot, false otherwise.
  */
 extern "C" PLUGIN_API bool IsClientSourceTV(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return false;
 	}
 
-	return pPlayer->IsSourceTV();
+	return player->IsSourceTV();
 }
 
 /**
@@ -435,12 +435,12 @@ extern "C" PLUGIN_API bool IsClientSourceTV(int playerSlot) {
  * @return true if the client is alive, false if dead.
  */
 extern "C" PLUGIN_API bool IsClientAlive(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return false;
 	}
 
-	return pPlayer->IsAlive();
+	return player->IsAlive();
 }
 
 /**
@@ -450,12 +450,12 @@ extern "C" PLUGIN_API bool IsClientAlive(int playerSlot) {
  * @return true if the client is a fake client, false otherwise.
  */
 extern "C" PLUGIN_API bool IsFakeClient(int playerSlot) {
-	auto pPlayer = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-	if (pPlayer == nullptr) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
 		return false;
 	}
 
-	return pPlayer->IsFakeClient();
+	return player->IsFakeClient();
 }
 
 /////

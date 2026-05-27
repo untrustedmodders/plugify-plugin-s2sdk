@@ -220,9 +220,9 @@ namespace schema {
 						}
 					}
 					case SCHEMA_TYPE_DECLARED_CLASS: {
-						int nSize = static_cast<CSchemaType_DeclaredClass*>(elementType)->m_pClassInfo->m_nSize;
-						if (nSize <= sizeof(double)) {
-							return {Array, nSize};
+						int size = static_cast<CSchemaType_DeclaredClass*>(elementType)->m_pClassInfo->m_nSize;
+						if (size <= sizeof(double)) {
+							return {Array, size};
 						}
 						return {Invalid, -1};
 					}
@@ -236,9 +236,9 @@ namespace schema {
 				return {Invalid, -1};
 			}
 			case SCHEMA_TYPE_DECLARED_CLASS: {
-				int nSize = static_cast<CSchemaType_DeclaredClass*>(type)->m_pClassInfo->m_nSize;
-				if (nSize <= sizeof(void*)) {
-					return {Single, nSize};
+				int size = static_cast<CSchemaType_DeclaredClass*>(type)->m_pClassInfo->m_nSize;
+				if (size <= sizeof(void*)) {
+					return {Single, size};
 				}
 				return {Class, -1};
 			}
@@ -332,9 +332,9 @@ namespace schema {
 						}
 					}
 					case SCHEMA_TYPE_DECLARED_CLASS: {
-						int nSize = static_cast<CSchemaType_DeclaredClass*>(elementType)->m_pClassInfo->m_nSize;
-						if (nSize <= sizeof(double)) {
-							return {Array, nSize};
+						int size = static_cast<CSchemaType_DeclaredClass*>(elementType)->m_pClassInfo->m_nSize;
+						if (size <= sizeof(double)) {
+							return {Array, size};
 						}
 						return {Invalid, -1};
 					}

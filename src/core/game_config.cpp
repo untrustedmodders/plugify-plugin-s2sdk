@@ -1227,7 +1227,7 @@ Result<Memory> SignatureResolver::ResolveSymbol(
 
 Result<Memory> SignatureResolver::ResolveReferences(
 	const std::shared_ptr<Module>& module,
-	const plg::vector<ReferenceInfo>& refs
+	std::span<const ReferenceInfo> refs
 ) const {
 	auto resolvedRefs = ClassifyRefs(refs);
 	if (!resolvedRefs) {
@@ -1293,7 +1293,7 @@ Result<Memory> SignatureResolver::ResolveReferences(
 }
 
 Result<ResolvedRefs> SignatureResolver::ClassifyRefs(
-	const plg::vector<ReferenceInfo>& refs
+	std::span<const ReferenceInfo> refs
 ) const {
 	ResolvedRefs out;
 	for (const auto& [type, name] : refs) {
@@ -1363,7 +1363,7 @@ Result<ResolvedAddress> AddressResolver::ResolveByName(
 
 Result<Memory> AddressResolver::ApplyIndirections(
 	Memory baseAddress,
-	const plg::vector<IndirectionStep>& steps
+	std::span<const IndirectionStep> steps
 ) const {
 	Memory current = baseAddress;
 

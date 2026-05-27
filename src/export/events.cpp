@@ -46,10 +46,10 @@ extern "C" PLUGIN_API IGameEvent* CreateEvent(const plg::string& name, bool forc
 /**
  * @brief Fires a game event.
  * @param event A pointer to the IGameEvent object containing event data.
- * @param bDontBroadcast A boolean indicating whether to broadcast the event.
+ * @param dontBroadcast A boolean indicating whether to broadcast the event.
  */
-extern "C" PLUGIN_API void FireEvent(IGameEvent* event, bool bDontBroadcast) {
-	if (event) g_EventManager.FireEvent(event, bDontBroadcast);
+extern "C" PLUGIN_API void FireEvent(IGameEvent* event, bool dontBroadcast) {
+	if (event) g_EventManager.FireEvent(event, dontBroadcast);
 }
 
 /**

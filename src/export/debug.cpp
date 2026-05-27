@@ -394,10 +394,10 @@ extern "C" PLUGIN_API void DebugCross3DOriented(const plg::vec3& origin, const p
  * @param duration Duration (in seconds) to display the line.
  */
 extern "C" PLUGIN_API void DebugDrawTickMarkedLine(const plg::vec3& start, const plg::vec3& end, float tickDist,
-	int r, int g, int b, int a, int nTickCount, bool zTest, float duration) {
+	int r, int g, int b, int a, int tickCount, bool zTest, float duration) {
 	CDebugOverlayScriptHelper{}.DrawTickMarkedLine(std::bit_cast<Vector>(start),
 		std::bit_cast<Vector>(end),
-		tickDist, r, g, b, a, nTickCount, zTest, duration);
+		tickDist, r, g, b, a, tickCount, zTest, duration);
 }
 
 /**

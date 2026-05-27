@@ -190,10 +190,10 @@ extern "C" PLUGIN_API bool Kv3HasInvalidMemberNames(const KeyValues3* kv) {
 /**
  * @brief Sets the invalid member names flag
  * @param kv Pointer to the KeyValues3 object
- * @param bValue true to mark as having invalid member names, false otherwise
+ * @param value true to mark as having invalid member names, false otherwise
  */
-extern "C" PLUGIN_API void Kv3SetHasInvalidMemberNames(KeyValues3* kv, bool bValue) {
-    if (kv) kv->SetHasInvalidMemberNames(bValue);
+extern "C" PLUGIN_API void Kv3SetHasInvalidMemberNames(KeyValues3* kv, bool value) {
+    if (kv) kv->SetHasInvalidMemberNames(value);
 }
 
 /**

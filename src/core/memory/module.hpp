@@ -44,14 +44,14 @@ class IModule
 public:
     virtual ~IModule() = default;
 
-    [[nodiscard]] virtual void* FindPatternEx(const char* svPattern)                                               = 0;
-    [[nodiscard]] virtual void* GetVirtualTableByNameEx(const char* svTableName, bool is_raw_name = false)         = 0;
-    [[nodiscard]] virtual void* GetFunctionByNameEx(const char* svFunctionName) noexcept                           = 0;
-    [[nodiscard]] virtual void* FindInterfaceEx(const char* svInterfaceName)                                       = 0;
-    [[nodiscard]] virtual bool  FindPatternMultiEx(const char* svPattern, CUtlLeanVector<std::uintptr_t>* results) = 0;
-    [[nodiscard]] virtual void* FindStringEx(const char* str)                                                      = 0;
-    [[nodiscard]] virtual void* FindDataEx(const uint8_t* needle, std::size_t needle_size, bool read_only)         = 0;
-    [[nodiscard]] virtual void* FindPtrEx(const void* ptr)                                                         = 0;
+    [[nodiscard]] virtual void* FindPatternEx(const char* pattern)                                               = 0;
+    [[nodiscard]] virtual void* GetVirtualTableByNameEx(const char* tableName, bool is_raw_name = false)         = 0;
+    [[nodiscard]] virtual void* GetFunctionByNameEx(const char* functionName) noexcept                           = 0;
+    [[nodiscard]] virtual void* FindInterfaceEx(const char* interfaceName)                                       = 0;
+    [[nodiscard]] virtual bool  FindPatternMultiEx(const char* pattern, CUtlLeanVector<std::uintptr_t>* results) = 0;
+    [[nodiscard]] virtual void* FindStringEx(const char* str)                                                    = 0;
+    [[nodiscard]] virtual void* FindDataEx(const uint8_t* needle, std::size_t needle_size, bool read_only)       = 0;
+    [[nodiscard]] virtual void* FindPtrEx(const void* ptr)                                                       = 0;
 
     virtual void FindVtablePartial(const char* name, CUtlLeanVector<RunTimeVTableInfo>* info) = 0;
     virtual bool IsPointerDerivedFromEx(void* ptr, const char* name)                          = 0;
@@ -193,7 +193,7 @@ public:
     [[nodiscard]] std::vector<CAddress> FindPtrs(std::uintptr_t ptr) const;
     [[nodiscard]] CAddress              GetVirtualTableByName(std::string_view name, bool is_raw_name = false);
     [[nodiscard]] CAddress              FindInterface(std::string_view name) const;
-    [[nodiscard]] std::vector<CAddress> FindPatternMulti(std::string_view svPattern) const;
+    [[nodiscard]] std::vector<CAddress> FindPatternMulti(std::string_view pattern) const;
     [[nodiscard]] CAddress              GetFunctionByName(std::string_view proc_name) const;
 
     [[nodiscard]] CAddress GetTypeInfoFromName(std::string_view name) const;
@@ -211,37 +211,37 @@ public:
     [[nodiscard]] std::vector<uintptr_t> FindAllFunctionsFromPointerRefs(std::span<const std::uintptr_t> ptrs);
 
     // interface
-    [[nodiscard]] void* FindPatternEx(const char* svPattern) override
+    [[nodiscard]] void* FindPatternEx(const char* pattern) override
     {
-        return FindPattern(svPattern);
+        return FindPattern(pattern);
     }
 
-    [[nodiscard]] void* GetVirtualTableByNameEx(const char* svTableName, bool bDecorated = false) override
+    [[nodiscard]] void* GetVirtualTableByNameEx(const char* tableName, bool bDecorated = false) override
     {
-        return GetVirtualTableByName(svTableName);
+        return GetVirtualTableByName(tableName);
     }
 
-    [[nodiscard]] void* GetFunctionByNameEx(const char* svFunctionName) noexcept override
+    [[nodiscard]] void* GetFunctionByNameEx(const char* functionName) noexcept override
     {
-        return GetFunctionByName(svFunctionName);
+        return GetFunctionByName(functionName);
     }
 
-    [[nodiscard]] void* FindInterfaceEx(const char* svInterfaceName) override
+    [[nodiscard]] void* FindInterfaceEx(const char* interfaceName) override
     {
-        return FindInterface(svInterfaceName);
+        return FindInterface(interfaceName);
     }
 
-    [[nodiscard]] bool FindPatternMultiEx(const char* svPattern, CUtlLeanVector<std::uintptr_t>* results) override
+    [[nodiscard]] bool FindPatternMultiEx(const char* pattern, CUtlLeanVector<std::uintptr_t>* results) override
     {
-        auto pattern_result = FindPatternMulti(svPattern);
+        auto pattern_result = FindPatternMulti(pattern);
         if (pattern_result.empty())
             return false;
 
         auto size = pattern_result.size();
         results->SetSize(static_cast<int32_t>(size));
 
-        for (auto i = 0u; i < size; i++)
-            results->Element(static_cast<int32_t>(i)) = pattern_result[i];
+        for (auto i = 0; i < size; i++)
+            results->Element(i) = pattern_result[i];
 
         return true;
     }
@@ -276,8 +276,8 @@ public:
         auto size = range.size();
         results->SetSize(static_cast<int32_t>(size));
 
-        for (auto i = 0u; i < size; i++)
-            results->Element(static_cast<int32_t>(i)) = range[i].source_ip;
+        for (auto i = 0; i < size; i++)
+            results->Element(i) = range[i].source_ip;
 
         return true;
     }
@@ -298,8 +298,8 @@ public:
             return false;
 
         results->SetCount(static_cast<int32_t>(temp_results.size()));
-        for (auto i = 0u; i < temp_results.size(); i++)
-            results->Element(static_cast<int32_t>(i)) = temp_results[i];
+        for (auto i = 0; i < temp_results.size(); i++)
+            results->Element(i) = temp_results[i];
 
         return true;
     }
@@ -322,8 +322,8 @@ public:
             return false;
 
         results->SetCount(static_cast<int32_t>(temp_results.size()));
-        for (auto i = 0u; i < temp_results.size(); i++)
-            results->Element(static_cast<int32_t>(i)) = temp_results[i];
+        for (auto i = 0; i < temp_results.size(); i++)
+            results->Element(i) = temp_results[i];
 
         return true;
     }

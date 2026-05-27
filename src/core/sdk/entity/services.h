@@ -220,8 +220,8 @@ public:
 
 	SCHEMA_FIELD(CHandle<CBaseViewModel>, m_hViewModel);
 
-	CBaseViewModel* GetViewModel(int iIndex = 0);
-	void SetViewModel(int iIndex, CBaseViewModel* pViewModel);
+	CBaseViewModel* GetViewModel(int index = 0);
+	void SetViewModel(int index, CBaseViewModel* viewModel);
 };
 
 // We need an exactly sized class to be able to iterate the vector, our schema system implementation can't do this

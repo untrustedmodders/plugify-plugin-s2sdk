@@ -53,11 +53,11 @@ public:
 		return m_fFlags & FL_CONTROLLER_FAKECLIENT;
 	}
 
-	void ChangeTeam(int iTeam) {
+	void ChangeTeam(int team) {
 		// TODO:
 	}
 
-	void SwitchTeam(CSTeam iTeam) {
+	void SwitchTeam(CSTeam team) {
 		// TODO:
 	}
 

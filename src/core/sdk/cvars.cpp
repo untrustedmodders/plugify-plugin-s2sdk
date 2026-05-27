@@ -68,8 +68,8 @@ void cvars::SendMultipleConVarValues(CPlayerSlot slot, std::span<const std::stri
 int cvars::SendConVarValueQueryToClient(CPlayerSlot slot, std::string_view cvarName, int queryCvarCookieOverride) {
 	if (g_pEngineServer->GetPlayerNetInfo(slot)) {
 		static INetworkMessageInternal* netMsg = g_pNetworkMessages->FindNetworkMessagePartial("CSVCMsg_GetCvarValue");
-		static int iQueryCvarCookieCounter = 0;
-		int queryCvarCookie = queryCvarCookieOverride == -1 ? ++iQueryCvarCookieCounter : queryCvarCookieOverride;
+		static int queryCvarCookieCounter = 0;
+		int queryCvarCookie = queryCvarCookieOverride == -1 ? ++queryCvarCookieCounter : queryCvarCookieOverride;
 
 		auto msg = netMsg->AllocateMessage()->As<CSVCMsg_GetCvarValue_t>();
 		msg->set_cookie(queryCvarCookie);

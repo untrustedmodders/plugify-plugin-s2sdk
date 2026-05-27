@@ -21,8 +21,8 @@ struct VScriptClass {
 
 using VScriptClassMap = plg::flat_hash_map<plg::string, VScriptClass, plg::string_hash, std::equal_to<>>;
 namespace vscript {
-	void RegisterFunction(ScriptFunctionBinding_t* pScriptFunction);
-	void RegisterScriptClass(ScriptClassDesc_t* pClassDesc, void* pInstance = nullptr);
+	void RegisterFunction(ScriptFunctionBinding_t* scriptFunction);
+	void RegisterScriptClass(ScriptClassDesc_t* classDesc, void* instance = nullptr);
 
 	VScriptBinding GetBinding(std::string_view className, std::string_view functionName);
 	VScriptBinding GetBinding(const char* className, const char* functionName);

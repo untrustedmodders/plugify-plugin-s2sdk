@@ -184,9 +184,9 @@ public:
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
-		const pb::EnumValueDescriptor* pEnumValue = field->enum_type()->FindValueByNumber(value);
-		if (!pEnumValue) return false;
-		m_msg->GetReflection()->SetRepeatedEnum(m_msg, field, index, pEnumValue);
+		const pb::EnumValueDescriptor* enumValue = field->enum_type()->FindValueByNumber(value);
+		if (!enumValue) return false;
+		m_msg->GetReflection()->SetRepeatedEnum(m_msg, field, index, enumValue);
 		return true;
 	}
 
@@ -987,12 +987,12 @@ public:
 		CHECK_REPEATED_ELEMENT(index);
 
 		// Protobuf guarantees that repeated field values will stay in order and so must we.
-		const pb::Reflection* pReflection = m_msg->GetReflection();
+		const pb::Reflection* reflection = m_msg->GetReflection();
 		for (int i = index; i < elemCount - 1; ++i) {
-			pReflection->SwapElements(m_msg, field, i, i + 1);
+			reflection->SwapElements(m_msg, field, i, i + 1);
 		}
 
-		pReflection->RemoveLast(m_msg, field);
+		reflection->RemoveLast(m_msg, field);
 
 		return true;
 	}

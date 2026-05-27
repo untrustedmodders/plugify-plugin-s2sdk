@@ -279,11 +279,11 @@ private:
 
 	Result<Memory> ResolveReferences(
 		const std::shared_ptr<Module>& module,
-		const plg::vector<ReferenceInfo>& refs
+		std::span<const ReferenceInfo> refs
 	) const;
 
 	Result<ResolvedRefs> ClassifyRefs(
-		const plg::vector<ReferenceInfo>& refs
+		std::span<const ReferenceInfo> refs
 	) const;
 };
 
@@ -308,7 +308,7 @@ public:
 private:
 	Result<Memory> ApplyIndirections(
 		Memory baseAddress,
-		const plg::vector<IndirectionStep>& steps
+		std::span<const IndirectionStep> steps
 	) const;
 
 	Result<Memory> ApplyStep(Memory current, const IndirectionStep& step) const;
