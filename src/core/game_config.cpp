@@ -2,36 +2,10 @@
 
 #include "game_config.hpp"
 
-#if _WIN32
-#include <windows.h>
-#else
-#include <dlfcn.h>
-#endif
-
-ModuleProvider::ModuleProvider() {
-	PreloadModules();
-}
-
 void ModuleProvider::PreloadModules() {
-	// Metamod workaround - check if metamod is loaded
-	const bool hasMetamod = Module("metamod.2.cs2").GetHandle() != nullptr;
-
-#if _WIN32
-	const int flags = hasMetamod ? DONT_RESOLVE_DLL_REFERENCES : 0;
-#else
-	const int flags = hasMetamod ? (RTLD_LAZY | RTLD_NOLOAD) : 0;
-#endif
-
 	// Helper lambda to load a module
-	auto loadModule = [&](std::string_view name, const auto& path) {
-		auto module = std::make_shared<Module>();
-
-		if (hasMetamod) {
-			module->LoadFromPath(plg::as_string(path), flags);
-		} else {
-			module = std::make_shared<Module>(name);
-		}
-
+	auto load = [&](std::string_view name) {
+		auto module = std::make_shared<Module>(name);
 		if (module->IsValid()) {
 			std::unique_lock lock(m_mutex);
 			m_modules[name] = std::move(module);
@@ -39,8 +13,8 @@ void ModuleProvider::PreloadModules() {
 	};
 
 	// Load common modules
-	loadModule("engine2", utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2");
-	loadModule("server", utils::GameDirectory() / S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server");
+	load((utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2").string());
+	load((utils::GameDirectory() / S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server").string());
 }
 
 std::shared_ptr<Module> ModuleProvider::GetModule(std::string_view name) {
@@ -151,26 +125,14 @@ Result<void> ConfigLoader::LoadSignatures(pcf::Config* config) {
 	if (config->IsObject() && config->JumpFirst()) {
 		do {
 			if (config->IsObject()) {
-				SignatureData sig;
-				sig.name = config->GetName();
-				sig.library = config->GetString("library");
-				plg::string signature = config->GetString(S2SDK_PLATFORM);
-
-				if (signature.empty()) {
-					plg::print(LS_WARNING, "No signature for " S2SDK_PLATFORM ": {}\n", sig.name);
-					continue;
-				}
-
-				// Determine type
-				if (signature[0] == '@') {
-					sig.type = SignatureData::Type::Symbol;
-					sig.value = signature.substr(1);
+				auto name = config->GetName();
+				auto result = ParseSignatureConfig(config, name);
+				if (result) {
+					m_signatures[std::move(name)] = std::move(*result);
 				} else {
-					sig.type = SignatureData::Type::Pattern;
-					sig.value = std::move(signature);
+					plg::print(LS_WARNING, "Failed to parse signature '{}': {}\n",
+							   name, result.error());
 				}
-
-				m_signatures[sig.name] = std::move(sig);
 			}
 		} while (config->JumpNext());
 		config->JumpBack();
@@ -188,18 +150,14 @@ Result<void> ConfigLoader::LoadOffsets(pcf::Config* config) {
 	if (config->IsObject() && config->JumpFirst()) {
 		do {
 			if (config->IsObject()) {
-				OffsetData offset;
-				offset.name = config->GetName();
-				if (config->HasKey(S2SDK_PLATFORM)) {
-					offset.value = config->GetAsInt32(S2SDK_PLATFORM);
+				auto name = config->GetName();
+				auto result = ParseOffsetsConfig(config, name);
+				if (result) {
+					m_offsets[std::move(name)] = std::move(*result);
+				} else {
+					plg::print(LS_WARNING, "Failed to parse offset '{}': {}\n",
+							   name, result.error());
 				}
-
-				if (!offset.value) {
-					plg::print(LS_WARNING, "No offset for " S2SDK_PLATFORM ": {}\n", offset.name);
-					continue;
-				}
-
-				m_offsets[offset.name] = std::move(offset);
 			}
 		} while (config->JumpNext());
 		config->JumpBack();
@@ -217,22 +175,14 @@ Result<void> ConfigLoader::LoadVTables(pcf::Config* config) {
 	if (config->IsObject() && config->JumpFirst()) {
 		do {
 			if (config->IsObject()) {
-				VTableData vt;
-				vt.name = config->GetName();
-				vt.library = config->GetString("library");
-				vt.table = config->GetString("table");
-
-				if (vt.library.empty()) {
-					plg::print(LS_WARNING, "No library for " S2SDK_PLATFORM ": {}\n", vt.name);
-					continue;
+				auto name = config->GetName();
+				auto result = ParseVTableConfig(config, name);
+				if (result) {
+					m_vtables[std::move(name)] = std::move(*result);
+				} else {
+					plg::print(LS_WARNING, "Failed to parse vtable '{}': {}\n",
+							   name, result.error());
 				}
-
-				if (vt.table.empty()) {
-					plg::print(LS_WARNING, "No table for " S2SDK_PLATFORM ": {}\n", vt.name);
-					continue;
-				}
-
-				m_vtables[vt.name] = std::move(vt);
 			}
 		} while (config->JumpNext());
 		config->JumpBack();
@@ -250,31 +200,14 @@ Result<void> ConfigLoader::LoadPatches(pcf::Config* config) {
 	if (config->IsObject() && config->JumpFirst()) {
 		do {
 			if (config->IsObject()) {
-				PatchData patch;
-				patch.name = config->GetName();
-				if (config->HasKey("signature")) {
-					patch.base = config->GetString("signature");
-					patch.type = PatchData::Type::Signature;
-				} else if (config->HasKey("address")) {
-					patch.base = config->GetString("address");
-					patch.type = PatchData::Type::Address;
-				} else if (config->HasKey("vtable")) {
-					patch.base = config->GetString("vtable");
-					patch.type = PatchData::Type::VTable;
+				auto name = config->GetName();
+				auto result = ParsePatchConfig(config, name);
+				if (result) {
+					m_patches[std::move(name)] = std::move(*result);
+				} else {
+					plg::print(LS_WARNING, "Failed to parse patch '{}': {}\n",
+							   name, result.error());
 				}
-				patch.pattern = config->GetString(S2SDK_PLATFORM);
-
-				if (patch.base.empty()) {
-					plg::print(LS_WARNING, "No address for " S2SDK_PLATFORM ": {}\n", patch.name);
-					continue;
-				}
-
-				if (patch.pattern.empty()) {
-					plg::print(LS_WARNING, "No pattern for " S2SDK_PLATFORM ": {}\n", patch.name);
-					continue;
-				}
-
-				m_patches[patch.name] = std::move(patch);
 			}
 		} while (config->JumpNext());
 		config->JumpBack();
@@ -309,6 +242,54 @@ Result<void> ConfigLoader::LoadAddresses(pcf::Config* config) {
 	return {};
 }
 
+Result<SignatureData> ConfigLoader::ParseSignatureConfig(pcf::Config* config, std::string_view name) {
+	SignatureData sig;
+	sig.name = name;
+	sig.library = config->GetString("library");
+	sig.value = config->GetString(S2SDK_PLATFORM);
+
+	// Parse references chain
+	if (config->JumpKey("refs")) {
+		if (config->IsArray() && config->JumpFirst()) {
+			do {
+				if (config->IsObject() && config->JumpFirst()) {
+					auto type = config->GetName();
+					auto value = config->GetString();
+
+					if (type == "string") {
+						sig.refs.emplace_back(ReferenceInfo::Type::String, std::move(value));
+					} else if (type == "cvar") {
+						sig.refs.emplace_back(ReferenceInfo::Type::CVar, std::move(value));
+					} else if (type == "vtable") {
+						sig.refs.emplace_back(ReferenceInfo::Type::VTable, std::move(value));
+					} else {
+						config->JumpBack(); config->JumpBack(); config->JumpBack();
+						return MakeError("Unknown reference type: {}", type);
+					}
+
+					config->JumpBack();
+				}
+			} while (config->JumpNext());
+			config->JumpBack();
+		}
+		config->JumpBack();
+	}
+
+	if (sig.value.empty() && sig.refs.empty()) {
+		return MakeError("No signature for " S2SDK_PLATFORM ": {}", sig.name);
+	}
+
+	// Determine type
+	if (sig.value[0] == '@') {
+		sig.type = SignatureData::Type::Symbol;
+		sig.value.erase(0, 1);
+	} else {
+		sig.type = SignatureData::Type::Pattern;
+	}
+
+	return sig;
+}
+
 Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::string_view name) {
 	AddressData addr;
 	addr.name = name;
@@ -332,19 +313,20 @@ Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::s
 		if (config->IsArray() && config->JumpFirst()) {
 			do {
 				if (config->IsObject() && config->JumpFirst()) {
-					auto stepName = config->GetName();
+					auto type = config->GetName();
 					auto value = config->GetAsInt32();
 
-					if (stepName == "offset") {
-						addr.indirections.push_back(IndirectionStep::MakeOffset(value));
-					} else if (stepName == "read") {
-						addr.indirections.push_back(IndirectionStep::MakeDereference(value));
-					}  else if (stepName == "index") {
-						addr.indirections.push_back(IndirectionStep::MakeIndex(value));
-					} else if (stepName == "read_offs32") {
-						addr.indirections.push_back(IndirectionStep::MakeRelative(value));
-					}else {
-						plg::print(LS_WARNING, "Unknown indirection type: {}\n", stepName);
+					if (type == "offset") {
+						addr.steps.emplace_back(IndirectionStep::Type::Offset, std::move(value));
+					} else if (type == "read") {
+						addr.steps.emplace_back(IndirectionStep::Type::Dereference, std::move(value));
+					}  else if (type == "index") {
+						addr.steps.emplace_back(IndirectionStep::Type::Index, std::move(value));
+					} else if (type == "read_offs32") {
+						addr.steps.emplace_back(IndirectionStep::Type::Relative, std::move(value));
+					} else {
+						config->JumpBack(); config->JumpBack(); config->JumpBack();
+						return MakeError("Unknown indirection type: {}", type);
 					}
 
 					config->JumpBack();
@@ -356,6 +338,63 @@ Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::s
 	}
 
 	return addr;
+}
+
+Result<OffsetData> ConfigLoader::ParseOffsetsConfig(pcf::Config* config, std::string_view name) {
+	OffsetData offset;
+	offset.name = name;
+	if (config->HasKey(S2SDK_PLATFORM)) {
+		offset.value = config->GetAsInt32(S2SDK_PLATFORM);
+	}
+
+	if (!offset.value) {
+		return MakeError("No offset for " S2SDK_PLATFORM ": {}", offset.name);
+	}
+
+	return offset;
+}
+
+Result<VTableData> ConfigLoader::ParseVTableConfig(pcf::Config* config, std::string_view name) {
+	VTableData vt;
+	vt.name = name;
+	vt.library = config->GetString("library");
+	vt.table = config->GetString("table");
+
+	if (vt.library.empty()) {
+		return MakeError("No library for " S2SDK_PLATFORM ": {}", vt.name);
+	}
+
+	if (vt.table.empty()) {
+		return MakeError("No table for " S2SDK_PLATFORM ": {}", vt.name);
+	}
+
+	return vt;
+}
+
+Result<PatchData> ConfigLoader::ParsePatchConfig(pcf::Config* config, std::string_view name) {
+	PatchData patch;
+	patch.name = name;
+	if (config->HasKey("signature")) {
+		patch.base = config->GetString("signature");
+		patch.type = PatchData::Type::Signature;
+	} else if (config->HasKey("address")) {
+		patch.base = config->GetString("address");
+		patch.type = PatchData::Type::Address;
+	} else if (config->HasKey("vtable")) {
+		patch.base = config->GetString("vtable");
+		patch.type = PatchData::Type::VTable;
+	}
+	patch.pattern = config->GetString(S2SDK_PLATFORM);
+
+	if (patch.base.empty()) {
+		return MakeError("No address for " S2SDK_PLATFORM ": {}", patch.name);
+	}
+
+	if (patch.pattern.empty()) {
+		return MakeError("No pattern for " S2SDK_PLATFORM ": {}", patch.name);
+	}
+
+	return patch;
 }
 
 std::optional<SignatureData> ConfigLoader::GetSignature(std::string_view name) const {
@@ -1117,16 +1156,20 @@ void GameConfig::PrintDiagnostics() const {
 	plg::print(LS_MESSAGE, "==============================\n");
 }
 
-Result<ResolvedSignature> SignatureResolver::Resolve(const SignatureData& signature) const {
+Result<ResolvedSignature> SignatureResolver::Resolve(
+	const SignatureData& signature
+) const {
 	auto& provider = g_GameConfigManager.GetModuleProvider();
 	auto module = provider.GetModule(signature.library);
 	if (!module) {
 		return MakeError("Module not found: {}", signature.library);
 	}
 
-	Result<Memory> addrResult = signature.IsSymbol()
-									? ResolveSymbol(module, signature.value)
-									: ResolvePattern(module, signature.value);
+	Result<Memory> addrResult = signature.IsSymbol() ?
+		ResolveSymbol(module, signature.value) :
+		ResolvePattern(module, signature.value);
+
+	if (!addrResult) addrResult = ResolveReferences(module, signature.refs);
 
 	if (!addrResult) {
 		return MakeError(std::move(addrResult.error()));
@@ -1147,20 +1190,140 @@ Result<ResolvedSignature> SignatureResolver::ResolveByName(
 	return Resolve(*sigData);
 }
 
-Result<Memory> SignatureResolver::ResolvePattern(const std::shared_ptr<Module>& module, std::string_view pattern) const {
-	auto address = module->FindPattern(DynLibUtils::ParsePattern(pattern));
-	if (!address) {
+Result<Memory> SignatureResolver::ResolvePattern(
+	const std::shared_ptr<Module>& module,
+	std::string_view pattern
+) const {
+	if (pattern.empty()) {
+		return MakeError("No pattern provided");
+	}
+
+	auto result = module->FindPatternMulti(pattern);
+	if (result.empty()) {
 		return MakeError("Pattern not found: {}", pattern);
 	}
-	return address;
+
+	if (result.size() > 1) {
+		return MakeError("Ambiguous: {} functions match pattern", result.size());
+	}
+
+	return result.front();
 }
 
-Result<Memory> SignatureResolver::ResolveSymbol(const std::shared_ptr<Module>& module, std::string_view symbol) const {
+Result<Memory> SignatureResolver::ResolveSymbol(
+	const std::shared_ptr<Module>& module,
+	std::string_view symbol
+) const {
+	if (symbol.empty()) {
+		return MakeError("No symbol provided");
+	}
+
 	auto address = module->GetFunctionByName(symbol);
 	if (!address) {
 		return MakeError("Symbol not found: {}", symbol);
 	}
 	return address;
+}
+
+Result<Memory> SignatureResolver::ResolveReferences(
+	const std::shared_ptr<Module>& module,
+	const plg::vector<ReferenceInfo>& refs
+) const {
+	auto resolvedRefs = ClassifyRefs(refs);
+	if (!resolvedRefs) {
+		return MakeError(std::move(resolvedRefs.error()));
+	}
+
+	const auto& [cvarRefs, stringRefs, vtableRefs] = *resolvedRefs;
+
+	std::optional<std::vector<std::uintptr_t>> result;
+
+	auto intersect = [&result](std::vector<std::uintptr_t> candidates) -> bool {
+		if (candidates.empty())
+			return false;
+
+		std::ranges::sort(candidates);
+		auto [begin, end] = std::ranges::unique(candidates);
+		candidates.erase(begin, end);
+
+		if (!result) {
+			result = std::move(candidates);
+		} else {
+			std::vector<std::uintptr_t> tmp;
+			std::ranges::set_intersection(*result, candidates, std::back_inserter(tmp));
+			result = std::move(tmp);
+		}
+		return !result->empty();
+	};
+
+	if (!cvarRefs.empty()) {
+		if (!intersect(module->FindAllFunctionsFromPointerRefs(cvarRefs))) {
+			return MakeError("No function found matching cvar references");
+		}
+	}
+
+    if (!stringRefs.empty()) {
+        if (!intersect(module->FindAllFunctionsFromStringRefs(stringRefs))) {
+            return MakeError("No function found matching string references");
+        }
+    }
+
+	if (!vtableRefs.empty()) {
+		std::vector<std::uintptr_t> vtableFunctions;
+
+		for (const auto& vt : vtableRefs) {
+			auto funcs = module->GetVFunctionsFromVTable(vt);
+			vtableFunctions.insert(vtableFunctions.end(), funcs.begin(), funcs.end());
+		}
+
+		if (!intersect(std::move(vtableFunctions))) {
+			return MakeError("No function found matching vtable references");
+		}
+	}
+
+    if (!result || result->empty()) {
+        return MakeError("No function found matching references");
+    }
+
+    if (result->size() > 1) {
+        return MakeError("Ambiguous: {} functions match all references", result->size());
+    }
+
+    return result->front();
+}
+
+Result<ResolvedRefs> SignatureResolver::ClassifyRefs(
+	const plg::vector<ReferenceInfo>& refs
+) const {
+	ResolvedRefs out;
+	for (const auto& [type, name] : refs) {
+		switch (type) {
+			case ReferenceInfo::Type::String:
+				out.stringRefs.emplace_back(name);
+				break;
+
+			case ReferenceInfo::Type::VTable:
+				out.vtableRefs.emplace_back(name);
+				break;
+
+			case ReferenceInfo::Type::CVar: {
+				auto conVarRef = g_pCVar->FindConVar(name.data());
+				if (!conVarRef.IsValidRef()) {
+					return MakeError("ConVarRef not found: {}", name);
+				}
+				auto conVarData = g_pCVar->GetConVarData(conVarRef);
+				if (!conVarData) {
+					return MakeError("ConVarData not found: {}", name);
+				}
+				out.cvarRefs.emplace_back(reinterpret_cast<std::uintptr_t>(conVarData));
+				break;
+			}
+
+			default:
+				return MakeError("Invalid reference type");
+		}
+	}
+	return out;
 }
 
 Result<ResolvedAddress> AddressResolver::Resolve(
@@ -1171,10 +1334,7 @@ Result<ResolvedAddress> AddressResolver::Resolve(
 		return MakeError("Base address is invalid");
 	}
 
-	auto finalAddr = ApplyIndirections(
-		baseAddress,
-		address.indirections
-	);
+	auto finalAddr = ApplyIndirections(baseAddress, address.steps);
 
 	if (!finalAddr) {
 		return MakeError(std::move(finalAddr.error()));
@@ -1208,7 +1368,7 @@ Result<Memory> AddressResolver::ApplyIndirections(
 	Memory current = baseAddress;
 
 	for (size_t i = 0; i < steps.size(); ++i) {
-		if (!current || current < VALID_MINIMUM_ADDRESS) {
+		if (!current.IsValid()) {
 			return MakeError("Invalid address in indirection chain");
 		}
 
@@ -1234,9 +1394,9 @@ Result<Memory> AddressResolver::ApplyStep(Memory current, const IndirectionStep&
 		case IndirectionStep::Type::Dereference:
 			return current.Deref(1, step.offset);
 
-		case IndirectionStep::Type::RelativeOffset: {
+		case IndirectionStep::Type::Relative: {
 			auto target = current.Offset(step.offset);
-			if (!target || target < VALID_MINIMUM_ADDRESS) {
+			if (!target.IsValid()) {
 				return MakeError("Invalid relative offset target");
 			}
 
@@ -1279,15 +1439,15 @@ Result<ResolvedVTable> VTableResolver::ResolveByName(
 }
 
 Result<Memory> VTableResolver::ResolveTable(const std::shared_ptr<Module>& module, std::string_view table) const {
+	if (table.empty()) {
+		return MakeError("No table provided");
+	}
+
 	auto address = module->GetVirtualTableByName(table);
 	if (!address) {
 		return MakeError("VTable not found: {}", table);
 	}
 	return address;
-}
-
-GameConfigManager::GameConfigManager() {
-	m_moduleProvider.PreloadModules();
 }
 
 Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {

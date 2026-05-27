@@ -5,13 +5,30 @@
 
 #include "patch_manager.hpp"
 
-struct SignatureData {
-	enum class Type { Invalid, Pattern, Symbol };
+struct ReferenceInfo {
+	enum class Type {
+		Invalid,
+		String,
+		VTable,
+		CVar
+	};
 
-	Type type;
-	plg::string name;       // Identifier name
-	plg::string value;      // Pattern string or symbol name
-	plg::string library;    // Module/library name
+	Type type{Type::Invalid};
+	plg::string name;
+};
+
+struct SignatureData {
+	enum class Type {
+		Invalid,
+		Pattern,
+		Symbol
+	};
+
+	Type type{Type::Invalid};
+	plg::string name;    // Identifier name
+	plg::string value;   // Pattern string or symbol name
+	plg::string library; // Module/library name
+    plg::vector<ReferenceInfo> refs;
 
 	bool IsSymbol() const { return type == Type::Symbol; }
 	bool IsPattern() const { return type == Type::Pattern; }
@@ -20,39 +37,28 @@ struct SignatureData {
 struct IndirectionStep {
 	enum class Type {
 		Invalid,
-		Offset,           // Simple offset
-		Index,            // Virtual function index
-		Dereference,      // Dereference pointer
-		RelativeOffset,   // Relative offset (RIP-relative on x64)
+		Offset,      // Simple offset
+		Dereference, // Dereference pointer
+		Index,       // Virtual function index
+		Relative,    // Relative offset (RIP-relative on x64)
 	};
 
 	Type type;
 	int32_t offset;
-
-	static IndirectionStep MakeOffset(int32_t off) {
-		return { Type::Offset, off };
-	}
-
-	static IndirectionStep MakeIndex(int32_t off) {
-		return { Type::Index, off };
-	}
-
-	static IndirectionStep MakeDereference(int32_t off) {
-		return { Type::Dereference, off };
-	}
-
-	static IndirectionStep MakeRelative(int32_t off) {
-		return { Type::RelativeOffset, off };
-	}
 };
 
 struct AddressData {
-	enum class Type { Invalid, Signature, Address, VTable };
+	enum class Type {
+		Invalid,
+		Signature,
+		Address,
+		VTable
+	};
 
-	Type type;
-	plg::string name;  // Identifier name
-	plg::string base;  // Reference to a signature/address/vtable
-	plg::vector<IndirectionStep> indirections;
+	Type type{Type::Invalid};
+	plg::string name; // Identifier name
+	plg::string base; // Reference to a signature/address/vtable
+	plg::vector<IndirectionStep> steps;
 
 	bool IsSignature() const { return type == Type::Signature; }
 	bool IsAddress() const { return type == Type::Address; }
@@ -71,9 +77,14 @@ struct VTableData {
 };
 
 struct PatchData {
-	enum class Type { Invalid, Signature, Address, VTable };
+	enum class Type {
+		Invalid,
+		Signature,
+		Address,
+		VTable
+	};
 
-	Type type;
+	Type type{Type::Invalid};
 	plg::string name;
 	plg::string base; // Reference to a signature/address/vtable
 	plg::string pattern;
@@ -141,7 +152,12 @@ private:
 	Result<void> LoadOffsets(pcf::Config* config);
 	Result<void> LoadVTables(pcf::Config* config);
 	Result<void> LoadPatches(pcf::Config* config);
-	Result<AddressData> ParseAddressConfig(pcf::Config* config, std::string_view name);
+
+	static Result<SignatureData> ParseSignatureConfig(pcf::Config* config, std::string_view name);
+	static Result<AddressData> ParseAddressConfig(pcf::Config* config, std::string_view name);
+	static Result<OffsetData> ParseOffsetsConfig(pcf::Config* config, std::string_view name);
+	static Result<VTableData> ParseVTableConfig(pcf::Config* config, std::string_view name);
+	static Result<PatchData> ParsePatchConfig(pcf::Config* config, std::string_view name);
 
 private:
 	LoadOptions& m_options;
@@ -213,7 +229,7 @@ struct ResolvedVTable {
 
 class ModuleProvider {
 public:
-	ModuleProvider();
+	ModuleProvider() = default;
 	~ModuleProvider() = default;
 
 	std::shared_ptr<Module> GetModule(std::string_view name);
@@ -228,13 +244,21 @@ private:
 	mutable std::shared_mutex m_mutex;
 };
 
+struct ResolvedRefs {
+	plg::vector<std::uintptr_t> cvarRefs;
+	plg::vector<std::string_view> stringRefs;
+	plg::vector<std::string_view> vtableRefs;
+};
+
 class SignatureResolver {
 public:
 	SignatureResolver() = default;
 	~SignatureResolver() = default;
 
 	// Resolve a single signature
-	Result<ResolvedSignature> Resolve(const SignatureData& signature) const;
+	Result<ResolvedSignature> Resolve(
+		const SignatureData& signature
+	) const;
 
 	// Resolve a signature by name from loader
 	Result<ResolvedSignature> ResolveByName(
@@ -243,8 +267,24 @@ public:
 	) const;
 
 private:
-	Result<Memory> ResolvePattern(const std::shared_ptr<Module>& module, std::string_view pattern) const;
-	Result<Memory> ResolveSymbol(const std::shared_ptr<Module>& module, std::string_view symbol) const;
+	Result<Memory> ResolvePattern(
+		const std::shared_ptr<Module>& module,
+		std::string_view pattern
+	) const;
+
+	Result<Memory> ResolveSymbol(
+		const std::shared_ptr<Module>& module,
+		std::string_view symbol
+	) const;
+
+	Result<Memory> ResolveReferences(
+		const std::shared_ptr<Module>& module,
+		const plg::vector<ReferenceInfo>& refs
+	) const;
+
+	Result<ResolvedRefs> ClassifyRefs(
+		const plg::vector<ReferenceInfo>& refs
+	) const;
 };
 
 class AddressResolver {
@@ -272,9 +312,6 @@ private:
 	) const;
 
 	Result<Memory> ApplyStep(Memory current, const IndirectionStep& step) const;
-
-private:
-	static constexpr Memory VALID_MINIMUM_ADDRESS{0x10000};
 };
 
 class VTableResolver {
@@ -467,7 +504,7 @@ private:
 };
 
 class GameConfigManager {
-	GameConfigManager();
+	GameConfigManager() = default;
 	~GameConfigManager() = default;
 	NONCOPYABLE(GameConfigManager)
 
@@ -507,66 +544,12 @@ private:
 };
 inline GameConfigManager& g_GameConfigManager = GameConfigManager::Instance();
 
-template <typename T>
-[[nodiscard]]
-inline auto TryGetSignature(auto* gameConfig, std::string_view name)
-	-> Result<T>
-{
-	auto result = gameConfig->GetSignature(name);
-
-	if (!result) {
-		return MakeError("Failed to resolve signature: {} - {}", name, result.error());
-	}
-
-	return result->template RCast<T>();
-}
-
-template <typename T>
-[[nodiscard]]
-inline auto TryGetAddress(auto* gameConfig, std::string_view name)
-	-> Result<T>
-{
-	auto result = gameConfig->GetAddress(name);
-
-	if (!result) {
-		return MakeError("Failed to resolve address: {} - {}", name, result.error());
-	}
-
-	return result->template RCast<T>();
-}
-
-[[nodiscard]]
-inline auto TryGetOffset(auto* gameConfig, std::string_view name)
-	-> Result<int>
-{
-	auto result = gameConfig->GetOffset(name);
-
-	if (!result) {
-		return MakeError("Failed to resolve offset: {} - {}", name, result.error());
-	}
-
-	return *result;
-}
-
-[[nodiscard]]
-inline auto TryGetVTable(auto* gameConfig, std::string_view name)
-	-> Result<Memory>
-{
-	auto result = gameConfig->GetVTable(name);
-
-	if (!result) {
-		return MakeError("Failed to resolve vtable: {} - {}", name, result.error());
-	}
-
-	return *result;
-}
-
-#define UNWRAP(out, expr)                                    \
+#define UNWRAP(out, expr)                                 \
     do {                                                  \
         auto _result = (expr);                            \
         if (!_result)                                     \
             return MakeError(std::move(_result.error())); \
-        (out) = std::move(*_result);                      \
+        (out) = _result->As<decltype((out))>();           \
     } while(0)
 
 template <typename R>
