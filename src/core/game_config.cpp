@@ -68,26 +68,20 @@ Result<void> ConfigLoader::ParseConfigFile(std::string_view gameName) {
 		return MakeError("No config paths provided");
 	}
 
-	std::inplace_vector<std::string_view, 16> paths;
-	paths.reserve(m_options.configPaths.size());
-	for (const auto& path : m_options.configPaths) {
-		paths.emplace_back(path);
-	}
-
-	auto config = pcf::ReadConfigs(paths);
-	if (!config) {
-		return MakeError("Reading error: {}", pcf::GetError());
+	auto config = configs::Config(m_options.configPaths);
+	if (auto error = config.GetError(); !error.empty()) {
+		return MakeError("Reading error: {}", error);
 	}
 
 	// Jump to game-specific section
-	if (!config->JumpKey(gameName)) {
+	if (!config.JumpKey(gameName)) {
 		return MakeError("Game section not found: {}", gameName);
 	}
 
 	// Load each section
 	struct SectionLoader {
 		const char* name;
-		Result<void> (ConfigLoader::*loader)(pcf::Config*);
+		Result<void> (ConfigLoader::*loader)(configs::Config&);
 	};
 
 	constexpr SectionLoader loaders[] = {
@@ -100,7 +94,7 @@ Result<void> ConfigLoader::ParseConfigFile(std::string_view gameName) {
 
 	bool hasErrors = false;
 	for (const auto& [name, loader] : loaders) {
-		if (auto result = (this->*loader)(config.get()); !result) {
+		if (auto result = (this->*loader)(config); !result) {
 			if (m_options.strictMode) {
 				return result;
 			}
@@ -116,16 +110,16 @@ Result<void> ConfigLoader::ParseConfigFile(std::string_view gameName) {
 	return {};
 }
 
-Result<void> ConfigLoader::LoadSignatures(pcf::Config* config) {
-	if (!config->JumpKey("Signatures")) {
+Result<void> ConfigLoader::LoadSignatures(configs::Config& config) {
+	if (!config.JumpKey("Signatures")) {
 		// No signatures section is okay
 		return {};
 	}
 
-	if (config->IsObject() && config->JumpFirst()) {
+	if (config.IsObject() && config.JumpFirst()) {
 		do {
-			if (config->IsObject()) {
-				auto name = config->GetName();
+			if (config.IsObject()) {
+				auto name = config.GetName();
 				auto result = ParseSignatureConfig(config, name);
 				if (result) {
 					m_signatures[std::move(name)] = std::move(*result);
@@ -134,23 +128,23 @@ Result<void> ConfigLoader::LoadSignatures(pcf::Config* config) {
 							   name, result.error());
 				}
 			}
-		} while (config->JumpNext());
-		config->JumpBack();
+		} while (config.JumpNext());
+		config.JumpBack();
 	}
-	config->JumpBack();
+	config.JumpBack();
 
 	return {};
 }
 
-Result<void> ConfigLoader::LoadOffsets(pcf::Config* config) {
-	if (!config->JumpKey("Offsets")) {
+Result<void> ConfigLoader::LoadOffsets(configs::Config& config) {
+	if (!config.JumpKey("Offsets")) {
 		return {};
 	}
 
-	if (config->IsObject() && config->JumpFirst()) {
+	if (config.IsObject() && config.JumpFirst()) {
 		do {
-			if (config->IsObject()) {
-				auto name = config->GetName();
+			if (config.IsObject()) {
+				auto name = config.GetName();
 				auto result = ParseOffsetsConfig(config, name);
 				if (result) {
 					m_offsets[std::move(name)] = std::move(*result);
@@ -159,23 +153,23 @@ Result<void> ConfigLoader::LoadOffsets(pcf::Config* config) {
 							   name, result.error());
 				}
 			}
-		} while (config->JumpNext());
-		config->JumpBack();
+		} while (config.JumpNext());
+		config.JumpBack();
 	}
-	config->JumpBack();
+	config.JumpBack();
 
 	return {};
 }
 
-Result<void> ConfigLoader::LoadVTables(pcf::Config* config) {
-	if (!config->JumpKey("VTables")) {
+Result<void> ConfigLoader::LoadVTables(configs::Config& config) {
+	if (!config.JumpKey("VTables")) {
 		return {};
 	}
 
-	if (config->IsObject() && config->JumpFirst()) {
+	if (config.IsObject() && config.JumpFirst()) {
 		do {
-			if (config->IsObject()) {
-				auto name = config->GetName();
+			if (config.IsObject()) {
+				auto name = config.GetName();
 				auto result = ParseVTableConfig(config, name);
 				if (result) {
 					m_vtables[std::move(name)] = std::move(*result);
@@ -184,23 +178,23 @@ Result<void> ConfigLoader::LoadVTables(pcf::Config* config) {
 							   name, result.error());
 				}
 			}
-		} while (config->JumpNext());
-		config->JumpBack();
+		} while (config.JumpNext());
+		config.JumpBack();
 	}
-	config->JumpBack();
+	config.JumpBack();
 
 	return {};
 }
 
-Result<void> ConfigLoader::LoadPatches(pcf::Config* config) {
-	if (!config->JumpKey("Patches")) {
+Result<void> ConfigLoader::LoadPatches(configs::Config& config) {
+	if (!config.JumpKey("Patches")) {
 		return {};
 	}
 
-	if (config->IsObject() && config->JumpFirst()) {
+	if (config.IsObject() && config.JumpFirst()) {
 		do {
-			if (config->IsObject()) {
-				auto name = config->GetName();
+			if (config.IsObject()) {
+				auto name = config.GetName();
 				auto result = ParsePatchConfig(config, name);
 				if (result) {
 					m_patches[std::move(name)] = std::move(*result);
@@ -209,23 +203,23 @@ Result<void> ConfigLoader::LoadPatches(pcf::Config* config) {
 							   name, result.error());
 				}
 			}
-		} while (config->JumpNext());
-		config->JumpBack();
+		} while (config.JumpNext());
+		config.JumpBack();
 	}
-	config->JumpBack();
+	config.JumpBack();
 
 	return {};
 }
 
-Result<void> ConfigLoader::LoadAddresses(pcf::Config* config) {
-	if (!config->JumpKey("Addresses")) {
+Result<void> ConfigLoader::LoadAddresses(configs::Config& config) {
+	if (!config.JumpKey("Addresses")) {
 		return {};
 	}
 
-	if (config->IsObject() && config->JumpFirst()) {
+	if (config.IsObject() && config.JumpFirst()) {
 		do {
-			if (config->IsObject()) {
-				auto name = config->GetName();
+			if (config.IsObject()) {
+				auto name = config.GetName();
 				auto result = ParseAddressConfig(config, name);
 				if (result) {
 					m_addresses[std::move(name)] = std::move(*result);
@@ -234,27 +228,27 @@ Result<void> ConfigLoader::LoadAddresses(pcf::Config* config) {
 							   name, result.error());
 				}
 			}
-		} while (config->JumpNext());
-		config->JumpBack();
+		} while (config.JumpNext());
+		config.JumpBack();
 	}
-	config->JumpBack();
+	config.JumpBack();
 
 	return {};
 }
 
-Result<SignatureData> ConfigLoader::ParseSignatureConfig(pcf::Config* config, std::string_view name) {
+Result<SignatureData> ConfigLoader::ParseSignatureConfig(configs::Config& config, std::string_view name) {
 	SignatureData sig;
 	sig.name = name;
-	sig.library = config->GetString("library");
-	sig.value = config->GetString(S2SDK_PLATFORM);
+	sig.library = config.GetString("library");
+	sig.value = config.GetString(S2SDK_PLATFORM);
 
 	// Parse references chain
-	if (config->JumpKey("refs")) {
-		if (config->IsArray() && config->JumpFirst()) {
+	if (config.JumpKey("refs")) {
+		if (config.IsArray() && config.JumpFirst()) {
 			do {
-				if (config->IsObject() && config->JumpFirst()) {
-					auto type = config->GetName();
-					auto value = config->GetString();
+				if (config.IsObject() && config.JumpFirst()) {
+					auto type = config.GetName();
+					auto value = config.GetString("##this##");
 
 					if (type == "string") {
 						sig.refs.emplace_back(ReferenceInfo::Type::String, std::move(value));
@@ -263,16 +257,16 @@ Result<SignatureData> ConfigLoader::ParseSignatureConfig(pcf::Config* config, st
 					} else if (type == "vtable") {
 						sig.refs.emplace_back(ReferenceInfo::Type::VTable, std::move(value));
 					} else {
-						config->JumpBack(); config->JumpBack(); config->JumpBack();
+						config.JumpBack(); config.JumpBack(); config.JumpBack();
 						return MakeError("Unknown reference type: {}", type);
 					}
 
-					config->JumpBack();
+					config.JumpBack();
 				}
-			} while (config->JumpNext());
-			config->JumpBack();
+			} while (config.JumpNext());
+			config.JumpBack();
 		}
-		config->JumpBack();
+		config.JumpBack();
 	}
 
 	if (sig.value.empty() && sig.refs.empty()) {
@@ -290,17 +284,17 @@ Result<SignatureData> ConfigLoader::ParseSignatureConfig(pcf::Config* config, st
 	return sig;
 }
 
-Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::string_view name) {
+Result<AddressData> ConfigLoader::ParseAddressConfig(configs::Config& config, std::string_view name) {
 	AddressData addr;
 	addr.name = name;
-	if (config->HasKey("signature")) {
-		addr.base = config->GetString("signature");
+	if (config.HasKey("signature")) {
+		addr.base = config.GetString("signature");
 		addr.type = AddressData::Type::Signature;
-	} else if (config->HasKey("address")) {
-		addr.base = config->GetString("address");
+	} else if (config.HasKey("address")) {
+		addr.base = config.GetString("address");
 		addr.type = AddressData::Type::Address;
-	} else if (config->HasKey("vtable")) {
-		addr.base = config->GetString("vtable");
+	} else if (config.HasKey("vtable")) {
+		addr.base = config.GetString("vtable");
 		addr.type = AddressData::Type::VTable;
 	}
 
@@ -309,12 +303,12 @@ Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::s
 	}
 
 	// Parse indirection chain
-	if (config->JumpKey(S2SDK_PLATFORM)) {
-		if (config->IsArray() && config->JumpFirst()) {
+	if (config.JumpKey(S2SDK_PLATFORM)) {
+		if (config.IsArray() && config.JumpFirst()) {
 			do {
-				if (config->IsObject() && config->JumpFirst()) {
-					auto type = config->GetName();
-					auto value = config->GetAsInt32();
+				if (config.IsObject() && config.JumpFirst()) {
+					auto type = config.GetName();
+					auto value = static_cast<int32_t>(config.GetAsInt());
 
 					if (type == "offset") {
 						addr.steps.emplace_back(IndirectionStep::Type::Offset, std::move(value));
@@ -325,26 +319,26 @@ Result<AddressData> ConfigLoader::ParseAddressConfig(pcf::Config* config, std::s
 					} else if (type == "read_offs32") {
 						addr.steps.emplace_back(IndirectionStep::Type::Relative, std::move(value));
 					} else {
-						config->JumpBack(); config->JumpBack(); config->JumpBack();
+						config.JumpBack(); config.JumpBack(); config.JumpBack();
 						return MakeError("Unknown indirection type: {}", type);
 					}
 
-					config->JumpBack();
+					config.JumpBack();
 				}
-			} while (config->JumpNext());
-			config->JumpBack();
+			} while (config.JumpNext());
+			config.JumpBack();
 		}
-		config->JumpBack();
+		config.JumpBack();
 	}
 
 	return addr;
 }
 
-Result<OffsetData> ConfigLoader::ParseOffsetsConfig(pcf::Config* config, std::string_view name) {
+Result<OffsetData> ConfigLoader::ParseOffsetsConfig(configs::Config& config, std::string_view name) {
 	OffsetData offset;
 	offset.name = name;
-	if (config->HasKey(S2SDK_PLATFORM)) {
-		offset.value = config->GetAsInt32(S2SDK_PLATFORM);
+	if (config.HasKey(S2SDK_PLATFORM)) {
+		offset.value = static_cast<int32_t>(config.GetAsInt(S2SDK_PLATFORM));
 	}
 
 	if (!offset.value) {
@@ -354,11 +348,11 @@ Result<OffsetData> ConfigLoader::ParseOffsetsConfig(pcf::Config* config, std::st
 	return offset;
 }
 
-Result<VTableData> ConfigLoader::ParseVTableConfig(pcf::Config* config, std::string_view name) {
+Result<VTableData> ConfigLoader::ParseVTableConfig(configs::Config& config, std::string_view name) {
 	VTableData vt;
 	vt.name = name;
-	vt.library = config->GetString("library");
-	vt.table = config->GetString("table");
+	vt.library = config.GetString("library");
+	vt.table = config.GetString("table");
 
 	if (vt.library.empty()) {
 		return MakeError("No library for " S2SDK_PLATFORM ": {}", vt.name);
@@ -371,20 +365,20 @@ Result<VTableData> ConfigLoader::ParseVTableConfig(pcf::Config* config, std::str
 	return vt;
 }
 
-Result<PatchData> ConfigLoader::ParsePatchConfig(pcf::Config* config, std::string_view name) {
+Result<PatchData> ConfigLoader::ParsePatchConfig(configs::Config& config, std::string_view name) {
 	PatchData patch;
 	patch.name = name;
-	if (config->HasKey("signature")) {
-		patch.base = config->GetString("signature");
+	if (config.HasKey("signature")) {
+		patch.base = config.GetString("signature");
 		patch.type = PatchData::Type::Signature;
-	} else if (config->HasKey("address")) {
-		patch.base = config->GetString("address");
+	} else if (config.HasKey("address")) {
+		patch.base = config.GetString("address");
 		patch.type = PatchData::Type::Address;
-	} else if (config->HasKey("vtable")) {
-		patch.base = config->GetString("vtable");
+	} else if (config.HasKey("vtable")) {
+		patch.base = config.GetString("vtable");
 		patch.type = PatchData::Type::VTable;
 	}
-	patch.pattern = config->GetString(S2SDK_PLATFORM);
+	patch.pattern = config.GetString(S2SDK_PLATFORM);
 
 	if (patch.base.empty()) {
 		return MakeError("No address for " S2SDK_PLATFORM ": {}", patch.name);

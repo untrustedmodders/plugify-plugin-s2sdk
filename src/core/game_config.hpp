@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/sdk/utils.hpp>
-#include <plugify-configs/plugify-configs.hpp>
+#include <configs/configs.hpp>
 
 #include "patch_manager.hpp"
 
@@ -147,17 +147,17 @@ public:
 
 private:
 	Result<void> ParseConfigFile(std::string_view gameName);
-	Result<void> LoadSignatures(pcf::Config* config);
-	Result<void> LoadAddresses(pcf::Config* config);
-	Result<void> LoadOffsets(pcf::Config* config);
-	Result<void> LoadVTables(pcf::Config* config);
-	Result<void> LoadPatches(pcf::Config* config);
+	Result<void> LoadSignatures(configs::Config& config);
+	Result<void> LoadAddresses(configs::Config& config);
+	Result<void> LoadOffsets(configs::Config& config);
+	Result<void> LoadVTables(configs::Config& config);
+	Result<void> LoadPatches(configs::Config& config);
 
-	static Result<SignatureData> ParseSignatureConfig(pcf::Config* config, std::string_view name);
-	static Result<AddressData> ParseAddressConfig(pcf::Config* config, std::string_view name);
-	static Result<OffsetData> ParseOffsetsConfig(pcf::Config* config, std::string_view name);
-	static Result<VTableData> ParseVTableConfig(pcf::Config* config, std::string_view name);
-	static Result<PatchData> ParsePatchConfig(pcf::Config* config, std::string_view name);
+	static Result<SignatureData> ParseSignatureConfig(configs::Config& config, std::string_view name);
+	static Result<AddressData> ParseAddressConfig(configs::Config& config, std::string_view name);
+	static Result<OffsetData> ParseOffsetsConfig(configs::Config& config, std::string_view name);
+	static Result<VTableData> ParseVTableConfig(configs::Config& config, std::string_view name);
+	static Result<PatchData> ParsePatchConfig(configs::Config& config, std::string_view name);
 
 private:
 	LoadOptions& m_options;
@@ -552,8 +552,16 @@ inline GameConfigManager& g_GameConfigManager = GameConfigManager::Instance();
         (out) = _result->As<decltype((out))>();           \
     } while(0)
 
+
+#define CHECK(expr)                                       \
+    do {                                                  \
+        auto _result = (expr);                            \
+        if (!_result)                                     \
+            return MakeError(std::move(_result.error())); \
+    } while(0)
+
 template <typename R>
-auto Unwrap(R&& r) {
+auto GetOrLog(R&& r) {
 	using T = std::remove_cvref_t<decltype(*r)>;
 	if (!r) {
 		plg::print(LS_ERROR, "{}\n", r.error());

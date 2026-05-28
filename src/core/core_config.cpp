@@ -1,6 +1,6 @@
 #include "core_config.hpp"
 #include <core/sdk/utils.hpp>
-#include <plugify-configs/plugify-configs.hpp>
+#include <configs/configs.hpp>
 
 using namespace std::string_view_literals;
 
@@ -14,55 +14,50 @@ CoreConfig::~CoreConfig() {
 }
 
 Result<bool> CoreConfig::Initialize() {
-	std::vector<std::string_view> paths;
-	paths.reserve(m_paths.size());
-	for (const auto& path : m_paths) {
-		paths.emplace_back(path);
-	}
-	auto config = pcf::ReadConfigs(paths);
-	if (!config) {
-		return MakeError(std::string(pcf::GetError()));
+	auto config = configs::Config(m_paths);
+	if (auto error = config.GetError(); !error.empty()) {
+		return MakeError("Reading error: {}", error);
 	}
 
 	PublicChatTrigger.clear();
-	if (config->JumpKey("PublicChatTrigger")) {
-		if (config->IsArray() && config->JumpFirst()) {
+	if (config.JumpKey("PublicChatTrigger")) {
+		if (config.IsArray() && config.JumpFirst()) {
 			do {
-				PublicChatTrigger.emplace_back(config->GetString());
-			} while (config->JumpNext());
-			config->JumpBack();
+				PublicChatTrigger.emplace_back(config.GetString());
+			} while (config.JumpNext());
+			config.JumpBack();
 		}
-		config->JumpBack();
+		config.JumpBack();
 	}
 
 	SilentChatTrigger.clear();
-	if (config->JumpKey("SilentChatTrigger")) {
-		if (config->IsArray() && config->JumpFirst()) {
+	if (config.JumpKey("SilentChatTrigger")) {
+		if (config.IsArray() && config.JumpFirst()) {
 			do {
-				SilentChatTrigger.emplace_back(config->GetString());
-			} while (config->JumpNext());
-			config->JumpBack();
+				SilentChatTrigger.emplace_back(config.GetString());
+			} while (config.JumpNext());
+			config.JumpBack();
 		}
-		config->JumpBack();
+		config.JumpBack();
 	}
 
 	/*FilterConsoleCleaner.clear();
-	if (config->JumpKey("FilterConsoleCleaner")) {
-		if (config->IsArray() && config->JumpFirst()) {
+	if (config.JumpKey("FilterConsoleCleaner")) {
+		if (config.IsArray() && config.JumpFirst()) {
 			do {
-				plg::string pattern = config->GetString();
+				plg::string pattern = config.GetString();
 				FilterConsoleCleaner.emplace_back(pattern.begin(), pattern.end());
-			} while (config->JumpNext());
-			config->JumpBack();
+			} while (config.JumpNext());
+			config.JumpBack();
 		}
-		config->JumpBack();
+		config.JumpBack();
 	}*/
 
-	ServerLanguage = config->GetString("ServerLanguage", "en");
-	FollowCS2ServerGuidelines = config->GetBool("FollowCS2ServerGuidelines", true);
-	FixFlashAlertMessage = config->GetBool("FixFlashAlertMessage", true);
-	FixServerListPlayer = config->GetBool("FixServerListPlayer", true);
-	FixLoadMotd = config->GetBool("FixLoadMotd", true);
+	ServerLanguage = config.GetString("ServerLanguage", "en");
+	FollowCS2ServerGuidelines = config.GetBool("FollowCS2ServerGuidelines", true);
+	FixFlashAlertMessage = config.GetBool("FixFlashAlertMessage", true);
+	FixServerListPlayer = config.GetBool("FixServerListPlayer", true);
+	FixLoadMotd = config.GetBool("FixLoadMotd", true);
 
 	return {};
 }

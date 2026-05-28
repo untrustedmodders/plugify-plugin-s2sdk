@@ -2,7 +2,6 @@
 
 #include <core/memory/module.hpp>
 #include <core/memory/memprotector.hpp>
-#include <plugify-configs/plugify-configs.hpp>
 
 using Memory = CAddress;
 using MemoryProtection = CMemProtector;
