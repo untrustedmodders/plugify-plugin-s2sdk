@@ -16,49 +16,48 @@ public:
 		return instance;
 	}
 
-	using Callback = polyhook::CallbackHandler;
+	using Hook = polyhook::IHook;
 	using Type = polyhook::CallbackType;
+	using Callback = polyhook::CallbackHandler;
 
-	template<typename Func, int Var = -1>
-	Result<Memory> AddHookVTableFunc(std::string_view name, Func func, void* ptr, const Callback& callback, std::initializer_list<Type> types) {
-		return AddHookVTableFunc<Func>(name, func, ptr, [&](const polyhook::IHook& hook) {
+	template<typename Func>
+	Result<Memory> AddHookVTableFunc(std::string_view name, Func func, void* ptr, const Callback& callback, std::initializer_list<Type> types, int varIndex = -1) {
+		return AddHookVTableFunc<Func>(name, func, ptr, [&](const Hook& hook) {
 			for (const auto& type : types) hook.AddCallback(type, callback);
-		}, Var);
+		}, varIndex);
 	}
 
-	template<typename Func, int Var = -1>
-	Result<Memory> AddHookVFuncFunc(std::string_view name, Func func, void* ptr, const Callback& callback, std::initializer_list<Type> types) {
-		return AddHookVFuncFunc<Func>(name, func, ptr, [&](const polyhook::IHook& hook) {
+	template<typename Func>
+	Result<Memory> AddHookVFuncFunc(std::string_view name, Func func, void* ptr, const Callback& callback, std::initializer_list<Type> types, int varIndex = -1) {
+		return AddHookVFuncFunc<Func>(name, func, ptr, [&](const Hook& hook) {
 			for (const auto& type : types) hook.AddCallback(type, callback);
-		}, Var);
+		}, varIndex);
 	}
 
-	template<typename Func, int Var = -1>
-	Result<Memory> AddHookDetourFunc(std::string_view name, const Callback& callback, std::initializer_list<Type> types) {
-		return AddHookDetourFunc<Func>(name, [&] -> Result<Memory> { return g_pGameConfig->GetSignature(name); }, [&](const polyhook::IHook& hook) {
+	template<typename Func>
+	Result<Memory> AddHookDetourFunc(std::string_view name, const Callback& callback, std::initializer_list<Type> types, int varIndex = -1) {
+		return AddHookDetourFunc<Func>(name, [&] -> Result<Memory> { return g_pGameConfig->GetSignature(name); }, [&](const Hook& hook) {
 			for (const auto& type : types) hook.AddCallback(type, callback);
-		}, Var);
+		}, varIndex);
 	}
 
-	template<typename Func, int Var = -1>
-	Result<Memory> AddHookDetourFunc(std::string_view name, uintptr_t addr, const Callback& callback, std::initializer_list<Type> types) {
-		return AddHookDetourFunc<Func>(name, [&] -> Result<Memory> { return addr; }, [&](const polyhook::IHook& hook) {
+	template<typename Func>
+	Result<Memory> AddHookDetourFunc(std::string_view name, uintptr_t addr, const Callback& callback, std::initializer_list<Type> types, int varIndex = -1) {
+		return AddHookDetourFunc<Func>(name, [&] -> Result<Memory> { return addr; }, [&](const Hook& hook) {
 			for (const auto& type : types) hook.AddCallback(type, callback);
-		}, Var);
+		}, varIndex);
 	}
 
-	template<int Var = -1>
 	Result<Memory> AddHookMidFunc(std::string_view name, const Callback& callback, std::initializer_list<Type> types) {
-		return AddHookMidFunc(name, [&] -> Result<Memory> { return g_pGameConfig->GetSignature(name); }, [&](const polyhook::IHook& hook) {
+		return AddHookMidFunc(name, [&] -> Result<Memory> { return g_pGameConfig->GetSignature(name); }, [&](const Hook& hook) {
 			for (const auto& type : types) hook.AddCallback(type, callback);
-		}, Var);
+		});
 	}
 
-	template<int Var = -1>
 	Result<Memory> AddHookMidFunc(std::string_view name, uintptr_t addr, const Callback& callback, std::initializer_list<Type> types) {
-		return AddHookMidFunc(name, [&] -> Result<Memory> { return addr; }, [&](const polyhook::IHook& hook) {
+		return AddHookMidFunc(name, [&] -> Result<Memory> { return addr; }, [&](const Hook& hook) {
 			for (const auto& type : types) hook.AddCallback(type, callback);
-		}, Var);
+		});
 	}
 
 	bool RemoveHookDetourFunc(std::string_view name) {
@@ -91,11 +90,8 @@ public:
 	}
 
 protected:
-	using Getter = std::function<Result<Memory>()>;
-	using Setter = std::function<void(const polyhook::IHook&)>;
-
-	template<typename Func>
-	Result<Memory> AddHookVTableFunc(std::string_view name, Func func, void* ptr, const Setter& setter, [[maybe_unused]] int varIndex = -1) {
+	template<typename Func, typename Setter>
+	Result<Memory> AddHookVTableFunc(std::string_view name, Func func, void* ptr, const Setter& setter, int varIndex) {
 		std::pair key{(void*&) func, ptr};
 
 		auto it = m_vhooks.find(key);
@@ -126,8 +122,8 @@ protected:
 		return orig;
 	}
 
-	template<typename Func>
-	Result<Memory> AddHookVFuncFunc(std::string_view name, Func func, void* ptr, const Setter& setter, [[maybe_unused]] int varIndex = -1) {
+	template<typename Func, typename Setter>
+	Result<Memory> AddHookVFuncFunc(std::string_view name, Func func, void* ptr, const Setter& setter, int varIndex) {
 		std::pair key{(void*&) func, ptr};
 
 		auto it = m_vhooks.find(key);
@@ -158,8 +154,8 @@ protected:
 		return orig;
 	}
 
-	template<typename Func>
-	Result<Memory> AddHookDetourFunc(std::string_view name, const Getter& getter, const Setter& setter, [[maybe_unused]] int varIndex = -1) {
+	template<typename Func, typename Getter, typename Setter>
+	Result<Memory> AddHookDetourFunc(std::string_view name, const Getter& getter, const Setter& setter, int varIndex) {
 		auto it = m_dhooks.find(name);
 		if (it != m_dhooks.end()) {
 			setter(*it->second);
@@ -193,7 +189,8 @@ protected:
 		return orig;
 	}
 
-	Result<Memory> AddHookMidFunc(std::string_view name, const Getter& getter, const Setter& setter, [[maybe_unused]] int varIndex = -1) {
+	template<typename Getter, typename Setter>
+	Result<Memory> AddHookMidFunc(std::string_view name, const Getter& getter, const Setter& setter) {
 		auto it = m_dhooks.find(name);
 		if (it != m_dhooks.end()) {
 			setter(*it->second);
@@ -224,7 +221,7 @@ protected:
 	}
 
 private:
-	plg::flat_hash_map<plg::string, std::unique_ptr<polyhook::IHook>, plg::string_hash, std::equal_to<>> m_dhooks;
-	plg::flat_hash_map<std::pair<void*, void*>, std::unique_ptr<polyhook::IHook>, plg::pair_hash<void*, void*>> m_vhooks;
+	plg::flat_hash_map<plg::string, std::unique_ptr<Hook>, plg::string_hash, std::equal_to<>> m_dhooks;
+	plg::flat_hash_map<std::pair<void*, void*>, std::unique_ptr<Hook>, plg::pair_hash<void*, void*>> m_vhooks;
 };
 inline HookManager& g_HookManager = HookManager::Instance();
