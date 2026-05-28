@@ -29,11 +29,11 @@ struct NullMutex {
 	bool try_lock_shared() const noexcept { return true; }
 };
 
-template<class Sig, class MutexT = NullMutex>
+template<const char* Name, class Sig, class MutexT = NullMutex>
 class ListenerManager;
 
-template<class Ret, class... Args, class Mutex>
-class ListenerManager<Ret(*)(Args...), Mutex> {
+template<const char* Name, class Ret, class... Args, class Mutex>
+class ListenerManager<Name, Ret(*)(Args...), Mutex> {
 public:
 	ListenerManager() = default;
 	~ListenerManager() = default;
@@ -64,13 +64,16 @@ public:
 		return true;
 	}
 
-	void operator()(Args... args) {
+	auto operator()(Args... args, const plg::source_location& loc = plg::source_location::current()) {
+		[[maybe_unused]] plg::Scope zone(Name, loc);
+
 		plg::hybrid_vector<Func, N> funcs;
 		{
 			SharedLock lock(m_mutex);
 			funcs = m_handlers;
 		}
-		for (const auto& func : funcs) func(std::forward<Args>(args)...);
+
+		return Dispatch(funcs, std::forward<Args>(args)...);
 	}
 
 	void Clear() {
@@ -87,6 +90,21 @@ public:
 	bool Empty() const {
 		SharedLock lock(m_mutex);
 		return m_handlers.empty();
+	}
+
+protected:
+	void Dispatch(const auto& funcs, Args&&... args) requires (!std::same_as<Ret, bool>) {
+		for (const auto& f : funcs)
+			f(std::forward<Args>(args)...);
+	}
+
+	bool Dispatch(const auto& funcs, Args&&... args) requires (std::same_as<Ret, bool>) {
+		bool result = false;
+
+		for (const auto& f : funcs)
+			result |= !f(std::forward<Args>(args)...);
+
+		return result;
 	}
 
 private:

@@ -1,22 +1,21 @@
 #include "event_listener.hpp"
 
 plg::hybrid_vector<CGameEventListener*, 64> g_vecEventListeners;
+bool g_registered = false;
 
 void RegisterEventListeners() {
-    static bool registered = false;
-
-    if (registered || !g_pGameEventManager)
+    if (!g_pGameEventManager || g_registered)
         return;
 
     for (const auto& event : g_vecEventListeners) {
         g_pGameEventManager->AddListener(event, event->GetEventName(), true);
     }
 
-    registered = true;
+    g_registered = true;
 }
 
 void UnregisterEventListeners() {
-    if (!g_pGameEventManager)
+    if (!g_pGameEventManager || !g_registered)
         return;
 
     for (const auto& event : g_vecEventListeners) {
@@ -24,4 +23,6 @@ void UnregisterEventListeners() {
     }
 
     g_vecEventListeners.clear();
+
+	g_registered = false;
 }

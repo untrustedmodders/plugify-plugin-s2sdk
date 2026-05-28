@@ -12,13 +12,14 @@ enum class ConCommandContext  {
 };
 
 using ConCommandListenerCallback = ResultType (*)(int caller, ConCommandContext context, const plg::vector<plg::string>& arguments);
+constexpr char ConCommandListenerStr[] = S2SDK_PACKAGE "::ConCommandListener";
 
 struct ConCommandInfo {
 	~ConCommandInfo();
 
 	ConCommandData* command{};
 	ConCommandRef commandRef{};
-	plg::enum_map<ListenerManager<CommandListenerCallback>, HookMode> callbacks;
+	plg::enum_map<ListenerManager<ConCommandListenerStr, ConCommandListenerCallback>, HookMode> callbacks;
 	bool defaultCommand{};
 };
 
@@ -33,20 +34,20 @@ public:
 		return instance;
 	}
 
-	bool AddCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode);
-	bool RemoveCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode);
+	bool AddCommandListener(std::string_view name, ConCommandListenerCallback callback, HookMode mode);
+	bool RemoveCommandListener(std::string_view name, ConCommandListenerCallback callback, HookMode mode);
 	bool IsValidValveCommand(std::string_view name);
 	bool AddValveCommand(std::string_view name, std::string_view description, ConVarFlag flags = ConVarFlag::None, uint64 adminFlags = 0);
 	bool RemoveValveCommand(std::string_view name);
 
 	ResultType DispatchConCommand(const CCommandContext* ctx, const CCommand* args, HookMode mode);
-	ResultType ExecuteCommandCallbacks(std::string_view name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext);
+	ResultType ExecuteCommandCallbacks(std::string_view name, const CCommandContext& ctx, const CCommand& args, HookMode mode, ConCommandContext callingContext);
 
 	plg::vector<plg::string> GetAllCommands();
 
 private:
  	plg::flat_hash_map<plg::string, std::shared_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
 	std::recursive_mutex m_mutex;
-	plg::enum_map<ListenerManager<CommandListenerCallback>, HookMode> m_globalCallbacks;
+	plg::enum_map<ListenerManager<ConCommandListenerStr, ConCommandListenerCallback>, HookMode> m_globalCallbacks;
 };
 inline ConCommandManager& g_ConCommandManager = ConCommandManager::Instance();

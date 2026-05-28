@@ -4,12 +4,13 @@
 #include <igameevents.h>
 
 using EventListenerCallback = ResultType (*)(const plg::string& name, IGameEvent* event, bool dontBroadcast);
+constexpr char EventListenerStr[] = S2SDK_PACKAGE "::EventListener";
 
 struct EventHook {
 	plg::string name;
 	bool postCopy{};
 	uint32_t refCount{1};
-	plg::enum_map<ListenerManager<EventListenerCallback>, HookMode> callbacks;
+	plg::enum_map<ListenerManager<EventListenerStr, EventListenerCallback>, HookMode> callbacks;
 };
 
 enum class EventHookError {

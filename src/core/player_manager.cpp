@@ -215,14 +215,9 @@ bool PlayerManager::OnClientConnect(CPlayerSlot slot, char const* name, uint64 s
 		cvars::SendConVarValueQueryToClient(slot, "cl_language", CLIENT_LANGUAGE_ID);
 		cvars::SendConVarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
 
-		s_refuseConnection = false;
-
 		plg::string playerName(name);
-		auto funcs = g_OnClientConnectListenerManager.Get();
-		for (const auto& func : funcs) {
-			auto res = func(slot, playerName, networkID);
-			s_refuseConnection |= !res;
-		}
+
+		s_refuseConnection = g_OnClientConnectListenerManager(slot, playerName, networkID);
 
 		return s_refuseConnection;
 	}

@@ -3,12 +3,8 @@
 #include "core/listener_manager.hpp"
 #include <core/sdk/entity/cgamerules.h>
 
-#define X(name, ret, ...) \
-	using name##Callback = ret (*)(__VA_ARGS__);     \
-	ListenerManager<name##Callback, std::shared_mutex>& Get##name##ListenerManager();
-
-template<typename Fn>
-using Manager = ListenerManager<Fn, std::shared_mutex>;
+template<char const* Name, typename Func>
+using Manager = ListenerManager<Name, Func, std::shared_mutex>;
 
 #define LISTENER_LIST(X) \
 	X(OnClientConnect, bool, int playerSlot, const plg::string& playerName, const plg::string& networkID) \
@@ -40,7 +36,8 @@ using Manager = ListenerManager<Fn, std::shared_mutex>;
 extern "C" {
 #define DECLARE_ACCESSOR(name, ret, ...) \
 	using name##Callback = ret (*)(__VA_ARGS__); \
-	inline Manager<name##Callback> g_##name##ListenerManager;
+	static constexpr const char name##_str[] = S2SDK_PACKAGE "::" #name "Listener"; \
+	inline Manager<name##_str, name##Callback> g_##name##ListenerManager;
 
 	LISTENER_LIST(DECLARE_ACCESSOR)
 }

@@ -1,6 +1,6 @@
 #include "con_command_manager.hpp"
-#include "player_manager.hpp"
 #include "core_config.hpp"
+#include "player_manager.hpp"
 
 #include <core/sdk/entity/cbaseplayercontroller.h>
 #include <core/sdk/utils.hpp>
@@ -19,7 +19,7 @@ ConCommandInfo::~ConCommandInfo() {
 	g_pCVar->UnregisterConCommandCallbacks(commandRef);
 }
 
-bool ConCommandManager::AddCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode) {
+bool ConCommandManager::AddCommandListener(std::string_view name, ConCommandListenerCallback callback, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 
 	if (name.empty()) {
@@ -46,7 +46,7 @@ bool ConCommandManager::AddCommandListener(std::string_view name, CommandListene
 	return commandInfo->callbacks[mode].Register(callback);
 }
 
-bool ConCommandManager::RemoveCommandListener(std::string_view name, CommandListenerCallback callback, HookMode mode) {
+bool ConCommandManager::RemoveCommandListener(std::string_view name, ConCommandListenerCallback callback, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 
 	if (name.empty()) {
@@ -138,7 +138,7 @@ static bool CheckCommandAccess(CPlayerSlot slot, uint64 flags) {
 	return true;
 }
 
-ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, const CCommandContext& ctx, const CCommand& args, HookMode mode, CommandCallingContext callingContext) {
+ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, const CCommandContext& ctx, const CCommand& args, HookMode mode, ConCommandContext callingContext) {
 	plg::print(LS_DETAILED, "[ConCommandManager::ExecuteCommandCallbacks][{}]: {}\n", mode == HookMode::Pre ? "Pre" : "Post", name);
 
 	int size = args.ArgC();
@@ -230,14 +230,14 @@ ResultType ConCommandManager::DispatchConCommand(const CCommandContext* ctx, con
     		CCommand nargs;
     		nargs.Tokenize(CUtlString(message_sv));
 
-    		auto result = ExecuteCommandCallbacks(nargs[0], *ctx, nargs, mode, CommandCallingContext::Chat);
+    		auto result = ExecuteCommandCallbacks(nargs[0], *ctx, nargs, mode, ConCommandContext::Chat);
     		if (result >= ResultType::Handled || silentChat) {
     			return ResultType::Stop;
     		}
     	}
     }
 
-    return ExecuteCommandCallbacks(arg0, *ctx, *args, mode, CommandCallingContext::Console);
+    return ExecuteCommandCallbacks(arg0, *ctx, *args, mode, ConCommandContext::Console);
 }
 
 plg::vector<plg::string> ConCommandManager::GetAllCommands() {

@@ -5,7 +5,8 @@
 #include <convar.h>
 #include <icvar.h>
 
-using ConVarChangeListenerCallback = void (*)(uint64 conVarHandle, const plg::string& newValue, const plg::string& oldValue);
+using ConVarListenerCallback = void (*)(uint64 conVarHandle, const plg::string& newValue, const plg::string& oldValue);
+constexpr char ConVarListenerStr[] = S2SDK_PACKAGE "::ConVarListener";
 
 enum class ConVarFlag : uint64_t {
 	None = 0, // The default, no flags at all
@@ -52,7 +53,7 @@ enum class ConVarFlag : uint64_t {
 
 struct ConVarInfo {
 	std::unique_ptr<ConVarRef> conVar;
-	ListenerManager<ConVarChangeListenerCallback> callbacks;
+	ListenerManager<ConVarListenerStr, ConVarListenerCallback> callbacks;
 };
 
 class ConVarManager {
@@ -136,8 +137,8 @@ public:
 	ConVarRef FindConVar(std::string_view name);
 	bool RemoveConVar(std::string_view name);
 
-	bool HookConVarChange(std::string_view name, ConVarChangeListenerCallback callback);
-	bool UnhookConVarChange(std::string_view name, ConVarChangeListenerCallback callback);
+	bool HookConVarChange(std::string_view name, ConVarListenerCallback callback);
+	bool UnhookConVarChange(std::string_view name, ConVarListenerCallback callback);
 
 	static void OnCvarsChanged(
 		ConVarRefAbstract* ref,
@@ -160,7 +161,7 @@ private:
 private:
 	plg::flat_hash_map<plg::string, std::shared_ptr<ConVarInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cnvLookup;
 	std::recursive_mutex m_mutex;
-	ListenerManager<ConVarChangeListenerCallback> m_globalCallbacks;
+	ListenerManager<ConVarListenerStr, ConVarListenerCallback> m_globalCallbacks;
 };
 inline ConVarManager& g_ConVarManager = ConVarManager::Instance();
 
