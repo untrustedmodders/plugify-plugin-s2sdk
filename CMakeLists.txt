@@ -62,16 +62,6 @@ string(TOLOWER "${PROJECT_NAME_SUBSTRING}" PROJECT_NAME_LOWER)
 string(TOUPPER "${PROJECT_NAME_SUBSTRING}" PROJECT_NAME_UPPER)
 
 #
-# Plugufy
-#
-add_subdirectory(external/configs)
-
-#
-# Dynlibutils
-#
-#add_subdirectory(external/dynlibutils)
-
-#
 # Maps
 #
 add_subdirectory(external/parallel-hashmap)
@@ -197,7 +187,9 @@ endif()
 
 file(GLOB_RECURSE SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
 
-add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/polyhook/polyhook.cpp")
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES}
+        "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/polyhook/polyhook.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/configs/configs.cpp")
 target_precompile_headers(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/pch.hpp")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -216,7 +208,7 @@ elseif(MACOS)
     set_target_properties(${PROJECT_NAME} PROPERTIES OSX_ARCHITECTURES "x86_64")
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE plugify-plugin-configs sourcesdk v8_monolith $<BUILD_INTERFACE:Zydis>)
+target_link_libraries(${PROJECT_NAME} PRIVATE sourcesdk v8_monolith $<BUILD_INTERFACE:Zydis>)
 target_include_directories(${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external/zydis/include>)
 target_include_directories(${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external/zydis/dependencies/zycore/include>)
 target_include_directories(${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/external/zydis>)
