@@ -34,6 +34,8 @@ polyhook::_UnhookAll __polyhook_UnhookAll = nullptr;
 
 polyhook::_UnhookAllVirtual __polyhook_UnhookAllVirtual = nullptr;
 
+polyhook::_GetError __polyhook_GetError = nullptr;
+
 polyhook::_AddCallback __polyhook_AddCallback = nullptr;
 
 polyhook::_AddCallback2 __polyhook_AddCallback2 = nullptr;

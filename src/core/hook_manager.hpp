@@ -112,7 +112,7 @@ protected:
 
 		ihook = polyhook::VTableHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
-			return MakeError("Could not hook table function: \"{}\"", name);
+			return MakeError("Could not hook table function: \"{}\" - {}",  name, polyhook::GetError());
 		}
 		ihook->SetName(name);
 
@@ -144,7 +144,7 @@ protected:
 
 		ihook = polyhook::VFuncHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
-			return MakeError("Could not hook virtual function: \"{}\"", name);
+			return MakeError("Could not hook virtual function: \"{}\" - {}",  name, polyhook::GetError());
 		}
 		ihook->SetName(name);
 
@@ -179,7 +179,7 @@ protected:
 
 		ihook = polyhook::DetourHook::Create(*addr, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
 		if (ihook == nullptr) {
-			return MakeError("Could not hook detour function: \"{}\"",  name);
+			return MakeError("Could not hook detour function: \"{}\" - {}",  name, polyhook::GetError());
 		}
 		ihook->SetName(name);
 
@@ -210,7 +210,7 @@ protected:
 
 		ihook = polyhook::DetourHook::Create(*addr);
 		if (ihook == nullptr) {
-			return MakeError("Could not hook mid function: \"{}\"",  name);
+			return MakeError("Could not hook mid function: \"{}\" - {}",  name, polyhook::GetError());
 		}
 		ihook->SetName(name);
 

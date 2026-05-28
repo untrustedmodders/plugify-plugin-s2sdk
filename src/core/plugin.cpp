@@ -60,7 +60,7 @@ polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::Par
 		return polyhook::ResultType::Ignored;
 	}
 
-	g_OnServerStartupListenerManager();
+	g_ServerStartupListenerManager();
 
 	return polyhook::ResultType::Ignored;
 }
@@ -80,12 +80,12 @@ polyhook::ResultType Hook_DisconnectGameNow(polyhook::HookHandle hook, polyhook:
 
 		g_Precached.clear();
 
-		g_OnMapEndListenerManager();
+		g_MapEndListenerManager();
 	}
 
 	if (reason == NETWORK_DISCONNECT_REQUEST_HOSTSTATE_IDLE) {
 		static std::once_flag flag;
-		std::call_once(flag, g_OnServerStartedListenerManager);
+		std::call_once(flag, g_ServerStartedListenerManager);
 	}
 
 	return polyhook::ResultType::Ignored;
@@ -175,8 +175,8 @@ polyhook::ResultType Hook_ActivateServer(polyhook::HookHandle hook, polyhook::Pa
 		LoadMOTDFile();
 	}
 
-	g_OnServerActivateListenerManager();
-	g_OnMapStartListenerManager();
+	g_ServerActivateListenerManager();
+	g_MapStartListenerManager();
 
 	return polyhook::ResultType::Ignored;
 }
@@ -184,7 +184,7 @@ polyhook::ResultType Hook_ActivateServer(polyhook::HookHandle hook, polyhook::Pa
 polyhook::ResultType Hook_SpawnServer(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	plg::print(LS_DETAILED, "[SpawnServer]\n");
 
-	g_OnServerSpawnListenerManager();
+	g_ServerSpawnListenerManager();
 
 	return polyhook::ResultType::Ignored;
 }
@@ -251,7 +251,7 @@ polyhook::ResultType Hook_GameFrame(polyhook::HookHandle hook, polyhook::Paramet
 	g_PlayerManager.OnGameFrame();
 	g_TimerSystem.OnGameFrame(simulating);
 
-	g_OnGameFrameListenerManager(simulating, bFirstTick, bLastTick);
+	g_GameFrameListenerManager(simulating, bFirstTick, bLastTick);
 	return polyhook::ResultType::Ignored;
 }
 
@@ -269,7 +269,7 @@ polyhook::ResultType Hook_ClientActive(polyhook::HookHandle hook, polyhook::Para
 #endif
 	g_PlayerManager.OnClientActive(slot, bLoadGame);
 
-	g_OnClientActiveListenerManager(slot, bLoadGame);
+	g_ClientActiveListenerManager(slot, bLoadGame);
 	return polyhook::ResultType::Ignored;
 }
 
@@ -315,7 +315,7 @@ polyhook::ResultType Hook_ClientSettingsChanged(polyhook::HookHandle hook, polyh
 
 	plg::print(LS_DETAILED, "[ClientSettingsChanged] = {}\n", slot);
 
-	g_OnClientSettingsChangedListenerManager(slot);
+	g_ClientSettingsChangedListenerManager(slot);
 	return polyhook::ResultType::Ignored;
 }
 
@@ -340,7 +340,7 @@ polyhook::ResultType Hook_ClientFullyConnect(polyhook::HookHandle hook, polyhook
 
 	plg::print(LS_DETAILED, "[ClientFullyConnect] = {}\n", slot);
 
-	g_OnClientFullyConnectListenerManager(slot);
+	g_ClientFullyConnectListenerManager(slot);
 	return polyhook::ResultType::Ignored;
 }
 
@@ -408,7 +408,7 @@ polyhook::ResultType Hook_GameServerSteamAPIActivated(polyhook::HookHandle hook,
 	g_MultiAddonManager.OnSteamAPIActivated();
 #endif
 
-	//g_OnGameServerSteamAPIActivatedListenerManager();
+	//g_GameServerSteamAPIActivatedListenerManager();
 	return polyhook::ResultType::Ignored;
 }
 
@@ -420,7 +420,7 @@ polyhook::ResultType Hook_GameServerSteamAPIDeactivated(polyhook::HookHandle hoo
 	g_MultiAddonManager.OnSteamAPIDeactivated();
 #endif
 
-	//g_OnGameServerSteamAPIDeactivatedListenerManager();
+	//g_GameServerSteamAPIDeactivatedListenerManager();
 	return polyhook::ResultType::Ignored;
 }
 
@@ -428,7 +428,7 @@ polyhook::ResultType Hook_UpdateWhenNotInGame(polyhook::HookHandle hook, polyhoo
 	// float flFrameTime
 	auto frameTime = polyhook::GetArgument<float>(params, 1);
 	//plg::print(LS_DETAILED, "UpdateWhenNotInGame = {}\n", frameTime);
-	g_OnUpdateWhenNotInGameListenerManager(frameTime);
+	g_UpdateWhenNotInGameListenerManager(frameTime);
 	return polyhook::ResultType::Ignored;
 }
 
@@ -439,7 +439,7 @@ polyhook::ResultType Hook_PreWorldUpdate(polyhook::HookHandle hook, polyhook::Pa
 
 	g_ServerManager.OnPreWorldUpdate();
 
-	g_OnPreWorldUpdateListenerManager(simulating);
+	g_PreWorldUpdateListenerManager(simulating);
 	return polyhook::ResultType::Ignored;
 }
 
@@ -472,7 +472,7 @@ polyhook::ResultType Hook_TerminateRound(polyhook::HookHandle hook, polyhook::Pa
 		g_pGameRules->m_bGameRestart = false;
 	}
 
-	g_OnRoundTerminatedListenerManager(delay, reason);
+	g_RoundTerminatedListenerManager(delay, reason);
 
 	return polyhook::ResultType::Ignored;
 }
@@ -496,7 +496,7 @@ polyhook::ResultType Hook_CheckTransmit(polyhook::HookHandle hook, polyhook::Par
 
 	plg::view view(infoList, infoCount);
 
-	g_OnServerCheckTransmitListenerManager(view.get());
+	g_ServerCheckTransmitListenerManager(view.get());
 
 	return polyhook::ResultType::Ignored;
 }
@@ -578,7 +578,7 @@ polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::Param
 		g_pTeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
 	}
 
-	g_OnEntityCreatedListenerManager(handle.ToInt());
+	g_EntityCreatedListenerManager(handle.ToInt());
 	return polyhook::ResultType::Ignored;
 }
 
@@ -593,7 +593,7 @@ polyhook::ResultType Hook_OnRemoveEntity(polyhook::HookHandle hook, polyhook::Pa
 		g_pTeamManagers.erase(entity->m_iTeamNum);
 	}
 
-	g_OnEntityDeletedListenerManager(handle.ToInt());
+	g_EntityDeletedListenerManager(handle.ToInt());
 	return polyhook::ResultType::Ignored;
 }
 
@@ -601,7 +601,7 @@ polyhook::ResultType Hook_OnEntityParentChanged(polyhook::HookHandle hook, polyh
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	auto newParent = polyhook::GetArgument<CBaseEntity*>(params, 2);
 
-	g_OnEntityParentChangedListenerManager(entity->GetRefEHandle().ToInt(), newParent ? newParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
+	g_EntityParentChangedListenerManager(entity->GetRefEHandle().ToInt(), newParent ? newParent->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX);
 	return polyhook::ResultType::Ignored;
 }
 
@@ -617,7 +617,7 @@ polyhook::ResultType Hook_BuildGameSessionManifest(polyhook::HookHandle hook, po
 	//auto system = polyhook::GetArgument<IGameSystem*>(params, 0);
 	auto msg = polyhook::GetArgument<EventBuildGameSessionManifest_t*>(params, 1);
 
-	g_OnBuildGameSessionManifestListenerManager();
+	g_BuildGameSessionManifestListenerManager();
 
 	msg->m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
 	for (const auto& resource : g_Precached) {
@@ -694,7 +694,7 @@ polyhook::ResultType Hook_ExecuteFunction(polyhook::HookHandle hook, polyhook::P
 	if (current == "OnSpawn") {
 		CScriptKeyValues* spawnkeys = reinterpret_cast<CScriptKeyValues*>(g_pScriptVM->GetInstanceValue(pArgs[0]));
 
-		//g_OnEntitySpawnListenerManager(entity->GetRefEHandle().ToInt(), spawnkeys->m_pKeyValues);
+		//g_EntitySpawnListenerManager(entity->GetRefEHandle().ToInt(), spawnkeys->m_pKeyValues);
 
 	} else if (currentlyExecutingScriptFunction == "OnDelete") {
 	} else if (current == "DispatchPrecache") {

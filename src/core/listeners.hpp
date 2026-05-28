@@ -7,31 +7,31 @@ template<char const* Name, typename Func>
 using Manager = ListenerManager<Name, Func, std::shared_mutex>;
 
 #define LISTENER_LIST(X) \
-	X(OnClientConnect, bool, int playerSlot, const plg::string& playerName, const plg::string& networkID) \
-	X(OnClientConnect_Post, void, int playerSlot) \
-	X(OnClientConnected, void, int playerSlot) \
-	X(OnClientPutInServer, void, int playerSlot) \
-	X(OnClientDisconnect, void, int playerSlot, ENetworkDisconnectionReason reason) \
-	X(OnClientDisconnect_Post, void, int playerSlot, ENetworkDisconnectionReason reason) \
-	X(OnClientActive, void, int playerSlot, bool loadGame) \
-	X(OnClientFullyConnect, void, int playerSlot) \
-	X(OnClientSettingsChanged, void, int playerSlot) \
-	X(OnClientAuthenticated, void, int playerSlot, uint64 steamID) \
-	X(OnRoundTerminated, void, float delay, CRoundEndReason reason) \
-	X(OnEntityCreated, void, int entityHandle) \
-	X(OnEntityDeleted, void, int entityHandle) \
-	X(OnEntityParentChanged, void, int entityHandle, int parentHandle) \
-	X(OnServerCheckTransmit, void, const plg::vector<CCheckTransmitInfo*>&) \
-	X(OnServerStartup, void) \
-	X(OnBuildGameSessionManifest, void) \
-	X(OnServerActivate, void) \
-	X(OnServerSpawn, void) \
-	X(OnServerStarted, void) \
-	X(OnMapStart, void) \
-	X(OnMapEnd, void) \
-	X(OnGameFrame, void, bool simulating, bool firstTick, bool lastTick) \
-	X(OnUpdateWhenNotInGame, void, float frameTime) \
-	X(OnPreWorldUpdate, void, bool simulating) \
+	X(ClientConnect, bool, int playerSlot, const plg::string& playerName, const plg::string& networkID) \
+	X(ClientConnect_Post, void, int playerSlot) \
+	X(ClientConnected, void, int playerSlot) \
+	X(ClientPutInServer, void, int playerSlot) \
+	X(ClientDisconnect, void, int playerSlot, ENetworkDisconnectionReason reason) \
+	X(ClientDisconnect_Post, void, int playerSlot, ENetworkDisconnectionReason reason) \
+	X(ClientActive, void, int playerSlot, bool loadGame) \
+	X(ClientFullyConnect, void, int playerSlot) \
+	X(ClientSettingsChanged, void, int playerSlot) \
+	X(ClientAuthenticated, void, int playerSlot, uint64 steamID) \
+	X(RoundTerminated, void, float delay, CRoundEndReason reason) \
+	X(EntityCreated, void, int entityHandle) \
+	X(EntityDeleted, void, int entityHandle) \
+	X(EntityParentChanged, void, int entityHandle, int parentHandle) \
+	X(ServerCheckTransmit, void, const plg::vector<CCheckTransmitInfo*>&) \
+	X(ServerStartup, void) \
+	X(BuildGameSessionManifest, void) \
+	X(ServerActivate, void) \
+	X(ServerSpawn, void) \
+	X(ServerStarted, void) \
+	X(MapStart, void) \
+	X(MapEnd, void) \
+	X(GameFrame, void, bool simulating, bool firstTick, bool lastTick) \
+	X(UpdateWhenNotInGame, void, float frameTime) \
+	X(PreWorldUpdate, void, bool simulating) \
 
 extern "C" {
 #define DECLARE_ACCESSOR(name, ret, ...) \

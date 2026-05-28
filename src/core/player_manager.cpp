@@ -200,7 +200,7 @@ void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* response)
 	for (const Player& player : m_players) {
 		CSteamID steamID = player.GetSteamId();
 		if (steamID == response->m_SteamID) {
-			g_OnClientAuthenticatedListenerManager(player.GetPlayerSlot(), steamID.ConvertToUint64());
+			g_ClientAuthenticatedListenerManager(player.GetPlayerSlot(), steamID.ConvertToUint64());
 			return;
 		}
 	}
@@ -217,7 +217,7 @@ bool PlayerManager::OnClientConnect(CPlayerSlot slot, char const* name, uint64 s
 
 		plg::string playerName(name);
 
-		s_refuseConnection = g_OnClientConnectListenerManager(slot, playerName, networkID);
+		s_refuseConnection = g_ClientConnectListenerManager(slot, playerName, networkID);
 
 		return s_refuseConnection;
 	}
@@ -232,7 +232,7 @@ bool PlayerManager::OnClientConnect_Post(CPlayerSlot slot, bool origRet) {
 		}
 
 		if (origRet) {
-			g_OnClientConnect_PostListenerManager(slot);
+			g_ClientConnect_PostListenerManager(slot);
 		} else {
 			player->Reset();
 		}
@@ -242,7 +242,7 @@ bool PlayerManager::OnClientConnect_Post(CPlayerSlot slot, bool origRet) {
 }
 
 void PlayerManager::OnClientConnected(CPlayerSlot slot, bool fakePlayer) {
-	g_OnClientConnectedListenerManager(slot);
+	g_ClientConnectedListenerManager(slot);
 }
 
 void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name) {
@@ -252,16 +252,16 @@ void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name) {
 			player->Init(slot, 0);
 		}
 
-		g_OnClientPutInServerListenerManager(slot);
+		g_ClientPutInServerListenerManager(slot);
 	}
 }
 
 void PlayerManager::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
-	g_OnClientDisconnectListenerManager(slot, reason);
+	g_ClientDisconnectListenerManager(slot, reason);
 }
 
 void PlayerManager::OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
-	g_OnClientDisconnect_PostListenerManager(slot, reason);
+	g_ClientDisconnect_PostListenerManager(slot, reason);
 
 	if (Player* player = ToPlayer(slot)) {
 		player->Reset();
@@ -269,7 +269,7 @@ void PlayerManager::OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnect
 }
 
 void PlayerManager::OnClientActive(CPlayerSlot slot, bool loadGame) const {
-	g_OnClientActiveListenerManager(slot, loadGame);
+	g_ClientActiveListenerManager(slot, loadGame);
 }
 
 bool PlayerManager::QueryCvarValue(CPlayerSlot slot, std::string_view convarName, CvarValueCallback callback, const plg::vector<plg::any>& data) {

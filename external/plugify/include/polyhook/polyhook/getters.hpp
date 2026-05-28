@@ -9,6 +9,19 @@
 
 namespace polyhook {
 
+  using _GetError = plg::string (*)();
+}
+extern "C" PLUGIN_API polyhook::_GetError __polyhook_GetError;
+namespace polyhook {
+  /**
+   * @brief Get last error
+   * @return string: Returns last error
+   */
+  inline plg::string GetError(plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetError", __location);
+    return __polyhook_GetError();
+  }
+
   using _GetFunctionAddr = void* (*)(HookHandle);
 }
 extern "C" PLUGIN_API polyhook::_GetFunctionAddr __polyhook_GetFunctionAddr;

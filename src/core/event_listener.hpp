@@ -2,7 +2,7 @@
 
 #include <igameevents.h>
 
-typedef void (*FnEventListenerCallback)(IGameEvent* event);
+using EventListenerCallback = void (*)(IGameEvent* event);
 
 class CGameEventListener;
 
@@ -10,7 +10,7 @@ extern plg::hybrid_vector<CGameEventListener*, 64> g_vecEventListeners;
 
 class CGameEventListener : public IGameEventListener2 {
 public:
-	CGameEventListener(FnEventListenerCallback callback, const char* eventName) :
+	CGameEventListener(EventListenerCallback callback, const char* eventName) :
 		m_callback(callback), m_eventName(eventName) {
 		g_vecEventListeners.emplace_back(this);
 	}
@@ -26,7 +26,7 @@ public:
 	const char* GetEventName() { return m_eventName; }
 
 private:
-	FnEventListenerCallback m_callback;
+	EventListenerCallback m_callback;
 	const char* m_eventName;
 };
 
