@@ -4,9 +4,6 @@
 [submodule "external/sourcesdk"]
 	path = external/sourcesdk
 	url = https://github.com/Wend4r/sourcesdk.git
-[submodule "external/configs"]
-	path = external/configs
-	url = https://github.com/untrustedmodders/plugify-configs.git
 [submodule "external/parallel-hashmap"]
 	path = external/parallel-hashmap
 	url = https://github.com/greg7mdp/parallel-hashmap.git
