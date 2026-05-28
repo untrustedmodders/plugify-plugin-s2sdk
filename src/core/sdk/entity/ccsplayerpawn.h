@@ -67,7 +67,7 @@ public:
 	SCHEMA_FIELD(CCSPlayer_ActionTrackingServices*, m_pActionTrackingServices)
 
 	void Respawn() {
-		static auto offset = Unwrap(g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn"));
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn"));
 		CALL_VIRTUAL(void, offset, this);
 	}
 

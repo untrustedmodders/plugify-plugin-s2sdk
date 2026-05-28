@@ -33,7 +33,7 @@ Source2SDK g_sdk;
 PLUGIFY_PLUGIN(PLUGIN_API, &g_sdk)
 
 CGameEntitySystem* GameEntitySystem() {
-	static auto offset = Unwrap(g_pGameConfig->GetOffset("GameEntitySystem"));
+	static auto offset = GetOrLog(g_pGameConfig->GetOffset("GameEntitySystem"));
 	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + offset);
 }
 
@@ -568,7 +568,7 @@ polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::Param
 			{"cs_script", CS_SCRIPT_PATH}
 		});
 #endif
-		static auto offset = Unwrap(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
 		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pointScript) + offset);
 	} else if (name.ends_with("team_manager")) {
 		g_pTeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);

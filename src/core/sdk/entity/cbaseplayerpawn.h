@@ -39,7 +39,7 @@ public:
 
 	void CommitSuicide(bool bExplode, bool bForce) {
 		m_bTakesDamage = true;
-		static auto offset = Unwrap(g_pGameConfig->GetOffset("CBasePlayerPawn::CommitSuicide"));
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBasePlayerPawn::CommitSuicide"));
 		CALL_VIRTUAL(void, offset, this, bExplode, bForce);
 		m_bTakesDamage = false;
 	}

@@ -11901,8 +11901,8 @@
           "ref": false,
           "description": "A callback function that is invoked when the command is executed.",
           "prototype": {
-            "name": "CommandCallback",
-            "funcName": "CommandCallback",
+            "name": "ConCommandCallback",
+            "funcName": "ConCommandCallback",
             "description": "Handles the execution of a command triggered by a caller. This function processes the command, interprets its context, and handles any provided arguments.",
             "paramTypes": [
               {
@@ -11915,7 +11915,7 @@
                 "type": "int32",
                 "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
                 "enum": {
-                  "name": "CommandCallingContext",
+                  "name": "ConCommandContext",
                   "description": "The command execution context.",
                   "values": [
                     {
@@ -12187,8 +12187,8 @@
           "ref": false,
           "description": "A callback function that is invoked when the command is executed.",
           "prototype": {
-            "name": "CommandCallback",
-            "funcName": "CommandCallback",
+            "name": "ConCommandCallback",
+            "funcName": "ConCommandCallback",
             "description": "Handles the execution of a command triggered by a caller. This function processes the command, interprets its context, and handles any provided arguments.",
             "paramTypes": [
               {
@@ -12201,7 +12201,7 @@
                 "type": "int32",
                 "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
                 "enum": {
-                  "name": "CommandCallingContext",
+                  "name": "ConCommandContext",
                   "description": "The command execution context.",
                   "values": [
                     {
@@ -12300,8 +12300,8 @@
           "ref": false,
           "description": "The callback function associated with the command to be removed.",
           "prototype": {
-            "name": "CommandCallback",
-            "funcName": "CommandCallback",
+            "name": "ConCommandCallback",
+            "funcName": "ConCommandCallback",
             "description": "Handles the execution of a command triggered by a caller. This function processes the command, interprets its context, and handles any provided arguments.",
             "paramTypes": [
               {
@@ -12314,7 +12314,7 @@
                 "type": "int32",
                 "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
                 "enum": {
-                  "name": "CommandCallingContext",
+                  "name": "ConCommandContext",
                   "description": "The command execution context.",
                   "values": [
                     {
@@ -12392,8 +12392,8 @@
           "ref": false,
           "description": "The callback function that will be invoked when the command is executed.",
           "prototype": {
-            "name": "CommandCallback",
-            "funcName": "CommandCallback",
+            "name": "ConCommandCallback",
+            "funcName": "ConCommandCallback",
             "description": "Handles the execution of a command triggered by a caller. This function processes the command, interprets its context, and handles any provided arguments.",
             "paramTypes": [
               {
@@ -12406,7 +12406,7 @@
                 "type": "int32",
                 "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
                 "enum": {
-                  "name": "CommandCallingContext",
+                  "name": "ConCommandContext",
                   "description": "The command execution context.",
                   "values": [
                     {
@@ -12505,8 +12505,8 @@
           "ref": false,
           "description": "The callback function to be removed.",
           "prototype": {
-            "name": "CommandCallback",
-            "funcName": "CommandCallback",
+            "name": "ConCommandCallback",
+            "funcName": "ConCommandCallback",
             "description": "Handles the execution of a command triggered by a caller. This function processes the command, interprets its context, and handles any provided arguments.",
             "paramTypes": [
               {
@@ -12519,7 +12519,7 @@
                 "type": "int32",
                 "description": "The context in which the command is being executed. This value can be used to provide additional information about the environment or state related to the command.",
                 "enum": {
-                  "name": "CommandCallingContext",
+                  "name": "ConCommandContext",
                   "description": "The command execution context.",
                   "values": [
                     {
@@ -13152,7 +13152,7 @@
           "ref": false,
           "description": "The context from which the command was called (e.g., Console or Chat).",
           "enum": {
-            "name": "CommandCallingContext",
+            "name": "ConCommandContext",
             "description": "The command execution context.",
             "values": [
               {
@@ -16823,8 +16823,8 @@
           "ref": false,
           "description": "The callback function to be executed when the variable's value changes.",
           "prototype": {
-            "name": "ChangeCallback",
-            "funcName": "ChangeCallback",
+            "name": "ConVarCallback",
+            "funcName": "ConVarCallback",
             "description": "Handles changes to a console variable's value. This function is called whenever the value of a specific console variable is modified.",
             "paramTypes": [
               {
@@ -16872,8 +16872,8 @@
           "ref": false,
           "description": "The callback function to be removed.",
           "prototype": {
-            "name": "ChangeCallback",
-            "funcName": "ChangeCallback",
+            "name": "ConVarCallback",
+            "funcName": "ConVarCallback",
             "description": "Handles changes to a console variable's value. This function is called whenever the value of a specific console variable is modified.",
             "paramTypes": [
               {
@@ -32273,7 +32273,33 @@
           "name": "team",
           "type": "int32",
           "ref": false,
-          "description": "The numeric identifier of the team."
+          "description": "The numeric identifier of the team.",
+          "enum": {
+            "name": "CSTeam",
+            "description": "Enum representing the possible teams in Counter-Strike.",
+            "values": [
+              {
+                "value": 0,
+                "name": "None",
+                "description": "No team."
+              },
+              {
+                "value": 1,
+                "name": "Spectator",
+                "description": "Spectator team."
+              },
+              {
+                "value": 2,
+                "name": "T",
+                "description": "Terrorist team."
+              },
+              {
+                "value": 3,
+                "name": "CT",
+                "description": "Counter-Terrorist team."
+              }
+            ]
+          }
         }
       ],
       "retType": {
@@ -32291,7 +32317,33 @@
           "name": "team",
           "type": "int32",
           "ref": false,
-          "description": "The numeric identifier of the team."
+          "description": "The numeric identifier of the team.",
+          "enum": {
+            "name": "CSTeam",
+            "description": "Enum representing the possible teams in Counter-Strike.",
+            "values": [
+              {
+                "value": 0,
+                "name": "None",
+                "description": "No team."
+              },
+              {
+                "value": 1,
+                "name": "Spectator",
+                "description": "Spectator team."
+              },
+              {
+                "value": 2,
+                "name": "T",
+                "description": "Terrorist team."
+              },
+              {
+                "value": 3,
+                "name": "CT",
+                "description": "Counter-Terrorist team."
+              }
+            ]
+          }
         }
       ],
       "retType": {
@@ -32309,7 +32361,33 @@
           "name": "team",
           "type": "int32",
           "ref": false,
-          "description": "The numeric identifier of the team (e.g., CS_TEAM_T, CS_TEAM_CT, CS_TEAM_SPECTATOR)."
+          "description": "The numeric identifier of the team (e.g., CS_TEAM_T, CS_TEAM_CT, CS_TEAM_SPECTATOR).",
+          "enum": {
+            "name": "CSTeam",
+            "description": "Enum representing the possible teams in Counter-Strike.",
+            "values": [
+              {
+                "value": 0,
+                "name": "None",
+                "description": "No team."
+              },
+              {
+                "value": 1,
+                "name": "Spectator",
+                "description": "Spectator team."
+              },
+              {
+                "value": 2,
+                "name": "T",
+                "description": "Terrorist team."
+              },
+              {
+                "value": 3,
+                "name": "CT",
+                "description": "Counter-Terrorist team."
+              }
+            ]
+           }
         }
       ],
       "retType": {

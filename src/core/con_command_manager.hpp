@@ -6,12 +6,12 @@
 
 #include <convar.h>
 
-enum class CommandCallingContext  {
+enum class ConCommandContext  {
 	Console = 0,
 	Chat = 1,
 };
 
-using CommandListenerCallback = ResultType (*)(int caller, CommandCallingContext context, const plg::vector<plg::string>& arguments);
+using ConCommandListenerCallback = ResultType (*)(int caller, ConCommandContext context, const plg::vector<plg::string>& arguments);
 
 struct ConCommandInfo {
 	~ConCommandInfo();

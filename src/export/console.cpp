@@ -1,5 +1,5 @@
-#include <core/sdk/utils.hpp>
 #include <core/con_command_manager.hpp>
+#include <core/sdk/utils.hpp>
 
 PLUGIFY_WARN_PUSH()
 
@@ -129,16 +129,16 @@ extern "C" PLUGIN_API void PrintToChatColoredAll(const plg::string& message) {
  *                    A negative value indicates a server-level message (no specific player).
  * @param message     The message string to be sent as a reply.
  */
-extern "C" PLUGIN_API void ReplyToCommand(CommandCallingContext context, int playerSlot, const plg::string& message) {
+extern "C" PLUGIN_API void ReplyToCommand(ConCommandContext context, int playerSlot, const plg::string& message) {
 	if (playerSlot < 0) {
 		ConMsg("%s\n", message.c_str());
 		return;
 	}
 	switch (context) {
-		case CommandCallingContext::Console:
+		case ConCommandContext::Console:
 			utils::PrintConsole(playerSlot, message);
 			return;
-		case CommandCallingContext::Chat:
+		case ConCommandContext::Chat:
 			utils::CPrintChat(playerSlot, message);
 			return;
 	}

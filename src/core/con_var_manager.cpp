@@ -47,7 +47,7 @@ ConVarRef ConVarManager::FindConVar(std::string_view name) {
 	}
 }
 
-bool ConVarManager::HookConVarChange(std::string_view name, ConVarChangeListenerCallback callback) {
+bool ConVarManager::HookConVarChange(std::string_view name, ConVarListenerCallback callback) {
 	std::scoped_lock lock(m_mutex);
 
 	if (name.empty()) {
@@ -63,7 +63,7 @@ bool ConVarManager::HookConVarChange(std::string_view name, ConVarChangeListener
 	return false;
 }
 
-bool ConVarManager::UnhookConVarChange(std::string_view name, ConVarChangeListenerCallback callback) {
+bool ConVarManager::UnhookConVarChange(std::string_view name, ConVarListenerCallback callback) {
 	std::scoped_lock lock(m_mutex);
 
 	if (name.empty()) {

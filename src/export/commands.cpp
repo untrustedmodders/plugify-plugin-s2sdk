@@ -22,7 +22,7 @@ PLUGIFY_WARN_IGNORE(4190)
  * @param mode Whether the hook was in post mode (after processing) or pre mode (before processing).
  * @return A boolean indicating whether the command was successfully added.
  */
-extern "C" PLUGIN_API bool AddAdminCommand(const plg::string& name, int64_t adminFlags, const plg::string& description, ConVarFlag flags, CommandListenerCallback callback, HookMode mode) {
+extern "C" PLUGIN_API bool AddAdminCommand(const plg::string& name, int64_t adminFlags, const plg::string& description, ConVarFlag flags, ConCommandListenerCallback callback, HookMode mode) {
 	auto result = g_ConCommandManager.AddValveCommand(name, description, flags, adminFlags);
 	g_ConCommandManager.AddCommandListener(name, callback, mode);
 	return result;
@@ -38,7 +38,7 @@ extern "C" PLUGIN_API bool AddAdminCommand(const plg::string& name, int64_t admi
  * @param mode Whether the hook was in post mode (after processing) or pre mode (before processing).
  * @return A boolean indicating whether the command was successfully added.
  */
-extern "C" PLUGIN_API bool AddConsoleCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, CommandListenerCallback callback, HookMode mode) {
+extern "C" PLUGIN_API bool AddConsoleCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, ConCommandListenerCallback callback, HookMode mode) {
 	auto result = g_ConCommandManager.AddValveCommand(name, description, flags);
 	g_ConCommandManager.AddCommandListener(name, callback, mode);
 	return result;
@@ -50,7 +50,7 @@ extern "C" PLUGIN_API bool AddConsoleCommand(const plg::string& name, const plg:
  * @param name The name of the command to be removed.
  * @param callback The callback function associated with the command to be removed.
  */
-extern "C" PLUGIN_API bool RemoveCommand(const plg::string& name, CommandListenerCallback callback) {
+extern "C" PLUGIN_API bool RemoveCommand(const plg::string& name, ConCommandListenerCallback callback) {
 	g_ConCommandManager.RemoveCommandListener(name, callback, HookMode::Pre);
 	g_ConCommandManager.RemoveCommandListener(name, callback, HookMode::Post);
 	return g_ConCommandManager.RemoveValveCommand(name);
@@ -64,7 +64,7 @@ extern "C" PLUGIN_API bool RemoveCommand(const plg::string& name, CommandListene
  * @param mode Whether the hook was in post mode (after processing) or pre mode (before processing).
  * @return A boolean indicating whether the callback was successfully added.
  */
-extern "C" PLUGIN_API bool AddCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
+extern "C" PLUGIN_API bool AddCommandListener(const plg::string& name, ConCommandListenerCallback callback, HookMode mode) {
 	return g_ConCommandManager.AddCommandListener(name, callback, mode);
 }
 
@@ -76,7 +76,7 @@ extern "C" PLUGIN_API bool AddCommandListener(const plg::string& name, CommandLi
  * @param mode Whether the hook was in post mode (after processing) or pre mode (before processing).
  * @return A boolean indicating whether the callback was successfully removed.
  */
-extern "C" PLUGIN_API bool RemoveCommandListener(const plg::string& name, CommandListenerCallback callback, HookMode mode) {
+extern "C" PLUGIN_API bool RemoveCommandListener(const plg::string& name, ConCommandListenerCallback callback, HookMode mode) {
 	return g_ConCommandManager.RemoveCommandListener(name, callback, mode);
 }
 

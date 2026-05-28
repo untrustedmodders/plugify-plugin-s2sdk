@@ -138,22 +138,22 @@ public:
 	SCHEMA_FIELD(CHandle<CBasePlayerWeapon>, m_hActiveWeapon)
 
 	bool CanUse(CBasePlayerWeapon* weapon) {
-		static auto offset = Unwrap(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::CanUse"));
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::CanUse"));
 		return CALL_VIRTUAL(bool, offset, this, weapon);
 	}
 
 	void DropWeapon(CBasePlayerWeapon* weapon, const Vector* target = nullptr, const Vector* velocity = nullptr) {
-		static auto offset = Unwrap(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::DropWeapon"));
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::DropWeapon"));
 		CALL_VIRTUAL(void, offset, this, weapon, target, velocity);
 	}
 
 	int SelectItem(CBasePlayerWeapon* weapon) {
-		static auto offset = Unwrap(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::SelectItem"));
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::SelectItem"));
 		return CALL_VIRTUAL(int, offset, this, weapon);
 	}
 
 	bool SwitchWeapon(CBasePlayerWeapon* weapon, int a3 = 0) {
-		static auto offset = Unwrap(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::SwitchWeapon"));
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::SwitchWeapon"));
 		return CALL_VIRTUAL(int, offset, this, weapon, a3);
 	}
 };
@@ -197,12 +197,12 @@ public:
 	DECLARE_SCHEMA_CLASS(CCSPlayer_ItemServices);
 
 	CBaseEntity* GiveNamedItem(const char* name) {
-		static auto offset = Unwrap(g_pGameConfig->GetOffset("CCSPlayer_ItemServices::GiveNamedItem"));
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_ItemServices::GiveNamedItem"));
 		return CALL_VIRTUAL(CBaseEntity*, offset, this, name);
 	}
 
 	int RemoveWeapons(bool removeSuit = false) {
-		static auto offset = Unwrap(g_pGameConfig->GetOffset("CCSPlayer_ItemServices::RemoveAllItems"));
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_ItemServices::RemoveAllItems"));
 		return CALL_VIRTUAL(int, offset, this, removeSuit);
 	}
 };
