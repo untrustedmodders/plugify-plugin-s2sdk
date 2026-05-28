@@ -16,252 +16,49 @@ public:
 		return instance;
 	}
 
-	template<typename F, typename C>
-	void* AddHookVTableFunc(F func, void* ptr, const C& callback, int varIndex = -1) {
-		std::pair name{(void*&) func, ptr};
+	using Callback = polyhook::CallbackHandler;
+	using Type = polyhook::CallbackType;
 
-		auto it = m_vhooks.find(name);
-		if (it != m_vhooks.end()) {
-			callback(*it->second);
-			return it->second->GetAddress();
-		}
-
-		using trait = polyhook::details::function_traits<F>;
-		auto args = trait::args();
-		auto ret = trait::ret();
-
-		auto ihook = polyhook::VTableHook2::Find(ptr, (void*&) func);
-		if (ihook != nullptr) {
-			callback(*ihook);
-			return ihook->GetAddress();
-		}
-
-		ihook = polyhook::VTableHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
-		if (ihook == nullptr) {
-#if PLUGIFY_IS_DEBUG
-			plg::print(LS_WARNING, "Could not hook table function \"{}\".\n", ptr);
-#else
-			plg::print(LS_WARNING, "Could not hook table function \"{}\".\n", typeid(func).name());
-#endif
-			return nullptr;
-		}
-
-		callback(*ihook);
-		void* orig = ihook->GetAddress();
-		m_vhooks.emplace(name, std::move(ihook));
-		return orig;
+	template<typename Func, int Var = -1>
+	Result<Memory> AddHookVTableFunc(std::string_view name, Func func, void* ptr, const Callback& callback, std::initializer_list<Type> types) {
+		return AddHookVTableFunc<Func>(name, func, ptr, [&](const polyhook::IHook& hook) {
+			for (const auto& type : types) hook.AddCallback(type, callback);
+		}, Var);
 	}
 
-	template<typename F, typename C>
-	void* AddHookVFuncFunc(F func, void* ptr, const C& callback, int varIndex = -1) {
-		std::pair name{(void*&) func, ptr};
-
-		auto it = m_vhooks.find(name);
-		if (it != m_vhooks.end()) {
-			callback(*it->second);
-			return it->second->GetAddress();
-		}
-
-		using trait = polyhook::details::function_traits<F>;
-		auto args = trait::args();
-		auto ret = trait::ret();
-
-		auto ihook = polyhook::VFuncHook2::Find(ptr, (void*&) func);
-		if (ihook != nullptr) {
-			callback(*ihook);
-			return ihook->GetAddress();
-		}
-
-		ihook = polyhook::VFuncHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
-		if (ihook == nullptr) {
-#if PLUGIFY_IS_DEBUG
-			plg::print(LS_WARNING, "Could not hook virtual function \"{}\".\n", ptr);
-#else
-			plg::print(LS_WARNING, "Could not hook virtual function \"{}\".\n", typeid(func).name());
-#endif
-			return nullptr;
-		}
-
-		callback(*ihook);
-		void* orig = ihook->GetAddress();
-		m_vhooks.emplace(name, std::move(ihook));
-		return orig;
+	template<typename Func, int Var = -1>
+	Result<Memory> AddHookVFuncFunc(std::string_view name, Func func, void* ptr, const Callback& callback, std::initializer_list<Type> types) {
+		return AddHookVFuncFunc<Func>(name, func, ptr, [&](const polyhook::IHook& hook) {
+			for (const auto& type : types) hook.AddCallback(type, callback);
+		}, Var);
 	}
 
-	template<typename F, typename C>
-	void* AddHookDetourFunc(std::string_view name, const C& callback, int varIndex = -1) {
-		auto it = m_dhooks.find(name);
-		if (it != m_dhooks.end()) {
-			callback(*it->second);
-			return it->second->GetAddress();
-		}
-
-		auto addr = g_pGameConfig->GetSignature(name);
-		if (!addr) {
-			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
-			return nullptr;
-		}
-
-		auto ihook = polyhook::DetourHook::Find(*addr);
-		if (ihook != nullptr) {
-			callback(*ihook);
-			return ihook->GetAddress();
-		}
-
-		using trait = polyhook::details::function_traits<F>;
-		auto args = trait::args();
-		auto ret = trait::ret();
-
-		ihook = polyhook::DetourHook::Create(*addr, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
-		if (ihook == nullptr) {
-			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
-			return nullptr;
-		}
-
-		callback(*ihook);
-		void* orig = ihook->GetAddress();
-		m_dhooks.emplace(name, std::move(ihook));
-		return orig;
+	template<typename Func, int Var = -1>
+	Result<Memory> AddHookDetourFunc(std::string_view name, const Callback& callback, std::initializer_list<Type> types) {
+		return AddHookDetourFunc<Func>(name, [&] -> Result<Memory> { return g_pGameConfig->GetSignature(name); }, [&](const polyhook::IHook& hook) {
+			for (const auto& type : types) hook.AddCallback(type, callback);
+		}, Var);
 	}
 
-	template<typename F, typename C>
-	void* AddHookDetourFunc(uintptr_t addr, const C& callback, int varIndex = -1) {
-		plg::string name = std::format("0x{:x}", addr);
-
-		auto it = m_dhooks.find(name);
-		if (it != m_dhooks.end()) {
-			callback(*it->second);
-			return it->second->GetAddress();
-		}
-
-		auto ihook = polyhook::DetourHook::Find(reinterpret_cast<void*>(addr));
-		if (ihook != nullptr) {
-			callback(*ihook);
-			return ihook->GetAddress();
-		}
-
-		using trait = polyhook::details::function_traits<F>;
-		auto args = trait::args();
-		auto ret = trait::ret();
-
-		ihook = polyhook::DetourHook::Create(reinterpret_cast<void*>(addr), ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
-		if (ihook == nullptr) {
-			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
-			return nullptr;
-		}
-
-		callback(*ihook);
-		void* orig = ihook->GetAddress();
-		m_dhooks.emplace(std::move(name), std::move(ihook));
-		return orig;
+	template<typename Func, int Var = -1>
+	Result<Memory> AddHookDetourFunc(std::string_view name, uintptr_t addr, const Callback& callback, std::initializer_list<Type> types) {
+		return AddHookDetourFunc<Func>(name, [&] -> Result<Memory> { return addr; }, [&](const polyhook::IHook& hook) {
+			for (const auto& type : types) hook.AddCallback(type, callback);
+		}, Var);
 	}
 
-	template<typename C>
-	void* AddHookMidFunc(std::string_view name, const C& callback) {
-		auto it = m_dhooks.find(name);
-		if (it != m_dhooks.end()) {
-			callback(*it->second);
-			return it->second->GetAddress();
-		}
-
-		auto addr = g_pGameConfig->GetSignature(name);
-		if (!addr) {
-			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
-			return nullptr;
-		}
-
-		auto ihook = polyhook::DetourHook::Find(*addr);
-		if (ihook != nullptr) {
-			callback(*ihook);
-			return ihook->GetAddress();
-		}
-
-		ihook = polyhook::DetourHook::Create(*addr);
-		if (ihook == nullptr) {
-			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
-			return nullptr;
-		}
-
-		callback(*ihook);
-		void* orig = ihook->GetAddress();
-		m_dhooks.emplace(name, std::move(ihook));
-		return orig;
+	template<int Var = -1>
+	Result<Memory> AddHookMidFunc(std::string_view name, const Callback& callback, std::initializer_list<Type> types) {
+		return AddHookMidFunc(name, [&] -> Result<Memory> { return g_pGameConfig->GetSignature(name); }, [&](const polyhook::IHook& hook) {
+			for (const auto& type : types) hook.AddCallback(type, callback);
+		}, Var);
 	}
 
-	template<typename C>
-	void* AddHookMidFunc(uintptr_t addr, const C& callback) {
-		plg::string name = std::format("0x{:x}", addr);
-
-		auto it = m_dhooks.find(name);
-		if (it != m_dhooks.end()) {
-			callback(*it->second);
-			return it->second->GetAddress();
-		}
-
-		auto ihook = polyhook::DetourHook::Find(reinterpret_cast<void*>(addr));
-		if (ihook != nullptr) {
-			callback(*ihook);
-			return ihook->GetAddress();
-		}
-
-		ihook = polyhook::DetourHook::Create(reinterpret_cast<void*>(addr));
-		if (ihook == nullptr) {
-			plg::print(LS_WARNING, "Could not hook detour function \"{}\".\n", name);
-			return nullptr;
-		}
-
-		callback(*ihook);
-		void* orig = ihook->GetAddress();
-		m_dhooks.emplace(std::move(name), std::move(ihook));
-		return orig;
-	}
-
-	template<typename F, int V = -1, typename C, typename... T>
-		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
-	void* AddHookVTableFunc(F func, void* ptr, C callback, T... types) {
-		return AddHookVTableFunc<F>(func, ptr, [&](const polyhook::IHook& hook) {
-			([&] { hook.AddCallback(types, callback); }(), ...);
-		}, V);
-	}
-
-	template<typename F, int V = -1, typename C, typename... T>
-		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
-	void* AddHookVFuncFunc(F func, void* ptr, C callback, T... types) {
-		return AddHookVFuncFunc<F>(func, ptr, [&](const polyhook::IHook& hook) {
-			([&] { hook.AddCallback(types, callback); }(), ...);
-		}, V);
-	}
-
-	template<typename F, int V = -1, typename C, typename... T>
-		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
-	void* AddHookDetourFunc(std::string_view name, C callback, T... types) {
-		return AddHookDetourFunc<F>(name, [&](const polyhook::IHook& hook) {
-			([&] { hook.AddCallback(types, callback); }(), ...);
-		}, V);
-	}
-
-	template<typename F, int V = -1, typename C, typename... T>
-		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
-	void* AddHookDetourFunc(uintptr_t addr, C callback, T... types) {
-		return AddHookDetourFunc<F>(addr, [&](const polyhook::IHook& hook) {
-			([&] { hook.AddCallback(types, callback); }(), ...);
-		}, V);
-	}
-
-	template<typename C, typename... T>
-		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
-	void* AddHookMidFunc(std::string_view name, C callback, T... types) {
-		return AddHookMidFunc(name, [&](const polyhook::IHook& hook) {
-			([&] { hook.AddCallback(types, callback); }(), ...);
-		});
-	}
-
-	template<typename C, typename... T>
-		requires(std::is_pointer_v<C> && std::is_function_v<std::remove_pointer_t<C>>)
-	void* AddHookMidFunc(uintptr_t addr, C callback, T... types) {
-		return AddHookMidFunc(addr, [&](const polyhook::IHook& hook) {
-			([&] { hook.AddCallback(types, callback); }(), ...);
-		});
+	template<int Var = -1>
+	Result<Memory> AddHookMidFunc(std::string_view name, uintptr_t addr, const Callback& callback, std::initializer_list<Type> types) {
+		return AddHookMidFunc(name, [&] -> Result<Memory> { return addr; }, [&](const polyhook::IHook& hook) {
+			for (const auto& type : types) hook.AddCallback(type, callback);
+		}, Var);
 	}
 
 	bool RemoveHookDetourFunc(std::string_view name) {
@@ -273,8 +70,8 @@ public:
 		return false;
 	}
 
-	template<typename F>
-	bool RemoveHookVirtualFunc(F func, void* ptr) {
+	template<typename Func>
+	bool RemoveHookVirtualFunc(Func func, void* ptr) {
 		auto it = m_vhooks.find({(void*&) func, ptr});
 		if (it != m_vhooks.end()) {
 			m_vhooks.erase(it);
@@ -288,9 +85,142 @@ public:
 		m_vhooks.clear();
 	}
 
-	template<typename F>
-	int GetVirtualIndex(F func) {
+	template<typename Func>
+	int GetVirtualIndex(Func func) {
 		return polyhook::GetVirtualIndex((void*&) func);
+	}
+
+protected:
+	using Getter = std::function<Result<Memory>()>;
+	using Setter = std::function<void(const polyhook::IHook&)>;
+
+	template<typename Func>
+	Result<Memory> AddHookVTableFunc(std::string_view name, Func func, void* ptr, const Setter& setter, [[maybe_unused]] int varIndex = -1) {
+		std::pair key{(void*&) func, ptr};
+
+		auto it = m_vhooks.find(key);
+		if (it != m_vhooks.end()) {
+			setter(*it->second);
+			return it->second->GetAddress();
+		}
+
+		using trait = polyhook::details::function_traits<Func>;
+		auto args = trait::args();
+		auto ret = trait::ret();
+
+		auto ihook = polyhook::VTableHook2::Find(ptr, (void*&) func);
+		if (ihook != nullptr) {
+			setter(*ihook);
+			return ihook->GetAddress();
+		}
+
+		ihook = polyhook::VTableHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
+		if (ihook == nullptr) {
+			return MakeError("Could not hook table function: \"{}\"", name);
+		}
+		ihook->SetName(name);
+
+		setter(*ihook);
+		void* orig = ihook->GetAddress();
+		m_vhooks.emplace(key, std::move(ihook));
+		return orig;
+	}
+
+	template<typename Func>
+	Result<Memory> AddHookVFuncFunc(std::string_view name, Func func, void* ptr, const Setter& setter, [[maybe_unused]] int varIndex = -1) {
+		std::pair key{(void*&) func, ptr};
+
+		auto it = m_vhooks.find(key);
+		if (it != m_vhooks.end()) {
+			setter(*it->second);
+			return it->second->GetAddress();
+		}
+
+		using trait = polyhook::details::function_traits<Func>;
+		auto args = trait::args();
+		auto ret = trait::ret();
+
+		auto ihook = polyhook::VFuncHook2::Find(ptr, (void*&) func);
+		if (ihook != nullptr) {
+			setter(*ihook);
+			return ihook->GetAddress();
+		}
+
+		ihook = polyhook::VFuncHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
+		if (ihook == nullptr) {
+			return MakeError("Could not hook virtual function: \"{}\"", name);
+		}
+		ihook->SetName(name);
+
+		setter(*ihook);
+		void* orig = ihook->GetAddress();
+		m_vhooks.emplace(key, std::move(ihook));
+		return orig;
+	}
+
+	template<typename Func>
+	Result<Memory> AddHookDetourFunc(std::string_view name, const Getter& getter, const Setter& setter, [[maybe_unused]] int varIndex = -1) {
+		auto it = m_dhooks.find(name);
+		if (it != m_dhooks.end()) {
+			setter(*it->second);
+			return it->second->GetAddress();
+		}
+
+		auto addr = getter();
+		if (!addr) {
+			return MakeError("Could not hook detour function: \"{}\" - {}",  name, addr.error());
+		}
+
+		auto ihook = polyhook::DetourHook::Find(*addr);
+		if (ihook != nullptr) {
+			setter(*ihook);
+			return ihook->GetAddress();
+		}
+
+		using trait = polyhook::details::function_traits<Func>;
+		auto args = trait::args();
+		auto ret = trait::ret();
+
+		ihook = polyhook::DetourHook::Create(*addr, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
+		if (ihook == nullptr) {
+			return MakeError("Could not hook detour function: \"{}\"",  name);
+		}
+		ihook->SetName(name);
+
+		setter(*ihook);
+		void* orig = ihook->GetAddress();
+		m_dhooks.emplace(name, std::move(ihook));
+		return orig;
+	}
+
+	Result<Memory> AddHookMidFunc(std::string_view name, const Getter& getter, const Setter& setter, [[maybe_unused]] int varIndex = -1) {
+		auto it = m_dhooks.find(name);
+		if (it != m_dhooks.end()) {
+			setter(*it->second);
+			return it->second->GetAddress();
+		}
+
+		auto addr = getter();
+		if (!addr) {
+			return MakeError("Could not hook mid function: \"{}\" - {}",  name, addr.error());
+		}
+
+		auto ihook = polyhook::DetourHook::Find(*addr);
+		if (ihook != nullptr) {
+			setter(*ihook);
+			return ihook->GetAddress();
+		}
+
+		ihook = polyhook::DetourHook::Create(*addr);
+		if (ihook == nullptr) {
+			return MakeError("Could not hook mid function: \"{}\"",  name);
+		}
+		ihook->SetName(name);
+
+		setter(*ihook);
+		void* orig = ihook->GetAddress();
+		m_dhooks.emplace(name, std::move(ihook));
+		return orig;
 	}
 
 private:
