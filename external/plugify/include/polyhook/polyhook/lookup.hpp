@@ -18,7 +18,8 @@ namespace polyhook {
    * @param pFunc (ptr64): Function address
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle FindDetour(void* pFunc) {
+  inline HookHandle FindDetour(void* pFunc, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::FindDetour", __location);
     return __polyhook_FindDetour(pFunc);
   }
 
@@ -32,7 +33,8 @@ namespace polyhook {
    * @param index (int32): Virtual table index
    * @return ptr64: Returns hook pointer
    */
-  inline void* FindVirtual(void* pClass, int32_t index) {
+  inline void* FindVirtual(void* pClass, int32_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::FindVirtual", __location);
     return __polyhook_FindVirtual(pClass, index);
   }
 
@@ -46,7 +48,8 @@ namespace polyhook {
    * @param pFunc (ptr64): Function address
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle FindVirtual2(void* pClass, void* pFunc) {
+  inline HookHandle FindVirtual2(void* pClass, void* pFunc, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::FindVirtual2", __location);
     return __polyhook_FindVirtual2(pClass, pFunc);
   }
 
@@ -59,7 +62,8 @@ namespace polyhook {
    * @param pFunc (ptr64): Function address
    * @return int32: Virtual table index
    */
-  inline int32_t GetVirtualIndex(void* pFunc) {
+  inline int32_t GetVirtualIndex(void* pFunc, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetVirtualIndex", __location);
     return __polyhook_GetVirtualIndex(pFunc);
   }
 

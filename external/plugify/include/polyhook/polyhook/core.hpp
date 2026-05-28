@@ -21,7 +21,8 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookDetour(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookDetour(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookDetour", __location);
     return __polyhook_HookDetour(pFunc, returnType, arguments, varIndex);
   }
 
@@ -34,7 +35,8 @@ namespace polyhook {
    * @param pFunc (ptr64): Function address
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookDetour2(void* pFunc) {
+  inline HookHandle HookDetour2(void* pFunc, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookDetour2", __location);
     return __polyhook_HookDetour2(pFunc);
   }
 
@@ -51,7 +53,8 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookVirtualTable(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookVirtualTable(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookVirtualTable", __location);
     return __polyhook_HookVirtualTable(pClass, index, returnType, arguments, varIndex);
   }
 
@@ -68,7 +71,8 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookVirtualTable2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookVirtualTable2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookVirtualTable2", __location);
     return __polyhook_HookVirtualTable2(pClass, pFunc, returnType, arguments, varIndex);
   }
 
@@ -85,7 +89,8 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookVirtualFunc(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookVirtualFunc(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookVirtualFunc", __location);
     return __polyhook_HookVirtualFunc(pClass, index, returnType, arguments, varIndex);
   }
 
@@ -102,7 +107,8 @@ namespace polyhook {
    * @param varIndex (int32): Index of a first variadic argument or -1
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookVirtualFunc2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1) {
+  inline HookHandle HookVirtualFunc2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookVirtualFunc2", __location);
     return __polyhook_HookVirtualFunc2(pClass, pFunc, returnType, arguments, varIndex);
   }
 
@@ -115,7 +121,8 @@ namespace polyhook {
    * @param pFunc (ptr64): Function address
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool UnhookDetour(void* pFunc) {
+  inline bool UnhookDetour(void* pFunc, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::UnhookDetour", __location);
     return __polyhook_UnhookDetour(pFunc);
   }
 
@@ -129,7 +136,8 @@ namespace polyhook {
    * @param index (int32): Virtual table index
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool UnhookVirtualTable(void* pClass, int32_t index) {
+  inline bool UnhookVirtualTable(void* pClass, int32_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::UnhookVirtualTable", __location);
     return __polyhook_UnhookVirtualTable(pClass, index);
   }
 
@@ -143,7 +151,8 @@ namespace polyhook {
    * @param pFunc (ptr64): Vtable member function address
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool UnhookVirtualTable2(void* pClass, void* pFunc) {
+  inline bool UnhookVirtualTable2(void* pClass, void* pFunc, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::UnhookVirtualTable2", __location);
     return __polyhook_UnhookVirtualTable2(pClass, pFunc);
   }
 
@@ -157,7 +166,8 @@ namespace polyhook {
    * @param index (int32): Virtual table index
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool UnhookVirtualFunc(void* pClass, int32_t index) {
+  inline bool UnhookVirtualFunc(void* pClass, int32_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::UnhookVirtualFunc", __location);
     return __polyhook_UnhookVirtualFunc(pClass, index);
   }
 
@@ -171,7 +181,8 @@ namespace polyhook {
    * @param pFunc (ptr64): Vtable member function address
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool UnhookVirtualFunc2(void* pClass, void* pFunc) {
+  inline bool UnhookVirtualFunc2(void* pClass, void* pFunc, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::UnhookVirtualFunc2", __location);
     return __polyhook_UnhookVirtualFunc2(pClass, pFunc);
   }
 
@@ -182,7 +193,8 @@ namespace polyhook {
   /**
    * @brief Removes all previously set hooks
    */
-  inline void UnhookAll() {
+  inline void UnhookAll(plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::UnhookAll", __location);
     return __polyhook_UnhookAll();
   }
 
@@ -194,7 +206,8 @@ namespace polyhook {
    * @brief Removes all previously set hooks on the object
    * @param pClass (ptr64): Object pointer
    */
-  inline void UnhookAllVirtual(void* pClass) {
+  inline void UnhookAllVirtual(void* pClass, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::UnhookAllVirtual", __location);
     return __polyhook_UnhookAllVirtual(pClass);
   }
 
@@ -209,7 +222,8 @@ namespace polyhook {
    * @param handler (function): Callback function which trigger by hook.
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool AddCallback(HookHandle hook, CallbackType type, CallbackHandler handler) {
+  inline bool AddCallback(HookHandle hook, CallbackType type, CallbackHandler handler, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::AddCallback", __location);
     return __polyhook_AddCallback(hook, type, handler);
   }
 
@@ -225,7 +239,8 @@ namespace polyhook {
    * @param priority (int32): Priority of callback among others
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool AddCallback2(HookHandle hook, CallbackType type, CallbackHandler handler, int32_t priority) {
+  inline bool AddCallback2(HookHandle hook, CallbackType type, CallbackHandler handler, int32_t priority, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::AddCallback2", __location);
     return __polyhook_AddCallback2(hook, type, handler, priority);
   }
 
@@ -240,7 +255,8 @@ namespace polyhook {
    * @param handler (function): Callback function which trigger by hook.
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool RemoveCallback(HookHandle hook, CallbackType type, CallbackHandler handler) {
+  inline bool RemoveCallback(HookHandle hook, CallbackType type, CallbackHandler handler, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::RemoveCallback", __location);
     return __polyhook_RemoveCallback(hook, type, handler);
   }
 
@@ -255,7 +271,8 @@ namespace polyhook {
    * @param handler (function): Callback function which trigger by hook.
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool IsCallbackRegistered(HookHandle hook, CallbackType type, CallbackHandler handler) {
+  inline bool IsCallbackRegistered(HookHandle hook, CallbackType type, CallbackHandler handler, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::IsCallbackRegistered", __location);
     return __polyhook_IsCallbackRegistered(hook, type, handler);
   }
 
@@ -268,7 +285,8 @@ namespace polyhook {
    * @param hook (ptr64): Hook pointer
    * @return bool: Returns true on success, false otherwise
    */
-  inline bool AreCallbacksRegistered(HookHandle hook) {
+  inline bool AreCallbacksRegistered(HookHandle hook, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::AreCallbacksRegistered", __location);
     return __polyhook_AreCallbacksRegistered(hook);
   }
 

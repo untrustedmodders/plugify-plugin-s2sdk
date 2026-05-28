@@ -48,6 +48,10 @@ polyhook::_GetFunctionAddr __polyhook_GetFunctionAddr = nullptr;
 
 polyhook::_GetOriginalAddr __polyhook_GetOriginalAddr = nullptr;
 
+polyhook::_SetDebugName __polyhook_SetDebugName = nullptr;
+
+polyhook::_GetDebugName __polyhook_GetDebugName = nullptr;
+
 polyhook::_GetArgumentBool __polyhook_GetArgumentBool = nullptr;
 
 polyhook::_GetArgumentInt8 __polyhook_GetArgumentInt8 = nullptr;

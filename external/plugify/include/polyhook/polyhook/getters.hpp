@@ -18,7 +18,8 @@ namespace polyhook {
    * @param hook (ptr64): Hook pointer
    * @return ptr64: Returns jit generated function pointer
    */
-  inline void* GetFunctionAddr(HookHandle hook) {
+  inline void* GetFunctionAddr(HookHandle hook, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetFunctionAddr", __location);
     return __polyhook_GetFunctionAddr(hook);
   }
 
@@ -31,8 +32,23 @@ namespace polyhook {
    * @param hook (ptr64): Hook pointer
    * @return ptr64: Returns original function pointer
    */
-  inline void* GetOriginalAddr(HookHandle hook) {
+  inline void* GetOriginalAddr(HookHandle hook, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetOriginalAddr", __location);
     return __polyhook_GetOriginalAddr(hook);
+  }
+
+  using _GetDebugName = plg::string (*)(HookHandle);
+}
+extern "C" PLUGIN_API polyhook::_GetDebugName __polyhook_GetDebugName;
+namespace polyhook {
+  /**
+   * @brief Get debug hook name
+   * @param hook (ptr64): Hook pointer
+   * @return string: Returns hook debug name
+   */
+  inline plg::string GetDebugName(HookHandle hook, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetDebugName", __location);
+    return __polyhook_GetDebugName(hook);
   }
 
   using _GetArgumentBool = bool (*)(ParametersHandle, uint64_t);
@@ -45,7 +61,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return bool
    */
-  inline bool GetArgumentBool(ParametersHandle params, uint64_t index) {
+  inline bool GetArgumentBool(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentBool", __location);
     return __polyhook_GetArgumentBool(params, index);
   }
 
@@ -59,7 +76,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return int8
    */
-  inline int8_t GetArgumentInt8(ParametersHandle params, uint64_t index) {
+  inline int8_t GetArgumentInt8(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentInt8", __location);
     return __polyhook_GetArgumentInt8(params, index);
   }
 
@@ -73,7 +91,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return uint8
    */
-  inline uint8_t GetArgumentUInt8(ParametersHandle params, uint64_t index) {
+  inline uint8_t GetArgumentUInt8(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentUInt8", __location);
     return __polyhook_GetArgumentUInt8(params, index);
   }
 
@@ -87,7 +106,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return int16
    */
-  inline int16_t GetArgumentInt16(ParametersHandle params, uint64_t index) {
+  inline int16_t GetArgumentInt16(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentInt16", __location);
     return __polyhook_GetArgumentInt16(params, index);
   }
 
@@ -101,7 +121,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return uint16
    */
-  inline uint16_t GetArgumentUInt16(ParametersHandle params, uint64_t index) {
+  inline uint16_t GetArgumentUInt16(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentUInt16", __location);
     return __polyhook_GetArgumentUInt16(params, index);
   }
 
@@ -115,7 +136,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return int32
    */
-  inline int32_t GetArgumentInt32(ParametersHandle params, uint64_t index) {
+  inline int32_t GetArgumentInt32(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentInt32", __location);
     return __polyhook_GetArgumentInt32(params, index);
   }
 
@@ -129,7 +151,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return uint32
    */
-  inline uint32_t GetArgumentUInt32(ParametersHandle params, uint64_t index) {
+  inline uint32_t GetArgumentUInt32(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentUInt32", __location);
     return __polyhook_GetArgumentUInt32(params, index);
   }
 
@@ -143,7 +166,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return int64
    */
-  inline int64_t GetArgumentInt64(ParametersHandle params, uint64_t index) {
+  inline int64_t GetArgumentInt64(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentInt64", __location);
     return __polyhook_GetArgumentInt64(params, index);
   }
 
@@ -157,7 +181,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return uint64
    */
-  inline uint64_t GetArgumentUInt64(ParametersHandle params, uint64_t index) {
+  inline uint64_t GetArgumentUInt64(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentUInt64", __location);
     return __polyhook_GetArgumentUInt64(params, index);
   }
 
@@ -171,7 +196,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return float
    */
-  inline float GetArgumentFloat(ParametersHandle params, uint64_t index) {
+  inline float GetArgumentFloat(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentFloat", __location);
     return __polyhook_GetArgumentFloat(params, index);
   }
 
@@ -185,7 +211,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return double
    */
-  inline double GetArgumentDouble(ParametersHandle params, uint64_t index) {
+  inline double GetArgumentDouble(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentDouble", __location);
     return __polyhook_GetArgumentDouble(params, index);
   }
 
@@ -199,7 +226,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return ptr64
    */
-  inline void* GetArgumentPointer(ParametersHandle params, uint64_t index) {
+  inline void* GetArgumentPointer(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentPointer", __location);
     return __polyhook_GetArgumentPointer(params, index);
   }
 
@@ -213,7 +241,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return string
    */
-  inline plg::string GetArgumentString(ParametersHandle params, uint64_t index) {
+  inline plg::string GetArgumentString(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgumentString", __location);
     return __polyhook_GetArgumentString(params, index);
   }
 
@@ -227,7 +256,8 @@ namespace polyhook {
    * @param index (uint64): Index to get
    * @return any
    */
-  inline plg::any GetArgument(ParametersHandle params, uint64_t index) {
+  inline plg::any GetArgument(ParametersHandle params, uint64_t index, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetArgument", __location);
     return __polyhook_GetArgument(params, index);
   }
 
@@ -240,7 +270,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return bool
    */
-  inline bool GetReturnBool(ReturnHandle ret) {
+  inline bool GetReturnBool(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnBool", __location);
     return __polyhook_GetReturnBool(ret);
   }
 
@@ -253,7 +284,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return int8
    */
-  inline int8_t GetReturnInt8(ReturnHandle ret) {
+  inline int8_t GetReturnInt8(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnInt8", __location);
     return __polyhook_GetReturnInt8(ret);
   }
 
@@ -266,7 +298,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return uint8
    */
-  inline uint8_t GetReturnUInt8(ReturnHandle ret) {
+  inline uint8_t GetReturnUInt8(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnUInt8", __location);
     return __polyhook_GetReturnUInt8(ret);
   }
 
@@ -279,7 +312,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return int16
    */
-  inline int16_t GetReturnInt16(ReturnHandle ret) {
+  inline int16_t GetReturnInt16(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnInt16", __location);
     return __polyhook_GetReturnInt16(ret);
   }
 
@@ -292,7 +326,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return uint16
    */
-  inline uint16_t GetReturnUInt16(ReturnHandle ret) {
+  inline uint16_t GetReturnUInt16(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnUInt16", __location);
     return __polyhook_GetReturnUInt16(ret);
   }
 
@@ -305,7 +340,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return int32
    */
-  inline int32_t GetReturnInt32(ReturnHandle ret) {
+  inline int32_t GetReturnInt32(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnInt32", __location);
     return __polyhook_GetReturnInt32(ret);
   }
 
@@ -318,7 +354,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return uint32
    */
-  inline uint32_t GetReturnUInt32(ReturnHandle ret) {
+  inline uint32_t GetReturnUInt32(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnUInt32", __location);
     return __polyhook_GetReturnUInt32(ret);
   }
 
@@ -331,7 +368,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return int64
    */
-  inline int64_t GetReturnInt64(ReturnHandle ret) {
+  inline int64_t GetReturnInt64(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnInt64", __location);
     return __polyhook_GetReturnInt64(ret);
   }
 
@@ -344,7 +382,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return uint64
    */
-  inline uint64_t GetReturnUInt64(ReturnHandle ret) {
+  inline uint64_t GetReturnUInt64(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnUInt64", __location);
     return __polyhook_GetReturnUInt64(ret);
   }
 
@@ -357,7 +396,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return float
    */
-  inline float GetReturnFloat(ReturnHandle ret) {
+  inline float GetReturnFloat(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnFloat", __location);
     return __polyhook_GetReturnFloat(ret);
   }
 
@@ -370,7 +410,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return double
    */
-  inline double GetReturnDouble(ReturnHandle ret) {
+  inline double GetReturnDouble(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnDouble", __location);
     return __polyhook_GetReturnDouble(ret);
   }
 
@@ -383,7 +424,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return ptr64
    */
-  inline void* GetReturnPointer(ReturnHandle ret) {
+  inline void* GetReturnPointer(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnPointer", __location);
     return __polyhook_GetReturnPointer(ret);
   }
 
@@ -396,7 +438,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return string
    */
-  inline plg::string GetReturnString(ReturnHandle ret) {
+  inline plg::string GetReturnString(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturnString", __location);
     return __polyhook_GetReturnString(ret);
   }
 
@@ -409,7 +452,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @return any
    */
-  inline plg::any GetReturn(ReturnHandle ret) {
+  inline plg::any GetReturn(ReturnHandle ret, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetReturn", __location);
     return __polyhook_GetReturn(ret);
   }
 
@@ -423,7 +467,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return bool
    */
-  inline bool GetRegisterBool(RegistersHandle registers, RegisterType reg) {
+  inline bool GetRegisterBool(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterBool", __location);
     return __polyhook_GetRegisterBool(registers, reg);
   }
 
@@ -437,7 +482,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return int8
    */
-  inline int8_t GetRegisterInt8(RegistersHandle registers, RegisterType reg) {
+  inline int8_t GetRegisterInt8(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterInt8", __location);
     return __polyhook_GetRegisterInt8(registers, reg);
   }
 
@@ -451,7 +497,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return uint8
    */
-  inline uint8_t GetRegisterUInt8(RegistersHandle registers, RegisterType reg) {
+  inline uint8_t GetRegisterUInt8(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterUInt8", __location);
     return __polyhook_GetRegisterUInt8(registers, reg);
   }
 
@@ -465,7 +512,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return int16
    */
-  inline int16_t GetRegisterInt16(RegistersHandle registers, RegisterType reg) {
+  inline int16_t GetRegisterInt16(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterInt16", __location);
     return __polyhook_GetRegisterInt16(registers, reg);
   }
 
@@ -479,7 +527,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return uint16
    */
-  inline uint16_t GetRegisterUInt16(RegistersHandle registers, RegisterType reg) {
+  inline uint16_t GetRegisterUInt16(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterUInt16", __location);
     return __polyhook_GetRegisterUInt16(registers, reg);
   }
 
@@ -493,7 +542,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return int32
    */
-  inline int32_t GetRegisterInt32(RegistersHandle registers, RegisterType reg) {
+  inline int32_t GetRegisterInt32(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterInt32", __location);
     return __polyhook_GetRegisterInt32(registers, reg);
   }
 
@@ -507,7 +557,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return uint32
    */
-  inline uint32_t GetRegisterUInt32(RegistersHandle registers, RegisterType reg) {
+  inline uint32_t GetRegisterUInt32(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterUInt32", __location);
     return __polyhook_GetRegisterUInt32(registers, reg);
   }
 
@@ -521,7 +572,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return int64
    */
-  inline int64_t GetRegisterInt64(RegistersHandle registers, RegisterType reg) {
+  inline int64_t GetRegisterInt64(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterInt64", __location);
     return __polyhook_GetRegisterInt64(registers, reg);
   }
 
@@ -535,7 +587,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return uint64
    */
-  inline uint64_t GetRegisterUInt64(RegistersHandle registers, RegisterType reg) {
+  inline uint64_t GetRegisterUInt64(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterUInt64", __location);
     return __polyhook_GetRegisterUInt64(registers, reg);
   }
 
@@ -549,7 +602,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return float
    */
-  inline float GetRegisterFloat(RegistersHandle registers, RegisterType reg) {
+  inline float GetRegisterFloat(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterFloat", __location);
     return __polyhook_GetRegisterFloat(registers, reg);
   }
 
@@ -563,7 +617,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return double
    */
-  inline double GetRegisterDouble(RegistersHandle registers, RegisterType reg) {
+  inline double GetRegisterDouble(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterDouble", __location);
     return __polyhook_GetRegisterDouble(registers, reg);
   }
 
@@ -577,7 +632,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return ptr64
    */
-  inline void* GetRegisterPointer(RegistersHandle registers, RegisterType reg) {
+  inline void* GetRegisterPointer(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterPointer", __location);
     return __polyhook_GetRegisterPointer(registers, reg);
   }
 
@@ -591,7 +647,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return string
    */
-  inline plg::string GetRegisterString(RegistersHandle registers, RegisterType reg) {
+  inline plg::string GetRegisterString(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegisterString", __location);
     return __polyhook_GetRegisterString(registers, reg);
   }
 
@@ -605,7 +662,8 @@ namespace polyhook {
    * @param reg (uint64): Register to get
    * @return any
    */
-  inline plg::any GetRegister(RegistersHandle registers, RegisterType reg) {
+  inline plg::any GetRegister(RegistersHandle registers, RegisterType reg, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetRegister", __location);
     return __polyhook_GetRegister(registers, reg);
   }
 

@@ -9,6 +9,20 @@
 
 namespace polyhook {
 
+  using _SetDebugName = void (*)(HookHandle, const plg::string&);
+}
+extern "C" PLUGIN_API polyhook::_SetDebugName __polyhook_SetDebugName;
+namespace polyhook {
+  /**
+   * @brief Set debug hook name
+   * @param hook (ptr64): Hook pointer
+   * @param name (string): Hook debug name
+   */
+  inline void SetDebugName(HookHandle hook, const plg::string& name, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetDebugName", __location);
+    return __polyhook_SetDebugName(hook, name);
+  }
+
   using _SetArgumentBool = void (*)(ParametersHandle, uint64_t, bool);
 }
 extern "C" PLUGIN_API polyhook::_SetArgumentBool __polyhook_SetArgumentBool;
@@ -19,7 +33,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (bool): Value to set
    */
-  inline void SetArgumentBool(ParametersHandle params, uint64_t index, bool value) {
+  inline void SetArgumentBool(ParametersHandle params, uint64_t index, bool value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentBool", __location);
     return __polyhook_SetArgumentBool(params, index, value);
   }
 
@@ -33,7 +48,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (int8): Value to set
    */
-  inline void SetArgumentInt8(ParametersHandle params, uint64_t index, int8_t value) {
+  inline void SetArgumentInt8(ParametersHandle params, uint64_t index, int8_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentInt8", __location);
     return __polyhook_SetArgumentInt8(params, index, value);
   }
 
@@ -47,7 +63,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (uint8): Value to set
    */
-  inline void SetArgumentUInt8(ParametersHandle params, uint64_t index, uint8_t value) {
+  inline void SetArgumentUInt8(ParametersHandle params, uint64_t index, uint8_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentUInt8", __location);
     return __polyhook_SetArgumentUInt8(params, index, value);
   }
 
@@ -61,7 +78,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (int16): Value to set
    */
-  inline void SetArgumentInt16(ParametersHandle params, uint64_t index, int16_t value) {
+  inline void SetArgumentInt16(ParametersHandle params, uint64_t index, int16_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentInt16", __location);
     return __polyhook_SetArgumentInt16(params, index, value);
   }
 
@@ -75,7 +93,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (uint16): Value to set
    */
-  inline void SetArgumentUInt16(ParametersHandle params, uint64_t index, uint16_t value) {
+  inline void SetArgumentUInt16(ParametersHandle params, uint64_t index, uint16_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentUInt16", __location);
     return __polyhook_SetArgumentUInt16(params, index, value);
   }
 
@@ -89,7 +108,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (int32): Value to set
    */
-  inline void SetArgumentInt32(ParametersHandle params, uint64_t index, int32_t value) {
+  inline void SetArgumentInt32(ParametersHandle params, uint64_t index, int32_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentInt32", __location);
     return __polyhook_SetArgumentInt32(params, index, value);
   }
 
@@ -103,7 +123,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (uint32): Value to set
    */
-  inline void SetArgumentUInt32(ParametersHandle params, uint64_t index, uint32_t value) {
+  inline void SetArgumentUInt32(ParametersHandle params, uint64_t index, uint32_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentUInt32", __location);
     return __polyhook_SetArgumentUInt32(params, index, value);
   }
 
@@ -117,7 +138,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (int64): Value to set
    */
-  inline void SetArgumentInt64(ParametersHandle params, uint64_t index, int64_t value) {
+  inline void SetArgumentInt64(ParametersHandle params, uint64_t index, int64_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentInt64", __location);
     return __polyhook_SetArgumentInt64(params, index, value);
   }
 
@@ -131,7 +153,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (uint64): Value to set
    */
-  inline void SetArgumentUInt64(ParametersHandle params, uint64_t index, uint64_t value) {
+  inline void SetArgumentUInt64(ParametersHandle params, uint64_t index, uint64_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentUInt64", __location);
     return __polyhook_SetArgumentUInt64(params, index, value);
   }
 
@@ -145,7 +168,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (float): Value to set
    */
-  inline void SetArgumentFloat(ParametersHandle params, uint64_t index, float value) {
+  inline void SetArgumentFloat(ParametersHandle params, uint64_t index, float value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentFloat", __location);
     return __polyhook_SetArgumentFloat(params, index, value);
   }
 
@@ -159,7 +183,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (double): Value to set
    */
-  inline void SetArgumentDouble(ParametersHandle params, uint64_t index, double value) {
+  inline void SetArgumentDouble(ParametersHandle params, uint64_t index, double value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentDouble", __location);
     return __polyhook_SetArgumentDouble(params, index, value);
   }
 
@@ -173,7 +198,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (ptr64): Value to set
    */
-  inline void SetArgumentPointer(ParametersHandle params, uint64_t index, void* value) {
+  inline void SetArgumentPointer(ParametersHandle params, uint64_t index, void* value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentPointer", __location);
     return __polyhook_SetArgumentPointer(params, index, value);
   }
 
@@ -188,7 +214,8 @@ namespace polyhook {
    * @param index (uint64): Index to set
    * @param value (string): Value to set
    */
-  inline void SetArgumentString(HookHandle hook, ParametersHandle params, uint64_t index, const plg::string& value) {
+  inline void SetArgumentString(HookHandle hook, ParametersHandle params, uint64_t index, const plg::string& value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgumentString", __location);
     return __polyhook_SetArgumentString(hook, params, index, value);
   }
 
@@ -203,7 +230,8 @@ namespace polyhook {
    * @param index (uint64): Value to set
    * @param value (any): Value to set
    */
-  inline void SetArgument(HookHandle hook, ParametersHandle params, uint64_t index, const plg::any& value) {
+  inline void SetArgument(HookHandle hook, ParametersHandle params, uint64_t index, const plg::any& value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetArgument", __location);
     return __polyhook_SetArgument(hook, params, index, value);
   }
 
@@ -216,7 +244,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (bool): Value to set
    */
-  inline void SetReturnBool(ReturnHandle ret, bool value) {
+  inline void SetReturnBool(ReturnHandle ret, bool value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnBool", __location);
     return __polyhook_SetReturnBool(ret, value);
   }
 
@@ -229,7 +258,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (int8): Value to set
    */
-  inline void SetReturnInt8(ReturnHandle ret, int8_t value) {
+  inline void SetReturnInt8(ReturnHandle ret, int8_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnInt8", __location);
     return __polyhook_SetReturnInt8(ret, value);
   }
 
@@ -242,7 +272,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (uint8): Value to set
    */
-  inline void SetReturnUInt8(ReturnHandle ret, uint8_t value) {
+  inline void SetReturnUInt8(ReturnHandle ret, uint8_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnUInt8", __location);
     return __polyhook_SetReturnUInt8(ret, value);
   }
 
@@ -255,7 +286,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (int16): Value to set
    */
-  inline void SetReturnInt16(ReturnHandle ret, int16_t value) {
+  inline void SetReturnInt16(ReturnHandle ret, int16_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnInt16", __location);
     return __polyhook_SetReturnInt16(ret, value);
   }
 
@@ -268,7 +300,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (uint16): Value to set
    */
-  inline void SetReturnUInt16(ReturnHandle ret, uint16_t value) {
+  inline void SetReturnUInt16(ReturnHandle ret, uint16_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnUInt16", __location);
     return __polyhook_SetReturnUInt16(ret, value);
   }
 
@@ -281,7 +314,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (int32): Value to set
    */
-  inline void SetReturnInt32(ReturnHandle ret, int32_t value) {
+  inline void SetReturnInt32(ReturnHandle ret, int32_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnInt32", __location);
     return __polyhook_SetReturnInt32(ret, value);
   }
 
@@ -294,7 +328,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (uint32): Value to set
    */
-  inline void SetReturnUInt32(ReturnHandle ret, uint32_t value) {
+  inline void SetReturnUInt32(ReturnHandle ret, uint32_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnUInt32", __location);
     return __polyhook_SetReturnUInt32(ret, value);
   }
 
@@ -307,7 +342,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (int64): Value to set
    */
-  inline void SetReturnInt64(ReturnHandle ret, int64_t value) {
+  inline void SetReturnInt64(ReturnHandle ret, int64_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnInt64", __location);
     return __polyhook_SetReturnInt64(ret, value);
   }
 
@@ -320,7 +356,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (uint64): Value to set
    */
-  inline void SetReturnUInt64(ReturnHandle ret, uint64_t value) {
+  inline void SetReturnUInt64(ReturnHandle ret, uint64_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnUInt64", __location);
     return __polyhook_SetReturnUInt64(ret, value);
   }
 
@@ -333,7 +370,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (float): Value to set
    */
-  inline void SetReturnFloat(ReturnHandle ret, float value) {
+  inline void SetReturnFloat(ReturnHandle ret, float value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnFloat", __location);
     return __polyhook_SetReturnFloat(ret, value);
   }
 
@@ -346,7 +384,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (double): Value to set
    */
-  inline void SetReturnDouble(ReturnHandle ret, double value) {
+  inline void SetReturnDouble(ReturnHandle ret, double value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnDouble", __location);
     return __polyhook_SetReturnDouble(ret, value);
   }
 
@@ -359,7 +398,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (ptr64): Value to set
    */
-  inline void SetReturnPointer(ReturnHandle ret, void* value) {
+  inline void SetReturnPointer(ReturnHandle ret, void* value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnPointer", __location);
     return __polyhook_SetReturnPointer(ret, value);
   }
 
@@ -373,7 +413,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (string): Value to set
    */
-  inline void SetReturnString(HookHandle hook, ReturnHandle ret, const plg::string& value) {
+  inline void SetReturnString(HookHandle hook, ReturnHandle ret, const plg::string& value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturnString", __location);
     return __polyhook_SetReturnString(hook, ret, value);
   }
 
@@ -387,7 +428,8 @@ namespace polyhook {
    * @param ret (ptr64): Pointer to return structure
    * @param value (any): Value to set
    */
-  inline void SetReturn(HookHandle hook, ReturnHandle ret, const plg::any& value) {
+  inline void SetReturn(HookHandle hook, ReturnHandle ret, const plg::any& value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetReturn", __location);
     return __polyhook_SetReturn(hook, ret, value);
   }
 
@@ -401,7 +443,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (bool): Value to set
    */
-  inline void SetRegisterBool(RegistersHandle registers, RegisterType reg, bool value) {
+  inline void SetRegisterBool(RegistersHandle registers, RegisterType reg, bool value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterBool", __location);
     return __polyhook_SetRegisterBool(registers, reg, value);
   }
 
@@ -415,7 +458,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (int8): Value to set
    */
-  inline void SetRegisterInt8(RegistersHandle registers, RegisterType reg, int8_t value) {
+  inline void SetRegisterInt8(RegistersHandle registers, RegisterType reg, int8_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterInt8", __location);
     return __polyhook_SetRegisterInt8(registers, reg, value);
   }
 
@@ -429,7 +473,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (uint8): Value to set
    */
-  inline void SetRegisterUInt8(RegistersHandle registers, RegisterType reg, uint8_t value) {
+  inline void SetRegisterUInt8(RegistersHandle registers, RegisterType reg, uint8_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterUInt8", __location);
     return __polyhook_SetRegisterUInt8(registers, reg, value);
   }
 
@@ -443,7 +488,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (int16): Value to set
    */
-  inline void SetRegisterInt16(RegistersHandle registers, RegisterType reg, int16_t value) {
+  inline void SetRegisterInt16(RegistersHandle registers, RegisterType reg, int16_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterInt16", __location);
     return __polyhook_SetRegisterInt16(registers, reg, value);
   }
 
@@ -457,7 +503,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (uint16): Value to set
    */
-  inline void SetRegisterUInt16(RegistersHandle registers, RegisterType reg, uint16_t value) {
+  inline void SetRegisterUInt16(RegistersHandle registers, RegisterType reg, uint16_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterUInt16", __location);
     return __polyhook_SetRegisterUInt16(registers, reg, value);
   }
 
@@ -471,7 +518,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (int32): Value to set
    */
-  inline void SetRegisterInt32(RegistersHandle registers, RegisterType reg, int32_t value) {
+  inline void SetRegisterInt32(RegistersHandle registers, RegisterType reg, int32_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterInt32", __location);
     return __polyhook_SetRegisterInt32(registers, reg, value);
   }
 
@@ -485,7 +533,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (uint32): Value to set
    */
-  inline void SetRegisterUInt32(RegistersHandle registers, RegisterType reg, uint32_t value) {
+  inline void SetRegisterUInt32(RegistersHandle registers, RegisterType reg, uint32_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterUInt32", __location);
     return __polyhook_SetRegisterUInt32(registers, reg, value);
   }
 
@@ -499,7 +548,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (int64): Value to set
    */
-  inline void SetRegisterInt64(RegistersHandle registers, RegisterType reg, int64_t value) {
+  inline void SetRegisterInt64(RegistersHandle registers, RegisterType reg, int64_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterInt64", __location);
     return __polyhook_SetRegisterInt64(registers, reg, value);
   }
 
@@ -513,7 +563,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (uint64): Value to set
    */
-  inline void SetRegisterUInt64(RegistersHandle registers, RegisterType reg, uint64_t value) {
+  inline void SetRegisterUInt64(RegistersHandle registers, RegisterType reg, uint64_t value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterUInt64", __location);
     return __polyhook_SetRegisterUInt64(registers, reg, value);
   }
 
@@ -527,7 +578,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (float): Value to set
    */
-  inline void SetRegisterFloat(RegistersHandle registers, RegisterType reg, float value) {
+  inline void SetRegisterFloat(RegistersHandle registers, RegisterType reg, float value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterFloat", __location);
     return __polyhook_SetRegisterFloat(registers, reg, value);
   }
 
@@ -541,7 +593,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (double): Value to set
    */
-  inline void SetRegisterDouble(RegistersHandle registers, RegisterType reg, double value) {
+  inline void SetRegisterDouble(RegistersHandle registers, RegisterType reg, double value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterDouble", __location);
     return __polyhook_SetRegisterDouble(registers, reg, value);
   }
 
@@ -555,7 +608,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (ptr64): Value to set
    */
-  inline void SetRegisterPointer(RegistersHandle registers, RegisterType reg, void* value) {
+  inline void SetRegisterPointer(RegistersHandle registers, RegisterType reg, void* value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterPointer", __location);
     return __polyhook_SetRegisterPointer(registers, reg, value);
   }
 
@@ -570,7 +624,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (string): Value to set
    */
-  inline void SetRegisterString(HookHandle hook, RegistersHandle registers, RegisterType reg, const plg::string& value) {
+  inline void SetRegisterString(HookHandle hook, RegistersHandle registers, RegisterType reg, const plg::string& value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegisterString", __location);
     return __polyhook_SetRegisterString(hook, registers, reg, value);
   }
 
@@ -585,7 +640,8 @@ namespace polyhook {
    * @param reg (uint64): Register to set
    * @param value (any): Value to set
    */
-  inline void SetRegister(HookHandle hook, RegistersHandle registers, RegisterType reg, const plg::any& value) {
+  inline void SetRegister(HookHandle hook, RegistersHandle registers, RegisterType reg, const plg::any& value, plg::source_location __location = plg::source_location::current()) {
+    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetRegister", __location);
     return __polyhook_SetRegister(hook, registers, reg, value);
   }
 

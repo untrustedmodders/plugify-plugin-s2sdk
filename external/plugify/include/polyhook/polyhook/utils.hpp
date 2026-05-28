@@ -41,6 +41,11 @@ namespace polyhook
 			return __polyhook_GetOriginalAddr(m_hook);
 		}
 
+		void SetName(std::string_view name) const
+		{
+			return __polyhook_SetDebugName(m_hook, name);
+		}
+
 	protected:
 		void* m_hook;
 	};
@@ -91,19 +96,19 @@ namespace polyhook
 	public:
 		~VirtualHookByIndexBase() override
 		{
-			_Unhook(m_class, m_index);
+			_Unhook(m_class, m_index, plg::source_location::current());
 		}
 
 		static std::unique_ptr<IHook> Create(void* pClass, int index, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
 		{
-			HookHandle pHook = _Hook(pClass, index, returnType, arguments, varIndex);
+			HookHandle pHook = _Hook(pClass, index, returnType, arguments, varIndex, plg::source_location::current());
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByIndexBase(pHook, pClass, index));
 		}
 
 		static std::unique_ptr<IHook> Find(void* pClass, int index)
 		{
-			HookHandle pHook = _Find(pClass, index);
+			HookHandle pHook = _Find(pClass, index, plg::source_location::current());
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByIndexBase(pHook, pClass, index));
 		}
@@ -117,25 +122,25 @@ namespace polyhook
 	template<auto _Hook, auto _Unhook, auto _Find>
 	class VirtualHookByFuncBase : public IHook {
 	protected:
-		VirtualHookByFuncBase(HookHandle pHook, void* pClass, void* pFunc) 
+		VirtualHookByFuncBase(HookHandle pHook, void* pClass, void* pFunc)
 			: IHook(pHook), m_class(pClass), m_func(pFunc) {}
 
 	public:
 		~VirtualHookByFuncBase() override
 		{
-			_Unhook(m_class, m_func);
+			_Unhook(m_class, m_func, plg::source_location::current());
 		}
 
 		static std::unique_ptr<IHook> Create(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
 		{
-			HookHandle pHook = _Hook(pClass, pFunc, returnType, arguments, varIndex);
+			HookHandle pHook = _Hook(pClass, pFunc, returnType, arguments, varIndex, plg::source_location::current());
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByFuncBase(pHook, pClass, pFunc));
 		}
 
 		static std::unique_ptr<IHook> Find(void* pClass, void* pFunc)
 		{
-			HookHandle pHook = _Find(pClass, pFunc);
+			HookHandle pHook = _Find(pClass, pFunc, plg::source_location::current());
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByFuncBase(pHook, pClass, pFunc));
 		}
