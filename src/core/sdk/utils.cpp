@@ -153,14 +153,16 @@ CServerSideClientBase* utils::GetClientBySlot(CPlayerSlot slot) {
 void utils::PlaySoundToClient(CPlayerSlot player, int channel, const char* soundName, float volume, soundlevel_t soundLevel, int flags, int pitch, const Vector& origin, float soundTime) {
 	CSingleRecipientFilter filter(player.Get());
 	EmitSound_t soundParams;
-	soundParams.m_nChannel = channel;
 	soundParams.m_pSoundName = soundName;
 	soundParams.m_flVolume = volume;
-	soundParams.m_SoundLevel = soundLevel;
-	soundParams.m_nFlags = flags;
-	soundParams.m_nPitch = pitch;
-	soundParams.m_pOrigin = origin.IsValid() ? &origin : nullptr;
+	soundParams.m_nFlags = static_cast<uint8_t>(flags);
+	soundParams.m_nPitch = static_cast<int16_t>(pitch);
 	soundParams.m_flSoundTime = soundTime;
+	if (origin.IsValid()) {
+		soundParams.m_vecSoundOrigin = origin;
+	}
+	(void)channel;
+	(void)soundLevel;
 	addresses::CBaseEntity_EmitSoundFilter(filter, player.Get() + 1, soundParams);
 }
 

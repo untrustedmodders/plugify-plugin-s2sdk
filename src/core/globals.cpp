@@ -62,7 +62,7 @@ namespace globals {
 		UNWRAP(addresses::CreateEntityByName, g_pGameConfig->GetSignature("CGameEntitySystem::CreateEntityByName"));
 		UNWRAP(addresses::DispatchSpawn, g_pGameConfig->GetSignature("CGameEntitySystem::DispatchSpawn"));
 		UNWRAP(addresses::CEntityInstance_AcceptInput, g_pGameConfig->GetSignature("CEntityInstance::AcceptInput"));
-		//TRY(addresses::CBaseEntity_EmitSoundFilter, g_pGameConfig->GetSignature("CBaseEntity::EmitSoundFilter"));
+		UNWRAP(addresses::CBaseEntity_EmitSoundFilter, g_pGameConfig->GetSignature("CBaseEntity::EmitSoundFilter"));
 		UNWRAP(addresses::CBaseEntity_SetMoveType, g_pGameConfig->GetSignature("CBaseEntity::SetMoveType"));
 
 #if defined (CS2)

@@ -99,7 +99,43 @@ struct SndOpEventGuid_t {
 	uint64 m_hStackHash;
 };
 
-// used with EmitSound_t
+struct StartSoundEventInfo {
+	SndOpEventGuid_t m_nSndOpEventGuid;
+	int32 m_nFlags;
+	uint64 m_nRecipients;
+};
+
+struct EmitSound_t
+{
+	EmitSound_t() :
+		m_pSoundName(0),
+		m_vecSoundOrigin(),
+		m_flVolume(VOL_NORM),
+		m_flSoundTime(0.0f),
+		m_nForceGuid(0),
+		m_nPitch(PITCH_NORM),
+		m_nFlags(0)
+	{
+	}
+	const char* m_pSoundName; // 0x0
+	Vector m_vecSoundOrigin;  // 0x8
+	float m_flVolume;		  // 0x14
+	float m_flSoundTime;	  // 0x18
+private:
+	uint8_t pad_1c[0x4];
+
+public:
+	uint32_t m_nForceGuid; // 0x20
+private:
+	uint8_t pad_24[0x4];
+
+public:
+	int16_t m_nPitch; // 0x28
+	uint8_t m_nFlags; // 0x2a
+}; // Size: 0x30 (with tail padding on x64)
+
+static_assert(sizeof(EmitSound_t) == 0x30);
+
 enum gender_t : uint8 {
 	GENDER_NONE = 0x0,
 	GENDER_MALE = 0x1,
@@ -122,42 +158,6 @@ enum gender_t : uint8 {
 	GENDER_HOSPITAL_PATIENT = 0x12,
 	GENDER_BRIDE = 0x13,
 	GENDER_LAST = 0x14,
-};
-
-struct EmitSound_t {
-	EmitSound_t() : m_nChannel(0),
-					m_pSoundName(0),
-					m_flVolume(VOL_NORM),
-					m_SoundLevel(SNDLVL_NONE),
-					m_nFlags(0),
-					m_nPitch(PITCH_NORM),
-					m_pOrigin(0),
-					m_flSoundTime(0.0f),
-					m_pflSoundDuration(0),
-					m_bEmitCloseCaption(true),
-					m_bWarnOnMissingCloseCaption(false),
-					m_bWarnOnDirectWaveReference(false),
-					m_nSpeakerEntity(-1),
-					m_UtlVecSoundOrigin(),
-					m_nForceGuid(0),
-					m_SpeakerGender(GENDER_NONE) {
-	}
-	int m_nChannel;
-	const char* m_pSoundName;
-	float m_flVolume;
-	soundlevel_t m_SoundLevel;
-	int m_nFlags;
-	int m_nPitch;
-	const Vector* m_pOrigin;
-	float m_flSoundTime;
-	float* m_pflSoundDuration;
-	bool m_bEmitCloseCaption;
-	bool m_bWarnOnMissingCloseCaption;
-	bool m_bWarnOnDirectWaveReference;
-	CEntityIndex m_nSpeakerEntity;
-	CUtlVector<Vector, int, CUtlVectorMemory_Growable<Vector, int>> m_UtlVecSoundOrigin;
-	SoundEventGuid_t m_nForceGuid;
-	gender_t m_SpeakerGender;
 };
 
 /*struct GameTime_t
