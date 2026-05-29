@@ -6,7 +6,7 @@
 #include <icvar.h>
 
 using ConVarListenerCallback = void (*)(uint64 conVarHandle, const plg::string& newValue, const plg::string& oldValue);
-constexpr char ConVarListenerStr[] = S2SDK_PACKAGE "::ConVarListener";
+inline char ConVarListenerStr[] = S2SDK_PACKAGE "::ConVarListener";
 
 enum class ConVarFlag : uint64_t {
 	None = 0, // The default, no flags at all

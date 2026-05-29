@@ -8,7 +8,7 @@ void RegisterEventListeners() {
         return;
 
     for (const auto& event : g_vecEventListeners) {
-        g_pGameEventManager->AddListener(event, event->GetEventName(), true);
+        g_pGameEventManager->AddListener(event, event->GetEventName().data(), true);
     }
 
     g_registered = true;

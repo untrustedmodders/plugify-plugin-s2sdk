@@ -4,7 +4,7 @@
 #include <igameevents.h>
 
 using EventListenerCallback = ResultType (*)(const plg::string& name, IGameEvent* event, bool dontBroadcast);
-constexpr char EventListenerStr[] = S2SDK_PACKAGE "::EventListener";
+inline char EventListenerStr[] = S2SDK_PACKAGE "::EventListener";
 
 struct EventHook {
 	plg::string name;

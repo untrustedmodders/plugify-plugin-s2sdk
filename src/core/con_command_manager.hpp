@@ -12,7 +12,7 @@ enum class ConCommandContext  {
 };
 
 using ConCommandListenerCallback = ResultType (*)(int caller, ConCommandContext context, const plg::vector<plg::string>& arguments);
-constexpr char ConCommandListenerStr[] = S2SDK_PACKAGE "::ConCommandListener";
+inline char ConCommandListenerStr[] = S2SDK_PACKAGE "::ConCommandListener";
 
 struct ConCommandInfo {
 	~ConCommandInfo();

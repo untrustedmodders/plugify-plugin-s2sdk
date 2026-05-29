@@ -40,7 +40,7 @@ CGameEntitySystem* GameEntitySystem() {
 extern Result<void> ServerStartup();
 
 namespace {
-constexpr char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
+inline char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
 
 polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	//auto config = polyhook::GetArgument<const GameSessionConfiguration_t *>(params, 1);

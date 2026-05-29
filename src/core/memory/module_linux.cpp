@@ -268,7 +268,7 @@ static CAddress engine2_vmi_class_typeinfo_vtable;
 
 void CModule::DumpVtables()
 {
-    auto get_vtable = [this](const char* name) -> CAddress {
+    auto get_vtable = [this](std::string_view name) -> CAddress {
         CAddress symbol_address = GetFunctionByName(name);
         if (symbol_address.IsValid())
         {
@@ -307,7 +307,7 @@ void CModule::DumpVtables()
         // to fix this issue, we only need to find the addresses of rtti vtables in engine2 and cache them for use with other modules
         //
         // note: tier0 is loaded before engine2, so for tier0 we simply just get the addresses
-        if (is_engine2)
+        if (is_tier0) // is_engine2
         {
             engine2_class_typeinfo_vtable     = class_typeinfo;
             engine2_si_class_typeinfo_vtable  = si_class_typeinfo;

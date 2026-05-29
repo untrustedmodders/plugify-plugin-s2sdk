@@ -1041,6 +1041,7 @@
         *_Unregister;
 
         __polyhook_*;
+        __configs_*;
         *_offset;
     local: *;
 };

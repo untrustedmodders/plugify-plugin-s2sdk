@@ -8,7 +8,7 @@
 
 using OutputKey = std::pair<plg::string, plg::string>;
 using EntityListenerCallback = ResultType (*)(int activatorHandle, int callerHandle, float delay);
-constexpr char EntityListenerStr[] = S2SDK_PACKAGE "::EntityListener";
+inline char EntityListenerStr[] = S2SDK_PACKAGE "::EntityListener";
 
 struct EntityOutputHook {
 	plg::enum_map<ListenerManager<EntityListenerStr, EntityListenerCallback>, HookMode> callbacks;

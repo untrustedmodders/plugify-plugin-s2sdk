@@ -13,6 +13,7 @@ void ModuleProvider::PreloadModules() {
 	};
 
 	// Load common modules
+	//load((utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "tier0").string());
 	load((utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2").string());
 	load((utils::GameDirectory() / S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server").string());
 }
