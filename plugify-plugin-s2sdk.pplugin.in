@@ -19101,24 +19101,42 @@
     {
       "name": "EmitSoundToClient",
       "group": "Engine",
-      "description": "Emits a sound to a specific client.",
+      "description": "Emits a sound to one or more clients.",
       "funcName": "EmitSoundToClient",
       "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "ref": false,
-          "description": "The index of the player's slot."
-        },
-        {
-          "name": "sound",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the sound to emit."
-        }
+    	{
+    	  "name": "entityIndex",
+    	  "type": "int32",
+    	  "ref": false,
+    	  "description": "The index of the entity that emits the sound."
+    	},
+    	{
+    	  "name": "playersSlot",
+    	  "type": "int32[]",
+    	  "ref": false,
+    	  "description": "Player slot indices that will hear the sound."
+    	},
+    	{
+    	  "name": "sound",
+    	  "type": "string",
+    	  "ref": false,
+    	  "description": "The name of the sound to emit."
+    	},
+    	{
+    	  "name": "volume",
+    	  "type": "float",
+    	  "ref": false,
+    	  "description": "The volume of the sound."
+    	},
+    	{
+    	  "name": "pitch",
+    	  "type": "float",
+    	  "ref": false,
+    	  "description": "The pitch of the sound."
+    	}
       ],
       "retType": {
-        "type": "void"
+    	"type": "void"
       }
     },
     {

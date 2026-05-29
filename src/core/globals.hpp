@@ -74,7 +74,7 @@ class CPlayer_WeaponServices;
 class IEntityFindFilter;
 class IRecipientFilter;
 struct EmitSound_t;
-struct SndOpEventGuid_t;
+struct StartSoundEventInfo;
 class CEntityKeyValues;
 class CBaseModelEntity;
 class CTakeDamageInfo;
@@ -99,7 +99,7 @@ namespace addresses {
 
 	inline void (*CEntityInstance_AcceptInput)(CEntityInstance* self, const char* inputName, CEntityInstance* activator, CEntityInstance* caller, variant_t* value, int outputID, void*);
 
-	inline SndOpEventGuid_t (*CBaseEntity_EmitSoundFilter)(IRecipientFilter& filter, CEntityIndex ent, const EmitSound_t& params);
+	inline StartSoundEventInfo (FASTCALL* CBaseEntity_EmitSoundFilter)(IRecipientFilter& filter, CEntityIndex ent, const EmitSound_t& params);
 
 	inline void (*CBaseEntity_SetMoveType)(CBaseEntity* self, MoveType_t moveType, MoveCollide_t moveCollide);
 

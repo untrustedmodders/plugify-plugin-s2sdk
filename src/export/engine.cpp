@@ -8,6 +8,8 @@
 #include <networksystem/inetworksystem.h>
 #include <core/sdk/entity/sounds.h>
 
+#include "recipientfilter.h"
+
 PLUGIFY_WARN_PUSH()
 
 #if defined(__clang)
@@ -224,16 +226,30 @@ extern "C" PLUGIN_API void StopSound(int entityHandle, const plg::string& sound)
 }
 
 /**
- * @brief Emits a sound to a specific client.
+ * @brief Emits a sound to one or more clients.
  *
- * @param playerSlot The index of the player's slot.
+ * @param entityIndex The index of the entity that emits the sound.
+ * @param playersSlot Player slot indices that will hear the sound.
  * @param sound The name of the sound to emit.
+ * @param volume The volume of the sound (default 1.0).
+ * @param pitch The pitch of the sound (default 0).
  */
-extern "C" PLUGIN_API void EmitSoundToClient(int playerSlot, const plg::string& sound) {
-	auto controller = helpers::GetController(playerSlot);
-	if (!controller) return;
-	ParamScope params(controller);
-	Sounds{}.EmitSoundOnClient(sound.c_str(), params[0]);
+extern "C" PLUGIN_API void EmitSoundToClient(int entityIndex, const plg::vector<int>& playersSlot, const plg::string& sound, float volume = 1, float pitch = 1) {
+	if (playersSlot.size() == 0)
+		return;
+
+	CRecipientFilter filter;
+
+	for (int i = 0; i < playersSlot.size(); i++) {
+		filter.AddRecipient(playersSlot[i]);
+	}
+
+	EmitSound_t params;
+	params.m_pSoundName = sound.c_str();
+	params.m_flVolume = volume;
+	params.m_nPitch = static_cast<int16_t>(pitch);
+
+	addresses::CBaseEntity_EmitSoundFilter(filter, entityIndex, params);
 }
 
 /**
