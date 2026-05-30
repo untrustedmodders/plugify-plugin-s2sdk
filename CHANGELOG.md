@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.9.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.8.3...v2.9.0) (2026-05-30)
+
+
+### Features
+
+* add module loader ([b2c8329](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b2c8329ba3478043db3d47f84d62a4316e43ce7a))
+
+
+### Bug Fixes
+
+* add configs as plugify dep ([6f61d11](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6f61d117511bec8d5f8df67e6b942be3b1af2d17))
+* add zydis ([be4e5aa](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/be4e5aac1e41a6b58c3c95a27c335039081fe902))
+* add zydis ([5a2017e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5a2017e901b2de1424f546d96dc9f771bb046311))
+* improve gameconfig ([4b2261c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4b2261c409d69e10662d43d11e12fc12df33372f))
+* improve hooking manager ([19a0e76](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/19a0e76a2178418efcf2054c1950a9f5a5500220))
+* improve listeners by adding profiler scopes ([489fa34](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/489fa34dd4a15302b6fedcfa39bfedd011bec817))
+* linux issues ([2b02a1d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2b02a1d82d7d0193accf0d1e5b1c33ed1f06d2ed))
+* module loading under different launchers ([316836e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/316836e3e8b981064ad14d52715a14e0219d3a32))
+* moving configs to plugin methods ([0707398](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/07073983f1e16ee5fa831b3185352a3e829d2e46))
+* other hook improvements ([498e727](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/498e7274327f9d1f21a9f4cf515cfde5b604d361))
+* remove dep ([08487bb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/08487bb49d8024517faaf8c6b6ca9958408044cb))
+* remove dynlibutils code ([d6985e2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d6985e258a6a080210c22131dcabf98f67f460dd))
+* small path changes ([29cfff0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/29cfff08aee2dbbfae77e6e0880f4af94fc57ace))
+* small refactor of listeners ([3606dc4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3606dc4271c38cd2dc5d97995e5804488f762613))
+* some gcc warnings ([078321d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/078321da9c1f97a08637bc7189c7fa933413aaa9))
+* update polyhook ([86a7937](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/86a7937278350918c0e8cc84eaa110ace655f554))
+* update schema ([1e08a87](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1e08a87dde637b3b65449a23eca6f806a252f33f))
+
 ## [2.8.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.8.2...v2.8.3) (2026-05-25)
 
 
