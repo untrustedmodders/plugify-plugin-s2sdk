@@ -44,11 +44,11 @@ void CModule::GetModuleInfo(std::string_view mod)
                 if (name.rfind(".so") == std::string::npos)
                     return 0;
 
-                /*if (name.find("/addons/") != std::string::npos)
-                    return 0;*/
+                if (name.find("/metamod/") != std::string::npos)
+                    return 0;
 
-                constexpr std::string_view ROOTBIN = "/bin/linuxsteamrt64/";
-                constexpr std::string_view GAMEBIN = "/csgo/bin/linuxsteamrt64/";
+                constexpr std::string_view ROOTBIN = S2SDK_ROOT_BINARY;
+                constexpr std::string_view GAMEBIN = S2SDK_GAME_BINARY;
 
                 bool isFromRootBin = name.find(ROOTBIN) != std::string::npos;
                 bool isFromGameBin = name.find(GAMEBIN) != std::string::npos;
@@ -307,7 +307,8 @@ void CModule::DumpVtables()
         // to fix this issue, we only need to find the addresses of rtti vtables in engine2 and cache them for use with other modules
         //
         // note: tier0 is loaded before engine2, so for tier0 we simply just get the addresses
-        if (is_tier0) // is_engine2
+    	auto exe_path = std::filesystem::canonical("/proc/self/exe").filename();
+		if (plg::as_string(exe_path) == "s2launcher" ? is_tier0 : is_engine2)
         {
             engine2_class_typeinfo_vtable     = class_typeinfo;
             engine2_si_class_typeinfo_vtable  = si_class_typeinfo;

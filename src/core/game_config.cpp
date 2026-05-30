@@ -13,9 +13,9 @@ void ModuleProvider::PreloadModules() {
 	};
 
 	// Load common modules
-	//load((utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "tier0").string());
-	load((utils::GameDirectory() / S2SDK_ROOT_BINARY S2SDK_LIBRARY_PREFIX "engine2").string());
-	load((utils::GameDirectory() / S2SDK_GAME_BINARY S2SDK_LIBRARY_PREFIX "server").string());
+	load("tier0");
+	load("engine2");
+	load("server");
 }
 
 std::shared_ptr<Module> ModuleProvider::GetModule(std::string_view name) {

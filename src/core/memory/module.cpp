@@ -34,7 +34,7 @@
 
 CModule::CModule(std::string_view str)
 {
-    GetModuleInfo(str);
+    GetModuleInfo(std::format(S2SDK_LIBRARY_PREFIX "{}" S2SDK_LIBRARY_SUFFIX, str));
 }
 
 CAddress CModule::FindPattern(std::string_view pattern) const

@@ -172,16 +172,16 @@ if(WINDOWS)
     set(S2SDK_COMPILE_DEFINITIONS
             ${S2SDK_COMPILE_DEFINITIONS}
             S2SDK_PLATFORM="win64"
-            S2SDK_ROOT_BINARY="bin/win64/"
-            S2SDK_GAME_BINARY="csgo/bin/win64/"
+            S2SDK_ROOT_BINARY="/bin/win64/"
+            S2SDK_GAME_BINARY="/${S2SDK_GAME_NAME}/bin/win64/"
             NOMINMAX=1
     )
 elseif(LINUX)
     set(S2SDK_COMPILE_DEFINITIONS
             ${S2SDK_COMPILE_DEFINITIONS}
             S2SDK_PLATFORM="linuxsteamrt64"
-            S2SDK_ROOT_BINARY="bin/linuxsteamrt64/"
-            S2SDK_GAME_BINARY="bin/linuxsteamrt64/../../csgo/bin/linuxsteamrt64/" # Metamod hack
+            S2SDK_ROOT_BINARY="/bin/linuxsteamrt64/"
+            S2SDK_GAME_BINARY="/${S2SDK_GAME_NAME}/bin/linuxsteamrt64/"
     )
 endif()
 
