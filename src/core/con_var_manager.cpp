@@ -241,8 +241,8 @@ bool ConVarManager::AutoExecConfig(std::span<const uint64> conVarHandles, bool a
 	    return false;
     }
 
-    std::string_view configFolder = folder.empty() ? "plugify" : folder;
-    fs::path configPath = utils::GameDirectory() / S2SDK_GAME_NAME "/cfg" / configFolder;
+    fs::path configFolder = folder.empty() ? "plugify" : folder;
+    fs::path configPath = utils::GameDirectory() / S2SDK_GAME_NAME / "cfg" / configFolder;
     fs::path fullPath = configPath / std::format("{}.cfg", name);
 
     std::vector<ConVarRefAbstract> conVarRefs;

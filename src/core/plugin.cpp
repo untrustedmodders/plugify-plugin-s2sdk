@@ -118,9 +118,9 @@ void LoadMOTDFile() {
 	}
 	
 	using namespace std::literals;
-	auto motdCvar = g_pCVar->FindConVar("motdfile");
-	auto motdFile = motdCvar.IsValidRef() ? cvars::GetConVarValue<CUtlString>(motdCvar) : "motd.txt"sv;
-	auto motdPath = utils::GameDirectory() / S2SDK_GAME_NAME / motdFile;
+	ConVarRef motdCvar = g_pCVar->FindConVar("motdfile");
+	fs::path motdFile = motdCvar.IsValidRef() ? cvars::GetConVarValue<CUtlString>(motdCvar) : "motd.txt"sv;
+	fs::path motdPath = utils::GameDirectory() / S2SDK_GAME_NAME / motdFile;
 
 	if (!fs::exists(motdPath)) {
 		std::ofstream file(motdPath, std::ios::out | std::ios::trunc);
