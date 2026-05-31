@@ -228,14 +228,18 @@ extern "C" PLUGIN_API void StopSound(int entityHandle, const plg::string& sound)
 /**
  * @brief Emits a sound to one or more clients.
  *
- * @param entityIndex The index of the entity that emits the sound.
+ * @param entityHandle The handle of the entity that emits the sound.
  * @param playersSlot Player slot indices that will hear the sound.
  * @param sound The name of the sound to emit.
  * @param volume The volume of the sound (default 1.0).
  * @param pitch The pitch of the sound (default 0).
  */
-extern "C" PLUGIN_API void EmitSoundToClient(int entityIndex, const plg::vector<int>& playersSlot, const plg::string& sound, float volume = 1, float pitch = 1) {
+extern "C" PLUGIN_API void EmitSoundToClient(int entityHandle, const plg::vector<int>& playersSlot, const plg::string& sound, float volume = 1, float pitch = 1) {
 	if (playersSlot.size() == 0)
+		return;
+
+	auto* entity = helpers::GetEntity<CBaseEntity>(entityHandle);
+	if (!entity)
 		return;
 
 	CRecipientFilter filter;
@@ -249,7 +253,7 @@ extern "C" PLUGIN_API void EmitSoundToClient(int entityIndex, const plg::vector<
 	params.m_flVolume = volume;
 	params.m_nPitch = static_cast<int16_t>(pitch);
 
-	addresses::CBaseEntity_EmitSoundFilter(filter, entityIndex, params);
+	addresses::CBaseEntity_EmitSoundFilter(filter, entity->GetEntityIndex(), params);
 }
 
 /**
