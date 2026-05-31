@@ -179,7 +179,6 @@ protected:
 		if (ihook == nullptr) {
 			return MakeError("Could not hook detour function: \"{}\" - {}",  name, polyhook::GetError());
 		}
-		ihook->SetName(name);
 
 		setter(*ihook);
 		void* orig = ihook->GetAddress();
