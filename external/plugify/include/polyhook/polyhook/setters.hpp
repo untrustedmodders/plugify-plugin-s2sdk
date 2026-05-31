@@ -9,20 +9,6 @@
 
 namespace polyhook {
 
-  using _SetDebugName = void (*)(HookHandle, const plg::string&);
-}
-extern "C" PLUGIN_API polyhook::_SetDebugName __polyhook_SetDebugName;
-namespace polyhook {
-  /**
-   * @brief Set debug hook name
-   * @param hook (ptr64): Hook pointer
-   * @param name (string): Hook debug name
-   */
-  inline void SetDebugName(HookHandle hook, const plg::string& name, plg::source_location __location = plg::source_location::current()) {
-    [[maybe_unused]] auto __scope = plg::Scope("polyhook::SetDebugName", __location);
-    return __polyhook_SetDebugName(hook, name);
-  }
-
   using _SetArgumentBool = void (*)(ParametersHandle, uint64_t, bool);
 }
 extern "C" PLUGIN_API polyhook::_SetArgumentBool __polyhook_SetArgumentBool;

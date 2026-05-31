@@ -41,11 +41,6 @@ namespace polyhook
 			return __polyhook_GetOriginalAddr(m_hook);
 		}
 
-		void SetName(std::string_view name) const
-		{
-			return __polyhook_SetDebugName(m_hook, name);
-		}
-
 	protected:
 		void* m_hook;
 	};
@@ -61,16 +56,16 @@ namespace polyhook
 			__polyhook_UnhookDetour(m_func);
 		}
 
-		static std::unique_ptr<IHook> Create(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
+		static std::unique_ptr<IHook> Create(void* pFunc, DataType returnType, std::span<const DataType> args, int varIndex = -1, std::string_view name = "")
 		{
-			HookHandle pHook = __polyhook_HookDetour(pFunc, returnType, arguments, varIndex);
+			HookHandle pHook = __polyhook_HookDetour(pFunc, returnType, plg::vector<DataType>(args.begin(), args.end()), varIndex, name);
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new DetourHook(pHook, pFunc));
 		}
 
-		static std::unique_ptr<IHook> Create(void* pFunc)
+		static std::unique_ptr<IHook> Create(void* pFunc, std::string_view name = "")
 		{
-			HookHandle pHook = __polyhook_HookDetour2(pFunc);
+			HookHandle pHook = __polyhook_HookDetour2(pFunc, name);
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new DetourHook(pHook, pFunc));
 		}
@@ -99,9 +94,9 @@ namespace polyhook
 			_Unhook(m_class, m_index, plg::source_location::current());
 		}
 
-		static std::unique_ptr<IHook> Create(void* pClass, int index, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
+		static std::unique_ptr<IHook> Create(void* pClass, int index, DataType returnType, std::span<const DataType> args, int varIndex = -1, std::string_view name = "")
 		{
-			HookHandle pHook = _Hook(pClass, index, returnType, arguments, varIndex, plg::source_location::current());
+			HookHandle pHook = _Hook(pClass, index, returnType, plg::vector<DataType>(args.begin(), args.end()), varIndex, name, plg::source_location::current());
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByIndexBase(pHook, pClass, index));
 		}
@@ -131,9 +126,9 @@ namespace polyhook
 			_Unhook(m_class, m_func, plg::source_location::current());
 		}
 
-		static std::unique_ptr<IHook> Create(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int varIndex = -1)
+		static std::unique_ptr<IHook> Create(void* pClass, void* pFunc, DataType returnType, std::span<const DataType> args, int varIndex = -1, std::string_view name = "")
 		{
-			HookHandle pHook = _Hook(pClass, pFunc, returnType, arguments, varIndex, plg::source_location::current());
+			HookHandle pHook = _Hook(pClass, pFunc, returnType, plg::vector<DataType>(args.begin(), args.end()), varIndex, name, plg::source_location::current());
 			if (pHook == nullptr) return nullptr;
 			return std::unique_ptr<IHook>(new VirtualHookByFuncBase(pHook, pClass, pFunc));
 		}

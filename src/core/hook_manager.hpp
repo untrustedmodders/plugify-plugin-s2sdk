@@ -110,11 +110,10 @@ protected:
 			return ihook->GetAddress();
 		}
 
-		ihook = polyhook::VTableHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
+		ihook = polyhook::VTableHook2::Create(ptr, (void*&) func, ret, args, varIndex, name);
 		if (ihook == nullptr) {
 			return MakeError("Could not hook table function: \"{}\" - {}",  name, polyhook::GetError());
 		}
-		ihook->SetName(name);
 
 		setter(*ihook);
 		void* orig = ihook->GetAddress();
@@ -142,11 +141,10 @@ protected:
 			return ihook->GetAddress();
 		}
 
-		ihook = polyhook::VFuncHook2::Create(ptr, (void*&) func, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
+		ihook = polyhook::VFuncHook2::Create(ptr, (void*&) func, ret, args, varIndex, name);
 		if (ihook == nullptr) {
 			return MakeError("Could not hook virtual function: \"{}\" - {}",  name, polyhook::GetError());
 		}
-		ihook->SetName(name);
 
 		setter(*ihook);
 		void* orig = ihook->GetAddress();
@@ -177,7 +175,7 @@ protected:
 		auto args = trait::args();
 		auto ret = trait::ret();
 
-		ihook = polyhook::DetourHook::Create(*addr, ret, plg::vector<polyhook::DataType>(args.begin(), args.end()), varIndex);
+		ihook = polyhook::DetourHook::Create(*addr, ret, args, varIndex, name);
 		if (ihook == nullptr) {
 			return MakeError("Could not hook detour function: \"{}\" - {}",  name, polyhook::GetError());
 		}
@@ -208,11 +206,10 @@ protected:
 			return ihook->GetAddress();
 		}
 
-		ihook = polyhook::DetourHook::Create(*addr);
+		ihook = polyhook::DetourHook::Create(*addr, name);
 		if (ihook == nullptr) {
 			return MakeError("Could not hook mid function: \"{}\" - {}",  name, polyhook::GetError());
 		}
-		ihook->SetName(name);
 
 		setter(*ihook);
 		void* orig = ihook->GetAddress();

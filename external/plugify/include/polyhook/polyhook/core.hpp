@@ -9,7 +9,7 @@
 
 namespace polyhook {
 
-  using _HookDetour = HookHandle (*)(void*, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookDetour = HookHandle (*)(void*, DataType, const plg::vector<DataType>&, int32_t, const plg::string&);
 }
 extern "C" PLUGIN_API polyhook::_HookDetour __polyhook_HookDetour;
 namespace polyhook {
@@ -19,28 +19,30 @@ namespace polyhook {
    * @param returnType (uint8): Return type
    * @param arguments (uint8[]): Arguments type array
    * @param varIndex (int32): Index of a first variadic argument or -1
+   * @param name (string): The debug name of hook for profiler and logging
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookDetour(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+  inline HookHandle HookDetour(void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, const plg::string& name = "", plg::source_location __location = plg::source_location::current()) {
     [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookDetour", __location);
-    return __polyhook_HookDetour(pFunc, returnType, arguments, varIndex);
+    return __polyhook_HookDetour(pFunc, returnType, arguments, varIndex, name);
   }
 
-  using _HookDetour2 = HookHandle (*)(void*);
+  using _HookDetour2 = HookHandle (*)(void*, const plg::string&);
 }
 extern "C" PLUGIN_API polyhook::_HookDetour2 __polyhook_HookDetour2;
 namespace polyhook {
   /**
    * @brief Sets a mid hook
    * @param pFunc (ptr64): Function address
+   * @param name (string): The debug name of hook for profiler and logging
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookDetour2(void* pFunc, plg::source_location __location = plg::source_location::current()) {
+  inline HookHandle HookDetour2(void* pFunc, const plg::string& name = "", plg::source_location __location = plg::source_location::current()) {
     [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookDetour2", __location);
-    return __polyhook_HookDetour2(pFunc);
+    return __polyhook_HookDetour2(pFunc, name);
   }
 
-  using _HookVirtualTable = HookHandle (*)(void*, int32_t, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookVirtualTable = HookHandle (*)(void*, int32_t, DataType, const plg::vector<DataType>&, int32_t, const plg::string&);
 }
 extern "C" PLUGIN_API polyhook::_HookVirtualTable __polyhook_HookVirtualTable;
 namespace polyhook {
@@ -51,14 +53,15 @@ namespace polyhook {
    * @param returnType (uint8): Return type
    * @param arguments (uint8[]): Arguments type array
    * @param varIndex (int32): Index of a first variadic argument or -1
+   * @param name (string): The debug name of hook for profiler and logging
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookVirtualTable(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+  inline HookHandle HookVirtualTable(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, const plg::string& name = "", plg::source_location __location = plg::source_location::current()) {
     [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookVirtualTable", __location);
-    return __polyhook_HookVirtualTable(pClass, index, returnType, arguments, varIndex);
+    return __polyhook_HookVirtualTable(pClass, index, returnType, arguments, varIndex, name);
   }
 
-  using _HookVirtualTable2 = HookHandle (*)(void*, void*, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookVirtualTable2 = HookHandle (*)(void*, void*, DataType, const plg::vector<DataType>&, int32_t, const plg::string&);
 }
 extern "C" PLUGIN_API polyhook::_HookVirtualTable2 __polyhook_HookVirtualTable2;
 namespace polyhook {
@@ -69,14 +72,15 @@ namespace polyhook {
    * @param returnType (uint8): Return type
    * @param arguments (uint8[]): Arguments type array
    * @param varIndex (int32): Index of a first variadic argument or -1
+   * @param name (string): The debug name of hook for profiler and logging
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookVirtualTable2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+  inline HookHandle HookVirtualTable2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, const plg::string& name = "", plg::source_location __location = plg::source_location::current()) {
     [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookVirtualTable2", __location);
-    return __polyhook_HookVirtualTable2(pClass, pFunc, returnType, arguments, varIndex);
+    return __polyhook_HookVirtualTable2(pClass, pFunc, returnType, arguments, varIndex, name);
   }
 
-  using _HookVirtualFunc = HookHandle (*)(void*, int32_t, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookVirtualFunc = HookHandle (*)(void*, int32_t, DataType, const plg::vector<DataType>&, int32_t, const plg::string&);
 }
 extern "C" PLUGIN_API polyhook::_HookVirtualFunc __polyhook_HookVirtualFunc;
 namespace polyhook {
@@ -87,14 +91,15 @@ namespace polyhook {
    * @param returnType (uint8): Return type
    * @param arguments (uint8[]): Arguments type array
    * @param varIndex (int32): Index of a first variadic argument or -1
+   * @param name (string): The debug name of hook for profiler and logging
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookVirtualFunc(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+  inline HookHandle HookVirtualFunc(void* pClass, int32_t index, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, const plg::string& name = "", plg::source_location __location = plg::source_location::current()) {
     [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookVirtualFunc", __location);
-    return __polyhook_HookVirtualFunc(pClass, index, returnType, arguments, varIndex);
+    return __polyhook_HookVirtualFunc(pClass, index, returnType, arguments, varIndex, name);
   }
 
-  using _HookVirtualFunc2 = HookHandle (*)(void*, void*, DataType, const plg::vector<DataType>&, int32_t);
+  using _HookVirtualFunc2 = HookHandle (*)(void*, void*, DataType, const plg::vector<DataType>&, int32_t, const plg::string&);
 }
 extern "C" PLUGIN_API polyhook::_HookVirtualFunc2 __polyhook_HookVirtualFunc2;
 namespace polyhook {
@@ -105,11 +110,12 @@ namespace polyhook {
    * @param returnType (uint8): Return type
    * @param arguments (uint8[]): Arguments type array
    * @param varIndex (int32): Index of a first variadic argument or -1
+   * @param name (string): The debug name of hook for profiler and logging
    * @return ptr64: Returns hook pointer
    */
-  inline HookHandle HookVirtualFunc2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, plg::source_location __location = plg::source_location::current()) {
+  inline HookHandle HookVirtualFunc2(void* pClass, void* pFunc, DataType returnType, const plg::vector<DataType>& arguments, int32_t varIndex = -1, const plg::string& name = "", plg::source_location __location = plg::source_location::current()) {
     [[maybe_unused]] auto __scope = plg::Scope("polyhook::HookVirtualFunc2", __location);
-    return __polyhook_HookVirtualFunc2(pClass, pFunc, returnType, arguments, varIndex);
+    return __polyhook_HookVirtualFunc2(pClass, pFunc, returnType, arguments, varIndex, name);
   }
 
   using _UnhookDetour = bool (*)(void*);

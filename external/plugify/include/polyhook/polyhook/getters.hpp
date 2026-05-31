@@ -50,20 +50,6 @@ namespace polyhook {
     return __polyhook_GetOriginalAddr(hook);
   }
 
-  using _GetDebugName = plg::string (*)(HookHandle);
-}
-extern "C" PLUGIN_API polyhook::_GetDebugName __polyhook_GetDebugName;
-namespace polyhook {
-  /**
-   * @brief Get debug hook name
-   * @param hook (ptr64): Hook pointer
-   * @return string: Returns hook debug name
-   */
-  inline plg::string GetDebugName(HookHandle hook, plg::source_location __location = plg::source_location::current()) {
-    [[maybe_unused]] auto __scope = plg::Scope("polyhook::GetDebugName", __location);
-    return __polyhook_GetDebugName(hook);
-  }
-
   using _GetArgumentBool = bool (*)(ParametersHandle, uint64_t);
 }
 extern "C" PLUGIN_API polyhook::_GetArgumentBool __polyhook_GetArgumentBool;
