@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.9.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.9.0...v2.9.1) (2026-05-31)
+
+
+### Bug Fixes
+
+* add semver constraints for deps ([cd60882](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/cd60882bed4363820d8c1c9957af648df026d5f0))
+* implement EmitSoundToClient with CS2 EmitSound_t layout ([5dd70ee](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5dd70ee597f63878022cd05ebf93e3e804e8f666))
+* remove some old func ([e4302d6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e4302d66bf02a4938f972ff80f5b6c36e0402909))
+* start use handle for EmitSoundToClient ([688d899](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/688d8990f88cdb42d0c3193be9615a51c47f0d1e))
+* update for new polyhook ([aa35dc2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/aa35dc2358b5067a53ff392bf54af7ba8053ce3d))
+
 ## [2.9.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.8.3...v2.9.0) (2026-05-30)
 
 
