@@ -10,7 +10,7 @@ struct EventHook {
 	plg::string name;
 	bool postCopy{};
 	uint32_t refCount{1};
-	plg::enum_map<ListenerManager<EventListenerStr, EventListenerCallback>, HookMode> callbacks;
+	plg::enum_array<ListenerManager<EventListenerStr, EventListenerCallback>, HookMode> callbacks;
 };
 
 enum class EventHookError {

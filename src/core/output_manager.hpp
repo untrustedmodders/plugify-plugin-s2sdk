@@ -11,7 +11,7 @@ using EntityListenerCallback = ResultType (*)(int activatorHandle, int callerHan
 inline char EntityListenerStr[] = S2SDK_PACKAGE "::EntityListener";
 
 struct EntityOutputHook {
-	plg::enum_map<ListenerManager<EntityListenerStr, EntityListenerCallback>, HookMode> callbacks;
+	plg::enum_array<ListenerManager<EntityListenerStr, EntityListenerCallback>, HookMode> callbacks;
 };
 
 class EntityOutputManager {

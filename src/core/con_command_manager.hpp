@@ -19,7 +19,7 @@ struct ConCommandInfo {
 
 	ConCommandData* command{};
 	ConCommandRef commandRef{};
-	plg::enum_map<ListenerManager<ConCommandListenerStr, ConCommandListenerCallback>, HookMode> callbacks;
+	plg::enum_array<ListenerManager<ConCommandListenerStr, ConCommandListenerCallback>, HookMode> callbacks;
 	bool defaultCommand{};
 };
 
@@ -48,6 +48,6 @@ public:
 private:
  	plg::flat_hash_map<plg::string, std::shared_ptr<ConCommandInfo>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_cmdLookup;
 	std::recursive_mutex m_mutex;
-	plg::enum_map<ListenerManager<ConCommandListenerStr, ConCommandListenerCallback>, HookMode> m_globalCallbacks;
+	plg::enum_array<ListenerManager<ConCommandListenerStr, ConCommandListenerCallback>, HookMode> m_globalCallbacks;
 };
 inline ConCommandManager& g_ConCommandManager = ConCommandManager::Instance();

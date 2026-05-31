@@ -9,7 +9,7 @@ using UserMessageCallback = ResultType (*)(UserMessage* message);
 inline char UserMessageStr[] = S2SDK_PACKAGE "::UserMessageListener";
 
 struct UserMessageHook {
-	plg::enum_map<ListenerManager<UserMessageStr, UserMessageCallback>, HookMode> callbacks;
+	plg::enum_array<ListenerManager<UserMessageStr, UserMessageCallback>, HookMode> callbacks;
 };
 
 class UserMessageManager {
