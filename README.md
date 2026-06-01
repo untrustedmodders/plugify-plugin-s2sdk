@@ -1,3 +1,5 @@
+[![Русский](https://img.shields.io/badge/Русский-%F0%9F%87%B7%F0%9F%87%BA-green?style=for-the-badge)](README_ru.md)
+
 # Source2 SDK Plugin
 
 ## Overview
