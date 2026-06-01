@@ -193,6 +193,3 @@ This project is licensed under the GPLv3 License - see the [LICENSE](LICENSE) fi
 
 For support and inquiries, please open an issue in the GitHub repository or contact us through our community channels.
 
----
-
-Happy coding and enjoy creating amazing plugins for Source 2!
