@@ -19,134 +19,134 @@
 
 #ifdef PLATFORM_WINDOWS
 
-#	include "os.h"
-#	include "module.hpp"
+#    include "os.h"
+#    include "module.hpp"
 
-#	include <Zydis/Zydis.h>
+#    include <Zydis/Zydis.h>
 
-#	include <algorithm>
-#	include <cinttypes>
-#	include <format>
-#	include <ranges>
-#	include <thread>
+#    include <algorithm>
+#    include <cinttypes>
+#    include <format>
+#    include <ranges>
+#    include <thread>
 
-#	ifdef __clang__
+#    ifdef __clang__
 // clang-cl compat: MSVC pre-defines _ThrowInfo as a compiler built-in type.
 // Newer MSVC CRT headers (ehdata_forceinclude.h) define ThrowInfo at line 178
 // but reference _ThrowInfo at line 187. clang-cl lacks this built-in, so we
 // use a macro to map _ThrowInfo -> ThrowInfo before the header is parsed.
 #        define _ThrowInfo ThrowInfo
-#	endif
-#	include <rttidata.h>
-#	ifdef __clang__
+#    endif
+#    include <rttidata.h>
+#    ifdef __clang__
 #        undef _ThrowInfo
-#	endif
-#	include <vcruntime.h>
+#    endif
+#    include <vcruntime.h>
 
 void CModule::GetModuleInfo(std::string_view mod)
 {
-	HMODULE handle = GetModuleHandleA(mod.data());
-	if (!handle)
+    HMODULE handle = GetModuleHandleA(mod.data());
+    if (!handle)
         return;
 
-	_module_name.resize(MAX_PATH);
-	auto actual_size = GetModuleFileNameA(handle, _module_name.data(), MAX_PATH);
-	_module_name.resize(actual_size);
+    _module_name.resize(MAX_PATH);
+    auto actual_size = GetModuleFileNameA(handle, _module_name.data(), MAX_PATH);
+    _module_name.resize(actual_size);
 
-	_module_name = _module_name.substr(_module_name.find_last_of('\\') + 1);
+    _module_name = _module_name.substr(_module_name.find_last_of('\\') + 1);
 
-	_base_address = reinterpret_cast<uintptr_t>(handle);
+    _base_address = reinterpret_cast<uintptr_t>(handle);
 
-	const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(handle);
+    const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(handle);
 
-	if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE)
+    if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE)
         return;
 
-	const auto bytes = reinterpret_cast<uint8_t*>(handle);
+    const auto bytes = reinterpret_cast<uint8_t*>(handle);
 
-	const auto ntHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(bytes + dosHeader->e_lfanew);
+    const auto ntHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(bytes + dosHeader->e_lfanew);
 
-	if (ntHeader->Signature != IMAGE_NT_SIGNATURE)
+    if (ntHeader->Signature != IMAGE_NT_SIGNATURE)
         return;
 
-	_size = ntHeader->OptionalHeader.SizeOfImage;
+    _size = ntHeader->OptionalHeader.SizeOfImage;
 
-	auto pSection = IMAGE_FIRST_SECTION(ntHeader);
+    auto section = IMAGE_FIRST_SECTION(ntHeader);
 
-	for (auto i = 0u; i < ntHeader->FileHeader.NumberOfSections; i++, pSection++)
-	{
-        const auto isExecutable = (pSection->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
-        const auto isReadable	= (pSection->Characteristics & IMAGE_SCN_MEM_READ) != 0;
-        const auto isWritable	= (pSection->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
+    for (auto i = 0u; i < ntHeader->FileHeader.NumberOfSections; i++, section++)
+    {
+        const auto isExecutable = (section->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
+        const auto isReadable   = (section->Characteristics & IMAGE_SCN_MEM_READ) != 0;
+        const auto isWritable   = (section->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
 
-        const auto start = _base_address + pSection->VirtualAddress;
-        const auto size  = pSection->Misc.VirtualSize;
+        const auto start = _base_address + section->VirtualAddress;
+        const auto size  = section->Misc.VirtualSize;
 
-        auto& section	= _sections.emplace_back();
-        section.address = start;
-        section.size	= size;
+        auto& segment   = _segments.emplace_back();
+        segment.address = start;
+        segment.size    = size;
         if (isExecutable)
-            section.flags |= FLAG_X;
+            segment.flags |= FLAG_X;
         if (isReadable)
-            section.flags |= FLAG_R;
+            segment.flags |= FLAG_R;
         if (isWritable)
-            section.flags |= FLAG_W;
+            segment.flags |= FLAG_W;
 
         const auto data = reinterpret_cast<uint8_t*>(start);
-        section.data	= std::span(data, data + size);
-		section.name	= reinterpret_cast<const char*>(pSection->Name);
-	}
+        segment.data    = std::span(data, data + size);
+		segment.name    = reinterpret_cast<const char*>(section->Name);
+    }
 
-	_createInterFaceFn = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
+    _createInterFaceFn = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
 
-	{
+    {
         [[maybe_unused]] plg::Scope scope(_module_name + "::DumpVTables");
         DumpVtables();
-	}
-	{
+    }
+    {
         [[maybe_unused]] plg::Scope scope(_module_name + "::BuildFunctionIndexAndReferences");
         BuildFunctionIndexAndReferences();
-	}
+    }
 }
 
 void CModule::BuildFunctionIndexAndReferences()
 {
-	// from praydog https://github.com/cursey/kananlib/blob/7a99a94cea3dbcbd46b54885bd3d04f1d242e21a/src/Scan.cpp#L1329-L1344
-	const auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(_base_address);
-	const auto nt_header  = reinterpret_cast<PIMAGE_NT_HEADERS>(_base_address + dos_header->e_lfanew);
+    // from praydog https://github.com/cursey/kananlib/blob/7a99a94cea3dbcbd46b54885bd3d04f1d242e21a/src/Scan.cpp#L1329-L1344
+    const auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(_base_address);
+    const auto nt_header  = reinterpret_cast<PIMAGE_NT_HEADERS>(_base_address + dos_header->e_lfanew);
 
-	const auto directory = &nt_header->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
+    const auto directory = &nt_header->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
 
-	const auto rva  = directory->VirtualAddress;
-	const auto size = directory->Size;
+    const auto rva  = directory->VirtualAddress;
+    const auto size = directory->Size;
 
-	const auto directory_ptr = reinterpret_cast<PIMAGE_RUNTIME_FUNCTION_ENTRY>(_base_address + rva);
+    const auto directory_ptr = reinterpret_cast<PIMAGE_RUNTIME_FUNCTION_ENTRY>(_base_address + rva);
 
-	const auto entries = size / sizeof(IMAGE_RUNTIME_FUNCTION_ENTRY);
+    const auto entries = size / sizeof(IMAGE_RUNTIME_FUNCTION_ENTRY);
 
-	if (entries <= 0)
-	{
+    if (entries <= 0)
+    {
         plg::print(LS_ERROR, "No exception directory entries was found for {}\n", _module_name);
         return;
-	}
+    }
 
-	_function_entries.reserve(entries);
+    _function_entries.reserve(entries);
 
-	// https://learn.microsoft.com/en-us/cpp/build/exception-handling-x64?view=msvc-170
-	struct UNWIND_INFO
-	{
+    // https://learn.microsoft.com/en-us/cpp/build/exception-handling-x64?view=msvc-170
+    struct UNWIND_INFO
+    {
         uint8_t Version : 3;
         uint8_t Flags : 5;
         uint8_t SizeOfProlog;
         uint8_t CountOfCodes;
         uint8_t FrameRegister : 4;
         uint8_t FrameOffset : 4;
-	};
+    };
 
-	for (size_t i = 0; i < entries;)
-	{
+    for (size_t i = 0; i < entries;)
+    {
         auto start_exception = &directory_ptr[i];
-        auto start_address	= start_exception->BeginAddress;
+        auto start_address   = start_exception->BeginAddress;
         auto end_address     = start_exception->EndAddress;
 
         size_t next_i = i + 1;
@@ -167,48 +167,48 @@ void CModule::BuildFunctionIndexAndReferences()
 
         auto& entry = _function_entries.emplace_back();
         entry.start = _base_address + start_address;
-        entry.end	= _base_address + end_address;
+        entry.end   = _base_address + end_address;
 
         i = next_i;
-	}
+    }
 
-	std::ranges::sort(_function_entries,
+    std::ranges::sort(_function_entries,
                       [](const FunctionEntry& a, const FunctionEntry& b) {
                           return a.start < b.start;
                       });
 
-	auto is_in_data_section = [this](uintptr_t address) noexcept {
-        for (const auto& section : _sections)
+    auto is_in_data_section = [this](uintptr_t address) noexcept {
+        for (const auto& seg : _segments)
         {
-            if (section.flags & FLAG_X) continue;
-            if (section.address <= address && address < section.address + section.size) return true;
+            if (seg.flags & FLAG_X) continue;
+            if (seg.address <= address && address < seg.address + seg.size) return true;
         }
         return false;
-	};
+    };
 
-	auto is_in_text_section = [this](uintptr_t address) noexcept {
-        for (const auto& section : _sections)
+    auto is_in_text_section = [this](uintptr_t address) noexcept {
+        for (const auto& seg : _segments)
         {
-            if ((section.flags & FLAG_X) == 0) continue;
-            if (section.address <= address && address < section.address + section.size) return true;
+            if ((seg.flags & FLAG_X) == 0) continue;
+            if (seg.address <= address && address < seg.address + seg.size) return true;
         }
         return false;
-	};
+    };
 
-	const auto num_threads = std::max(1u, std::thread::hardware_concurrency());
-	const auto chunk_size  = (_function_entries.size() + num_threads - 1) / num_threads;
+    const auto num_threads = std::max(1u, std::thread::hardware_concurrency());
+    const auto chunk_size  = (_function_entries.size() + num_threads - 1) / num_threads;
 
-	std::vector<std::vector<ReferenceEntry>> chunk_results(num_threads);
-	std::vector<std::thread>                 threads;
-	threads.reserve(num_threads);
+    std::vector<std::vector<ReferenceEntry>> chunk_results(num_threads);
+    std::vector<std::thread>                 threads;
+    threads.reserve(num_threads);
 
-	// multithreaded solution inspired by the code snippet @angelfor3v3r gave me a long time ago.
-	// to be honest i could have used yaxpeax-x86, which is the fastest decoder i have found yet (it takes about 100ms to decode the entire .text section
-	// in libserver.so while zydis takes ~450ms), but i dont think it is worth the effort to replace zydis with it,
-	// not to mention safetyhook also uses zydis and i use the encoder feature from zydis too.
-	// hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
+    // multithreaded solution inspired by the code snippet @angelfor3v3r gave me a long time ago.
+    // to be honest i could have used yaxpeax-x86, which is the fastest decoder i have found yet (it takes about 100ms to decode the entire .text section
+    // in libserver.so while zydis takes ~450ms), but i dont think it is worth the effort to replace zydis with it,
+    // not to mention safetyhook also uses zydis and i use the encoder feature from zydis too.
+    // hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
 
-	auto disassemble_chunk = [&](std::uint32_t idx, std::size_t start_idx, std::size_t end_idx) {
+    auto disassemble_chunk = [&](std::uint32_t idx, std::size_t start_idx, std::size_t end_idx) {
         ZydisDecoder decoder{};
         if (ZYAN_FAILED(ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64))) return;
 
@@ -222,7 +222,7 @@ void CModule::BuildFunctionIndexAndReferences()
         {
             const auto& entry = _function_entries[i];
             auto        start = entry.start;
-            auto        end	= entry.end;
+            auto        end   = entry.end;
 
             uintptr_t jumptable_start_address{};
 
@@ -248,7 +248,7 @@ void CModule::BuildFunctionIndexAndReferences()
                 else if (jumptable_start_address == 0 && (instr.mnemonic == ZYDIS_MNEMONIC_MOV || instr.mnemonic == ZYDIS_MNEMONIC_MOVSXD))
                 {
                     const auto& src = operands[1];
-                    if (src.type == ZYDIS_OPERAND_TYPE_MEMORY && src.mem.index != ZYDIS_REGISTER_NONE && (src.mem.section == ZYDIS_REGISTER_DS || src.mem.section == ZYDIS_REGISTER_SS) && src.mem.scale != 0 && src.mem.disp.value > 0)
+                    if (src.type == ZYDIS_OPERAND_TYPE_MEMORY && src.mem.index != ZYDIS_REGISTER_NONE && (src.mem.segment == ZYDIS_REGISTER_DS || src.mem.segment == ZYDIS_REGISTER_SS) && src.mem.scale != 0 && src.mem.disp.value > 0)
                     {
                         auto target = src.mem.disp.value + _base_address;
 
@@ -259,75 +259,75 @@ void CModule::BuildFunctionIndexAndReferences()
                 ip += instr.length;
             }
         }
-	};
+    };
 
-	for (auto i = 0u; i < num_threads; ++i)
-	{
+    for (auto i = 0u; i < num_threads; ++i)
+    {
         const auto start_idx = i * chunk_size;
-        const auto end_idx	= std::min(start_idx + chunk_size, _function_entries.size());
+        const auto end_idx   = std::min(start_idx + chunk_size, _function_entries.size());
 
         if (start_idx >= _function_entries.size()) break;
 
         threads.emplace_back(disassemble_chunk, i, start_idx, end_idx);
-	}
+    }
 
-	// wait for completion
-	for (auto& t : threads) t.join();
+    // wait for completion
+    for (auto& t : threads) t.join();
 
-	// merge results from each thread
-	std::size_t total_refs = 0;
-	for (const auto& r : chunk_results) total_refs += r.size();
+    // merge results from each thread
+    std::size_t total_refs = 0;
+    for (const auto& r : chunk_results) total_refs += r.size();
 
-	_references.reserve(total_refs);
+    _references.reserve(total_refs);
 
-	for (auto& r : chunk_results) _references.insert(_references.end(), std::make_move_iterator(r.begin()), std::make_move_iterator(r.end()));
+    for (auto& r : chunk_results) _references.insert(_references.end(), std::make_move_iterator(r.begin()), std::make_move_iterator(r.end()));
 
-	std::ranges::sort(_references, std::less{}, &ReferenceEntry::target);
-#	if 0 //DEBUG
-	FLOG("BuildFunctionIndexAndReferences: %zu function entries, %zu references", _function_entries.size(), _references.size());
-#	endif
+    std::ranges::sort(_references, std::less{}, &ReferenceEntry::target);
+#    if 0 //DEBUG
+    FLOG("BuildFunctionIndexAndReferences: %zu function entries, %zu references", _function_entries.size(), _references.size());
+#    endif
 }
 
 void CModule::DumpVtables()
 {
-	// originally inspired by praydog & cursey's kananlib https://github.com/cursey/kananlib/blob/main/src/RTTI.cpp
-	// but made some improvements based on our usage.
-	// hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
+    // originally inspired by praydog & cursey's kananlib https://github.com/cursey/kananlib/blob/main/src/RTTI.cpp
+    // but made some improvements based on our usage.
+    // hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
 
-	constexpr auto type_info_type_descriptor_name = ".?AVtype_info@@";
+    constexpr auto type_info_type_descriptor_name = ".?AVtype_info@@";
 
-	auto type_descriptor_address = FindString(type_info_type_descriptor_name, false);
-	if (!type_descriptor_address.IsValid())
-	{
+    auto type_descriptor_address = FindString(type_info_type_descriptor_name, false);
+    if (!type_descriptor_address.IsValid())
+    {
         plg::print(LS_ERROR, "Failed to find type descriptor address for \"{}\" in module {}\n", type_info_type_descriptor_name, _module_name);
         return;
-	}
+    }
 
-	auto type_info = type_descriptor_address.Offset(-0x10).Deref();
+    auto type_info = type_descriptor_address.Offset(-0x10).Deref();
 
-	const auto type_info_xrefs = FindPtrs(type_info);
-	_vtables.reserve(type_info_xrefs.size());
+    const auto type_info_xrefs = FindPtrs(type_info);
+    _vtables.reserve(type_info_xrefs.size());
 
-	std::vector<uint32_t> valid_type_rvas;
-	valid_type_rvas.reserve(type_info_xrefs.size());
+    std::vector<uint32_t> valid_type_rvas;
+    valid_type_rvas.reserve(type_info_xrefs.size());
 
-	for (auto xref : type_info_xrefs) valid_type_rvas.push_back(static_cast<uint32_t>(xref.GetPtr() - _base_address));
+    for (auto xref : type_info_xrefs) valid_type_rvas.push_back(static_cast<uint32_t>(xref.GetPtr() - _base_address));
 
-	// sort for binary search
-	std::ranges::sort(valid_type_rvas);
+    // sort for binary search
+    std::ranges::sort(valid_type_rvas);
 
-	std::unordered_map<std::type_info*, VTable*> vtable_map;
+    std::unordered_map<std::type_info*, VTable*> vtable_map;
 
-	for (const auto& section : _sections)
-	{
-        if (section.flags & (FLAG_X | FLAG_W))
+    for (const auto& segment : _segments)
+    {
+		if (segment.name != ".data" && segment.name != ".rdata")
+            continue;
+
+        if (segment.flags & (FLAG_X | FLAG_W))
 			continue;
 
-		if (section.name != ".data" && section.name != ".rdata")
-			continue;
-
-        auto start_addr = section.address;
-        auto end_addr	= start_addr + section.size;
+        auto start_addr = segment.address;
+        auto end_addr   = start_addr + segment.size;
 
         auto is_in_current_segment = [&](uintptr_t ptr) {
             return start_addr <= ptr && ptr < end_addr;
@@ -360,10 +360,10 @@ void CModule::DumpVtables()
                 _vtables.push_back(std::move(node));
             }
         }
-	}
+    }
 
-	for (const auto& vtable : _vtables)
-	{
+    for (const auto& vtable : _vtables)
+    {
         auto locator = vtable->object_locator;
 
         auto hierarchy_descriptor = reinterpret_cast<_s_RTTIClassHierarchyDescriptor*>(_base_address + locator->pClassDescriptor);
@@ -378,27 +378,27 @@ void CModule::DumpVtables()
             auto it = vtable_map.find(base_class_ti);
             if (it != vtable_map.end()) vtable->children.push_back(it->second);
         }
-	}
+    }
 
-#	if 0 // DEBUG
-	if (_module_name.find("server") != std::string::npos)
-	{
+#    if 0 // DEBUG
+    if (_module_name.find("server") != std::string::npos)
+    {
         for (const auto& vtable : _vtables)
         {
             if (vtable->demangled_name.find("CWeapon") == std::string::npos) continue;
             printf("Vtable for %s (offset: 0x%llx)\n", vtable->demangled_name.c_str(), vtable->offset);
             for (const auto& child : vtable->children)
             {
-                printf("	%s(offset: 0x%llx)\n", child->demangled_name.c_str(), child->offset);
+                printf("    %s(offset: 0x%llx)\n", child->demangled_name.c_str(), child->offset);
             }
         }
-	}
-#	endif
+    }
+#    endif
 }
 
 CAddress CModule::GetFunctionByName(std::string_view proc_name) const
 {
-	return GetProcAddress(reinterpret_cast<HMODULE>(_base_address), proc_name.data());
+    return GetProcAddress(reinterpret_cast<HMODULE>(_base_address), proc_name.data());
 }
 
 #endif
