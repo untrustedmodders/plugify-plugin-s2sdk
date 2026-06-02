@@ -156,7 +156,8 @@ void CModule::GetModuleInfo(std::string_view mod)
 			for (auto i = 0; i < ehdr->e_shnum; ++i) // Loop through the sections.
 			{
 				ElfW(Shdr)* shdr = reinterpret_cast<ElfW(Shdr)*>(reinterpret_cast<uintptr_t>(shdrs) + i * ehdr->e_shentsize);
-				if (*(strTab + shdr->sh_name) == '\0')
+				const char* name = strTab + shdr->sh_name;
+				if (*name == '\0')
 					continue;
 
 				auto address = info.dlpi_addr + shdr->sh_addr;
@@ -189,7 +190,7 @@ void CModule::GetModuleInfo(std::string_view mod)
 				segment.address = address;
 				segment.data    = std::span(data, data + size);
 				segment.size    = size;
-				segment.name    = strTab + shdr->sh_name;
+				segment.name    = name;
 
 				min_vaddr = std::min(min_vaddr, address);
        		 	max_vaddr = std::max(max_vaddr, address + size);
@@ -273,8 +274,8 @@ void CModule::DumpExports(void* module_base)
         return lastSymbol;
     };
 
-    ElfW(Sym) * symbols{};
-    ElfW(Word) * hash_ptr{};
+    ElfW(Sym)*  symbols{};
+    ElfW(Word)* hash_ptr{};
 
     char*       string_table{};
     std::size_t symbol_count{};
@@ -301,9 +302,14 @@ void CModule::DumpExports(void* module_base)
         dyn++;
     }
 
+	if (symbols == nullptr)
+	{
+		return;
+	}
+
     for (auto i = 0; i < symbol_count; i++)
     {
-		auto& symbol = symbols[i];
+		const auto& symbol = symbols[i];
 
 		if (!symbol.st_name)
         {
@@ -321,7 +327,7 @@ void CModule::DumpExports(void* module_base)
         _exports.emplace(name, address);
     }
 
-    if (auto it = _exports.find("CreateInterface"); it != _exports.end()) [[unlikely]]
+    if (auto it = _exports.find("CreateInterface"); it != _exports.end())
         _createInterFaceFn = reinterpret_cast<CreateInterfaceFn>(it->second);
 }
 
@@ -772,12 +778,12 @@ void CModule::BuildFunctionIndexAndReferences()
     temp_refs.reserve(total_refs);
     seen_functions.reserve(total_funcs);
 
-    for (auto& r : chunk_results)
+    for (const auto& [functions, paddings, refs] : chunk_results)
     {
         // todo: C++23 .append_range(std::views::as_rvalue(r.abc));
-        padding_addrs.insert(padding_addrs.end(), std::move_iterator(r.paddings.begin()), std::move_iterator(r.paddings.end()));
-        temp_refs.insert(temp_refs.end(), std::move_iterator(r.refs.begin()), std::move_iterator(r.refs.end()));
-        seen_functions.insert(seen_functions.end(), std::move_iterator(r.functions.begin()), std::move_iterator(r.functions.end()));
+        padding_addrs.insert(padding_addrs.end(), std::move_iterator(paddings.begin()), std::move_iterator(paddings.end()));
+        temp_refs.insert(temp_refs.end(), std::move_iterator(refs.begin()), std::move_iterator(refs.end()));
+        seen_functions.insert(seen_functions.end(), std::move_iterator(functions.begin()), std::move_iterator(functions.end()));
     }
 
     if (seen_functions.empty()) [[unlikely]]
