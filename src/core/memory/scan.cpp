@@ -736,7 +736,7 @@ static std::vector<CAddress> FindPatternMultiAVX2(uint8_t* data, std::size_t siz
 }
 
 template <typename T, typename Callback>
-ATTRIBUTE_SSE static void FindValueSSEImpl(std::uintptr_t data, std::size_t size, T value, Callback on_match) noexcept
+ATTRIBUTE_SSE static void FindValueSSEImpl(uintptr_t data, std::size_t size, T value, Callback on_match) noexcept
 {
     constexpr auto value_size    = sizeof(T);
     constexpr auto simd_size     = sizeof(__m128i);
@@ -838,7 +838,7 @@ ATTRIBUTE_SSE static void FindValueSSEImpl(std::uintptr_t data, std::size_t size
 }
 
 template <typename T, typename Callback>
-ATTRIBUTE_AVX2 static void FindValueAVX2Impl(std::uintptr_t data, std::size_t size, T value, Callback on_match) noexcept
+ATTRIBUTE_AVX2 static void FindValueAVX2Impl(uintptr_t data, std::size_t size, T value, Callback on_match) noexcept
 {
     constexpr auto value_size    = sizeof(T);
     constexpr auto simd_size     = sizeof(__m256i);
@@ -995,10 +995,10 @@ CAddress scan::FindStr(uint8_t* data, std::size_t size, std::string_view str, bo
     return result;
 }
 
-CAddress scan::FindPtr(std::uintptr_t data, std::size_t size, std::uintptr_t ptr) noexcept
+CAddress scan::FindPtr(uintptr_t data, std::size_t size, uintptr_t ptr) noexcept
 {
     CAddress result{};
-    auto     callback = [&result](CAddress address) {
+    auto callback = [&result](CAddress address) {
         result = address;
         return detail::SearchAction::Stop;
     };
@@ -1015,10 +1015,10 @@ CAddress scan::FindPtr(std::uintptr_t data, std::size_t size, std::uintptr_t ptr
     return result;
 }
 
-CAddress scan::FindRVA(std::uintptr_t data, std::size_t size, uint32_t rva) noexcept
+CAddress scan::FindRVA(uintptr_t data, std::size_t size, uint32_t rva) noexcept
 {
     CAddress result{};
-    auto     callback = [&result](CAddress address) {
+    auto callback = [&result](CAddress address) {
         result = address;
         return detail::SearchAction::Stop;
     };
@@ -1035,10 +1035,10 @@ CAddress scan::FindRVA(std::uintptr_t data, std::size_t size, uint32_t rva) noex
     return result;
 }
 
-std::vector<CAddress> scan::FindRVAs(std::uintptr_t data, std::size_t size, uint32_t rva) noexcept
+std::vector<CAddress> scan::FindRVAs(uintptr_t data, std::size_t size, uint32_t rva) noexcept
 {
     std::vector<CAddress> result{};
-    auto                  callback = [&result](CAddress address) {
+    auto callback = [&result](CAddress address) {
         result.emplace_back(address);
         return detail::SearchAction::Continue;
     };
@@ -1055,10 +1055,10 @@ std::vector<CAddress> scan::FindRVAs(std::uintptr_t data, std::size_t size, uint
     return result;
 }
 
-std::vector<CAddress> scan::FindPtrs(std::uintptr_t data, std::size_t size, std::uintptr_t ptr) noexcept
+std::vector<CAddress> scan::FindPtrs(uintptr_t data, std::size_t size, uintptr_t ptr) noexcept
 {
     std::vector<CAddress> result{};
-    auto                  callback = [&result](CAddress address) {
+    auto callback = [&result](CAddress address) {
         result.emplace_back(address);
         return detail::SearchAction::Continue;
     };

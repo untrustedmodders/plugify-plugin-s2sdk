@@ -49,7 +49,7 @@ public:
 	{
 	    return m_value + offset;
     }
-	
+
 	[[nodiscard]] CAddress& OffsetSelf(ptrdiff_t offset) noexcept
 	{
 	    m_value += offset;
@@ -68,7 +68,7 @@ public:
 
     	return base;
     }
-	
+
 	[[nodiscard]] CAddress& DerefSelf(int deref = 1, ptrdiff_t offset = 0) noexcept
     {
     	while (deref)
@@ -80,7 +80,7 @@ public:
     	return *this;
     }
 
-    [[nodiscard]] bool IsValid() const
+    [[nodiscard]] bool IsValid() const noexcept
     {
         return m_value >= 0x1000 && m_value < 0x7FFFFFFEFFFF;
     }
@@ -97,16 +97,19 @@ public:
     	return m_value <=> static_cast<uintptr_t>(val);
     }
 
-    bool operator==(void* val) const
+    bool operator==(void* val) const noexcept
     {
         return (m_value == reinterpret_cast<uintptr_t>(val));
     }
 
-    auto operator<=>(void* val) const
+    auto operator<=>(void* val) const noexcept
     {
         return *this <=> reinterpret_cast<uintptr_t>(val);
     }
-	
+
+    bool operator==(const CAddress& val) const = default;
+    auto operator<=>(const CAddress& val) const = default;
+
     uintptr_t GetPtr() const
     {
         return m_value;

@@ -69,7 +69,7 @@ void CModule::GetModuleInfo(std::string_view mod)
     if (ntHeader->Signature != IMAGE_NT_SIGNATURE)
         return;
 
-    _size        = ntHeader->OptionalHeader.SizeOfImage;
+    _size = ntHeader->OptionalHeader.SizeOfImage;
 
     auto section = IMAGE_FIRST_SECTION(ntHeader);
 
@@ -79,7 +79,7 @@ void CModule::GetModuleInfo(std::string_view mod)
         const auto isReadable   = (section->Characteristics & IMAGE_SCN_MEM_READ) != 0;
         const auto isWritable   = (section->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
 
-        const auto start = this->_base_address + section->VirtualAddress;
+        const auto start = _base_address + section->VirtualAddress;
         const auto size  = section->Misc.VirtualSize;
 
         auto& segment   = _segments.emplace_back();
@@ -93,7 +93,8 @@ void CModule::GetModuleInfo(std::string_view mod)
             segment.flags |= FLAG_W;
 
         const auto data = reinterpret_cast<uint8_t*>(start);
-        segment.data    = std::vector(data, data + size);
+        segment.data    = std::span(data, data + size);
+		segment.name    = reinterpret_cast<const char*>(section->Name);
     }
 
     _createInterFaceFn = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
@@ -176,18 +177,20 @@ void CModule::BuildFunctionIndexAndReferences()
                           return a.start < b.start;
                       });
 
-    auto is_in_data_section = [this](std::uintptr_t address) noexcept {
+    auto is_in_data_section = [this](uintptr_t address) noexcept {
         for (const auto& seg : _segments)
         {
+			if (seg.name != ".rdata" || seg.name != ".data") continue;
             if (seg.flags & FLAG_X) continue;
             if (seg.address <= address && address < seg.address + seg.size) return true;
         }
         return false;
     };
 
-    auto is_in_text_section = [this](std::uintptr_t address) noexcept {
+    auto is_in_text_section = [this](uintptr_t address) noexcept {
         for (const auto& seg : _segments)
         {
+			if (seg.name != ".text") continue;
             if ((seg.flags & FLAG_X) == 0) continue;
             if (seg.address <= address && address < seg.address + seg.size) return true;
         }
@@ -319,7 +322,11 @@ void CModule::DumpVtables()
 
     for (const auto& segment : _segments)
     {
-        if (segment.flags & (FLAG_X | FLAG_W)) continue;
+		if (segment.name != ".data" && segment.name != ".rdata")
+            continue;
+
+        if (segment.flags & (FLAG_X | FLAG_W))
+			continue;
 
         auto start_addr = segment.address;
         auto end_addr   = start_addr + segment.size;

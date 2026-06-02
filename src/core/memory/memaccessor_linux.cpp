@@ -34,10 +34,10 @@ static region_t GetRegionFromAddr(uintptr_t addr)
 				++strend;
 				if (strend[0] == 'r')
 					res.prot = res.prot | ProtFlag::R;
-	
+
 				if (strend[1] == 'w')
 					res.prot = res.prot | ProtFlag::W;
-	
+
 				if (strend[2] == 'x')
 					res.prot = res.prot | ProtFlag::X;
 
@@ -60,13 +60,13 @@ bool CMemAccessor::MemCopy(CAddress dest, CAddress src, size_t size)
 bool CMemAccessor::SafeMemCopy(CAddress dest, CAddress src, size_t size, size_t& written) noexcept
 {
 	region_t region_infos = GetRegionFromAddr(src);
-	
+
 	// Make sure that the region we query is writable
 	if (!(region_infos.prot & ProtFlag::W))
 		return false;
-	
+
 	size = std::min<uintptr_t>(region_infos.end - src, size);
-	
+
 	std::memcpy(dest, src, size);
 	written = size;
 
@@ -76,7 +76,7 @@ bool CMemAccessor::SafeMemCopy(CAddress dest, CAddress src, size_t size, size_t&
 bool CMemAccessor::SafeMemRead(CAddress src, CAddress dest, size_t size, size_t& read) noexcept
 {
 	region_t region_infos = GetRegionFromAddr(src);
-	
+
 	// Make sure that the region we query is readable
 	if (!(region_infos.prot & ProtFlag::R))
 		return false;

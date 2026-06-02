@@ -48,7 +48,7 @@ public:
     [[nodiscard]] virtual void* GetVirtualTableByNameEx(const char* tableName, bool is_raw_name = false)         = 0;
     [[nodiscard]] virtual void* GetFunctionByNameEx(const char* functionName) noexcept                           = 0;
     [[nodiscard]] virtual void* FindInterfaceEx(const char* interfaceName)                                       = 0;
-    [[nodiscard]] virtual bool  FindPatternMultiEx(const char* pattern, CUtlLeanVector<std::uintptr_t>* results) = 0;
+    [[nodiscard]] virtual bool  FindPatternMultiEx(const char* pattern, CUtlLeanVector<uintptr_t>* results) = 0;
     [[nodiscard]] virtual void* FindStringEx(const char* str)                                                    = 0;
     [[nodiscard]] virtual void* FindDataEx(const uint8_t* needle, std::size_t needle_size, bool read_only)       = 0;
     [[nodiscard]] virtual void* FindPtrEx(const void* ptr)                                                       = 0;
@@ -56,10 +56,10 @@ public:
     virtual void FindVtablePartial(const char* name, CUtlLeanVector<RunTimeVTableInfo>* info) = 0;
     virtual bool IsPointerDerivedFromEx(void* ptr, const char* name)                          = 0;
 
-    [[nodiscard]] virtual bool GetReferencesEx(std::uintptr_t ptr, CUtlLeanVector<std::uintptr_t>* results)                                      = 0;
-    [[nodiscard]] virtual bool FindAllFunctionsFromStringsRefsEx(CUtlLeanVector<CUtlString>* strs, CUtlLeanVector<std::uintptr_t>* results)      = 0;
-    [[nodiscard]] virtual bool FindAllFunctionsFromPointersRefsEx(CUtlLeanVector<std::uintptr_t>* ptrs, CUtlLeanVector<std::uintptr_t>* results) = 0;
-    virtual bool               GetFunctionRangeEx(std::uintptr_t middle, std::uintptr_t* start, std::uintptr_t* end)                             = 0;
+    [[nodiscard]] virtual bool GetReferencesEx(uintptr_t ptr, CUtlLeanVector<uintptr_t>* results)                                      = 0;
+    [[nodiscard]] virtual bool FindAllFunctionsFromStringsRefsEx(CUtlLeanVector<CUtlString>* strs, CUtlLeanVector<uintptr_t>* results)      = 0;
+    [[nodiscard]] virtual bool FindAllFunctionsFromPointersRefsEx(CUtlLeanVector<uintptr_t>* ptrs, CUtlLeanVector<uintptr_t>* results) = 0;
+    virtual bool               GetFunctionRangeEx(uintptr_t middle, uintptr_t* start, uintptr_t* end)                             = 0;
     [[nodiscard]] virtual void* FindStringExactEx(const char* str)                                                                               = 0;
 };
 
@@ -109,7 +109,8 @@ public:
         uint8_t              flags{};
         uintptr_t            address{};
         std::size_t          size{};
-        std::vector<uint8_t> data{};
+        std::span<uint8_t>   data{};
+		std::string          name{};
     };
 
     struct ReferenceEntry
@@ -146,11 +147,11 @@ private:
     std::vector<std::unique_ptr<VTable>> _vtables{};
 
 #ifndef PLATFORM_WINDOWS
-    std::unordered_map<std::string, uintptr_t> _exports{};
+    std::unordered_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>> _exports{};
     void                                       DumpExports(void* module_base);
 #endif
 
-    std::uintptr_t GetFunctionEntry(std::uintptr_t middle);
+    uintptr_t GetFunctionEntry(uintptr_t middle);
 
 public:
     CModule() = default;
@@ -181,7 +182,7 @@ public:
 	    return _base_address != 0;
     }
 
-    std::vector<std::uintptr_t> GetVFunctionsFromVTable(std::string_view vtableName);
+    std::vector<uintptr_t> GetVFunctionsFromVTable(std::string_view vtableName);
 
     void LoopVFunctions(std::string_view vtable_name, const std::function<bool(CAddress)>& callback);
 
@@ -189,8 +190,8 @@ public:
     [[nodiscard]] CAddress              FindPatternStrict(std::string_view pattern) const;
     [[nodiscard]] CAddress              FindString(std::string_view str, bool read_only, bool exact = false) const;
     [[nodiscard]] CAddress              FindData(const uint8_t* needle, std::size_t needle_size, bool read_only) const;
-    [[nodiscard]] CAddress              FindPtr(std::uintptr_t ptr) const;
-    [[nodiscard]] std::vector<CAddress> FindPtrs(std::uintptr_t ptr) const;
+    [[nodiscard]] CAddress              FindPtr(uintptr_t ptr) const;
+    [[nodiscard]] std::vector<CAddress> FindPtrs(uintptr_t ptr) const;
     [[nodiscard]] CAddress              GetVirtualTableByName(std::string_view name, bool is_raw_name = false);
     [[nodiscard]] CAddress              FindInterface(std::string_view name) const;
     [[nodiscard]] std::vector<CAddress> FindPatternMulti(std::string_view pattern) const;
@@ -204,11 +205,11 @@ public:
 
     [[nodiscard]] CAddress FindFunctionFromStringRef(std::string_view str);
     [[nodiscard]] CAddress FindFunctionFromStringRefs(std::span<const std::string_view> strs);
-    [[nodiscard]] CAddress FindFunctionFromPointerRef(std::uintptr_t ptr);
-    [[nodiscard]] CAddress FindFunctionFromPointerRefs(std::span<const std::uintptr_t> ptrs);
+    [[nodiscard]] CAddress FindFunctionFromPointerRef(uintptr_t ptr);
+    [[nodiscard]] CAddress FindFunctionFromPointerRefs(std::span<const uintptr_t> ptrs);
 
     [[nodiscard]] std::vector<uintptr_t> FindAllFunctionsFromStringRefs(std::span<const std::string_view> strs);
-    [[nodiscard]] std::vector<uintptr_t> FindAllFunctionsFromPointerRefs(std::span<const std::uintptr_t> ptrs);
+    [[nodiscard]] std::vector<uintptr_t> FindAllFunctionsFromPointerRefs(std::span<const uintptr_t> ptrs);
 
     // interface
     [[nodiscard]] void* FindPatternEx(const char* pattern) override
@@ -231,7 +232,7 @@ public:
         return FindInterface(interfaceName);
     }
 
-    [[nodiscard]] bool FindPatternMultiEx(const char* pattern, CUtlLeanVector<std::uintptr_t>* results) override
+    [[nodiscard]] bool FindPatternMultiEx(const char* pattern, CUtlLeanVector<uintptr_t>* results) override
     {
         auto pattern_result = FindPatternMulti(pattern);
         if (pattern_result.empty())
@@ -267,7 +268,7 @@ public:
         return IsPointerDerivedFrom(ptr, name);
     }
 
-    [[nodiscard]] bool GetReferencesEx(std::uintptr_t ptr, CUtlLeanVector<std::uintptr_t>* results) override
+    [[nodiscard]] bool GetReferencesEx(uintptr_t ptr, CUtlLeanVector<uintptr_t>* results) override
     {
         auto range = GetReferenceRange(ptr);
         if (range.empty())
@@ -282,7 +283,7 @@ public:
         return true;
     }
 
-    [[nodiscard]] bool FindAllFunctionsFromStringsRefsEx(CUtlLeanVector<CUtlString>* strs, CUtlLeanVector<std::uintptr_t>* results) override
+    [[nodiscard]] bool FindAllFunctionsFromStringsRefsEx(CUtlLeanVector<CUtlString>* strs, CUtlLeanVector<uintptr_t>* results) override
     {
         if (strs->Count() == 0) [[unlikely]]
             return false;
@@ -304,12 +305,12 @@ public:
         return true;
     }
 
-    [[nodiscard]] bool FindAllFunctionsFromPointersRefsEx(CUtlLeanVector<std::uintptr_t>* ptrs, CUtlLeanVector<std::uintptr_t>* results) override
+    [[nodiscard]] bool FindAllFunctionsFromPointersRefsEx(CUtlLeanVector<uintptr_t>* ptrs, CUtlLeanVector<uintptr_t>* results) override
     {
         if (ptrs->Count() == 0) [[unlikely]]
             return false;
 
-        std::vector<std::uintptr_t> temp_strs{};
+        std::vector<uintptr_t> temp_strs{};
         temp_strs.reserve(ptrs->Count());
 
         for (int i = 0; i < ptrs->Count(); ++i)
@@ -328,7 +329,7 @@ public:
         return true;
     }
 
-    [[nodiscard]] const FunctionEntry* GetFunctionRange(std::uintptr_t middle) const
+    [[nodiscard]] const FunctionEntry* GetFunctionRange(uintptr_t middle) const
     {
         auto it = std::ranges::upper_bound(_function_entries, middle, {}, &FunctionEntry::start);
 
@@ -339,7 +340,7 @@ public:
         return (middle < candidate->end) ? &(*candidate) : nullptr;
     }
 
-    bool GetFunctionRangeEx(std::uintptr_t middle, std::uintptr_t* start, std::uintptr_t* end) override
+    bool GetFunctionRangeEx(uintptr_t middle, uintptr_t* start, uintptr_t* end) override
     {
         if (auto* entry = GetFunctionRange(middle))
         {

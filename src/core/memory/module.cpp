@@ -39,14 +39,14 @@ CModule::CModule(std::string_view str)
 
 CAddress CModule::FindPattern(std::string_view pattern) const
 {
-    for (auto&& segment : _segments)
+    for (const auto& segment : _segments)
     {
         if ((segment.flags & FLAG_X) == 0)
             continue;
 
         const auto& data = segment.data;
 
-        if (auto result = scan::FindPattern(const_cast<uint8_t*>(data.data()), data.size(), pattern))
+        if (auto result = scan::FindPattern(data.data(), data.size(), pattern))
         {
             if (result > 0)
                 return segment.address + result;
@@ -66,7 +66,7 @@ CAddress CModule::FindPatternStrict(std::string_view pattern) const
 
 CAddress CModule::FindString(std::string_view str, bool read_only, bool exact) const
 {
-    for (auto&& segment : _segments)
+    for (const auto& segment : _segments)
     {
         if ((segment.flags & FLAG_X) != 0)
             continue;
@@ -86,7 +86,7 @@ CAddress CModule::FindString(std::string_view str, bool read_only, bool exact) c
 
 CAddress CModule::FindData(const uint8_t* needle, std::size_t needle_size, bool read_only) const
 {
-    for (auto&& segment : _segments)
+    for (const auto& segment : _segments)
     {
         if ((segment.flags & FLAG_X) != 0)
             continue;
@@ -121,11 +121,11 @@ CAddress CModule::FindPtr(uintptr_t ptr) const
     return {};
 }
 
-std::vector<CAddress> CModule::FindPtrs(std::uintptr_t ptr) const
+std::vector<CAddress> CModule::FindPtrs(uintptr_t ptr) const
 {
     std::vector<CAddress> results{};
 
-    for (auto&& segment : _segments)
+    for (const auto& segment : _segments)
     {
         if ((segment.flags & FLAG_X) != 0)
             continue;
@@ -151,16 +151,16 @@ CAddress CModule::FindInterface(std::string_view name) const
     return _createInterFaceFn(name.data(), nullptr);
 }
 
-std::vector<CAddress> CModule::FindPatternMulti(std::string_view svPattern) const
+std::vector<CAddress> CModule::FindPatternMulti(std::string_view pattern) const
 {
-    for (auto&& segment : _segments)
+    for (const auto& segment : _segments)
     {
         if ((segment.flags & FLAG_X) == 0)
             continue;
 
         const auto& data = segment.data;
 
-        auto result = scan::FindPatternMulti(const_cast<uint8_t*>(data.data()), data.size(), svPattern);
+        auto result = scan::FindPatternMulti(const_cast<uint8_t*>(data.data()), data.size(), pattern);
         if (!result.empty())
         {
             std::ranges::transform(result, result.begin(), [&](CAddress address) {
@@ -174,14 +174,14 @@ std::vector<CAddress> CModule::FindPatternMulti(std::string_view svPattern) cons
     return {};
 }
 
-std::vector<std::uintptr_t> CModule::GetVFunctionsFromVTable(std::string_view vtableName)
+std::vector<uintptr_t> CModule::GetVFunctionsFromVTable(std::string_view vtableName)
 {
     if (auto it = _vtable_functions.find(vtableName); it != _vtable_functions.end())
     {
         return it->second;
     }
 
-    std::vector<std::uintptr_t> funcs{};
+    std::vector<uintptr_t> funcs{};
 
     LoopVFunctions(vtableName, [&](CAddress addr) {
         funcs.emplace_back(addr);
@@ -359,7 +359,7 @@ CAddress CModule::GetTypeInfoFromName(std::string_view name) const
     return {};
 }
 
-std::uintptr_t CModule::GetFunctionEntry(std::uintptr_t middle)
+uintptr_t CModule::GetFunctionEntry(uintptr_t middle)
 {
     auto it = std::ranges::upper_bound(_function_entries, middle, {}, &FunctionEntry::start);
 
@@ -388,7 +388,7 @@ std::vector<uintptr_t> CModule::IntersectFunctionReferences(std::vector<std::spa
     });
 
     auto get_unique_funcs = [&](std::span<const ReferenceEntry> refs) {
-        std::vector<std::uintptr_t> funcs;
+        std::vector<uintptr_t> funcs;
         funcs.reserve(refs.size());
 
         for (const auto& entry : refs)
@@ -413,7 +413,7 @@ std::vector<uintptr_t> CModule::IntersectFunctionReferences(std::vector<std::spa
             break;
 
         auto                        next_funcs = get_unique_funcs(reference_sets[i]);
-        std::vector<std::uintptr_t> intersection;
+        std::vector<uintptr_t> intersection;
         intersection.reserve(std::min(candidates.size(), next_funcs.size()));
 
         std::ranges::set_intersection(candidates, next_funcs, std::back_inserter(intersection));
@@ -462,12 +462,12 @@ CAddress CModule::FindFunctionFromStringRefs(std::span<const std::string_view> s
     return matches[0];
 }
 
-CAddress CModule::FindFunctionFromPointerRef(std::uintptr_t ptr)
+CAddress CModule::FindFunctionFromPointerRef(uintptr_t ptr)
 {
     return FindFunctionFromPointerRefs(std::span(&ptr, 1));
 }
 
-CAddress CModule::FindFunctionFromPointerRefs(std::span<const std::uintptr_t> ptrs)
+CAddress CModule::FindFunctionFromPointerRefs(std::span<const uintptr_t> ptrs)
 {
     auto matches = FindAllFunctionsFromPointerRefs(ptrs);
 
@@ -485,7 +485,7 @@ CAddress CModule::FindFunctionFromPointerRefs(std::span<const std::uintptr_t> pt
     return matches[0];
 }
 
-std::vector<uintptr_t> CModule::FindAllFunctionsFromPointerRefs(std::span<const std::uintptr_t> ptrs)
+std::vector<uintptr_t> CModule::FindAllFunctionsFromPointerRefs(std::span<const uintptr_t> ptrs)
 {
     if (ptrs.empty()) [[unlikely]]
         return {};
