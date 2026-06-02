@@ -146,6 +146,7 @@ private:
     std::vector<std::unique_ptr<VTable>> _vtables{};
 
 #ifndef PLATFORM_WINDOWS
+    std::string                                _module_path{};
     std::unordered_map<std::string, uintptr_t> _exports{};
     void                                       DumpExports(void* module_base);
 #endif

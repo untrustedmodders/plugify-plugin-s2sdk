@@ -25,6 +25,7 @@
 #    include <Zydis/Zydis.h>
 
 #    include <algorithm>
+#    include <cctype>
 #    include <chrono>
 #    include <cstring>
 #    include <memory>
@@ -78,6 +79,7 @@ void CModule::GetModuleInfo(std::string_view mod)
     const auto             info = it->second;
 
     this->_base_address = info.dlpi_addr;
+    this->_module_path   = std::string(path);
     this->_module_name  = path.substr(path.find_last_of('/') + 1);
 
     uintptr_t min_vaddr = std::numeric_limits<uintptr_t>::max();
@@ -266,30 +268,176 @@ static CAddress engine2_class_typeinfo_vtable;
 static CAddress engine2_si_class_typeinfo_vtable;
 static CAddress engine2_vmi_class_typeinfo_vtable;
 
+struct ElfSection
+{
+    uintptr_t   address{};
+    std::size_t size{};
+    std::string name;
+};
+
+static std::vector<ElfSection> LoadElfSections(const std::string& path, uintptr_t base)
+{
+    std::vector<ElfSection> sections;
+
+    const int fd = open(path.c_str(), O_RDONLY);
+    if (fd == -1)
+        return sections;
+
+    struct stat st{};
+    if (fstat(fd, &st) != 0 || st.st_size == 0)
+    {
+        close(fd);
+        return sections;
+    }
+
+    void* map = mmap(nullptr, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    close(fd);
+
+    if (map == MAP_FAILED)
+        return sections;
+
+    const auto* ehdr = static_cast<const ElfW(Ehdr)*>(map);
+    if (ehdr->e_shoff == 0 || ehdr->e_shnum == 0)
+    {
+        munmap(map, st.st_size);
+        return sections;
+    }
+
+    const auto* shdrs  = reinterpret_cast<const ElfW(Shdr)*>(reinterpret_cast<uintptr_t>(ehdr) + ehdr->e_shoff);
+    const char* strtab = reinterpret_cast<const char*>(reinterpret_cast<uintptr_t>(ehdr) + shdrs[ehdr->e_shstrndx].sh_offset);
+
+    sections.reserve(ehdr->e_shnum);
+    for (ElfW(Half) i = 0; i < ehdr->e_shnum; ++i)
+    {
+        const auto& shdr = shdrs[i];
+        if (shdr.sh_name == 0 || shdr.sh_addr == 0 || shdr.sh_size == 0)
+            continue;
+
+        sections.emplace_back(base + shdr.sh_addr, shdr.sh_size, strtab + shdr.sh_name);
+    }
+
+    munmap(map, st.st_size);
+    return sections;
+}
+
+static bool IsValidTypeName(const char* str)
+{
+    if (!str || str[0] == '\0')
+        return false;
+
+    if (str[0] == '_' && str[1] == 'Z')
+        return true;
+
+    if (!std::isdigit(static_cast<unsigned char>(str[0])))
+        return false;
+
+    std::size_t i = 0;
+    while (std::isdigit(static_cast<unsigned char>(str[i])))
+        ++i;
+
+    return i > 0 && str[i] != '\0';
+}
+
+static const char* GetStringInRodata(uintptr_t addr, const std::vector<ElfSection>& rodata_sections)
+{
+    for (const auto& sec : rodata_sections)
+    {
+        if (addr < sec.address || addr >= sec.address + sec.size)
+            continue;
+
+        const char* str     = reinterpret_cast<const char*>(addr);
+        const auto  max_len = sec.address + sec.size - addr;
+
+        if (std::memchr(str, '\0', max_len) != nullptr)
+            return str;
+    }
+
+    return nullptr;
+}
+
 void CModule::DumpVtables()
 {
-    auto get_vtable = [this](std::string_view name) -> CAddress {
-        CAddress symbol_address = GetFunctionByName(name);
-        if (symbol_address.IsValid())
+    struct TypeInfo
+    {
+        std::type_info*         ti;
+        [[nodiscard]] uintptr_t address() const { return reinterpret_cast<uintptr_t>(ti); }
+    };
+
+    std::vector<TypeInfo> known_typeinfos;
+
+    // originally inspired by praydog & cursey's kananlib https://github.com/cursey/kananlib/blob/main/src/RTTI.cpp
+    // but made some improvements based on our usage.
+    // hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
+
+    const auto elf_sections = LoadElfSections(_module_path, _base_address);
+    if (elf_sections.empty()) [[unlikely]]
+    {
+        plg::print(LS_WARNING, "Failed to load ELF sections for {}", _module_name);
+        return;
+    }
+
+    std::vector<ElfSection> rodata_sections;
+    std::vector<const ElfSection*> relro_sections;
+
+    for (const auto& sec : elf_sections)
+    {
+        if (sec.name.starts_with(".rodata"))
+            rodata_sections.push_back(sec);
+        else if (sec.name.starts_with(".data.rel.ro"))
+            relro_sections.push_back(&sec);
+    }
+
+    for (const auto* sec : relro_sections)
+    {
+        const auto end = sec->address + sec->size;
+        for (auto addr = sec->address; addr + 16 <= end; addr += sizeof(void*))
         {
-            return symbol_address.Offset(0x10);
+            const auto name_ptr = *reinterpret_cast<uintptr_t*>(addr + 8);
+            const char* name    = GetStringInRodata(name_ptr, rodata_sections);
+
+            if (!name || !IsValidTypeName(name))
+                continue;
+
+            known_typeinfos.emplace_back(reinterpret_cast<std::type_info*>(addr));
+        }
+    }
+
+    if (known_typeinfos.empty()) [[unlikely]]
+    {
+        plg::print(LS_WARNING, "No typeinfos found in {}", _module_name);
+        return;
+    }
+
+    std::ranges::sort(known_typeinfos, {}, &TypeInfo::address);
+    const auto unique_end = std::ranges::unique(known_typeinfos, {}, &TypeInfo::address).begin();
+    known_typeinfos.erase(unique_end, known_typeinfos.end());
+
+    auto find_cxxabiv1_vtable = [&](std::string_view suffix) -> CAddress {
+        for (const auto& ti : known_typeinfos)
+        {
+            const char* name = ti.ti->name();
+            if (std::string_view(name).ends_with(suffix))
+                return CAddress(*reinterpret_cast<const uintptr_t*>(ti.ti));
         }
         return {};
     };
 
-    CAddress class_typeinfo;
-    CAddress si_class_typeinfo;
-    CAddress vmi_class_typeinfo;
+    CAddress class_typeinfo     = find_cxxabiv1_vtable("17__class_type_infoE");
+    CAddress si_class_typeinfo  = find_cxxabiv1_vtable("20__si_class_type_infoE");
+    CAddress vmi_class_typeinfo = find_cxxabiv1_vtable("21__vmi_class_type_infoE");
+
+    if (!class_typeinfo.IsValid())
+        class_typeinfo = GetFunctionByName("_ZTVN10__cxxabiv117__class_type_infoE");
+    if (!si_class_typeinfo.IsValid())
+        si_class_typeinfo = GetFunctionByName("_ZTVN10__cxxabiv120__si_class_type_infoE");
+    if (!vmi_class_typeinfo.IsValid())
+        vmi_class_typeinfo = GetFunctionByName("_ZTVN10__cxxabiv121__vmi_class_type_infoE");
 
     const auto is_engine2 = _module_name.find("engine2") != std::string::npos;
     const auto is_tier0   = _module_name.find("tier0") != std::string::npos;
 
     if (is_engine2 || is_tier0)
     {
-        class_typeinfo     = get_vtable("_ZTVN10__cxxabiv117__class_type_infoE");
-        si_class_typeinfo  = get_vtable("_ZTVN10__cxxabiv120__si_class_type_infoE");
-        vmi_class_typeinfo = get_vtable("_ZTVN10__cxxabiv121__vmi_class_type_infoE");
-
         // the game loads modules (e.g., libserver.so) with RTLD_LOCAL visibility,
         // which makes each loaded module have their own copies of C++ rtti vtables (e.g., _ZTVN10__cxxabiv117__class_type_infoE)
         // causes finding std::type_info to fail due to different vtable addresses across modules.
@@ -307,8 +455,8 @@ void CModule::DumpVtables()
         // to fix this issue, we only need to find the addresses of rtti vtables in engine2 and cache them for use with other modules
         //
         // note: tier0 is loaded before engine2, so for tier0 we simply just get the addresses
-    	auto exe_path = std::filesystem::canonical("/proc/self/exe").filename();
-		if (plg::as_string(exe_path) == "s2launcher" ? is_tier0 : is_engine2)
+        auto exe_path = std::filesystem::canonical("/proc/self/exe").filename();
+        if (plg::as_string(exe_path) == "s2launcher" ? is_tier0 : is_engine2)
         {
             engine2_class_typeinfo_vtable     = class_typeinfo;
             engine2_si_class_typeinfo_vtable  = si_class_typeinfo;
@@ -322,37 +470,9 @@ void CModule::DumpVtables()
         vmi_class_typeinfo = engine2_vmi_class_typeinfo_vtable;
     }
 
-    if (!class_typeinfo.IsValid() || !si_class_typeinfo.IsValid() || !vmi_class_typeinfo.IsValid()) [[unlikely]]
-    {
-        plg::print(LS_ERROR, "Failed to get typeinfo vtables");
-        return;
-    }
-
-    struct TypeInfo
-    {
-        std::type_info*         ti;
-        [[nodiscard]] uintptr_t address() const { return reinterpret_cast<uintptr_t>(ti); }
-    };
-
-    std::vector<TypeInfo> known_typeinfos;
-
-    // originally inspired by praydog & cursey's kananlib https://github.com/cursey/kananlib/blob/main/src/RTTI.cpp
-    // but made some improvements based on our usage.
-    // hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
-
-    // find every address that points to the typeinfo vtable, used for brutefocing vtable later
-    auto collect_typeinfos = [&](CAddress root_rtti_vtable) {
-        auto instances = FindPtrs(root_rtti_vtable.GetPtr());
-        known_typeinfos.reserve(known_typeinfos.size() + instances.size());
-
-        for (auto xref : instances)
-            known_typeinfos.emplace_back(xref.As<std::type_info*>());
-    };
-
-    collect_typeinfos(vmi_class_typeinfo);
-    collect_typeinfos(si_class_typeinfo);
-    collect_typeinfos(class_typeinfo);
-    std::ranges::sort(known_typeinfos, {}, &TypeInfo::address);
+    const bool have_cxxabiv1 = class_typeinfo.IsValid() && si_class_typeinfo.IsValid() && vmi_class_typeinfo.IsValid();
+    if (!have_cxxabiv1) [[unlikely]]
+        plg::print(LS_WARNING, "Failed to get typeinfo vtables in {}, skipping inheritance", _module_name);
 
     const auto min_ti_addr = known_typeinfos.front().address();
     const auto max_ti_addr = known_typeinfos.back().address();
@@ -361,18 +481,12 @@ void CModule::DumpVtables()
     ti_to_vtable_map.reserve(known_typeinfos.size() / 2);
     _vtables.reserve(known_typeinfos.size());
 
-    // bruteforcing vtable
-    for (const auto& segment : _segments)
+    for (const auto* sec : relro_sections)
     {
-        if (segment.flags & FLAG_X)
-            continue;
-
-        auto scan_start = segment.address;
-        auto scan_end   = scan_start + segment.size;
-
-        for (auto current_addr = scan_start; current_addr < scan_end; current_addr += sizeof(void*))
+        const auto scan_end = sec->address + sec->size;
+        for (auto current_addr = sec->address + 8; current_addr + 8 <= scan_end; current_addr += sizeof(void*))
         {
-            auto ptr = *reinterpret_cast<uintptr_t*>(current_addr);
+            const auto ptr = *reinterpret_cast<uintptr_t*>(current_addr);
 
             if (ptr < min_ti_addr || ptr > max_ti_addr)
                 continue;
@@ -381,26 +495,30 @@ void CModule::DumpVtables()
 
             if (it == known_typeinfos.end() || it->address() != ptr)
                 continue;
-            auto offset = *(std::intptr_t*)(current_addr - 0x8);
+
+            const auto offset = *(std::intptr_t*)(current_addr - 0x8);
             // offset_to_top: 0 for primary vtable, negative for secondary vtables
             if (offset > 0)
                 continue;
 
             // make it positive to behave the same as windows
-            offset = -offset;
+            const auto positive_offset = static_cast<uint64_t>(-offset);
 
             const auto& [type_info] = *it;
 
-            auto start_address = current_addr + 0x8;
+            const auto start_address = current_addr + 0x8;
 
-            auto vtable = std::make_unique<VTable>(type_info, start_address, demangle(type_info->name()), offset);
+            auto vtable = std::make_unique<VTable>(type_info, start_address, demangle(type_info->name()), positive_offset);
 
-            if (offset == 0) [[likely]]
+            if (positive_offset == 0) [[likely]]
                 ti_to_vtable_map[type_info] = vtable.get();
 
             _vtables.push_back(std::move(vtable));
         }
     }
+
+    if (!have_cxxabiv1)
+        return;
 
     std::vector<const std::type_info*>        worklist;
     std::unordered_set<const std::type_info*> visited;
