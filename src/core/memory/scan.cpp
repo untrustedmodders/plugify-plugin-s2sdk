@@ -130,11 +130,6 @@ struct Pattern
         return true;
     }
 
-    bool is_match(uint8_t* data) const
-    {
-        return is_match(const_cast<const uint8_t*>(data));
-    }
-
 private:
     std::vector<Element> _elements{};
 };
@@ -213,15 +208,15 @@ enum class SearchAction : uint8_t
 };
 
 template <typename Callback>
-static void FindDataScalar(uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size, Callback on_match) noexcept
+static void FindDataScalar(const uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size, Callback on_match) noexcept
 {
     if (size < needle_size) [[unlikely]]
         return;
 
     const auto first_byte = needle[0];
-    uint8_t*   end        = data + size - needle_size + 1;
+    const uint8_t*   end        = data + size - needle_size + 1;
 
-    for (uint8_t* current = data; current < end; ++current)
+    for (const uint8_t* current = data; current < end; ++current)
     {
         current = std::find(current, end, first_byte);
         if (current == end) break;
@@ -235,16 +230,16 @@ static void FindDataScalar(uint8_t* data, std::size_t size, const uint8_t* needl
 }
 
 template <typename Callback>
-static void FindPatternScalar(uint8_t* data, std::size_t size, const std::vector<Pattern::Element>& pattern, Callback on_match) noexcept
+static void FindPatternScalar(const uint8_t* data, std::size_t size, const std::vector<Pattern::Element>& pattern, Callback on_match) noexcept
 {
     const auto pattern_size = pattern.size();
     if (size < pattern_size) [[unlikely]]
         return;
 
     const auto first_byte = pattern[0].byte;
-    uint8_t*   end        = data + size - pattern_size + 1;
+    const uint8_t*   end        = data + size - pattern_size + 1;
 
-    for (uint8_t* current = data; current < end; ++current)
+    for (const uint8_t* current = data; current < end; ++current)
     {
         current = std::find(current, end, first_byte);
         if (current == end) break;
@@ -266,7 +261,7 @@ static void FindPatternScalar(uint8_t* data, std::size_t size, const std::vector
 // Implementation from: http://0x80.pl/notesen/2016-11-28-simd-strfind.html
 
 template <typename Callback>
-ATTRIBUTE_SSE static void FindDataSSEImpl(uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size, Callback on_match)
+ATTRIBUTE_SSE static void FindDataSSEImpl(const uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size, Callback on_match)
 {
     if (needle_size < 2 || size < needle_size) [[unlikely]]
     {
@@ -283,11 +278,11 @@ ATTRIBUTE_SSE static void FindDataSSEImpl(uint8_t* data, std::size_t size, const
     const auto v_first = _mm_set1_epi8(static_cast<char>(needle[0]));
     const auto v_last  = _mm_set1_epi8(static_cast<char>(needle[needle_size - 1]));
 
-    auto process_mask = [&](uint32_t mask, uint8_t* base) -> bool {
+    auto process_mask = [&](uint32_t mask, const uint8_t* base) -> bool {
         while (mask != 0)
         {
             uint32_t bit_pos   = std::countr_zero(mask);
-            uint8_t* match_ptr = base + bit_pos;
+            const uint8_t* match_ptr = base + bit_pos;
 
             // only check middle bytes, first and last are already checked
             if (std::memcmp(match_ptr + 1, needle + 1, needle_size - 2) == 0) [[unlikely]]
@@ -303,15 +298,15 @@ ATTRIBUTE_SSE static void FindDataSSEImpl(uint8_t* data, std::size_t size, const
 
     while (current <= unroll_limit)
     {
-        auto v_block1_first = _mm_loadu_si128(reinterpret_cast<__m128i*>(current));
-        auto v_block2_first = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + simd_size));
-        auto v_block3_first = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + 2 * simd_size));
-        auto v_block4_first = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + 3 * simd_size));
+        auto v_block1_first = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current));
+        auto v_block2_first = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + simd_size));
+        auto v_block3_first = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + 2 * simd_size));
+        auto v_block4_first = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + 3 * simd_size));
 
-        auto v_block1_last = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + needle_size - 1));
-        auto v_block2_last = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + simd_size + needle_size - 1));
-        auto v_block3_last = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + 2 * simd_size + needle_size - 1));
-        auto v_block4_last = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + 3 * simd_size + needle_size - 1));
+        auto v_block1_last = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + needle_size - 1));
+        auto v_block2_last = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + simd_size + needle_size - 1));
+        auto v_block3_last = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + 2 * simd_size + needle_size - 1));
+        auto v_block4_last = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + 3 * simd_size + needle_size - 1));
 
         uint32_t mask1 = _mm_movemask_epi8(_mm_and_si128(
             _mm_cmpeq_epi8(v_first, v_block1_first), _mm_cmpeq_epi8(v_last, v_block1_last)));
@@ -353,7 +348,7 @@ ATTRIBUTE_SSE static void FindDataSSEImpl(uint8_t* data, std::size_t size, const
 }
 
 template <typename Callback>
-ATTRIBUTE_AVX2 static void FindDataAvx2Impl(uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size, Callback on_match)
+ATTRIBUTE_AVX2 static void FindDataAvx2Impl(const uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size, Callback on_match)
 {
     if (needle_size < 2 || size < needle_size) [[unlikely]]
     {
@@ -370,11 +365,11 @@ ATTRIBUTE_AVX2 static void FindDataAvx2Impl(uint8_t* data, std::size_t size, con
     const auto v_first = _mm256_set1_epi8(static_cast<char>(needle[0]));
     const auto v_last  = _mm256_set1_epi8(static_cast<char>(needle[needle_size - 1]));
 
-    auto process_mask = [&](uint32_t mask, uint8_t* base) -> bool {
+    auto process_mask = [&](uint32_t mask, const uint8_t* base) -> bool {
         while (mask != 0)
         {
             uint32_t bit_pos   = std::countr_zero(mask);
-            uint8_t* match_ptr = base + bit_pos;
+            const uint8_t* match_ptr = base + bit_pos;
 
             // only check middle bytes, first and last are already checked
             if (std::memcmp(match_ptr + 1, needle + 1, needle_size - 2) == 0) [[unlikely]]
@@ -390,15 +385,15 @@ ATTRIBUTE_AVX2 static void FindDataAvx2Impl(uint8_t* data, std::size_t size, con
 
     while (current <= unroll_limit)
     {
-        auto v_block1_first = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current));
-        auto v_block2_first = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + simd_size));
-        auto v_block3_first = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + 2 * simd_size));
-        auto v_block4_first = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + 3 * simd_size));
+        auto v_block1_first = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current));
+        auto v_block2_first = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + simd_size));
+        auto v_block3_first = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + 2 * simd_size));
+        auto v_block4_first = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + 3 * simd_size));
 
-        auto v_block1_last = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + needle_size - 1));
-        auto v_block2_last = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + simd_size + needle_size - 1));
-        auto v_block3_last = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + 2 * simd_size + needle_size - 1));
-        auto v_block4_last = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + 3 * simd_size + needle_size - 1));
+        auto v_block1_last = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + needle_size - 1));
+        auto v_block2_last = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + simd_size + needle_size - 1));
+        auto v_block3_last = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + 2 * simd_size + needle_size - 1));
+        auto v_block4_last = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + 3 * simd_size + needle_size - 1));
 
         uint32_t mask1 = _mm256_movemask_epi8(_mm256_and_si256(
             _mm256_cmpeq_epi8(v_first, v_block1_first), _mm256_cmpeq_epi8(v_last, v_block1_last)));
@@ -439,7 +434,7 @@ ATTRIBUTE_AVX2 static void FindDataAvx2Impl(uint8_t* data, std::size_t size, con
     }
 }
 
-static CAddress FindDataSSE(uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size)
+static CAddress FindDataSSE(const uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size)
 {
     CAddress   result{};
     const auto base = reinterpret_cast<uintptr_t>(data);
@@ -452,7 +447,7 @@ static CAddress FindDataSSE(uint8_t* data, std::size_t size, const uint8_t* need
     return result;
 }
 
-static std::vector<CAddress> FindDataMultiSSE(uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size)
+static std::vector<CAddress> FindDataMultiSSE(const uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size)
 {
     std::vector<CAddress> results{};
     results.reserve(8);
@@ -469,7 +464,7 @@ static std::vector<CAddress> FindDataMultiSSE(uint8_t* data, std::size_t size, c
 
 ATTRIBUTE_AVX2
 
-static CAddress FindDataAVX2(uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size)
+static CAddress FindDataAVX2(const uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size)
 {
     CAddress   result{};
     const auto base = reinterpret_cast<uintptr_t>(data);
@@ -484,7 +479,7 @@ static CAddress FindDataAVX2(uint8_t* data, std::size_t size, const uint8_t* nee
 
 ATTRIBUTE_AVX2
 
-static std::vector<CAddress> FindDataMultiAVX2(uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size)
+static std::vector<CAddress> FindDataMultiAVX2(const uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size)
 {
     std::vector<CAddress> results{};
     results.reserve(8);
@@ -500,7 +495,7 @@ static std::vector<CAddress> FindDataMultiAVX2(uint8_t* data, std::size_t size, 
 }
 
 template <typename Callback>
-ATTRIBUTE_SSE static void FindPatternSSEImpl(uint8_t* data, std::size_t size, const Pattern& pattern, Callback on_match)
+ATTRIBUTE_SSE static void FindPatternSSEImpl(const uint8_t* data, std::size_t size, const Pattern& pattern, Callback on_match)
 {
     const auto& pattern_bytes = pattern.bytes();
     const auto  pattern_size  = pattern_bytes.size();
@@ -520,11 +515,11 @@ ATTRIBUTE_SSE static void FindPatternSSEImpl(uint8_t* data, std::size_t size, co
     const auto v_first = _mm_set1_epi8(static_cast<char>(pattern_bytes.front().byte));
     const auto v_last  = _mm_set1_epi8(static_cast<char>(pattern_bytes.back().byte));
 
-    auto process_mask = [&](uint32_t mask, uint8_t* base) -> bool {
+    auto process_mask = [&](uint32_t mask, const uint8_t* base) -> bool {
         while (mask != 0)
         {
             uint32_t bit_pos   = std::countr_zero(mask);
-            uint8_t* match_ptr = base + bit_pos;
+            const uint8_t* match_ptr = base + bit_pos;
 
             if (pattern.is_match(match_ptr)) [[unlikely]]
             {
@@ -539,15 +534,15 @@ ATTRIBUTE_SSE static void FindPatternSSEImpl(uint8_t* data, std::size_t size, co
 
     while (current <= unroll_limit)
     {
-        auto v_block1_first = _mm_loadu_si128(reinterpret_cast<__m128i*>(current));
-        auto v_block2_first = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + simd_size));
-        auto v_block3_first = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + 2 * simd_size));
-        auto v_block4_first = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + 3 * simd_size));
+        auto v_block1_first = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current));
+        auto v_block2_first = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + simd_size));
+        auto v_block3_first = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + 2 * simd_size));
+        auto v_block4_first = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + 3 * simd_size));
 
-        auto v_block1_last = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + pattern_size - 1));
-        auto v_block2_last = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + simd_size + pattern_size - 1));
-        auto v_block3_last = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + 2 * simd_size + pattern_size - 1));
-        auto v_block4_last = _mm_loadu_si128(reinterpret_cast<__m128i*>(current + 3 * simd_size + pattern_size - 1));
+        auto v_block1_last = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + pattern_size - 1));
+        auto v_block2_last = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + simd_size + pattern_size - 1));
+        auto v_block3_last = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + 2 * simd_size + pattern_size - 1));
+        auto v_block4_last = _mm_loadu_si128(reinterpret_cast<const __m128i*>(current + 3 * simd_size + pattern_size - 1));
 
         uint32_t mask1 = _mm_movemask_epi8(_mm_and_si128(
             _mm_cmpeq_epi8(v_first, v_block1_first), _mm_cmpeq_epi8(v_last, v_block1_last)));
@@ -589,7 +584,7 @@ ATTRIBUTE_SSE static void FindPatternSSEImpl(uint8_t* data, std::size_t size, co
 }
 
 template <typename Callback>
-ATTRIBUTE_AVX2 static void FindPatternAvx2Impl(uint8_t* data, std::size_t size, const Pattern& pattern, Callback on_match)
+ATTRIBUTE_AVX2 static void FindPatternAvx2Impl(const uint8_t* data, std::size_t size, const Pattern& pattern, Callback on_match)
 {
     const auto& pattern_bytes = pattern.bytes();
     const auto  pattern_size  = pattern_bytes.size();
@@ -609,11 +604,11 @@ ATTRIBUTE_AVX2 static void FindPatternAvx2Impl(uint8_t* data, std::size_t size, 
     const auto v_first = _mm256_set1_epi8(static_cast<char>(pattern_bytes.front().byte));
     const auto v_last  = _mm256_set1_epi8(static_cast<char>(pattern_bytes.back().byte));
 
-    auto process_mask = [&](uint32_t mask, uint8_t* base) -> bool {
+    auto process_mask = [&](uint32_t mask, const uint8_t* base) -> bool {
         while (mask != 0)
         {
             uint32_t bit_pos   = std::countr_zero(mask);
-            uint8_t* match_ptr = base + bit_pos;
+            const uint8_t* match_ptr = base + bit_pos;
 
             if (pattern.is_match(match_ptr)) [[unlikely]]
             {
@@ -628,15 +623,15 @@ ATTRIBUTE_AVX2 static void FindPatternAvx2Impl(uint8_t* data, std::size_t size, 
 
     while (current <= unroll_limit)
     {
-        auto v_block1_first = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current));
-        auto v_block2_first = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + simd_size));
-        auto v_block3_first = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + 2 * simd_size));
-        auto v_block4_first = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + 3 * simd_size));
+        auto v_block1_first = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current));
+        auto v_block2_first = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + simd_size));
+        auto v_block3_first = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + 2 * simd_size));
+        auto v_block4_first = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + 3 * simd_size));
 
-        auto v_block1_last = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + pattern_size - 1));
-        auto v_block2_last = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + simd_size + pattern_size - 1));
-        auto v_block3_last = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + 2 * simd_size + pattern_size - 1));
-        auto v_block4_last = _mm256_loadu_si256(reinterpret_cast<__m256i*>(current + 3 * simd_size + pattern_size - 1));
+        auto v_block1_last = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + pattern_size - 1));
+        auto v_block2_last = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + simd_size + pattern_size - 1));
+        auto v_block3_last = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + 2 * simd_size + pattern_size - 1));
+        auto v_block4_last = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(current + 3 * simd_size + pattern_size - 1));
 
         uint32_t mask1 = _mm256_movemask_epi8(_mm256_and_si256(
             _mm256_cmpeq_epi8(v_first, v_block1_first), _mm256_cmpeq_epi8(v_last, v_block1_last)));
@@ -677,7 +672,7 @@ ATTRIBUTE_AVX2 static void FindPatternAvx2Impl(uint8_t* data, std::size_t size, 
     }
 }
 
-static CAddress FindPatternSSE(uint8_t* data, std::size_t size, const Pattern& pattern)
+static CAddress FindPatternSSE(const uint8_t* data, std::size_t size, const Pattern& pattern)
 {
     CAddress   result{};
     const auto base = reinterpret_cast<uintptr_t>(data);
@@ -690,7 +685,7 @@ static CAddress FindPatternSSE(uint8_t* data, std::size_t size, const Pattern& p
     return result;
 }
 
-static std::vector<CAddress> FindPatternMultiSSE(uint8_t* data, std::size_t size, const Pattern& pattern)
+static std::vector<CAddress> FindPatternMultiSSE(const uint8_t* data, std::size_t size, const Pattern& pattern)
 {
     std::vector<CAddress> results{};
     results.reserve(8);
@@ -706,7 +701,7 @@ static std::vector<CAddress> FindPatternMultiSSE(uint8_t* data, std::size_t size
 }
 
 ATTRIBUTE_AVX2
-static CAddress FindPatternAVX2(uint8_t* data, std::size_t size, const Pattern& pattern)
+static CAddress FindPatternAVX2(const uint8_t* data, std::size_t size, const Pattern& pattern)
 {
     CAddress   result{};
     const auto base = reinterpret_cast<uintptr_t>(data);
@@ -720,7 +715,7 @@ static CAddress FindPatternAVX2(uint8_t* data, std::size_t size, const Pattern& 
 }
 
 ATTRIBUTE_AVX2
-static std::vector<CAddress> FindPatternMultiAVX2(uint8_t* data, std::size_t size, const Pattern& pattern)
+static std::vector<CAddress> FindPatternMultiAVX2(const uint8_t* data, std::size_t size, const Pattern& pattern)
 {
     std::vector<CAddress> results{};
     results.reserve(8);
@@ -940,7 +935,7 @@ ATTRIBUTE_AVX2 static void FindValueAVX2Impl(uintptr_t data, std::size_t size, T
 }
 } // namespace detail
 
-CAddress scan::FindPattern(uint8_t* data, std::size_t size, std::string_view pattern) noexcept
+CAddress scan::FindPattern(const uint8_t* data, std::size_t size, std::string_view pattern) noexcept
 {
     auto pat = Pattern::FromHexString(pattern);
 
@@ -950,7 +945,7 @@ CAddress scan::FindPattern(uint8_t* data, std::size_t size, std::string_view pat
     return detail::FindPatternSSE(data, size, pat);
 }
 
-std::vector<CAddress> scan::FindPatternMulti(uint8_t* data, std::size_t size, std::string_view pattern) noexcept
+std::vector<CAddress> scan::FindPatternMulti(const uint8_t* data, std::size_t size, std::string_view pattern) noexcept
 {
     auto pat = Pattern::FromHexString(pattern);
 
@@ -960,7 +955,7 @@ std::vector<CAddress> scan::FindPatternMulti(uint8_t* data, std::size_t size, st
     return detail::FindPatternMultiSSE(data, size, pat);
 }
 
-CAddress scan::FindStr(uint8_t* data, std::size_t size, std::string_view str, bool zero_terminated, bool exact) noexcept
+CAddress scan::FindStr(const uint8_t* data, std::size_t size, std::string_view str, bool zero_terminated, bool exact) noexcept
 {
     const uint8_t* needle      = reinterpret_cast<const uint8_t*>(str.data());
     std::size_t    needle_size = zero_terminated ? str.size() + 1 : str.size();
@@ -1075,14 +1070,14 @@ std::vector<CAddress> scan::FindPtrs(uintptr_t data, std::size_t size, uintptr_t
     return result;
 }
 
-CAddress scan::FindData(uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size) noexcept
+CAddress scan::FindData(const uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size) noexcept
 {
     if (s_InstructionSet.SupportAvx2()) return detail::FindDataAVX2(data, size, needle, needle_size);
 
     return detail::FindDataSSE(data, size, needle, needle_size);
 }
 
-std::vector<CAddress> scan::FindDataMulti(uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size) noexcept
+std::vector<CAddress> scan::FindDataMulti(const uint8_t* data, std::size_t size, const uint8_t* needle, std::size_t needle_size) noexcept
 {
     if (s_InstructionSet.SupportAvx2()) return detail::FindDataMultiAVX2(data, size, needle, needle_size);
 

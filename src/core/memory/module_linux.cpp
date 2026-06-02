@@ -31,13 +31,7 @@
 #    include <ranges>
 #    include <unordered_set>
 
-struct ElfModule
-{
-	std::string path;
-	dl_phdr_info info;
-};
-
-static std::vector<ElfModule> module_list{};
+static std::vector<std::string> module_list{};
 
 void CModule::GetModuleInfo(std::string_view mod)
 {
@@ -61,7 +55,7 @@ void CModule::GetModuleInfo(std::string_view mod)
                 if (!isFromGameBin && !isFromRootBin)
                     return 0;
 
-                module_list.emplace_back(std::string(name), *info);
+                module_list.emplace_back(name);
                 return 0;
             },
             nullptr);
@@ -69,7 +63,7 @@ void CModule::GetModuleInfo(std::string_view mod)
 
     const auto it = std::ranges::find_if(module_list,
                                          [&](const auto& i) {
-                                             return i.path.contains(mod);
+                                             return i.contains(mod);
                                          });
 
     if (it == module_list.end())
@@ -77,71 +71,31 @@ void CModule::GetModuleInfo(std::string_view mod)
         return;
     }
 
-    const auto& [path, info] = *it;
+    const auto& path = *it;
 
-    _base_address = info.dlpi_addr;
-    _module_name  = path.substr(path.find_last_of('/') + 1);
-
-    uintptr_t min_vaddr = std::numeric_limits<uintptr_t>::max();
-    uintptr_t max_vaddr = 0;
-
-#if 0
-    for (auto i = 0; i < info.dlpi_phnum; i++)
-    {
-        auto address            = _base_address + info.dlpi_phdr[i].p_paddr;
-        auto size               = (uintptr_t)info.dlpi_phdr[i].p_memsz;
-        auto type               = info.dlpi_phdr[i].p_type;
-        auto is_dynamic_section = type == PT_DYNAMIC;
-
-        auto flags = info.dlpi_phdr[i].p_flags;
-
-        auto is_executable = (flags & PF_X) != 0;
-        auto is_readable   = (flags & PF_R) != 0;
-        auto is_writable   = (flags & PF_W) != 0;
-
-        if (is_dynamic_section)
-        {
-            DumpExports(reinterpret_cast<void*>(address));
-            continue;
-        }
-
-        if (type != PT_LOAD)
-            continue;
-
-        /*if (info.dlpi_phdr[i].p_paddr == 0)
-            continue;*/
-
-        auto* data = reinterpret_cast<std::uint8_t*>(address);
-
-        auto& segment = _segments.emplace_back();
-
-        segment.address = address;
-        segment.data    = std::span(data, data + size);
-        segment.size    = size;
-
-        min_vaddr = std::min(min_vaddr, address);
-        max_vaddr = std::max(max_vaddr, address + size);
-
-        if (is_executable)
-            segment.flags |= FLAG_X;
-
-        if (is_readable)
-            segment.flags |= FLAG_R;
-        if (is_writable)
-            segment.flags |= FLAG_W;
-    }
-#endif
-	void* handle = dlopen(path.data(), RTLD_LAZY | RTLD_NOLOAD);
+	void* handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_NOLOAD);
 	if (!handle)
 	{
 		return;
 	}
 
-	int fd = open(path.data(), O_RDONLY);
+	link_map* lmap;
+	if (dlinfo(handle, RTLD_DI_LINKMAP, &lmap) != 0)
+	{
+		return;
+	}
+
+	int fd = open(lmap->l_name, O_RDONLY);
 	if (fd == -1)
 	{
 		return;
 	}
+
+	_base_address = lmap->l_addr;
+	_module_name  = path.substr(path.find_last_of('/') + 1);
+
+	uintptr_t min_vaddr = std::numeric_limits<uintptr_t>::max();
+	uintptr_t max_vaddr = 0;
 
 	struct stat st;
 	if (fstat(fd, &st) == 0)
@@ -160,7 +114,7 @@ void CModule::GetModuleInfo(std::string_view mod)
 				if (*name == '\0')
 					continue;
 
-				auto address = info.dlpi_addr + shdr->sh_addr;
+				auto address = lmap->l_addr + shdr->sh_addr;
 				auto size     = shdr->sh_size;
 				auto type      = shdr->sh_type;
 				auto is_dynamic_section = type == SHT_DYNAMIC;
@@ -185,22 +139,22 @@ void CModule::GetModuleInfo(std::string_view mod)
 
 				auto* data = reinterpret_cast<std::uint8_t*>(address);
 
-				auto& segment = _segments.emplace_back();
+				auto& section = _sections.emplace_back();
 
-				segment.address = address;
-				segment.data    = std::span(data, data + size);
-				segment.size    = size;
-				segment.name    = name;
+				section.address = address;
+				section.data    = std::vector(data, data + size);
+				section.size    = size;
+				section.name    = name;
 
 				min_vaddr = std::min(min_vaddr, address);
        		 	max_vaddr = std::max(max_vaddr, address + size);
 
 				if (is_executable)
-					segment.flags |= FLAG_X;
+					section.flags |= FLAG_X;
 				if (is_readable)
-					segment.flags |= FLAG_R;
+					section.flags |= FLAG_R;
 				if (is_writable)
-					segment.flags |= FLAG_W;
+					section.flags |= FLAG_W;
 			}
 
 			munmap(map, st.st_size);
@@ -463,16 +417,16 @@ void CModule::DumpVtables()
     _vtables.reserve(known_typeinfos.size());
 
     // bruteforcing vtable
-    for (const auto& segment : _segments)
+    for (const auto& section : _sections)
     {
-		if (segment.name != ".data.rel.ro" && segment.name != ".data.rel.ro.local" && segment.name != ".rodata")
+		if (section.name != ".data.rel.ro" && section.name != ".data.rel.ro.local" && section.name != ".rodata")
             continue;
 
-        if (segment.flags & FLAG_X)
+        if (section.flags & FLAG_X)
             continue;
 
-        auto scan_start = segment.address;
-        auto scan_end   = scan_start + segment.size;
+        auto scan_start = section.address;
+        auto scan_end   = scan_start + section.size;
 
         for (auto current_addr = scan_start; current_addr < scan_end; current_addr += sizeof(void*))
         {
@@ -570,13 +524,13 @@ void CModule::BuildFunctionIndexAndReferences()
 {
     uintptr_t exec_start{}, exec_end{}, exec_size{};
 
-    std::vector<const Segment*> data_segments;
-    data_segments.reserve(_segments.size());
+    std::vector<const Section*> data_sections;
+    data_sections.reserve(_sections.size());
 
     uintptr_t min_data_addr = std::numeric_limits<uintptr_t>::max();
     uintptr_t max_data_addr = 0;
 
-    for (const auto& seg : _segments)
+    for (const auto& seg : _sections)
     {
         if (seg.flags & FLAG_X)
         {
@@ -589,7 +543,7 @@ void CModule::BuildFunctionIndexAndReferences()
         }
         else
         {
-            data_segments.push_back(&seg);
+            data_sections.push_back(&seg);
             min_data_addr = std::min(min_data_addr, seg.address);
             max_data_addr = std::max(max_data_addr, seg.address + seg.size);
         }
@@ -602,7 +556,7 @@ void CModule::BuildFunctionIndexAndReferences()
     auto is_data_pointer = [&](uintptr_t addr) noexcept {
         if (addr < min_data_addr || addr >= max_data_addr)
             return false;
-        return std::ranges::any_of(data_segments, [addr](const Segment* s) noexcept {
+        return std::ranges::any_of(data_sections, [addr](const Section* s) noexcept {
             return s->address <= addr && addr < s->address + s->size;
         });
     };
@@ -611,7 +565,7 @@ void CModule::BuildFunctionIndexAndReferences()
     seen_functions.reserve(exec_size / 32);
 
     // phase1: scan data for function ptrs
-    for (const Segment* seg : data_segments)
+    for (const Section* seg : data_sections)
     {
         const auto seg_end = seg->address + seg->size;
         for (auto current_ptr = seg->address; current_ptr + sizeof(void*) <= seg_end; current_ptr += sizeof(void*))

@@ -63,16 +63,16 @@ public:
     [[nodiscard]] virtual void* FindStringExactEx(const char* str)                                                                               = 0;
 };
 
-enum SegmentFlags : uint8_t
+enum SectionFlags : uint8_t
 {
     FLAG_R = 1 << 0,
     FLAG_W = 1 << 1,
     FLAG_X = 1 << 2,
 };
 
-constexpr SegmentFlags operator|(SegmentFlags a, SegmentFlags b)
+constexpr SectionFlags operator|(SectionFlags a, SectionFlags b)
 {
-    return static_cast<SegmentFlags>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
+    return static_cast<SectionFlags>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
 }
 
 class CModule final : public IModule
@@ -98,18 +98,18 @@ public:
 #endif
     };
 
-    struct Segment
+    struct Section
     {
-        Segment()                          = default;
-        Segment(Segment&&)                 = default;
-        Segment(const Segment&)            = delete;
-        Segment& operator=(const Segment&) = delete;
-        Segment& operator=(Segment&&)      = delete;
+        Section()                          = default;
+        Section(Section&&)                 = default;
+        Section(const Section&)            = delete;
+        Section& operator=(const Section&) = delete;
+        Section& operator=(Section&&)      = delete;
 
         uint8_t              flags{};
         uintptr_t            address{};
         std::size_t          size{};
-        std::span<uint8_t>   data{};
+        std::vector<uint8_t> data{};
 		std::string          name{};
     };
 
@@ -127,7 +127,7 @@ public:
 
 private:
 
-    std::vector<Segment> _segments{};
+    std::vector<Section> _sections{};
     uintptr_t            _base_address{};
     std::size_t          _size{};
     std::string          _module_name{};

@@ -71,30 +71,30 @@ void CModule::GetModuleInfo(std::string_view mod)
 
     _size = ntHeader->OptionalHeader.SizeOfImage;
 
-    auto section = IMAGE_FIRST_SECTION(ntHeader);
+    auto imgSection = IMAGE_FIRST_SECTION(ntHeader);
 
-    for (auto i = 0u; i < ntHeader->FileHeader.NumberOfSections; i++, section++)
+    for (auto i = 0u; i < ntHeader->FileHeader.NumberOfSections; i++, imgSection++)
     {
-        const auto isExecutable = (section->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
-        const auto isReadable   = (section->Characteristics & IMAGE_SCN_MEM_READ) != 0;
-        const auto isWritable   = (section->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
+        const auto isExecutable = (imgSection->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
+        const auto isReadable   = (imgSection->Characteristics & IMAGE_SCN_MEM_READ) != 0;
+        const auto isWritable   = (imgSection->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
 
-        const auto start = _base_address + section->VirtualAddress;
-        const auto size  = section->Misc.VirtualSize;
+        const auto start = _base_address + imgSection->VirtualAddress;
+        const auto size  = imgSection->Misc.VirtualSize;
 
-        auto& segment   = _segments.emplace_back();
-        segment.address = start;
-        segment.size    = size;
+        auto& section   = _sections.emplace_back();
+        section.address = start;
+        section.size    = size;
         if (isExecutable)
-            segment.flags |= FLAG_X;
+            section.flags |= FLAG_X;
         if (isReadable)
-            segment.flags |= FLAG_R;
+            section.flags |= FLAG_R;
         if (isWritable)
-            segment.flags |= FLAG_W;
+            section.flags |= FLAG_W;
 
         const auto data = reinterpret_cast<uint8_t*>(start);
-        segment.data    = std::span(data, data + size);
-		segment.name    = reinterpret_cast<const char*>(section->Name);
+        section.data    = std::vector(data, data + size);
+		section.name    = reinterpret_cast<const char*>(imgSection->Name);
     }
 
     _createInterFaceFn = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
@@ -165,9 +165,10 @@ void CModule::BuildFunctionIndexAndReferences()
             next_i++;
         }
 
-        auto& entry = _function_entries.emplace_back();
-        entry.start = _base_address + start_address;
-        entry.end   = _base_address + end_address;
+        _function_entries.emplace_back(
+        	_base_address + start_address,
+        	_base_address + end_address
+        );
 
         i = next_i;
     }
@@ -178,19 +179,19 @@ void CModule::BuildFunctionIndexAndReferences()
                       });
 
     auto is_in_data_section = [this](uintptr_t address) noexcept {
-        for (const auto& seg : _segments)
+        for (const auto& section : _sections)
         {
-            if (seg.flags & FLAG_X) continue;
-            if (seg.address <= address && address < seg.address + seg.size) return true;
+            if (section.flags & FLAG_X) continue;
+            if (section.address <= address && address < section.address + section.size) return true;
         }
         return false;
     };
 
     auto is_in_text_section = [this](uintptr_t address) noexcept {
-        for (const auto& seg : _segments)
+        for (const auto& section : _sections)
         {
-            if ((seg.flags & FLAG_X) == 0) continue;
-            if (seg.address <= address && address < seg.address + seg.size) return true;
+            if ((section.flags & FLAG_X) == 0) continue;
+            if (section.address <= address && address < section.address + section.size) return true;
         }
         return false;
     };
@@ -318,18 +319,18 @@ void CModule::DumpVtables()
 
     std::unordered_map<std::type_info*, VTable*> vtable_map;
 
-    for (const auto& segment : _segments)
+    for (const auto& section : _sections)
     {
-		if (segment.name != ".data" && segment.name != ".rdata")
+		if (section.name != ".data" && section.name != ".rdata")
             continue;
 
-        if (segment.flags & (FLAG_X | FLAG_W))
+        if (section.flags & (FLAG_X | FLAG_W))
 			continue;
 
-        auto start_addr = segment.address;
-        auto end_addr   = start_addr + segment.size;
+        auto start_addr = section.address;
+        auto end_addr   = start_addr + section.size;
 
-        auto is_in_current_segment = [&](uintptr_t ptr) {
+        auto is_in_current_section = [&](uintptr_t ptr) {
             return start_addr <= ptr && ptr < end_addr;
         };
 
@@ -340,7 +341,7 @@ void CModule::DumpVtables()
             // check for alignment, struct _s_RTTICompleteObjectLocator aligns to 4 bytes
             if ((potential_col_ptr & 3) != 0) continue;
 
-            if (!is_in_current_segment(potential_col_ptr)) continue;
+            if (!is_in_current_section(potential_col_ptr)) continue;
 
             auto col = reinterpret_cast<_s_RTTICompleteObjectLocator*>(potential_col_ptr);
 
