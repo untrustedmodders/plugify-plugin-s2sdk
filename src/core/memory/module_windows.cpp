@@ -71,30 +71,30 @@ void CModule::GetModuleInfo(std::string_view mod)
 
     _size = ntHeader->OptionalHeader.SizeOfImage;
 
-    auto imgSection = IMAGE_FIRST_SECTION(ntHeader);
+    auto section = IMAGE_FIRST_SECTION(ntHeader);
 
-    for (auto i = 0u; i < ntHeader->FileHeader.NumberOfSections; i++, imgSection++)
+    for (auto i = 0u; i < ntHeader->FileHeader.NumberOfSections; i++, section++)
     {
-        const auto isExecutable = (imgSection->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
-        const auto isReadable   = (imgSection->Characteristics & IMAGE_SCN_MEM_READ) != 0;
-        const auto isWritable   = (imgSection->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
+        const auto isExecutable = (section->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
+        const auto isReadable   = (section->Characteristics & IMAGE_SCN_MEM_READ) != 0;
+        const auto isWritable   = (section->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
 
-        const auto start = _base_address + imgSection->VirtualAddress;
-        const auto size  = imgSection->Misc.VirtualSize;
+        const auto start = _base_address + section->VirtualAddress;
+        const auto size  = section->Misc.VirtualSize;
 
-        auto& section   = _sections.emplace_back();
-        section.address = start;
-        section.size    = size;
+        auto& segment   = _segments.emplace_back();
+        segment.address = start;
+        segment.size    = size;
         if (isExecutable)
-            section.flags |= SectionFlags::X;
+            segment.flags |= SegFlags::X;
         if (isReadable)
-            section.flags |= SectionFlags::R;
+            segment.flags |= SegFlags::R;
         if (isWritable)
-            section.flags |= SectionFlags::W;
+            segment.flags |= SegFlags::W;
 
         const auto data = reinterpret_cast<uint8_t*>(start);
-        section.data    = std::vector(data, data + size);
-		section.name    = reinterpret_cast<const char*>(imgSection->Name);
+        segment.data    = std::vector(data, data + size);
+		//segment.name    = reinterpret_cast<const char*>(section->Name);
     }
 
     _createInterFaceFn = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
@@ -178,20 +178,20 @@ void CModule::BuildFunctionIndexAndReferences()
                           return a.start < b.start;
                       });
 
-    auto is_in_data_section = [this](uintptr_t address) noexcept {
-        for (const auto& section : _sections)
+    auto is_in_data_segment = [this](uintptr_t address) noexcept {
+        for (const auto& segment : _segments)
         {
-            if (section.flags & SectionFlags::X) continue;
-            if (section.address <= address && address < section.address + section.size) return true;
+            if (segment.flags & SegFlags::X) continue;
+            if (segment.address <= address && address < segment.address + segment.size) return true;
         }
         return false;
     };
 
-    auto is_in_text_section = [this](uintptr_t address) noexcept {
-        for (const auto& section : _sections)
+    auto is_in_text_segment = [this](uintptr_t address) noexcept {
+        for (const auto& segment : _segments)
         {
-            if ((section.flags & SectionFlags::X) == 0) continue;
-            if (section.address <= address && address < section.address + section.size) return true;
+            if ((segment.flags & SegFlags::X) == 0) continue;
+            if (segment.address <= address && address < segment.address + segment.size) return true;
         }
         return false;
     };
@@ -204,7 +204,7 @@ void CModule::BuildFunctionIndexAndReferences()
     threads.reserve(num_threads);
 
     // multithreaded solution inspired by the code snippet @angelfor3v3r gave me a long time ago.
-    // to be honest i could have used yaxpeax-x86, which is the fastest decoder i have found yet (it takes about 100ms to decode the entire .text section
+    // to be honest i could have used yaxpeax-x86, which is the fastest decoder i have found yet (it takes about 100ms to decode the entire .text segment
     // in libserver.so while zydis takes ~450ms), but i dont think it is worth the effort to replace zydis with it,
     // not to mention safetyhook also uses zydis and i use the encoder feature from zydis too.
     // hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
@@ -243,7 +243,7 @@ void CModule::BuildFunctionIndexAndReferences()
                     {
                         const auto target = ip + instr.length + instr.raw.disp.value;
 
-                        if (is_in_data_section(target)) local_refs.emplace_back(target, ip);
+                        if (is_in_data_segment(target)) local_refs.emplace_back(target, ip);
                     }
                 }
                 else if (jumptable_start_address == 0 && (instr.mnemonic == ZYDIS_MNEMONIC_MOV || instr.mnemonic == ZYDIS_MNEMONIC_MOVSXD))
@@ -253,7 +253,7 @@ void CModule::BuildFunctionIndexAndReferences()
                     {
                         auto target = src.mem.disp.value + _base_address;
 
-                        if (is_in_text_section(target)) jumptable_start_address = target;
+                        if (is_in_text_segment(target)) jumptable_start_address = target;
                     }
                 }
 
@@ -316,16 +316,13 @@ void CModule::DumpVtables()
 
     std::unordered_map<std::type_info*, VTable*> vtable_map;
 
-    for (const auto& section : _sections)
+    for (const auto& segment : _segments)
     {
-		if (section.name != ".data" && section.name != ".rdata")
-            continue;
-
-        if (section.flags & (SectionFlags::X | SectionFlags::W))
+        if (segment.flags & (SegFlags::X | SegFlags::W))
 			continue;
 
-        auto start_addr = section.address;
-        auto end_addr   = start_addr + section.size;
+        auto start_addr = segment.address;
+        auto end_addr   = start_addr + segment.size;
 
         auto is_in_current_section = [&](uintptr_t ptr) {
             return start_addr <= ptr && ptr < end_addr;

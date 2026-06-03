@@ -63,26 +63,26 @@ public:
     [[nodiscard]] virtual void* FindStringExactEx(const char* str)                                                                     = 0;
 };
 
-enum class SectionFlags : uint8_t
+enum class SegFlags : uint8_t
 {
     R = 1 << 0,
     W = 1 << 1,
     X = 1 << 2,
 };
 
-constexpr SectionFlags operator|(SectionFlags lhs, SectionFlags rhs)
+constexpr SegFlags operator|(SegFlags lhs, SegFlags rhs)
 {
-	using underlying = std::underlying_type_t<SectionFlags>;
-	return static_cast<SectionFlags> (static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+	using underlying = std::underlying_type_t<SegFlags>;
+	return static_cast<SegFlags> (static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
 }
 
-constexpr bool operator&(SectionFlags lhs, SectionFlags rhs) noexcept
+constexpr bool operator&(SegFlags lhs, SegFlags rhs) noexcept
 {
-	using underlying = std::underlying_type_t<SectionFlags>;
+	using underlying = std::underlying_type_t<SegFlags>;
 	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
 }
 
-constexpr SectionFlags& operator|=(SectionFlags& lhs, SectionFlags rhs) noexcept
+constexpr SegFlags& operator|=(SegFlags& lhs, SegFlags rhs) noexcept
 {
 	lhs = lhs | rhs;
 	return lhs;
@@ -111,19 +111,18 @@ public:
 #endif
     };
 
-    struct Section
+    struct Segment
     {
-        Section()                          = default;
-        Section(Section&&)                 = default;
-        Section(const Section&)            = delete;
-        Section& operator=(const Section&) = delete;
-        Section& operator=(Section&&)      = delete;
+        Segment()                          = default;
+        Segment(Segment&&)                 = default;
+        Segment(const Segment&)            = delete;
+        Segment& operator=(const Segment&) = delete;
+        Segment& operator=(Segment&&)      = delete;
 
-        SectionFlags         flags{};
+        SegFlags             flags{};
         uintptr_t            address{};
         std::size_t          size{};
         std::vector<uint8_t> data{};
-		std::string          name{};
     };
 
     struct ReferenceEntry
@@ -140,7 +139,7 @@ public:
 
 private:
 
-    std::vector<Section> _sections{};
+    std::vector<Segment> _segments{};
     uintptr_t            _base_address{};
     std::size_t          _size{};
     std::string          _module_name{};

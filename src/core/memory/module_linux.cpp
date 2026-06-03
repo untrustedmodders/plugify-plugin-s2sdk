@@ -31,148 +31,99 @@
 #    include <ranges>
 #    include <unordered_set>
 
-static std::vector<std::string> module_list{};
-
 void CModule::GetModuleInfo(std::string_view mod)
 {
-    if (module_list.empty()) [[unlikely]]
-    {
-        dl_iterate_phdr(
-            [](struct dl_phdr_info* info, size_t, void*) {
-                std::string_view name = info->dlpi_name;
+	auto fn = [&](struct dl_phdr_info& info) -> int {
+		std::string_view name = info.dlpi_name;
 
-                if (name.rfind(".so") == std::string::npos)
-                    return 0;
+		if (!name.contains(mod))
+			return 0;
 
-                if (name.find("/metamod/") != std::string::npos)
-                    return 0;
+		_base_address = info.dlpi_addr;
+		_module_name  = name.substr(name.find_last_of('/') + 1);
 
-                constexpr std::string_view ROOTBIN = S2SDK_ROOT_BINARY;
-                constexpr std::string_view GAMEBIN = S2SDK_GAME_BINARY;
+		uintptr_t min_vaddr = std::numeric_limits<uintptr_t>::max();
+		uintptr_t max_vaddr = 0;
 
-                bool isFromRootBin = name.find(ROOTBIN) != std::string::npos;
-                bool isFromGameBin = name.find(GAMEBIN) != std::string::npos;
-                if (!isFromGameBin && !isFromRootBin)
-                    return 0;
-
-                module_list.emplace_back(name);
-                return 0;
-            },
-            nullptr);
-    }
-
-    const auto it = std::ranges::find_if(module_list,
-                                         [&](const auto& i) {
-                                             return i.contains(mod);
-                                         });
-
-    if (it == module_list.end())
-    {
-        return;
-    }
-
-    const auto& path = *it;
-
-	void* handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_NOLOAD);
-	if (!handle)
-	{
-		return;
-	}
-
-	link_map* lmap;
-	if (dlinfo(handle, RTLD_DI_LINKMAP, &lmap) != 0)
-	{
-		return;
-	}
-
-	int fd = open(lmap->l_name, O_RDONLY);
-	if (fd == -1)
-	{
-		return;
-	}
-
-	_base_address = lmap->l_addr;
-	_module_name  = path.substr(path.find_last_of('/') + 1);
-
-	uintptr_t min_vaddr = std::numeric_limits<uintptr_t>::max();
-	uintptr_t max_vaddr = 0;
-
-	struct stat st;
-	if (fstat(fd, &st) == 0)
-	{
-		void* map = mmap(nullptr, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-		if (map != MAP_FAILED)
+		for (auto i = 0; i < info.dlpi_phnum; i++)
 		{
-			ElfW(Ehdr)* ehdr = static_cast<ElfW(Ehdr)*>(map);
-			ElfW(Shdr)* shdrs = reinterpret_cast<ElfW(Shdr)*>(reinterpret_cast<uintptr_t>(ehdr) + ehdr->e_shoff);
-			const char* strTab = reinterpret_cast<const char*>(reinterpret_cast<uintptr_t>(ehdr) + shdrs[ehdr->e_shstrndx].sh_offset);
+			const auto address = _base_address + info.dlpi_phdr[i].p_paddr;
+			const auto size               = static_cast<uintptr_t>(info.dlpi_phdr[i].p_memsz);
+			const auto type      = info.dlpi_phdr[i].p_type;
+			const auto is_dynamic_section = type == PT_DYNAMIC;
 
-			for (auto i = 0; i < ehdr->e_shnum; ++i) // Loop through the sections.
+			const auto flags = info.dlpi_phdr[i].p_flags;
+
+			const auto is_executable = (flags & PF_X) != 0;
+			const auto is_readable   = (flags & PF_R) != 0;
+			const auto is_writable   = (flags & PF_W) != 0;
+
+			if (is_dynamic_section)
 			{
-				ElfW(Shdr)* shdr = reinterpret_cast<ElfW(Shdr)*>(reinterpret_cast<uintptr_t>(shdrs) + i * ehdr->e_shentsize);
-				const char* name = strTab + shdr->sh_name;
-				if (*name == '\0')
-					continue;
-
-				auto address = lmap->l_addr + shdr->sh_addr;
-				auto size    = shdr->sh_size;
-				auto type    = shdr->sh_type;
-				auto is_dynamic_section = type == SHT_DYNAMIC;
-
- 				auto flags = shdr->sh_flags;
-
-				auto is_executable = (flags & SHF_EXECINSTR) != 0;
-				auto is_readable   = (flags & SHF_ALLOC) != 0;
-				auto is_writable   = (flags & SHF_WRITE) != 0;
-
-				if (is_dynamic_section)
-				{
-					DumpExports(reinterpret_cast<void*>(address));
-					continue;
-				}
-
-				/*if (type != PT_LOAD)
-					continue;
-
-				if (info.dlpi_phdr[i].p_paddr == 0)
-					continue;*/
-
-				auto* data = reinterpret_cast<std::uint8_t*>(address);
-
-				auto& section = _sections.emplace_back();
-
-				section.address = address;
-				section.data    = std::vector(data, data + size);
-				section.size    = size;
-				section.name    = name;
-
-				min_vaddr = std::min(min_vaddr, address);
-       		 	max_vaddr = std::max(max_vaddr, address + size);
-
-				if (is_executable)
-					section.flags |= SectionFlags::X;
-				if (is_readable)
-					section.flags |= SectionFlags::R;
-				if (is_writable)
-					section.flags |= SectionFlags::W;
+				DumpExports(reinterpret_cast<void*>(address));
+				continue;
 			}
 
-			munmap(map, st.st_size);
+			if (type != PT_LOAD)
+				continue;
+
+			/*if (info.dlpi_phdr[i].p_paddr == 0)
+				continue;*/
+
+			auto* data = reinterpret_cast<std::uint8_t*>(address);
+
+			auto& segment = _segments.emplace_back();
+
+			segment.address = address;
+			segment.data    = std::vector(data, data + size);
+			segment.size    = size;
+
+			min_vaddr = std::min(min_vaddr, address);
+			max_vaddr = std::max(max_vaddr, address + size);
+
+			if (is_executable)
+				segment.flags |= SegFlags::X;
+			if (is_readable)
+				segment.flags |= SegFlags::R;
+			if (is_writable)
+				segment.flags |= SegFlags::W;
 		}
-	}
 
-	close(fd);
+		_size = max_vaddr - min_vaddr;
 
-    _size = max_vaddr - min_vaddr;
+		_createInterFaceFn = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
 
-    {
-       [[maybe_unused]] plg::Scope scope(_module_name + "::DumpVTables");
-        DumpVtables();
-    }
-    {
-        [[maybe_unused]] plg::Scope scope(_module_name + "::BuildFunctionIndexAndReferences");
-        BuildFunctionIndexAndReferences();
-    }
+		{
+			[[maybe_unused]] plg::Scope scope(_module_name + "::DumpVTables");
+			DumpVtables();
+		}
+		{
+			[[maybe_unused]] plg::Scope scope(_module_name + "::BuildFunctionIndexAndReferences");
+			BuildFunctionIndexAndReferences();
+		}
+		return 1;
+	};
+
+	dl_iterate_phdr(
+	[](struct dl_phdr_info* info, size_t, void* data) {
+		std::string_view name = info->dlpi_name;
+
+		if (name.rfind(".so") == std::string::npos)
+			return 0;
+
+		if (name.find("/metamod/") != std::string::npos)
+			return 0;
+
+		constexpr std::string_view ROOTBIN = S2SDK_ROOT_BINARY;
+		constexpr std::string_view GAMEBIN = S2SDK_GAME_BINARY;
+
+		bool isFromRootBin = name.find(ROOTBIN) != std::string::npos;
+		bool isFromGameBin = name.find(GAMEBIN) != std::string::npos;
+		if (!isFromGameBin && !isFromRootBin)
+			return 0;
+
+		return (*static_cast<decltype(fn)*>(data))(*info);
+	}, &fn);
 }
 
 void CModule::DumpExports(void* module_base)
@@ -280,9 +231,6 @@ void CModule::DumpExports(void* module_base)
 
         _exports.emplace(name, address);
     }
-
-    if (auto it = _exports.find("CreateInterface"); it != _exports.end())
-        _createInterFaceFn = reinterpret_cast<CreateInterfaceFn>(it->second);
 }
 
 CAddress CModule::GetFunctionByName(std::string_view proc_name) const
@@ -314,55 +262,50 @@ struct VTableSet
 	auto operator<=>(const VTableSet& other) const noexcept = default;
 };
 
-static std::vector<VTableSet> vtable_list{};
-
 void CModule::DumpVtables()
 {
-	if (vtable_list.empty()) [[unlikely]]
-	{
-		dl_iterate_phdr(
-			[](struct dl_phdr_info* info, size_t, void* all_vtable_sets) {
+	std::vector<VTableSet> vtable_list{};
+
+	dl_iterate_phdr(
+		[](struct dl_phdr_info* info, size_t, void* all_vtable_sets) {
+			void* handle;
+
+			if (info->dlpi_name && *info->dlpi_name)
 			{
-				void* handle;
-
-				if (info->dlpi_name && *info->dlpi_name)
-				{
-					handle = dlopen(info->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
-				}
-				else
-				{
-					handle = dlopen(nullptr, RTLD_LAZY);
-				}
-
-				auto get_vtable = [](void* handle, const char* name) -> CAddress
-				{
-					CAddress symbol_address = dlsym(handle, name);
-					if (symbol_address.IsValid())
-					{
-						return symbol_address.Offset(0x10);
-					}
-					return {};
-				};
-
-				auto class_typeinfo = get_vtable(handle, "_ZTVN10__cxxabiv117__class_type_infoE");
-				auto si_class_typeinfo = get_vtable(handle, "_ZTVN10__cxxabiv120__si_class_type_infoE");
-				auto vmi_class_typeinfo = get_vtable(handle, "_ZTVN10__cxxabiv121__vmi_class_type_infoE");
-
-				// Check if all three are valid (complete typeinfo set found)
-				if (class_typeinfo.IsValid() && si_class_typeinfo.IsValid() && vmi_class_typeinfo.IsValid())
-				{
-					reinterpret_cast<std::vector<VTableSet>*>(all_vtable_sets)->emplace_back(class_typeinfo, si_class_typeinfo, vmi_class_typeinfo);
-				}
-
-				return 0;
+				handle = dlopen(info->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
 			}
-		}, &vtable_list);
+			else
+			{
+				handle = dlopen(nullptr, RTLD_LAZY);
+			}
 
-		{
-			std::ranges::sort(vtable_list);
-			auto [first, last] = std::ranges::unique(vtable_list);
-			vtable_list.erase(first, last);
-		}
+			auto get_vtable = [](void* handle, const char* name) -> CAddress
+			{
+				CAddress symbol_address = dlsym(handle, name);
+				if (symbol_address.IsValid())
+				{
+					return symbol_address.Offset(0x10);
+				}
+				return {};
+			};
+
+			auto class_typeinfo = get_vtable(handle, "_ZTVN10__cxxabiv117__class_type_infoE");
+			auto si_class_typeinfo = get_vtable(handle, "_ZTVN10__cxxabiv120__si_class_type_infoE");
+			auto vmi_class_typeinfo = get_vtable(handle, "_ZTVN10__cxxabiv121__vmi_class_type_infoE");
+
+			// Check if all three are valid (complete typeinfo set found)
+			if (class_typeinfo.IsValid() && si_class_typeinfo.IsValid() && vmi_class_typeinfo.IsValid())
+			{
+				reinterpret_cast<std::vector<VTableSet>*>(all_vtable_sets)->emplace_back(class_typeinfo, si_class_typeinfo, vmi_class_typeinfo);
+			}
+
+			return 0;
+	}, &vtable_list);
+
+	{
+		std::ranges::sort(vtable_list);
+		auto [first, last] = std::ranges::unique(vtable_list);
+		vtable_list.erase(first, last);
 	}
 
     if (vtable_list.empty()) [[unlikely]]
@@ -416,16 +359,13 @@ void CModule::DumpVtables()
     _vtables.reserve(known_typeinfos.size());
 
     // bruteforcing vtable
-    for (const auto& section : _sections)
+    for (const auto& segment : _segments)
     {
-		if (section.name != ".data.rel.ro" && section.name != ".data.rel.ro.local" && section.name != ".rodata")
+        if (segment.flags & SegFlags::X)
             continue;
 
-        if (section.flags & SectionFlags::X)
-            continue;
-
-        auto scan_start = section.address;
-        auto scan_end   = scan_start + section.size;
+        auto scan_start = segment.address;
+        auto scan_end   = scan_start + segment.size;
 
         for (auto current_addr = scan_start; current_addr < scan_end; current_addr += sizeof(void*))
         {
@@ -523,15 +463,15 @@ void CModule::BuildFunctionIndexAndReferences()
 {
     uintptr_t exec_start{}, exec_end{}, exec_size{};
 
-    std::vector<const Section*> data_sections;
-    data_sections.reserve(_sections.size());
+    std::vector<const Segment*> data_sections;
+    data_sections.reserve(_segments.size());
 
     uintptr_t min_data_addr = std::numeric_limits<uintptr_t>::max();
     uintptr_t max_data_addr = 0;
 
-    for (const auto& seg : _sections)
+    for (const auto& seg : _segments)
     {
-        if (seg.flags & SectionFlags::X)
+        if (seg.flags & SegFlags::X)
         {
             if (!exec_start)
             {
@@ -555,7 +495,7 @@ void CModule::BuildFunctionIndexAndReferences()
     auto is_data_pointer = [&](uintptr_t addr) noexcept {
         if (addr < min_data_addr || addr >= max_data_addr)
             return false;
-        return std::ranges::any_of(data_sections, [addr](const Section* s) noexcept {
+        return std::ranges::any_of(data_sections, [addr](const Segment* s) noexcept {
             return s->address <= addr && addr < s->address + s->size;
         });
     };
@@ -564,7 +504,7 @@ void CModule::BuildFunctionIndexAndReferences()
     seen_functions.reserve(exec_size / 32);
 
     // phase1: scan data for function ptrs
-    for (const Section* seg : data_sections)
+    for (const Segment* seg : data_sections)
     {
         const auto seg_end = seg->address + seg->size;
         for (auto current_ptr = seg->address; current_ptr + sizeof(void*) <= seg_end; current_ptr += sizeof(void*))
@@ -576,10 +516,10 @@ void CModule::BuildFunctionIndexAndReferences()
         }
     }
 
-    // phase2: disassembles the entire executable section in a single pass to
+    // phase2: disassembles the entire executable segment in a single pass to
     // 1. find INT3(0xCC) padding
     // 2. find the potential function entries
-    // 3. find pointer references in .text section
+    // 3. find pointer references in .text segment
 
     struct ChunkResult
     {
@@ -596,7 +536,7 @@ void CModule::BuildFunctionIndexAndReferences()
     threads.reserve(num_threads);
 
     // multithreaded solution inspired by the code snippet @angelfor3v3r gave me a long time ago.
-    // to be honest i could have used yaxpeax-x86, which is the fastest decoder i have found yet (it takes about 100ms to decode libserver.so .text section
+    // to be honest i could have used yaxpeax-x86, which is the fastest decoder i have found yet (it takes about 100ms to decode libserver.so .text segment
     // while zydis takes ~450ms), but i dont think it is worth the effort to replace zydis with it,
     // not to mention safetyhook also uses zydis and i use the encoder feature from zydis too.
     // hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
