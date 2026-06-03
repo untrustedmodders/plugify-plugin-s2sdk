@@ -141,7 +141,7 @@ void CModule::DumpExports(void* module_base)
             uint32_t bloom_shift;
         };
 
-        auto       header         = (Header*)gnuHashAddress;
+        auto       header         = reinterpret_cast<Header*>(gnuHashAddress);
         const auto bucketsAddress = gnuHashAddress + sizeof(Header) + (sizeof(uintptr_t) * header->bloom_size);
 
         // Locate the chain that handles the largest index bucket.
@@ -252,38 +252,23 @@ static std::string demangle(const char* mangled_name)
     return status == 0 ? std::string(demangled_ptr.get()) : mangled_name;
 }
 
-struct VTableSet
+std::vector<RunTimeTypeInfo> CModule::GetRuntimeTypeInfos() const
 {
-	CAddress class_typeinfo;
-	CAddress si_class_typeinfo;
-	CAddress vmi_class_typeinfo;
-
-	bool operator==(const VTableSet& other) const noexcept = default;
-	auto operator<=>(const VTableSet& other) const noexcept = default;
-};
-
-void CModule::DumpVtables()
-{
-	std::vector<VTableSet> vtable_list{};
+	std::vector<RunTimeTypeInfo> runtime_typeinfos;
 
 	dl_iterate_phdr(
-		[](struct dl_phdr_info* info, size_t, void* all_vtable_sets) {
+		[](struct dl_phdr_info* info, size_t, void* data) {
 			void* handle;
 
-			if (info->dlpi_name && *info->dlpi_name)
-			{
+			if (info->dlpi_name && *info->dlpi_name) {
 				handle = dlopen(info->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
-			}
-			else
-			{
+			} else {
 				handle = dlopen(nullptr, RTLD_LAZY);
 			}
 
-			auto get_vtable = [](void* handle, const char* name) -> CAddress
-			{
+			auto get_vtable = [](void* handle, const char* name) -> CAddress {
 				CAddress symbol_address = dlsym(handle, name);
-				if (symbol_address.IsValid())
-				{
+				if (symbol_address.IsValid()) {
 					return symbol_address.Offset(0x10);
 				}
 				return {};
@@ -294,61 +279,64 @@ void CModule::DumpVtables()
 			auto vmi_class_typeinfo = get_vtable(handle, "_ZTVN10__cxxabiv121__vmi_class_type_infoE");
 
 			// Check if all three are valid (complete typeinfo set found)
-			if (class_typeinfo.IsValid() && si_class_typeinfo.IsValid() && vmi_class_typeinfo.IsValid())
-			{
-				reinterpret_cast<std::vector<VTableSet>*>(all_vtable_sets)->emplace_back(class_typeinfo, si_class_typeinfo, vmi_class_typeinfo);
+			if (class_typeinfo.IsValid() && si_class_typeinfo.IsValid() && vmi_class_typeinfo.IsValid()) {
+				static_cast<std::vector<RunTimeTypeInfo>*>(data)->emplace_back(class_typeinfo, si_class_typeinfo, vmi_class_typeinfo);
 			}
 
 			return 0;
-	}, &vtable_list);
+		},
+		&runtime_typeinfos
+	);
 
-	{
-		std::ranges::sort(vtable_list);
-		auto [first, last] = std::ranges::unique(vtable_list);
-		vtable_list.erase(first, last);
+	std::ranges::sort(runtime_typeinfos);
+	auto [first, last] = std::ranges::unique(runtime_typeinfos);
+	runtime_typeinfos.erase(first, last);
+
+	return runtime_typeinfos;
+}
+
+std::vector<TypeInfo> CModule::GetTypeInfos(std::span<const RunTimeTypeInfo> runtime_typeinfos) const
+{
+	std::vector<TypeInfo> known_typeinfos;
+
+	auto collect_typeinfos = [&](CAddress root_rtti_vtable) {
+		auto instances = FindPtrs(root_rtti_vtable.GetPtr());
+		known_typeinfos.reserve(known_typeinfos.size() + instances.size());
+
+		for (auto xref : instances) {
+			known_typeinfos.emplace_back(xref.As<std::type_info*>());
+		}
+	};
+
+	for (const auto& [class_typeinfo, si_class_typeinfo, vmi_class_typeinfo] : runtime_typeinfos) {
+		collect_typeinfos(vmi_class_typeinfo);
+		collect_typeinfos(si_class_typeinfo);
+		collect_typeinfos(class_typeinfo);
 	}
 
-    if (vtable_list.empty()) [[unlikely]]
+	std::ranges::sort(known_typeinfos, {}, &TypeInfo::address);
+	auto [first, last] = std::ranges::unique(known_typeinfos, {}, &TypeInfo::ti);
+	known_typeinfos.erase(first, last);
+
+	return known_typeinfos;
+}
+
+void CModule::DumpVtables()
+{
+	std::vector<RunTimeTypeInfo> runtime_typeinfos = GetRuntimeTypeInfos();
+
+    if (runtime_typeinfos.empty()) [[unlikely]]
     {
-        plg::print(LS_ERROR, "Failed to get typeinfo vtables from any loaded module");
+        plg::print(LS_ERROR, "Failed to get rtti from any loaded module");
         return;
     }
 
-    struct TypeInfo
-    {
-        std::type_info* ti;
-        [[nodiscard]] uintptr_t address() const { return reinterpret_cast<uintptr_t>(ti); }
-    	bool operator==(const TypeInfo& other) const noexcept = default;
-		auto operator<=>(const TypeInfo& other) const noexcept = default;
-    };
-
-    std::vector<TypeInfo> known_typeinfos;
-
-    auto collect_typeinfos = [&](CAddress root_rtti_vtable) {
-        auto instances = FindPtrs(root_rtti_vtable.GetPtr());
-        known_typeinfos.reserve(known_typeinfos.size() + instances.size());
-
-        for (auto xref : instances)
-            known_typeinfos.emplace_back(xref.As<std::type_info*>());
-    };
-
-    for (const auto& [class_typeinfo, si_class_typeinfo, vmi_class_typeinfo] : vtable_list)
-    {
-        collect_typeinfos(vmi_class_typeinfo);
-        collect_typeinfos(si_class_typeinfo);
-        collect_typeinfos(class_typeinfo);
-    }
+    std::vector<TypeInfo> known_typeinfos = GetTypeInfos(runtime_typeinfos);
 
     if (known_typeinfos.empty()) [[unlikely]]
     {
         plg::print(LS_ERROR, "Failed to find any typeinfo instances");
         return;
-    }
-
-    {
-    	std::ranges::sort(known_typeinfos, {}, &TypeInfo::address);
-    	auto [first, last] = std::ranges::unique(known_typeinfos, {}, &TypeInfo::ti);
-    	known_typeinfos.erase(first, last);
     }
 
     const auto min_ti_addr = known_typeinfos.front().address();
@@ -438,7 +426,7 @@ void CModule::DumpVtables()
                 }
             };
 
-            for (const auto& [class_typeinfo, si_class_typeinfo, vmi_class_typeinfo] : vtable_list)
+            for (const auto& [class_typeinfo, si_class_typeinfo, vmi_class_typeinfo] : runtime_typeinfos)
 			{
 				if (ti_vtable_ptr == si_class_typeinfo.GetPtr())
 				{

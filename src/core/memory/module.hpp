@@ -36,7 +36,10 @@ struct RunTimeVTableInfo
 {
     CUtlString demangled_name;
     uintptr_t  address;
-    uint64_t   offset;
+	uint64_t   offset;
+
+	bool operator==(const RunTimeVTableInfo& other) const noexcept = default;
+	auto operator<=>(const RunTimeVTableInfo& other) const noexcept = default;
 };
 
 class IModule
@@ -87,6 +90,27 @@ constexpr SegFlags& operator|=(SegFlags& lhs, SegFlags rhs) noexcept
 	lhs = lhs | rhs;
 	return lhs;
 }
+
+#ifndef PLATFORM_WINDOWS
+struct RunTimeTypeInfo
+{
+	CAddress class_typeinfo;
+	CAddress si_class_typeinfo;
+	CAddress vmi_class_typeinfo;
+
+	bool operator==(const RunTimeTypeInfo& other) const noexcept = default;
+	auto operator<=>(const RunTimeTypeInfo& other) const noexcept = default;
+};
+
+struct TypeInfo
+{
+	std::type_info* ti;
+	[[nodiscard]] uintptr_t address() const { return reinterpret_cast<uintptr_t>(ti); }
+
+	bool operator==(const TypeInfo& other) const noexcept = default;
+	auto operator<=>(const TypeInfo& other) const noexcept = default;
+};
+#endif
 
 class CModule final : public IModule
 {
@@ -159,8 +183,11 @@ private:
     std::vector<std::unique_ptr<VTable>> _vtables{};
 
 #ifndef PLATFORM_WINDOWS
+	std::vector<RunTimeTypeInfo> GetRuntimeTypeInfos() const;
+	std::vector<TypeInfo> GetTypeInfos(std::span<const RunTimeTypeInfo> runtime_typeinfos) const;
+
     std::unordered_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>> _exports{};
-    void                                       DumpExports(void* module_base);
+    void DumpExports(void* module_base);
 #endif
 
     uintptr_t GetFunctionEntry(uintptr_t middle);
