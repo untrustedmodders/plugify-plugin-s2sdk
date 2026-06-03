@@ -50,7 +50,7 @@ public:
 	    return m_value + offset;
     }
 
-	[[nodiscard]] CAddress& OffsetSelf(ptrdiff_t offset) noexcept
+	CAddress& OffsetSelf(ptrdiff_t offset) noexcept
 	{
 	    m_value += offset;
     	return *this;
@@ -69,7 +69,7 @@ public:
     	return base;
     }
 
-	[[nodiscard]] CAddress& DerefSelf(int deref = 1, ptrdiff_t offset = 0) noexcept
+	CAddress& DerefSelf(int deref = 1, ptrdiff_t offset = 0) noexcept
     {
     	while (deref)
     	{
