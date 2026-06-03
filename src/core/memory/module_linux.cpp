@@ -115,8 +115,8 @@ void CModule::GetModuleInfo(std::string_view mod)
 					continue;
 
 				auto address = lmap->l_addr + shdr->sh_addr;
-				auto size     = shdr->sh_size;
-				auto type      = shdr->sh_type;
+				auto size    = shdr->sh_size;
+				auto type    = shdr->sh_type;
 				auto is_dynamic_section = type == SHT_DYNAMIC;
 
  				auto flags = shdr->sh_flags;
@@ -150,11 +150,11 @@ void CModule::GetModuleInfo(std::string_view mod)
        		 	max_vaddr = std::max(max_vaddr, address + size);
 
 				if (is_executable)
-					section.flags |= FLAG_X;
+					section.flags |= SectionFlags::X;
 				if (is_readable)
-					section.flags |= FLAG_R;
+					section.flags |= SectionFlags::R;
 				if (is_writable)
-					section.flags |= FLAG_W;
+					section.flags |= SectionFlags::W;
 			}
 
 			munmap(map, st.st_size);
@@ -349,8 +349,7 @@ void CModule::DumpVtables()
 				auto vmi_class_typeinfo = get_vtable(handle, "_ZTVN10__cxxabiv121__vmi_class_type_infoE");
 
 				// Check if all three are valid (complete typeinfo set found)
-				if (class_typeinfo.IsValid() && si_class_typeinfo.IsValid() &&
-					vmi_class_typeinfo.IsValid())
+				if (class_typeinfo.IsValid() && si_class_typeinfo.IsValid() && vmi_class_typeinfo.IsValid())
 				{
 					reinterpret_cast<std::vector<VTableSet>*>(all_vtable_sets)->emplace_back(class_typeinfo, si_class_typeinfo, vmi_class_typeinfo);
 				}
@@ -422,7 +421,7 @@ void CModule::DumpVtables()
 		if (section.name != ".data.rel.ro" && section.name != ".data.rel.ro.local" && section.name != ".rodata")
             continue;
 
-        if (section.flags & FLAG_X)
+        if (section.flags & SectionFlags::X)
             continue;
 
         auto scan_start = section.address;
@@ -532,7 +531,7 @@ void CModule::BuildFunctionIndexAndReferences()
 
     for (const auto& seg : _sections)
     {
-        if (seg.flags & FLAG_X)
+        if (seg.flags & SectionFlags::X)
         {
             if (!exec_start)
             {
@@ -800,8 +799,5 @@ void CModule::BuildFunctionIndexAndReferences()
     }
 
     std::ranges::sort(_references, std::less{}, &ReferenceEntry::target);
-#    if 0 //DEBUG
-    printf("[%s] BuildFunctionIndexAndReferences: %zu function entries, %zu references\n", _module_name.c_str(), _function_entries.size(), _references.size());
-#    endif
 }
 #endif

@@ -41,7 +41,7 @@ CAddress CModule::FindPattern(std::string_view pattern) const
 {
     for (const auto& section : _sections)
     {
-        if ((section.flags & FLAG_X) == 0)
+        if ((section.flags & SectionFlags::X) == 0)
             continue;
 
         const auto& data = section.data;
@@ -68,10 +68,10 @@ CAddress CModule::FindString(std::string_view str, bool read_only, bool exact) c
 {
     for (const auto& section : _sections)
     {
-        if ((section.flags & FLAG_X) != 0)
+        if ((section.flags & SectionFlags::X) != 0)
             continue;
 
-        if (read_only && (section.flags & FLAG_W) != 0)
+        if (read_only && (section.flags & SectionFlags::W) != 0)
             continue;
 
         if (auto result = scan::FindStr(reinterpret_cast<uint8_t*>(section.address), section.size, str, true, exact))
@@ -88,10 +88,10 @@ CAddress CModule::FindData(const uint8_t* needle, std::size_t needle_size, bool 
 {
     for (const auto& section : _sections)
     {
-        if ((section.flags & FLAG_X) != 0)
+        if ((section.flags & SectionFlags::X) != 0)
             continue;
 
-        if (read_only && (section.flags & FLAG_W) != 0)
+        if (read_only && (section.flags & SectionFlags::W) != 0)
             continue;
 
         if (auto result = scan::FindData(reinterpret_cast<uint8_t*>(section.address), section.size, needle, needle_size))
@@ -110,7 +110,7 @@ CAddress CModule::FindPtr(uintptr_t ptr) const
     {
         const auto flags = section.flags;
 
-        if ((flags & FLAG_X) != 0)
+        if ((flags & SectionFlags::X) != 0)
             continue;
 
         auto res = scan::FindPtr(section.address, section.size, ptr);
@@ -127,7 +127,7 @@ std::vector<CAddress> CModule::FindPtrs(uintptr_t ptr) const
 
     for (const auto& section : _sections)
     {
-        if ((section.flags & FLAG_X) != 0)
+        if ((section.flags & SectionFlags::X) != 0)
             continue;
 
         auto ptrs = scan::FindPtrs(section.address, section.size, ptr);
@@ -155,12 +155,12 @@ std::vector<CAddress> CModule::FindPatternMulti(std::string_view pattern) const
 {
     for (const auto& section : _sections)
     {
-        if ((section.flags & FLAG_X) == 0)
+        if ((section.flags & SectionFlags::X) == 0)
             continue;
 
         const auto& data = section.data;
 
-        auto result = scan::FindPatternMulti(const_cast<uint8_t*>(data.data()), data.size(), pattern);
+        auto result = scan::FindPatternMulti(data.data(), data.size(), pattern);
         if (!result.empty())
         {
             std::ranges::transform(result, result.begin(), [&](CAddress address) {
@@ -174,7 +174,7 @@ std::vector<CAddress> CModule::FindPatternMulti(std::string_view pattern) const
     return {};
 }
 
-std::vector<uintptr_t> CModule::GetVFunctionsFromVTable(std::string_view vtableName)
+std::vector<uintptr_t> CModule::GetVFunctionsFromVTable(std::string_view vtableName) const
 {
     if (auto it = _vtable_functions.find(vtableName); it != _vtable_functions.end())
     {
@@ -193,7 +193,7 @@ std::vector<uintptr_t> CModule::GetVFunctionsFromVTable(std::string_view vtableN
     return funcs;
 }
 
-void CModule::LoopVFunctions(std::string_view vtable_name, const std::function<bool(CAddress)>& callback)
+void CModule::LoopVFunctions(std::string_view vtable_name, const std::function<bool(CAddress)>& callback) const
 {
     auto vtable = GetVirtualTableByName(vtable_name);
     if (!vtable.IsValid())
@@ -204,7 +204,7 @@ void CModule::LoopVFunctions(std::string_view vtable_name, const std::function<b
 
     for (const auto& section : _sections)
     {
-        if ((section.flags & FLAG_X) != 0)
+        if ((section.flags & SectionFlags::X) != 0)
         {
             sectionStart = section.address;
             sectionEnd   = section.address + section.size;
@@ -228,7 +228,7 @@ void CModule::LoopVFunctions(std::string_view vtable_name, const std::function<b
 static constexpr std::string_view class_prefix  = "class ";
 static constexpr std::string_view struct_prefix = "struct ";
 
-CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
+CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name) const
 {
     if (const auto it = _cached_vtables.find(name); it != _cached_vtables.end())
     {
@@ -242,7 +242,7 @@ CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
 #endif
 
     auto it = std::ranges::find_if(_vtables, [&](const std::unique_ptr<VTable>& vtable) {
-        // 只需要final class
+        // final class
         if (vtable->offset != 0)
             return false;
 
@@ -399,7 +399,7 @@ std::vector<uintptr_t> CModule::IntersectFunctionReferences(std::vector<std::spa
 
         std::ranges::sort(funcs);
         auto [first, last] = std::ranges::unique(funcs);
-        funcs.erase(first, funcs.end());
+        funcs.erase(first, last);
         return funcs;
     };
 

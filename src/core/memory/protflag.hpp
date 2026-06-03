@@ -26,7 +26,7 @@ enum class ProtFlag
  * @param rhs The right-hand side ProtFlag value.
  * @return The combined ProtFlag value.
  */
-inline ProtFlag operator|(ProtFlag lhs, ProtFlag rhs) noexcept
+constexpr ProtFlag operator|(ProtFlag lhs, ProtFlag rhs) noexcept
 {
 	using underlying = std::underlying_type_t<ProtFlag>;
 	return static_cast<ProtFlag> (static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
@@ -39,7 +39,7 @@ inline ProtFlag operator|(ProtFlag lhs, ProtFlag rhs) noexcept
  * @param rhs The right-hand side ProtFlag value.
  * @return True if lhs contains rhs, false otherwise.
  */
-inline bool operator&(ProtFlag lhs, ProtFlag rhs) noexcept
+constexpr bool operator&(ProtFlag lhs, ProtFlag rhs) noexcept
 {
 	using underlying = std::underlying_type_t<ProtFlag>;
 	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
@@ -52,7 +52,7 @@ inline bool operator&(ProtFlag lhs, ProtFlag rhs) noexcept
  * @param rhs Right-hand side ProtFlag.
  * @return Reference to the left-hand side ProtFlag.
  */
-inline ProtFlag& operator|=(ProtFlag& lhs, ProtFlag rhs) noexcept
+constexpr ProtFlag& operator|=(ProtFlag& lhs, ProtFlag rhs) noexcept
 {
 	lhs = lhs | rhs;
 	return lhs;

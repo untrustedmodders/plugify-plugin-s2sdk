@@ -57,22 +57,35 @@ public:
     virtual bool IsPointerDerivedFromEx(void* ptr, const char* name)                          = 0;
 
     [[nodiscard]] virtual bool GetReferencesEx(uintptr_t ptr, CUtlLeanVector<uintptr_t>* results)                                      = 0;
-    [[nodiscard]] virtual bool FindAllFunctionsFromStringsRefsEx(CUtlLeanVector<CUtlString>* strs, CUtlLeanVector<uintptr_t>* results)      = 0;
+    [[nodiscard]] virtual bool FindAllFunctionsFromStringsRefsEx(CUtlLeanVector<CUtlString>* strs, CUtlLeanVector<uintptr_t>* results) = 0;
     [[nodiscard]] virtual bool FindAllFunctionsFromPointersRefsEx(CUtlLeanVector<uintptr_t>* ptrs, CUtlLeanVector<uintptr_t>* results) = 0;
-    virtual bool               GetFunctionRangeEx(uintptr_t middle, uintptr_t* start, uintptr_t* end)                             = 0;
-    [[nodiscard]] virtual void* FindStringExactEx(const char* str)                                                                               = 0;
+    virtual bool               GetFunctionRangeEx(uintptr_t middle, uintptr_t* start, uintptr_t* end)                                  = 0;
+    [[nodiscard]] virtual void* FindStringExactEx(const char* str)                                                                     = 0;
 };
 
-enum SectionFlags : uint8_t
+enum class SectionFlags : uint8_t
 {
-    FLAG_R = 1 << 0,
-    FLAG_W = 1 << 1,
-    FLAG_X = 1 << 2,
+    R = 1 << 0,
+    W = 1 << 1,
+    X = 1 << 2,
 };
 
-constexpr SectionFlags operator|(SectionFlags a, SectionFlags b)
+constexpr SectionFlags operator|(SectionFlags lhs, SectionFlags rhs)
 {
-    return static_cast<SectionFlags>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
+	using underlying = std::underlying_type_t<SectionFlags>;
+	return static_cast<SectionFlags> (static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+}
+
+constexpr bool operator&(SectionFlags lhs, SectionFlags rhs) noexcept
+{
+	using underlying = std::underlying_type_t<SectionFlags>;
+	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
+}
+
+constexpr SectionFlags& operator|=(SectionFlags& lhs, SectionFlags rhs) noexcept
+{
+	lhs = lhs | rhs;
+	return lhs;
 }
 
 class CModule final : public IModule
@@ -106,7 +119,7 @@ public:
         Section& operator=(const Section&) = delete;
         Section& operator=(Section&&)      = delete;
 
-        uint8_t              flags{};
+        SectionFlags         flags{};
         uintptr_t            address{};
         std::size_t          size{};
         std::vector<uint8_t> data{};
@@ -133,8 +146,8 @@ private:
     std::string          _module_name{};
     CreateInterfaceFn    _createInterFaceFn;
 
-    std::unordered_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>>              _cached_vtables{};
-    std::unordered_map<std::string, std::vector<uintptr_t>, plg::string_hash, std::equal_to<>> _vtable_functions{};
+    mutable std::unordered_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>>              _cached_vtables{};
+    mutable std::unordered_map<std::string, std::vector<uintptr_t>, plg::string_hash, std::equal_to<>> _vtable_functions{};
 
     void GetModuleInfo(std::string_view mod);;
 
@@ -182,9 +195,9 @@ public:
 	    return _base_address != 0;
     }
 
-    std::vector<uintptr_t> GetVFunctionsFromVTable(std::string_view vtableName);
+    std::vector<uintptr_t> GetVFunctionsFromVTable(std::string_view vtableName) const;
 
-    void LoopVFunctions(std::string_view vtable_name, const std::function<bool(CAddress)>& callback);
+    void LoopVFunctions(std::string_view vtable_name, const std::function<bool(CAddress)>& callback) const;
 
     [[nodiscard]] CAddress              FindPattern(std::string_view pattern) const;
     [[nodiscard]] CAddress              FindPatternStrict(std::string_view pattern) const;
@@ -192,7 +205,7 @@ public:
     [[nodiscard]] CAddress              FindData(const uint8_t* needle, std::size_t needle_size, bool read_only) const;
     [[nodiscard]] CAddress              FindPtr(uintptr_t ptr) const;
     [[nodiscard]] std::vector<CAddress> FindPtrs(uintptr_t ptr) const;
-    [[nodiscard]] CAddress              GetVirtualTableByName(std::string_view name, bool is_raw_name = false);
+    [[nodiscard]] CAddress              GetVirtualTableByName(std::string_view name, bool is_raw_name = false) const;
     [[nodiscard]] CAddress              FindInterface(std::string_view name) const;
     [[nodiscard]] std::vector<CAddress> FindPatternMulti(std::string_view pattern) const;
     [[nodiscard]] CAddress              GetFunctionByName(std::string_view proc_name) const;

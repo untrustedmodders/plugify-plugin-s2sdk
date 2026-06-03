@@ -86,11 +86,11 @@ void CModule::GetModuleInfo(std::string_view mod)
         section.address = start;
         section.size    = size;
         if (isExecutable)
-            section.flags |= FLAG_X;
+            section.flags |= SectionFlags::X;
         if (isReadable)
-            section.flags |= FLAG_R;
+            section.flags |= SectionFlags::R;
         if (isWritable)
-            section.flags |= FLAG_W;
+            section.flags |= SectionFlags::W;
 
         const auto data = reinterpret_cast<uint8_t*>(start);
         section.data    = std::vector(data, data + size);
@@ -181,7 +181,7 @@ void CModule::BuildFunctionIndexAndReferences()
     auto is_in_data_section = [this](uintptr_t address) noexcept {
         for (const auto& section : _sections)
         {
-            if (section.flags & FLAG_X) continue;
+            if (section.flags & SectionFlags::X) continue;
             if (section.address <= address && address < section.address + section.size) return true;
         }
         return false;
@@ -190,7 +190,7 @@ void CModule::BuildFunctionIndexAndReferences()
     auto is_in_text_section = [this](uintptr_t address) noexcept {
         for (const auto& section : _sections)
         {
-            if ((section.flags & FLAG_X) == 0) continue;
+            if ((section.flags & SectionFlags::X) == 0) continue;
             if (section.address <= address && address < section.address + section.size) return true;
         }
         return false;
@@ -284,9 +284,6 @@ void CModule::BuildFunctionIndexAndReferences()
     for (auto& r : chunk_results) _references.insert(_references.end(), std::make_move_iterator(r.begin()), std::make_move_iterator(r.end()));
 
     std::ranges::sort(_references, std::less{}, &ReferenceEntry::target);
-#    if 0 //DEBUG
-    FLOG("BuildFunctionIndexAndReferences: %zu function entries, %zu references", _function_entries.size(), _references.size());
-#    endif
 }
 
 void CModule::DumpVtables()
@@ -324,7 +321,7 @@ void CModule::DumpVtables()
 		if (section.name != ".data" && section.name != ".rdata")
             continue;
 
-        if (section.flags & (FLAG_X | FLAG_W))
+        if (section.flags & (SectionFlags::X | SectionFlags::W))
 			continue;
 
         auto start_addr = section.address;
@@ -380,21 +377,6 @@ void CModule::DumpVtables()
             if (it != vtable_map.end()) vtable->children.push_back(it->second);
         }
     }
-
-#    if 0 // DEBUG
-    if (_module_name.find("server") != std::string::npos)
-    {
-        for (const auto& vtable : _vtables)
-        {
-            if (vtable->demangled_name.find("CWeapon") == std::string::npos) continue;
-            printf("Vtable for %s (offset: 0x%llx)\n", vtable->demangled_name.c_str(), vtable->offset);
-            for (const auto& child : vtable->children)
-            {
-                printf("    %s(offset: 0x%llx)\n", child->demangled_name.c_str(), child->offset);
-            }
-        }
-    }
-#    endif
 }
 
 CAddress CModule::GetFunctionByName(std::string_view proc_name) const
