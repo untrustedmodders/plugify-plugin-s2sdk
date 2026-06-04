@@ -105,7 +105,7 @@ namespace vscript {
 			for (auto& function : classDesc->m_FunctionBindings) {
 				scriptClass.functions.emplace(function.m_desc.m_pszScriptName, ScriptConvertFuncPtrToBinding(function));
 			}
-			return scriptClass.functions;
+			return scriptClass;
 		};
 
 #if 0

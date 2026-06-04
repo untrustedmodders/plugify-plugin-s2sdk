@@ -88,17 +88,17 @@ void CModule::GetModuleInfo(std::string_view module_name)
 	[](struct dl_phdr_info* info, size_t, void* data) {
 		std::string_view name = info->dlpi_name;
 
-		if (name.rfind(".so") == std::string::npos)
+		if (!name.contains(".so"))
 			return 0;
 
-		if (name.find("/metamod/") != std::string::npos)
+		if (name.contains("/metamod/"))
 			return 0;
 
 		constexpr std::string_view ROOTBIN = S2SDK_ROOT_BINARY;
 		constexpr std::string_view GAMEBIN = S2SDK_GAME_BINARY;
 
-		bool isFromRootBin = name.find(ROOTBIN) != std::string::npos;
-		bool isFromGameBin = name.find(GAMEBIN) != std::string::npos;
+		bool isFromRootBin = name.contains(ROOTBIN);
+		bool isFromGameBin = name.contains(GAMEBIN);
 		if (!isFromGameBin && !isFromRootBin)
 			return 0;
 
@@ -216,7 +216,9 @@ void CModule::DumpExports(void* module_base)
 CAddress CModule::GetFunctionByName(std::string_view proc_name) const
 {
     if (auto it = _exports.find(proc_name); it != _exports.end())
-        return it->second;
+    {
+    	return it->second;
+    }
     return {};
 }
 

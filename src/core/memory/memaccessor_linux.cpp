@@ -21,31 +21,31 @@ static region_t GetRegionFromAddr(uintptr_t addr)
 	std::string s;
 	while (std::getline(f, s))
 	{
-		if (!s.empty() && s.find("vdso") == std::string::npos && s.find("vsyscall") == std::string::npos)
+		if (s.empty() || s.contains("vdso") || s.contains("vsyscall"))
+			continue;
+
+		char* strend = &s[0];
+		uintptr_t start = strtoul(strend, &strend, 16);
+		uintptr_t end = strtoul(strend + 1, &strend, 16);
+		if (start != 0 && end != 0 && start <= addr && addr < end)
 		{
-			char* strend = &s[0];
-			uintptr_t start = strtoul(strend  , &strend, 16);
-			uintptr_t end   = strtoul(strend+1, &strend, 16);
-			if (start != 0 && end != 0 && start <= addr && addr < end)
-			{
-				res.start = start;
-				res.end = end;
+			res.start = start;
+			res.end = end;
 
-				++strend;
-				if (strend[0] == 'r')
-					res.prot = res.prot | ProtFlag::R;
+			++strend;
+			if (strend[0] == 'r')
+				res.prot = res.prot | ProtFlag::R;
 
-				if (strend[1] == 'w')
-					res.prot = res.prot | ProtFlag::W;
+			if (strend[1] == 'w')
+				res.prot = res.prot | ProtFlag::W;
 
-				if (strend[2] == 'x')
-					res.prot = res.prot | ProtFlag::X;
+			if (strend[2] == 'x')
+				res.prot = res.prot | ProtFlag::X;
 
-				if (res.prot == ProtFlag::UNSET)
-					res.prot = ProtFlag::N;
+			if (res.prot == ProtFlag::UNSET)
+				res.prot = ProtFlag::N;
 
-				break;
-			}
+			break;
 		}
 	}
 	return res;

@@ -265,7 +265,7 @@ CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
 {
 	{
 		std::shared_lock lock(_mutex);
-		if (const auto it = m_cached_vtables.find(name); it != m_cached_vtables.end())
+		if (auto it = m_cached_vtables.find(name); it != m_cached_vtables.end())
 		{
 			return it->second;
 		}

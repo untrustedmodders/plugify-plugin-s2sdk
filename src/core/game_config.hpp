@@ -232,15 +232,11 @@ public:
 	ModuleProvider() = default;
 	~ModuleProvider() = default;
 
-	std::shared_ptr<Module> GetModule(std::string_view name);
+	Module* GetModule(std::string_view name);
 	bool HasModule(std::string_view name) const;
-	void PreloadModules();
 
 private:
-	std::shared_ptr<Module> LoadModuleInternal(std::string_view name);
-
-private:
-	plg::flat_hash_map<plg::string, std::shared_ptr<Module>, plg::string_hash, std::equal_to<>> m_modules;
+	plg::flat_hash_map<plg::string, std::unique_ptr<Module>, plg::string_hash, std::equal_to<>> m_modules;
 	mutable std::shared_mutex m_mutex;
 };
 
@@ -262,17 +258,17 @@ public:
 
 private:
 	Result<Memory> ResolvePattern(
-		const std::shared_ptr<Module>& module,
+		const Module& module,
 		std::string_view pattern
 	) const;
 
 	Result<Memory> ResolveSymbol(
-		const std::shared_ptr<Module>& module,
+		const Module& module,
 		std::string_view symbol
 	) const;
 
 	Result<Memory> ResolveReferences(
-		const std::shared_ptr<Module>& module,
+		const Module& module,
 		std::span<const ReferenceInfo> refs
 	) const;
 };
@@ -319,7 +315,7 @@ public:
 	) const;
 
 private:
-	Result<Memory> ResolveTable(const std::shared_ptr<Module>& module, std::string_view table) const;
+	Result<Memory> ResolveTable(const Module& module, std::string_view table) const;
 };
 
 class ConfigCache {
@@ -415,7 +411,6 @@ public:
 	Result<Memory> GetVTable(std::string_view name);
 	Result<int32_t> GetOffset(std::string_view name);
 	Result<plg::string> GetPatch(std::string_view name);
-	Result<std::shared_ptr<Module>> GetModule(std::string_view name);
 
 	// Inspection API
 	bool HasAddress(std::string_view name) const;

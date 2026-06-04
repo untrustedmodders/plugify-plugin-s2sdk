@@ -2,48 +2,19 @@
 
 #include "game_config.hpp"
 
-void ModuleProvider::PreloadModules() {
-	// Helper lambda to load a module
-	auto load = [&](std::string_view name) {
-		auto module = std::make_shared<Module>(name);
-		if (module->IsValid()) {
-			std::unique_lock lock(m_mutex);
-			m_modules[name] = std::move(module);
-		}
-	};
-
-	// Load common modules
-	load("tier0");
-	load("engine2");
-	load("server");
-}
-
-std::shared_ptr<Module> ModuleProvider::GetModule(std::string_view name) {
+Module* ModuleProvider::GetModule(std::string_view name) {
 	// Try to find existing module
 	{
 		std::shared_lock lock(m_mutex);
 		auto it = m_modules.find(name);
 		if (it != m_modules.end()) {
-			return it->second;
+			return it->second.get();
 		}
 	}
 
 	// Load module
-	return LoadModuleInternal(name);
-}
-
-std::shared_ptr<Module> ModuleProvider::LoadModuleInternal(std::string_view name) {
 	std::unique_lock lock(m_mutex);
-
-	auto module = std::make_shared<Module>(name);
-	if (!module->IsValid()) {
-		plg::print(LS_WARNING, "Failed to load module: {}\n", name);
-		return {};
-	}
-
-	auto ref = module;
-	m_modules[name] = std::move(module);
-	return ref;
+	return m_modules.emplace(name, std::make_unique<Module>(name)).first->second.get();
 }
 
 bool ModuleProvider::HasModule(std::string_view name) const {
@@ -1014,18 +985,6 @@ Result<plg::string> GameConfig::GetPatch(std::string_view name) {
 	return patch->pattern;
 }
 
-Result<std::shared_ptr<Module>> GameConfig::GetModule(std::string_view name) {
-	std::shared_lock lock(m_mutex);
-
-	auto& provider = g_GameConfigManager.GetModuleProvider();
-	auto module = provider.GetModule(name);
-	if (!module) {
-		return MakeError("Module not found: {}", name);
-	}
-
-	return module;
-}
-
 bool GameConfig::HasAddress(std::string_view name) const {
 	std::shared_lock lock(m_mutex);
 	return m_loader.GetAddress(name).has_value();
@@ -1162,17 +1121,17 @@ Result<ResolvedSignature> SignatureResolver::Resolve(
 	const SignatureData& signature
 ) const {
 	auto& provider = g_GameConfigManager.GetModuleProvider();
-	auto module = provider.GetModule(signature.library);
+	auto* module = provider.GetModule(signature.library);
 	if (!module) {
 		return MakeError("Module not found: {}", signature.library);
 	}
 
 	Result<Memory> addrResult = signature.IsSymbol() ?
-		ResolveSymbol(module, signature.value) :
-		ResolvePattern(module, signature.value);
+		ResolveSymbol(*module, signature.value) :
+		ResolvePattern(*module, signature.value);
 
 	if (!addrResult && !signature.refs.empty()) {
-		addrResult = ResolveReferences(module, signature.refs);
+		addrResult = ResolveReferences(*module, signature.refs);
 	}
 
 	if (!addrResult) {
@@ -1195,14 +1154,14 @@ Result<ResolvedSignature> SignatureResolver::ResolveByName(
 }
 
 Result<Memory> SignatureResolver::ResolvePattern(
-	const std::shared_ptr<Module>& module,
+	const Module& module,
 	std::string_view pattern
 ) const {
 	if (pattern.empty()) {
 		return MakeError("No pattern provided");
 	}
 
-	auto result = module->FindPatternMulti(pattern);
+	auto result = module.FindPatternMulti(pattern);
 	if (result.empty()) {
 		return MakeError("Pattern not found: {}", pattern);
 	}
@@ -1215,14 +1174,14 @@ Result<Memory> SignatureResolver::ResolvePattern(
 }
 
 Result<Memory> SignatureResolver::ResolveSymbol(
-	const std::shared_ptr<Module>& module,
+	const Module& module,
 	std::string_view symbol
 ) const {
 	if (symbol.empty()) {
 		return MakeError("No symbol provided");
 	}
 
-	auto address = module->GetFunctionByName(symbol);
+	auto address = module.GetFunctionByName(symbol);
 	if (!address) {
 		return MakeError("Symbol not found: {}", symbol);
 	}
@@ -1230,14 +1189,14 @@ Result<Memory> SignatureResolver::ResolveSymbol(
 }
 
 Result<Memory> SignatureResolver::ResolveReferences(
-	const std::shared_ptr<Module>& module,
+	const Module& module,
 	std::span<const ReferenceInfo> refs
 ) const {
 	bool vtable = false;
-	auto result = module->FindAllFunctionsFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<Memory> {
+	auto result = module.FindAllFunctionsFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<Memory> {
 		switch (ref.type) {
 			case ReferenceInfo::Type::String:
-				return module->FindString(ref.name, false, true);
+				return module.FindString(ref.name, false, true);
 
 			case ReferenceInfo::Type::VTable:
 				vtable = true;
@@ -1252,7 +1211,7 @@ Result<Memory> SignatureResolver::ResolveReferences(
 				if (!conVarData) {
 					return MakeError("ConVarData not found: {}", ref.name);
 				}
-				return module->FindPtr(reinterpret_cast<uintptr_t>(conVarData));
+				return module.FindPtr(reinterpret_cast<uintptr_t>(conVarData));
 			}
 			default:
 				return MakeError("Invalid reference type");
@@ -1274,7 +1233,7 @@ Result<Memory> SignatureResolver::ResolveReferences(
 
 			for (const auto& [type, name] : refs) {
 				if (type == ReferenceInfo::Type::VTable) {
-					funcs.push_back(module->GetVFunctionsFromVTable(name));
+					funcs.push_back(module.GetVFunctionsFromVTable(name));
 				}
 			}
 
@@ -1392,12 +1351,12 @@ Result<Memory> AddressResolver::ApplyStep(Memory current, const IndirectionStep&
 
 Result<ResolvedVTable> VTableResolver::Resolve(const VTableData& vtable) const {
 	auto& provider = g_GameConfigManager.GetModuleProvider();
-	auto module = provider.GetModule(vtable.library);
+	auto* module = provider.GetModule(vtable.library);
 	if (!module) {
 		return MakeError("Module not found: {}", vtable.library);
 	}
 
-	Result<Memory> addrResult = ResolveTable(module, vtable.table);
+	Result<Memory> addrResult = ResolveTable(*module, vtable.table);
 	if (!addrResult) {
 		return MakeError(std::move(addrResult.error()));
 	}
@@ -1417,12 +1376,12 @@ Result<ResolvedVTable> VTableResolver::ResolveByName(
 	return Resolve(*vtData);
 }
 
-Result<Memory> VTableResolver::ResolveTable(const std::shared_ptr<Module>& module, std::string_view table) const {
+Result<Memory> VTableResolver::ResolveTable(const Module& module, std::string_view table) const {
 	if (table.empty()) {
 		return MakeError("No table provided");
 	}
 
-	auto address = module->GetVirtualTableByName(table);
+	auto address = module.GetVirtualTableByName(table);
 	if (!address) {
 		return MakeError("VTable not found: {}", table);
 	}
