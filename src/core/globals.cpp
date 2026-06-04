@@ -21,7 +21,22 @@ GameConfig* g_pGameConfig = nullptr;
 
 namespace globals {
 	Result<void> Initialize(plg::flat_map<plg::string, plg::string> paths) {
-		g_GameConfigManager.GetModuleProvider().PreloadModules();
+		UNWRAP(g_pCVar, utils::QueryInterface("tier0", CVAR_INTERFACE_VERSION));
+		UNWRAP(g_pSchemaSystem, utils::QueryInterface("schemasystem", SCHEMASYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pSource2Server, utils::QueryInterface("server", SOURCE2SERVER_INTERFACE_VERSION));
+		UNWRAP(g_pSource2GameEntities, utils::QueryInterface("server", SOURCE2GAMEENTITIES_INTERFACE_VERSION));
+		UNWRAP(g_pSource2GameClients, utils::QueryInterface("server", SOURCE2GAMECLIENTS_INTERFACE_VERSION));
+		UNWRAP(g_pGameResourceServiceServer, utils::QueryInterface("engine2", GAMERESOURCESERVICESERVER_INTERFACE_VERSION));
+		UNWRAP(g_pEngineServiceMgr, utils::QueryInterface("engine2", ENGINESERVICEMGR_INTERFACE_VERSION));
+
+		UNWRAP(g_pEngineServer, utils::QueryInterface("engine2", SOURCE2ENGINETOSERVER_INTERFACE_VERSION));
+		UNWRAP(g_pFullFileSystem, utils::QueryInterface("filesystem_stdio", FILESYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pGameEventSystem, utils::QueryInterface("engine2", GAMEEVENTSYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pNetworkServerService, utils::QueryInterface("engine2", NETWORKSERVERSERVICE_INTERFACE_VERSION));
+		UNWRAP(g_pNetworkMessages, utils::QueryInterface("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
+		UNWRAP(g_pNetworkSystem, utils::QueryInterface("networksystem", NETWORKSYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pScriptManager, utils::QueryInterface("vscript", VSCRIPT_INTERFACE_VERSION));
+		UNWRAP(g_pNetworkStringTableServer, utils::QueryInterface("engine2", INTERFACENAME_NETWORKSTRINGTABLESERVER));
 
 		{
 			g_pCoreConfig = new CoreConfig(plg::vector{
@@ -72,23 +87,6 @@ namespace globals {
 		UNWRAP(addresses::CGameRules_TerminateRound, g_pGameConfig->GetSignature("CGameRules::TerminateRound"));
 		UNWRAP(addresses::GetCSWeaponDataFromKey, g_pGameConfig->GetSignature("GetCSWeaponDataFromKey"));
 #endif
-
-		UNWRAP(g_pCVar, utils::QueryInterface("tier0", CVAR_INTERFACE_VERSION));
-		UNWRAP(g_pSchemaSystem, utils::QueryInterface("schemasystem", SCHEMASYSTEM_INTERFACE_VERSION));
-		UNWRAP(g_pSource2Server, utils::QueryInterface("server", SOURCE2SERVER_INTERFACE_VERSION));
-		UNWRAP(g_pSource2GameEntities, utils::QueryInterface("server", SOURCE2GAMEENTITIES_INTERFACE_VERSION));
-		UNWRAP(g_pSource2GameClients, utils::QueryInterface("server", SOURCE2GAMECLIENTS_INTERFACE_VERSION));
-		UNWRAP(g_pGameResourceServiceServer, utils::QueryInterface("engine2", GAMERESOURCESERVICESERVER_INTERFACE_VERSION));
-		UNWRAP(g_pEngineServiceMgr, utils::QueryInterface("engine2", ENGINESERVICEMGR_INTERFACE_VERSION));
-
-		UNWRAP(g_pEngineServer, utils::QueryInterface("engine2", SOURCE2ENGINETOSERVER_INTERFACE_VERSION));
-		UNWRAP(g_pFullFileSystem, utils::QueryInterface("filesystem_stdio", FILESYSTEM_INTERFACE_VERSION));
-		UNWRAP(g_pGameEventSystem, utils::QueryInterface("engine2", GAMEEVENTSYSTEM_INTERFACE_VERSION));
-		UNWRAP(g_pNetworkServerService, utils::QueryInterface("engine2", NETWORKSERVERSERVICE_INTERFACE_VERSION));
-		UNWRAP(g_pNetworkMessages, utils::QueryInterface("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
-		UNWRAP(g_pNetworkSystem, utils::QueryInterface("networksystem", NETWORKSYSTEM_INTERFACE_VERSION));
-		UNWRAP(g_pScriptManager, utils::QueryInterface("vscript", VSCRIPT_INTERFACE_VERSION));
-		UNWRAP(g_pNetworkStringTableServer, utils::QueryInterface("engine2", INTERFACENAME_NETWORKSTRINGTABLESERVER));
 
 		ConVarManager::Init();
 
