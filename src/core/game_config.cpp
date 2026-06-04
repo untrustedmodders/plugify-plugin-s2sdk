@@ -274,6 +274,13 @@ Result<SignatureData> ConfigLoader::ParseSignatureConfig(configs::Config& config
 		return MakeError("No signature for " S2SDK_PLATFORM ": {}", sig.name);
 	}
 
+	bool onlyVtable = std::ranges::all_of(sig.refs, [](const ReferenceInfo& ref) {
+		return ref.type == ReferenceInfo::Type::VTable;
+	});
+	if (onlyVtable) {
+		return MakeError();
+	}
+
 	// Determine type
 	if (sig.value[0] == '@') {
 		sig.type = SignatureData::Type::Symbol;
@@ -1224,7 +1231,7 @@ Result<Memory> SignatureResolver::ResolveReferences(
 	const std::shared_ptr<Module>& module,
 	std::span<const ReferenceInfo> refs
 ) const {
-	return module->FindFunctionFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<std::vector<CAddress>> {
+	auto result = module->FindFunctionFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<std::vector<CAddress>> {
 		switch (ref.type) {
 			case ReferenceInfo::Type::String:
 				return module->FindStringMulti(ref.name, false, true);
@@ -1247,6 +1254,53 @@ Result<Memory> SignatureResolver::ResolveReferences(
 				return MakeError("Invalid reference type");
 		}
 	}, [&](const ReferenceInfo& ref) -> std::string_view { return ref.name; });
+
+	/*if (!result)
+	{
+		return MakeError(std::move(result.error()));
+	}
+
+	if (result->empty())
+	{
+		return MakeError("No function found matching provided references.");
+	}
+
+	if (result->size() > 1)
+	{
+		auto singleCommon = [](std::span<const std::vector<CAddress>> vecs) -> Result<Memory> {
+			if (vecs.empty())
+				return MakeError("No function found matching provided references.");
+
+			std::vector<CAddress> candidates = std::move(vecs.front());
+
+			for (const auto& next_funcs : vecs | std::views::drop(1)) {
+				std::vector<CAddress> intersection;
+				intersection.reserve(std::min(candidates.size(), next_funcs.size()));
+				std::ranges::set_intersection(candidates, next_funcs, std::back_inserter(intersection));
+				std::swap(candidates, intersection);
+			}
+
+			if (candidates.empty())
+				return MakeError("No function found matching provided references.");
+			if (candidates.size() > 1)
+				return MakeError("Ambiguous: {} functions match provided references.", candidates.size());
+
+			return candidates.front();
+		};
+
+		std::vector<std::vector<CAddress>> funcs;
+		funcs.push_back(std::move(*result));
+
+		for (const auto& [type, name] : refs) {
+			if (type == ReferenceInfo::Type::VTable) {
+				funcs.push_back(module->GetVFunctionsFromVTable(name));
+			}
+		}
+
+		return singleCommon(funcs);
+	}*/
+
+	return result;
 }
 
 Result<ResolvedAddress> AddressResolver::Resolve(
