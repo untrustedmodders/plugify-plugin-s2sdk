@@ -341,12 +341,12 @@
         "address": "GetHammerUniqueId",
         "win64": "B0 01",
         "linuxsteamrt64": "B0 01"
-      },
-      /*"SetHammerIdPatch": {
+      }
+      /*,"SetHammerIdPatch": {
         "address": "SetHammerUniqueId",
         "win64": "EB",
         "linuxsteamrt64": "EB"
-      },*/
+      },
       "FixWaterFloorJumpPatch": {
         "signature": "CheckJumpButtonWater",
         "win64": "11 43",
@@ -366,7 +366,7 @@
         "signature": "EmitSoundVolume",
         "win64": "41 B9 E9 54 60 BD",
         "linuxsteamrt64": "B8 E9 54 60 BD"
-      }
+      }*/
     },
     "VTables": {
       "CServerSideClient": {

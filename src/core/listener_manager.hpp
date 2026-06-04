@@ -108,7 +108,6 @@ protected:
 	}
 
 private:
-	alignas(std::hardware_constructive_interference_size)
 	plg::hybrid_vector<Func, N> m_handlers;
 	plg::hybrid_vector<int, N> m_priorities;
 	PLUGIFY_NO_UNIQUE_ADDRESS mutable Mutex m_mutex;

@@ -1,22 +1,3 @@
-/*
- * ModSharp
- * Copyright (C) 2023-2026 Kxnrl. All Rights Reserved.
- *
- * This file is part of ModSharp.
- * ModSharp is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * ModSharp is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with ModSharp. If not, see <https://www.gnu.org/licenses/>.
- */
-
 #ifdef PLATFORM_POSIX
 
 #    include "os.h"
@@ -31,12 +12,12 @@
 #    include <ranges>
 #    include <unordered_set>
 
-void CModule::GetModuleInfo(std::string_view mod)
+void CModule::GetModuleInfo(std::string_view module_name)
 {
 	auto fn = [&](struct dl_phdr_info& info) -> int {
 		std::string_view name = info.dlpi_name;
 
-		if (!name.contains(mod))
+		if (!name.contains(module_name))
 			return 0;
 
 		_base_address = info.dlpi_addr;
@@ -128,7 +109,7 @@ void CModule::GetModuleInfo(std::string_view mod)
 
 void CModule::DumpExports(void* module_base)
 {
-    auto dyn = (ElfW(Dyn)*)(module_base);
+    auto dyn = reinterpret_cast<ElfW(Dyn)*>(module_base);
     // thanks to https://stackoverflow.com/a/57099317
     auto GetNumberOfSymbolsFromGnuHash = [](ElfW(Addr) gnuHashAddress) {
         // See https://flapenguin.me/2017/05/10/elf-lookup-dt-gnu-hash/ and
@@ -183,7 +164,7 @@ void CModule::DumpExports(void* module_base)
     ElfW(Word)* hash_ptr{};
 
     char*       string_table{};
-    std::size_t symbol_count{};
+    size_t symbol_count{};
 
     while (dyn->d_tag != DT_NULL)
     {
@@ -303,7 +284,7 @@ std::vector<TypeInfo> CModule::GetTypeInfos(std::span<const RunTimeTypeInfo> run
 		auto instances = FindPtrs(root_rtti_vtable.GetPtr());
 		known_typeinfos.reserve(known_typeinfos.size() + instances.size());
 
-		for (auto xref : instances) {
+		for (const auto& xref : instances) {
 			known_typeinfos.emplace_back(xref.As<std::type_info*>());
 		}
 	};
@@ -622,7 +603,7 @@ void CModule::BuildFunctionIndexAndReferences()
     // so we would not get garbage results which can cause missing references
     // technically we can go with 16 bytes, which handles the maximum instruction lenth(15), but we use
     // 24 here to ensure the decoder has fully synchronized before the chunk for actual decoding start
-    constexpr std::size_t warmup_bytes = 24;
+    constexpr size_t warmup_bytes = 24;
 
     for (auto i = 0u; i < num_threads; ++i)
     {
@@ -641,9 +622,9 @@ void CModule::BuildFunctionIndexAndReferences()
         t.join();
 
     // merge results from each thread
-    std::size_t total_funcs = seen_functions.size();
-    std::size_t total_pads  = 0;
-    std::size_t total_refs  = 0;
+    size_t total_funcs = seen_functions.size();
+    size_t total_pads  = 0;
+    size_t total_refs  = 0;
 
     for (const auto& r : chunk_results)
     {
@@ -684,7 +665,7 @@ void CModule::BuildFunctionIndexAndReferences()
     auto       pad_it  = padding_addrs.begin();
     const auto pad_end = padding_addrs.end();
 
-    for (std::size_t idx = 0; idx < seen_functions.size(); ++idx)
+    for (size_t idx = 0; idx < seen_functions.size(); ++idx)
     {
         const auto start           = seen_functions[idx];
         const auto next_func_start = (idx + 1 < seen_functions.size()) ? seen_functions[idx + 1] : exec_end;

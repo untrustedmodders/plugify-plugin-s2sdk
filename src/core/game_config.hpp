@@ -104,7 +104,7 @@ struct LoadOptions {
 	plg::vector<plg::string> configPaths;
 	plg::string gameDirectory = S2SDK_GAME_NAME;
 	CacheStrategy cacheStrategy = CacheStrategy::Eager;
-	//std::execution::parallel_policy processStrategy = std::execution::par;
+	std::execution::parallel_policy processStrategy = std::execution::par;
 	bool strictMode = false;
 	bool validateOnLoad = true;
 	bool allowPartialApply = false;
@@ -244,12 +244,6 @@ private:
 	mutable std::shared_mutex m_mutex;
 };
 
-struct ResolvedRefs {
-	plg::vector<std::uintptr_t> cvarRefs;
-	plg::vector<std::string_view> stringRefs;
-	plg::vector<std::string_view> vtableRefs;
-};
-
 class SignatureResolver {
 public:
 	SignatureResolver() = default;
@@ -279,10 +273,6 @@ private:
 
 	Result<Memory> ResolveReferences(
 		const std::shared_ptr<Module>& module,
-		std::span<const ReferenceInfo> refs
-	) const;
-
-	Result<ResolvedRefs> ClassifyRefs(
 		std::span<const ReferenceInfo> refs
 	) const;
 };

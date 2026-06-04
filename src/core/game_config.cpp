@@ -424,35 +424,35 @@ std::optional<PatchData> ConfigLoader::GetPatch(std::string_view name) const {
 
 template <typename Fn>
 void ConfigLoader::ForEachSignature(Fn&& fn) const {
-	std::for_each(m_signatures.begin(), m_signatures.end(), [&](const auto& kv) {
+	std::for_each(m_options.processStrategy, m_signatures.begin(), m_signatures.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachAddress(Fn&& fn) const  {
-	std::for_each(m_addresses.begin(), m_addresses.end(), [&](const auto& kv) {
+	std::for_each(m_options.processStrategy, m_addresses.begin(), m_addresses.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachVTable(Fn&& fn) const  {
-	std::for_each(m_vtables.begin(), m_vtables.end(), [&](const auto& kv) {
+	std::for_each(m_options.processStrategy, m_vtables.begin(), m_vtables.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachOffset(Fn&& fn) const  {
-	std::for_each(m_offsets.begin(), m_offsets.end(), [&](const auto& kv) {
+	std::for_each(m_options.processStrategy, m_offsets.begin(), m_offsets.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachPatch(Fn&& fn) const  {
-	std::for_each(m_patches.begin(), m_patches.end(), [&](const auto& kv) {
+	std::for_each(m_options.processStrategy, m_patches.begin(), m_patches.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
@@ -1224,101 +1224,29 @@ Result<Memory> SignatureResolver::ResolveReferences(
 	const std::shared_ptr<Module>& module,
 	std::span<const ReferenceInfo> refs
 ) const {
-	auto resolvedRefs = ClassifyRefs(refs);
-	if (!resolvedRefs) {
-		return MakeError(std::move(resolvedRefs.error()));
-	}
-
-	const auto& [cvarRefs, stringRefs, vtableRefs] = *resolvedRefs;
-
-	std::optional<std::vector<std::uintptr_t>> result;
-
-	auto intersect = [&result](std::vector<std::uintptr_t> candidates) -> bool {
-		if (candidates.empty())
-			return false;
-
-		std::ranges::sort(candidates);
-		auto [begin, end] = std::ranges::unique(candidates);
-		candidates.erase(begin, end);
-
-		if (!result) {
-			result = std::move(candidates);
-		} else {
-			std::vector<std::uintptr_t> tmp;
-			std::ranges::set_intersection(*result, candidates, std::back_inserter(tmp));
-			result = std::move(tmp);
-		}
-		return !result->empty();
-	};
-
-	if (!cvarRefs.empty()) {
-		if (!intersect(module->FindAllFunctionsFromPointerRefs(cvarRefs))) {
-			return MakeError("No function found matching cvar references");
-		}
-	}
-
-    if (!stringRefs.empty()) {
-        if (!intersect(module->FindAllFunctionsFromStringRefs(stringRefs))) {
-            return MakeError("No function found matching string references");
-        }
-    }
-
-	if (!vtableRefs.empty()) {
-		std::vector<std::uintptr_t> vtableFunctions;
-
-		for (const auto& vt : vtableRefs) {
-			auto funcs = module->GetVFunctionsFromVTable(vt);
-			vtableFunctions.insert(vtableFunctions.end(), funcs.begin(), funcs.end());
-		}
-
-		if (!intersect(std::move(vtableFunctions))) {
-			return MakeError("No function found matching vtable references");
-		}
-	}
-
-    if (!result || result->empty()) {
-        return MakeError("No function found matching references");
-    }
-
-    if (result->size() > 1) {
-        return MakeError("Ambiguous: {} functions match all references", result->size());
-    }
-
-    return result->front();
-}
-
-Result<ResolvedRefs> SignatureResolver::ClassifyRefs(
-	std::span<const ReferenceInfo> refs
-) const {
-	ResolvedRefs out;
-	for (const auto& [type, name] : refs) {
-		switch (type) {
+	return module->FindFunctionFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<std::vector<CAddress>> {
+		switch (ref.type) {
 			case ReferenceInfo::Type::String:
-				out.stringRefs.emplace_back(name);
-				break;
+				return module->FindStringMulti(ref.name, false, true);
 
 			case ReferenceInfo::Type::VTable:
-				out.vtableRefs.emplace_back(name);
-				break;
+				return module->GetVFunctionsFromVTable(ref.name);
 
 			case ReferenceInfo::Type::CVar: {
-				auto conVarRef = g_pCVar->FindConVar(name.data());
+				auto conVarRef = g_pCVar->FindConVar(ref.name.data());
 				if (!conVarRef.IsValidRef()) {
-					return MakeError("ConVarRef not found: {}", name);
+					return MakeError("ConVarRef not found: {}", ref.name);
 				}
 				auto conVarData = g_pCVar->GetConVarData(conVarRef);
 				if (!conVarData) {
-					return MakeError("ConVarData not found: {}", name);
+					return MakeError("ConVarData not found: {}", ref.name);
 				}
-				out.cvarRefs.emplace_back(reinterpret_cast<std::uintptr_t>(conVarData));
-				break;
+				return module->FindPtrs(reinterpret_cast<uintptr_t>(conVarData));
 			}
-
 			default:
 				return MakeError("Invalid reference type");
 		}
-	}
-	return out;
+	}, [&](const ReferenceInfo& ref) -> std::string_view { return ref.name; });
 }
 
 Result<ResolvedAddress> AddressResolver::Resolve(

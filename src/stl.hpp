@@ -14,6 +14,12 @@
 #include <map>
 #endif
 
+#ifdef __cpp_lib_flat_set
+#include <flat_set>
+#else
+#include <set>
+#endif
+
 #include <parallel_hashmap/phmap.h>
 
 #define UNUSED(x) [[maybe_unused]] auto _ = x
@@ -44,6 +50,14 @@ namespace plg {
 #else
 	template<typename Key, typename T, typename Compare = std::less<Key>>
 	using flat_map = std::map<Key, T, Compare>;
+#endif
+
+#ifdef __cpp_lib_flat_set
+	template<typename Key,typename Compare = std::less<Key>>
+	using flat_set = std::flat_set<Key, Compare>;
+#else
+	template<typename Key, typename Compare = std::less<Key>>
+	using flat_set = std::set<Key, Compare>;
 #endif
 
 	using namespace phmap;

@@ -1,22 +1,3 @@
-/*
- * ModSharp
- * Copyright (C) 2023-2026 Kxnrl. All Rights Reserved.
- *
- * This file is part of ModSharp.
- * ModSharp is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * ModSharp is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with ModSharp. If not, see <https://www.gnu.org/licenses/>.
- */
-
 #include "scan.hpp"
 
 #include "module.hpp"
@@ -955,41 +936,6 @@ std::vector<CAddress> scan::FindPatternMulti(const uint8_t* data, size_t size, s
     return detail::FindPatternMultiSSE(data, size, pat);
 }
 
-CAddress scan::FindStr(const uint8_t* data, size_t size, std::string_view str, bool zero_terminated, bool exact) noexcept
-{
-    const uint8_t* needle      = reinterpret_cast<const uint8_t*>(str.data());
-    size_t    needle_size = zero_terminated ? str.size() + 1 : str.size();
-
-    if (!exact)
-    {
-        return FindData(data, size, needle, needle_size);
-    }
-
-    CAddress   result{};
-    const auto base = reinterpret_cast<uintptr_t>(data);
-
-    auto callback = [&result, base, data](CAddress match) {
-        auto offset = match.GetPtr() - base;
-        if (offset == 0 || data[offset - 1] == '\0')
-        {
-            result = offset;
-            return detail::SearchAction::Stop;
-        }
-        return detail::SearchAction::Continue;
-    };
-
-    if (s_InstructionSet.SupportAvx2())
-    {
-        detail::FindDataAvx2Impl(data, size, needle, needle_size, callback);
-    }
-    else
-    {
-        detail::FindDataSSEImpl(data, size, needle, needle_size, callback);
-    }
-
-    return result;
-}
-
 CAddress scan::FindPtr(uintptr_t data, size_t size, uintptr_t ptr) noexcept
 {
     CAddress result{};
@@ -1008,6 +954,26 @@ CAddress scan::FindPtr(uintptr_t data, size_t size, uintptr_t ptr) noexcept
     }
 
     return result;
+}
+
+std::vector<CAddress> scan::FindPtrs(uintptr_t data, size_t size, uintptr_t ptr) noexcept
+{
+	std::vector<CAddress> result{};
+	auto callback = [&result](CAddress address) {
+		result.emplace_back(address);
+		return detail::SearchAction::Continue;
+	};
+
+	if (s_InstructionSet.SupportAvx2())
+	{
+		detail::FindValueAVX2Impl(data, size, ptr, callback);
+	}
+	else
+	{
+		detail::FindValueSSEImpl(data, size, ptr, callback);
+	}
+
+	return result;
 }
 
 CAddress scan::FindRVA(uintptr_t data, size_t size, uint32_t rva) noexcept
@@ -1050,26 +1016,6 @@ std::vector<CAddress> scan::FindRVAs(uintptr_t data, size_t size, uint32_t rva) 
     return result;
 }
 
-std::vector<CAddress> scan::FindPtrs(uintptr_t data, size_t size, uintptr_t ptr) noexcept
-{
-    std::vector<CAddress> result{};
-    auto callback = [&result](CAddress address) {
-        result.emplace_back(address);
-        return detail::SearchAction::Continue;
-    };
-
-    if (s_InstructionSet.SupportAvx2())
-    {
-        detail::FindValueAVX2Impl(data, size, ptr, callback);
-    }
-    else
-    {
-        detail::FindValueSSEImpl(data, size, ptr, callback);
-    }
-
-    return result;
-}
-
 CAddress scan::FindData(const uint8_t* data, size_t size, const uint8_t* needle, size_t needle_size) noexcept
 {
     if (s_InstructionSet.SupportAvx2()) return detail::FindDataAVX2(data, size, needle, needle_size);
@@ -1082,4 +1028,72 @@ std::vector<CAddress> scan::FindDataMulti(const uint8_t* data, size_t size, cons
     if (s_InstructionSet.SupportAvx2()) return detail::FindDataMultiAVX2(data, size, needle, needle_size);
 
     return detail::FindDataMultiSSE(data, size, needle, needle_size);
+}
+
+CAddress scan::FindStr(const uint8_t* data, size_t size, std::string_view str, bool zero_terminated, bool exact) noexcept
+{
+	const uint8_t* needle = reinterpret_cast<const uint8_t*>(str.data());
+	size_t needle_size = zero_terminated ? str.size() + 1 : str.size();
+
+	if (!exact)
+	{
+		return FindData(data, size, needle, needle_size);
+	}
+
+	CAddress   result{};
+	const auto base = reinterpret_cast<uintptr_t>(data);
+
+	auto callback = [&result, base, data](CAddress match) {
+		auto offset = match.GetPtr() - base;
+		if (offset == 0 || data[offset - 1] == '\0')
+		{
+			result = offset;
+			return detail::SearchAction::Stop;
+		}
+		return detail::SearchAction::Continue;
+	};
+
+	if (s_InstructionSet.SupportAvx2())
+	{
+		detail::FindDataAvx2Impl(data, size, needle, needle_size, callback);
+	}
+	else
+	{
+		detail::FindDataSSEImpl(data, size, needle, needle_size, callback);
+	}
+
+	return result;
+}
+
+std::vector<CAddress> scan::FindStrMulti(const uint8_t* data, size_t size, std::string_view str, bool zero_terminated, bool exact) noexcept {
+	const uint8_t* needle = reinterpret_cast<const uint8_t*>(str.data());
+	size_t needle_size = zero_terminated ? str.size() + 1 : str.size();
+
+	if (!exact)
+	{
+		return FindDataMulti(data, size, needle, needle_size);
+	}
+
+	std::vector<CAddress> result{};
+	const auto base = reinterpret_cast<uintptr_t>(data);
+
+	auto callback = [&result, base, data](CAddress match) {
+		auto offset = match.GetPtr() - base;
+		if (offset == 0 || data[offset - 1] == '\0')
+		{
+			result.emplace_back(offset);
+		}
+		return detail::SearchAction::Continue;
+	};
+
+	if (s_InstructionSet.SupportAvx2())
+	{
+		detail::FindDataAvx2Impl(data, size, needle, needle_size, callback);
+	}
+	else
+	{
+		detail::FindDataSSEImpl(data, size, needle, needle_size, callback);
+	}
+
+	return result;
 }

@@ -1,22 +1,3 @@
-/*
- * ModSharp
- * Copyright (C) 2023-2026 Kxnrl. All Rights Reserved.
- *
- * This file is part of ModSharp.
- * ModSharp is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * ModSharp is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with ModSharp. If not, see <https://www.gnu.org/licenses/>.
- */
-
 #pragma once
 
 #include <cstdint>
@@ -29,12 +10,9 @@
 #include "interface.h"
 #include "memaddr.hpp"
 
-struct _s_RTTICompleteObjectLocator;
-class CUtlString;
-
 struct RunTimeVTableInfo
 {
-    CUtlString demangled_name;
+    std::string_view demangled_name;
     uintptr_t  address;
 	uint64_t   offset;
 
@@ -42,99 +20,14 @@ struct RunTimeVTableInfo
 	auto operator<=>(const RunTimeVTableInfo& other) const noexcept = default;
 };
 
-class IModule
-{
-public:
-    virtual ~IModule() = default;
-
-    [[nodiscard]] virtual void* FindPatternEx(const char* pattern)                                               = 0;
-    [[nodiscard]] virtual void* GetVirtualTableByNameEx(const char* tableName, bool is_raw_name = false)         = 0;
-    [[nodiscard]] virtual void* GetFunctionByNameEx(const char* functionName) noexcept                           = 0;
-    [[nodiscard]] virtual void* FindInterfaceEx(const char* interfaceName)                                       = 0;
-    [[nodiscard]] virtual bool  FindPatternMultiEx(const char* pattern, CUtlLeanVector<uintptr_t>* results) = 0;
-    [[nodiscard]] virtual void* FindStringEx(const char* str)                                                    = 0;
-    [[nodiscard]] virtual void* FindDataEx(const uint8_t* needle, std::size_t needle_size, bool read_only)       = 0;
-    [[nodiscard]] virtual void* FindPtrEx(const void* ptr)                                                       = 0;
-
-    virtual void FindVtablePartial(const char* name, CUtlLeanVector<RunTimeVTableInfo>* info) = 0;
-    virtual bool IsPointerDerivedFromEx(void* ptr, const char* name)                          = 0;
-
-    [[nodiscard]] virtual bool GetReferencesEx(uintptr_t ptr, CUtlLeanVector<uintptr_t>* results)                                      = 0;
-    [[nodiscard]] virtual bool FindAllFunctionsFromStringsRefsEx(CUtlLeanVector<CUtlString>* strs, CUtlLeanVector<uintptr_t>* results) = 0;
-    [[nodiscard]] virtual bool FindAllFunctionsFromPointersRefsEx(CUtlLeanVector<uintptr_t>* ptrs, CUtlLeanVector<uintptr_t>* results) = 0;
-    virtual bool               GetFunctionRangeEx(uintptr_t middle, uintptr_t* start, uintptr_t* end)                                  = 0;
-    [[nodiscard]] virtual void* FindStringExactEx(const char* str)                                                                     = 0;
-};
-
-enum class SegFlags : uint8_t
-{
-    R = 1 << 0,
-    W = 1 << 1,
-    X = 1 << 2,
-};
-
-constexpr SegFlags operator|(SegFlags lhs, SegFlags rhs)
-{
-	using underlying = std::underlying_type_t<SegFlags>;
-	return static_cast<SegFlags> (static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
-}
-
-constexpr bool operator&(SegFlags lhs, SegFlags rhs) noexcept
-{
-	using underlying = std::underlying_type_t<SegFlags>;
-	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
-}
-
-constexpr SegFlags& operator|=(SegFlags& lhs, SegFlags rhs) noexcept
-{
-	lhs = lhs | rhs;
-	return lhs;
-}
-
-#ifndef PLATFORM_WINDOWS
-struct RunTimeTypeInfo
-{
-	CAddress class_typeinfo;
-	CAddress si_class_typeinfo;
-	CAddress vmi_class_typeinfo;
-
-	bool operator==(const RunTimeTypeInfo& other) const noexcept = default;
-	auto operator<=>(const RunTimeTypeInfo& other) const noexcept = default;
-};
-
-struct TypeInfo
-{
-	std::type_info* ti;
-	[[nodiscard]] uintptr_t address() const { return reinterpret_cast<uintptr_t>(ti); }
-
-	bool operator==(const TypeInfo& other) const noexcept = default;
-	auto operator<=>(const TypeInfo& other) const noexcept = default;
-};
-#endif
-
-class CModule final : public IModule
-{
-public:
-    struct VTable
-    {
-        std::type_info* type_info;
-        uintptr_t       vtable_address;
-        std::string     demangled_name;
-        uint64_t        offset;
-
-        std::vector<VTable*> children;
+enum class SegFlags : uint8_t;
 
 #ifdef PLATFORM_WINDOWS
-        _s_RTTICompleteObjectLocator* object_locator;
-
-        VTable(std::type_info* ti, uintptr_t vtable, std::string name, uint64_t off, _s_RTTICompleteObjectLocator* locator) :
-            type_info(ti), vtable_address(vtable), demangled_name(std::move(name)), offset(off), object_locator(locator) {}
-#else
-        VTable(std::type_info* ti, uintptr_t vtable, std::string name, uint64_t off) :
-            type_info(ti), vtable_address(vtable), demangled_name(std::move(name)), offset(off) {}
+struct _s_RTTICompleteObjectLocator;
 #endif
-    };
 
+class CModule final
+{
     struct Segment
     {
         Segment()                          = default;
@@ -145,52 +38,90 @@ public:
 
         SegFlags             flags{};
         uintptr_t            address{};
-        std::size_t          size{};
+        size_t               size{};
         std::vector<uint8_t> data{};
     };
 
     struct ReferenceEntry
     {
-        uintptr_t target;
-        uintptr_t source_ip;
+        uintptr_t target{};
+        uintptr_t source_ip{};
     };
 
     struct FunctionEntry
     {
-        uintptr_t start;
+        uintptr_t start{};
         uintptr_t end{};
     };
 
-private:
-
     std::vector<Segment> _segments{};
     uintptr_t            _base_address{};
-    std::size_t          _size{};
+    size_t                _size{};
     std::string          _module_name{};
     CreateInterfaceFn    _createInterFaceFn;
 
-    mutable std::unordered_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>>              _cached_vtables{};
-    mutable std::unordered_map<std::string, std::vector<uintptr_t>, plg::string_hash, std::equal_to<>> _vtable_functions{};
+    mutable plg::flat_hash_map<std::string, CAddress, plg::string_hash, std::equal_to<>>              _cached_vtables{};
+    mutable plg::flat_hash_map<std::string, std::vector<CAddress>, plg::string_hash, std::equal_to<>> _vtable_functions{};
+	mutable std::shared_mutex _mutex;
 
-    void GetModuleInfo(std::string_view mod);;
+    void GetModuleInfo(std::string_view module_name);
 
     std::vector<FunctionEntry>  _function_entries{};
     std::vector<ReferenceEntry> _references{};
 
     void BuildFunctionIndexAndReferences();
 
-    void                                 DumpVtables();
+	struct VTable
+	{
+		std::type_info* type_info;
+		uintptr_t       vtable_address;
+		std::string     demangled_name;
+		uint64_t        offset;
+
+		std::vector<VTable*> children;
+
+#ifdef PLATFORM_WINDOWS
+		_s_RTTICompleteObjectLocator* object_locator;
+
+		VTable(std::type_info* ti, uintptr_t vtable, std::string name, uint64_t off, _s_RTTICompleteObjectLocator* locator) :
+			type_info(ti), vtable_address(vtable), demangled_name(std::move(name)), offset(off), object_locator(locator) {}
+#else
+		VTable(std::type_info* ti, uintptr_t vtable, std::string name, uint64_t off) :
+			type_info(ti), vtable_address(vtable), demangled_name(std::move(name)), offset(off) {}
+#endif
+	};
+
+    void DumpVtables();
     std::vector<std::unique_ptr<VTable>> _vtables{};
 
 #ifndef PLATFORM_WINDOWS
+	struct RunTimeTypeInfo
+	{
+		CAddress class_typeinfo;
+		CAddress si_class_typeinfo;
+		CAddress vmi_class_typeinfo;
+
+		bool operator==(const RunTimeTypeInfo& other) const noexcept = default;
+		auto operator<=>(const RunTimeTypeInfo& other) const noexcept = default;
+	};
+
+	struct TypeInfo
+	{
+		std::type_info* ti;
+		[[nodiscard]] uintptr_t address() const { return reinterpret_cast<uintptr_t>(ti); }
+
+		bool operator==(const TypeInfo& other) const noexcept = default;
+		auto operator<=>(const TypeInfo& other) const noexcept = default;
+	};
+
 	std::vector<RunTimeTypeInfo> GetRuntimeTypeInfos() const;
 	std::vector<TypeInfo> GetTypeInfos(std::span<const RunTimeTypeInfo> runtime_typeinfos) const;
 
-    std::unordered_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>> _exports{};
+    std::flat_hash_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>> _exports{};
     void DumpExports(void* module_base);
 #endif
 
-    uintptr_t GetFunctionEntry(uintptr_t middle);
+    uintptr_t GetFunctionEntry(uintptr_t middle) const;
 
 public:
     CModule() = default;
@@ -221,179 +152,125 @@ public:
 	    return _base_address != 0;
     }
 
-    std::vector<uintptr_t> GetVFunctionsFromVTable(std::string_view vtableName) const;
-
-    void LoopVFunctions(std::string_view vtable_name, const std::function<bool(CAddress)>& callback) const;
-
     [[nodiscard]] CAddress              FindPattern(std::string_view pattern) const;
-    [[nodiscard]] CAddress              FindPatternStrict(std::string_view pattern) const;
+    [[nodiscard]] std::vector<CAddress> FindPatternMulti(std::string_view pattern) const;
+
     [[nodiscard]] CAddress              FindString(std::string_view str, bool read_only, bool exact = false) const;
-    [[nodiscard]] CAddress              FindData(const uint8_t* needle, std::size_t needle_size, bool read_only) const;
+    [[nodiscard]] std::vector<CAddress> FindStringMulti(std::string_view str, bool read_only, bool exact = false) const;
+
+    [[nodiscard]] CAddress              FindData(const uint8_t* needle, size_t needle_size, bool read_only) const;
+    [[nodiscard]] std::vector<CAddress> FindDataMulti(const uint8_t* needle, size_t needle_size, bool read_only) const;
+
     [[nodiscard]] CAddress              FindPtr(uintptr_t ptr) const;
     [[nodiscard]] std::vector<CAddress> FindPtrs(uintptr_t ptr) const;
+
+	[[nodiscard]] CAddress              FindInterface(std::string_view name) const;
+
+	[[nodiscard]] std::vector<CAddress> GetVFunctionsFromVTable(std::string_view vtableName) const;
+	void LoopVFunctions(std::string_view vtable_name, const std::function<bool(CAddress)>& callback) const;
+
     [[nodiscard]] CAddress              GetVirtualTableByName(std::string_view name, bool is_raw_name = false) const;
-    [[nodiscard]] CAddress              FindInterface(std::string_view name) const;
-    [[nodiscard]] std::vector<CAddress> FindPatternMulti(std::string_view pattern) const;
     [[nodiscard]] CAddress              GetFunctionByName(std::string_view proc_name) const;
+    [[nodiscard]] CAddress              GetTypeInfoFromName(std::string_view name) const;
 
-    [[nodiscard]] CAddress GetTypeInfoFromName(std::string_view name) const;
-
-    [[nodiscard]] bool                            IsPointerDerivedFrom(void* ptr, std::string_view vtable_name);
-    std::vector<uintptr_t>                        IntersectFunctionReferences(std::vector<std::span<const ReferenceEntry>>& reference_sets);
+	[[nodiscard]] std::vector<RunTimeVTableInfo>  FindVtablePartial(std::string_view vtable_name) const;
+    [[nodiscard]] bool                            IsPointerDerivedFrom(void* ptr, std::string_view vtable_name) const;
+    [[nodiscard]] std::vector<CAddress>           IntersectFunctionReferences(std::vector<std::span<const ReferenceEntry>>& reference_sets) const;
     [[nodiscard]] std::span<const ReferenceEntry> GetReferenceRange(uintptr_t address) const;
 
-    [[nodiscard]] CAddress FindFunctionFromStringRef(std::string_view str);
-    [[nodiscard]] CAddress FindFunctionFromStringRefs(std::span<const std::string_view> strs);
-    [[nodiscard]] CAddress FindFunctionFromPointerRef(uintptr_t ptr);
-    [[nodiscard]] CAddress FindFunctionFromPointerRefs(std::span<const uintptr_t> ptrs);
+    [[nodiscard]] Result<CAddress> FindFunctionFromStringRef(std::string_view str) const;
+    [[nodiscard]] Result<CAddress> FindFunctionFromStringRefs(std::span<const std::string_view> strs) const;
+    [[nodiscard]] Result<CAddress> FindFunctionFromPointerRef(uintptr_t ptr) const;
+    [[nodiscard]] Result<CAddress> FindFunctionFromPointerRefs(std::span<const uintptr_t> ptrs) const;
+    [[nodiscard]] Result<CAddress> FindFunctionFromAddressRef(uintptr_t addr) const;
+	[[nodiscard]] Result<CAddress> FindFunctionFromAddressRefs(std::span<const uintptr_t> addrs) const;
+	template<typename Range, typename Getter, typename Formatter>
+	[[nodiscard]] Result<CAddress> FindFunctionFromRefs(Range&& items, Getter&& getter, Formatter&& formatter) const
+	{
+		auto matches = FindAllFunctionsFromRefs(items, getter, formatter);
 
-    [[nodiscard]] std::vector<uintptr_t> FindAllFunctionsFromStringRefs(std::span<const std::string_view> strs);
-    [[nodiscard]] std::vector<uintptr_t> FindAllFunctionsFromPointerRefs(std::span<const uintptr_t> ptrs);
+		if (!matches)
+		{
+			return MakeError(std::move(matches.error()));
+		}
+		if (matches->empty())
+		{
+			return MakeError("No function found matching provided references.");
+		}
+		if (matches->size() > 1)
+		{
+			return MakeError("Ambiguous: {} functions match provided references.", matches->size());
+		}
 
-    // interface
-    [[nodiscard]] void* FindPatternEx(const char* pattern) override
-    {
-        return FindPattern(pattern);
-    }
+		return matches->front();
+	}
 
-    [[nodiscard]] void* GetVirtualTableByNameEx(const char* tableName, bool bDecorated = false) override
-    {
-        return GetVirtualTableByName(tableName);
-    }
+    [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromStringRefs(std::span<const std::string_view> strs) const;
+    [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromPointerRefs(std::span<const uintptr_t> ptrs) const;
+    [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromAddressRefs(std::span<const uintptr_t> addrs) const;
+	template<typename Range, typename Getter, typename Formatter>
+	[[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromRefs(Range&& items, Getter&& getter, Formatter&& formatter) const
+	{
+		if (std::begin(items) == std::end(items)) [[unlikely]]
+		{
+			return MakeError("No references provided to search for.");
+		}
 
-    [[nodiscard]] void* GetFunctionByNameEx(const char* functionName) noexcept override
-    {
-        return GetFunctionByName(functionName);
-    }
+		std::vector<std::span<const ReferenceEntry>> ref_sets;
 
-    [[nodiscard]] void* FindInterfaceEx(const char* interfaceName) override
-    {
-        return FindInterface(interfaceName);
-    }
+		for (const auto& item : items)
+		{
+			auto addrs = getter(item);
 
-    [[nodiscard]] bool FindPatternMultiEx(const char* pattern, CUtlLeanVector<uintptr_t>* results) override
-    {
-        auto pattern_result = FindPatternMulti(pattern);
-        if (pattern_result.empty())
-            return false;
+			if (!addrs)
+			{
+				return MakeError(std::move(addrs.error()));
+			}
 
-        auto size = pattern_result.size();
-        results->SetSize(static_cast<int32_t>(size));
+			for (const auto& addr : *addrs)
+			{
+				if (!addr.IsValid())
+				{
+					return MakeError("Reference \"{}\" not found.", formatter(item));
+				}
 
-        for (auto i = 0; i < size; i++)
-            results->Element(i) = pattern_result[i];
+				auto range = GetReferenceRange(*addr);
 
-        return true;
-    }
+				if (range.empty())
+				{
+					return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), addr.GetPtr());
+				}
 
-    [[nodiscard]] void* FindStringEx(const char* str) override
-    {
-        return FindString(str, false);
-    }
+				ref_sets.push_back(range);
+			}
+		}
 
-    [[nodiscard]] void* FindDataEx(const uint8_t* needle, std::size_t needle_size, bool read_only) override
-    {
-        return FindData(needle, needle_size, read_only);
-    }
-
-    [[nodiscard]] void* FindPtrEx(const void* ptr) override
-    {
-        return FindPtr(reinterpret_cast<uintptr_t>(ptr));
-    }
-
-    void FindVtablePartial(const char* name, CUtlLeanVector<RunTimeVTableInfo>* info) override;
-    bool IsPointerDerivedFromEx(void* ptr, const char* name) override
-    {
-        return IsPointerDerivedFrom(ptr, name);
-    }
-
-    [[nodiscard]] bool GetReferencesEx(uintptr_t ptr, CUtlLeanVector<uintptr_t>* results) override
-    {
-        auto range = GetReferenceRange(ptr);
-        if (range.empty())
-            return false;
-
-        auto size = range.size();
-        results->SetSize(static_cast<int32_t>(size));
-
-        for (auto i = 0; i < size; i++)
-            results->Element(i) = range[i].source_ip;
-
-        return true;
-    }
-
-    [[nodiscard]] bool FindAllFunctionsFromStringsRefsEx(CUtlLeanVector<CUtlString>* strs, CUtlLeanVector<uintptr_t>* results) override
-    {
-        if (strs->Count() == 0) [[unlikely]]
-            return false;
-
-        std::vector<std::string_view> temp_strs{};
-        temp_strs.reserve(strs->Count());
-
-        for (int i = 0; i < strs->Count(); ++i)
-            temp_strs.emplace_back(strs->Element(i).Get());
-
-        auto temp_results = FindAllFunctionsFromStringRefs(temp_strs);
-        if (temp_results.empty())
-            return false;
-
-        results->SetCount(static_cast<int32_t>(temp_results.size()));
-        for (auto i = 0; i < temp_results.size(); i++)
-            results->Element(i) = temp_results[i];
-
-        return true;
-    }
-
-    [[nodiscard]] bool FindAllFunctionsFromPointersRefsEx(CUtlLeanVector<uintptr_t>* ptrs, CUtlLeanVector<uintptr_t>* results) override
-    {
-        if (ptrs->Count() == 0) [[unlikely]]
-            return false;
-
-        std::vector<uintptr_t> temp_strs{};
-        temp_strs.reserve(ptrs->Count());
-
-        for (int i = 0; i < ptrs->Count(); ++i)
-        {
-            temp_strs.emplace_back(ptrs->Element(i));
-        }
-
-        auto temp_results = FindAllFunctionsFromPointerRefs(temp_strs);
-        if (temp_results.empty())
-            return false;
-
-        results->SetCount(static_cast<int32_t>(temp_results.size()));
-        for (auto i = 0; i < temp_results.size(); i++)
-            results->Element(i) = temp_results[i];
-
-        return true;
-    }
-
-    [[nodiscard]] const FunctionEntry* GetFunctionRange(uintptr_t middle) const
-    {
-        auto it = std::ranges::upper_bound(_function_entries, middle, {}, &FunctionEntry::start);
-
-        if (it == _function_entries.begin())
-            return nullptr;
-
-        auto candidate = std::prev(it);
-        return (middle < candidate->end) ? &(*candidate) : nullptr;
-    }
-
-    bool GetFunctionRangeEx(uintptr_t middle, uintptr_t* start, uintptr_t* end) override
-    {
-        if (auto* entry = GetFunctionRange(middle))
-        {
-            *start = entry->start;
-            *end   = entry->end;
-            return true;
-        }
-        *start = 0;
-        *end   = 0;
-        return false;
-    }
-
-    [[nodiscard]] void* FindStringExactEx(const char* str) override
-    {
-        return FindString(str, false, true);
-    }
+		return IntersectFunctionReferences(ref_sets);
+	}
 };
+
+enum class SegFlags : uint8_t
+{
+	UNSET = 0,
+	R = 1 << 0,
+	W = 1 << 1,
+	X = 1 << 2,
+};
+
+constexpr SegFlags operator|(SegFlags lhs, SegFlags rhs)
+{
+	using underlying = std::underlying_type_t<SegFlags>;
+	return static_cast<SegFlags> (static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
+}
+
+constexpr bool operator&(SegFlags lhs, SegFlags rhs) noexcept
+{
+	using underlying = std::underlying_type_t<SegFlags>;
+	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
+}
+
+constexpr SegFlags& operator|=(SegFlags& lhs, SegFlags rhs) noexcept
+{
+	lhs = lhs | rhs;
+	return lhs;
+}

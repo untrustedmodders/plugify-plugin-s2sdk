@@ -1,22 +1,3 @@
-/*
- * ModSharp
- * Copyright (C) 2023-2026 Kxnrl. All Rights Reserved.
- *
- * This file is part of ModSharp.
- * ModSharp is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * ModSharp is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with ModSharp. If not, see <https://www.gnu.org/licenses/>.
- */
-
 #ifdef PLATFORM_WINDOWS
 
 #    include "os.h"
@@ -43,9 +24,9 @@
 #    endif
 #    include <vcruntime.h>
 
-void CModule::GetModuleInfo(std::string_view mod)
+void CModule::GetModuleInfo(std::string_view module_name)
 {
-    HMODULE handle = GetModuleHandleA(mod.data());
+    HMODULE handle = GetModuleHandleA(module_name.data());
     if (!handle)
         return;
 
@@ -209,7 +190,7 @@ void CModule::BuildFunctionIndexAndReferences()
     // not to mention safetyhook also uses zydis and i use the encoder feature from zydis too.
     // hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
 
-    auto disassemble_chunk = [&](std::uint32_t idx, std::size_t start_idx, std::size_t end_idx) {
+    auto disassemble_chunk = [&](std::uint32_t idx, size_t start_idx, size_t end_idx) {
         ZydisDecoder decoder{};
         if (ZYAN_FAILED(ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64))) return;
 
@@ -219,7 +200,7 @@ void CModule::BuildFunctionIndexAndReferences()
         auto& local_refs = chunk_results[idx];
         local_refs.reserve((end_idx - start_idx) * 10);
 
-        for (std::size_t i = start_idx; i < end_idx; ++i)
+        for (size_t i = start_idx; i < end_idx; ++i)
         {
             const auto& entry = _function_entries[i];
             auto        start = entry.start;
@@ -276,7 +257,7 @@ void CModule::BuildFunctionIndexAndReferences()
     for (auto& t : threads) t.join();
 
     // merge results from each thread
-    std::size_t total_refs = 0;
+    size_t total_refs = 0;
     for (const auto& r : chunk_results) total_refs += r.size();
 
     _references.reserve(total_refs);
@@ -309,7 +290,7 @@ void CModule::DumpVtables()
     std::vector<uint32_t> valid_type_rvas;
     valid_type_rvas.reserve(type_info_xrefs.size());
 
-    for (auto xref : type_info_xrefs) valid_type_rvas.push_back(static_cast<uint32_t>(xref.GetPtr() - _base_address));
+    for (const auto& xref : type_info_xrefs) valid_type_rvas.push_back(static_cast<uint32_t>(xref.GetPtr() - _base_address));
 
     // sort for binary search
     std::ranges::sort(valid_type_rvas);
