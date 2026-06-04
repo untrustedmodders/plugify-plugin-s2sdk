@@ -30,13 +30,13 @@ void CModule::GetModuleInfo(std::string_view module_name)
     if (!handle)
         return;
 
-    _module_name.resize(MAX_PATH);
-    auto actual_size = GetModuleFileNameA(handle, _module_name.data(), MAX_PATH);
-    _module_name.resize(actual_size);
+    m_module_name.resize(MAX_PATH);
+    auto actual_size = GetModuleFileNameA(handle, m_module_name.data(), MAX_PATH);
+    m_module_name.resize(actual_size);
 
-    _module_name = _module_name.substr(_module_name.find_last_of('\\') + 1);
+    m_module_name = m_module_name.substr(m_module_name.find_last_of('\\') + 1);
 
-    _base_address = reinterpret_cast<uintptr_t>(handle);
+    m_base_address = reinterpret_cast<uintptr_t>(handle);
 
     const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(handle);
 
@@ -50,7 +50,7 @@ void CModule::GetModuleInfo(std::string_view module_name)
     if (ntHeader->Signature != IMAGE_NT_SIGNATURE)
         return;
 
-    _size = ntHeader->OptionalHeader.SizeOfImage;
+    m_size = ntHeader->OptionalHeader.SizeOfImage;
 
     auto section = IMAGE_FIRST_SECTION(ntHeader);
 
@@ -60,10 +60,10 @@ void CModule::GetModuleInfo(std::string_view module_name)
         const auto isReadable   = (section->Characteristics & IMAGE_SCN_MEM_READ) != 0;
         const auto isWritable   = (section->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
 
-        const auto start = _base_address + section->VirtualAddress;
+        const auto start = m_base_address + section->VirtualAddress;
         const auto size  = section->Misc.VirtualSize;
 
-        auto& segment   = _segments.emplace_back();
+        auto& segment   = m_segments.emplace_back();
         segment.address = start;
         segment.size    = size;
         if (isExecutable)
@@ -78,14 +78,14 @@ void CModule::GetModuleInfo(std::string_view module_name)
 		//segment.name    = reinterpret_cast<const char*>(section->Name);
     }
 
-    _createInterFaceFn = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
+    m_createInterface = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
 
     {
-        [[maybe_unused]] plg::Scope scope(_module_name + "::DumpVTables");
+        [[maybe_unused]] plg::Scope scope(m_module_name + "::DumpVTables");
         DumpVtables();
     }
     {
-        [[maybe_unused]] plg::Scope scope(_module_name + "::BuildFunctionIndexAndReferences");
+        [[maybe_unused]] plg::Scope scope(m_module_name + "::BuildFunctionIndexAndReferences");
         BuildFunctionIndexAndReferences();
     }
 }
@@ -93,25 +93,25 @@ void CModule::GetModuleInfo(std::string_view module_name)
 void CModule::BuildFunctionIndexAndReferences()
 {
     // from praydog https://github.com/cursey/kananlib/blob/7a99a94cea3dbcbd46b54885bd3d04f1d242e21a/src/Scan.cpp#L1329-L1344
-    const auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(_base_address);
-    const auto nt_header  = reinterpret_cast<PIMAGE_NT_HEADERS>(_base_address + dos_header->e_lfanew);
+    const auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(m_base_address);
+    const auto nt_header  = reinterpret_cast<PIMAGE_NT_HEADERS>(m_base_address + dos_header->e_lfanew);
 
     const auto directory = &nt_header->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
 
     const auto rva  = directory->VirtualAddress;
     const auto size = directory->Size;
 
-    const auto directory_ptr = reinterpret_cast<PIMAGE_RUNTIME_FUNCTION_ENTRY>(_base_address + rva);
+    const auto directory_ptr = reinterpret_cast<PIMAGE_RUNTIME_FUNCTION_ENTRY>(m_base_address + rva);
 
     const auto entries = size / sizeof(IMAGE_RUNTIME_FUNCTION_ENTRY);
 
     if (entries <= 0)
     {
-        plg::print(LS_ERROR, "No exception directory entries was found for {}\n", _module_name);
+        plg::print(LS_ERROR, "No exception directory entries was found for {}\n", m_module_name);
         return;
     }
 
-    _function_entries.reserve(entries);
+    m_function_entries.reserve(entries);
 
     // https://learn.microsoft.com/en-us/cpp/build/exception-handling-x64?view=msvc-170
     struct UNWIND_INFO
@@ -137,7 +137,7 @@ void CModule::BuildFunctionIndexAndReferences()
             // if that flag is set, meaning the next entry belongs to current entry, we should merge it
             // otherwise we treat it as a new function
             auto next_unwind_rva = directory_ptr[next_i].UnwindData;
-            auto next_unwind_ptr = reinterpret_cast<UNWIND_INFO*>(_base_address + next_unwind_rva);
+            auto next_unwind_ptr = reinterpret_cast<UNWIND_INFO*>(m_base_address + next_unwind_rva);
 
             if ((next_unwind_ptr->Flags & UNW_FLAG_CHAININFO) == 0) break;
 
@@ -146,21 +146,21 @@ void CModule::BuildFunctionIndexAndReferences()
             next_i++;
         }
 
-        _function_entries.emplace_back(
-        	_base_address + start_address,
-        	_base_address + end_address
+        m_function_entries.emplace_back(
+        	m_base_address + start_address,
+        	m_base_address + end_address
         );
 
         i = next_i;
     }
 
-    std::ranges::sort(_function_entries,
+    std::ranges::sort(m_function_entries,
                       [](const FunctionEntry& a, const FunctionEntry& b) {
                           return a.start < b.start;
                       });
 
     auto is_in_data_segment = [this](uintptr_t address) noexcept {
-        for (const auto& segment : _segments)
+        for (const auto& segment : m_segments)
         {
             if (segment.flags & SegFlags::X) continue;
             if (segment.address <= address && address < segment.address + segment.size) return true;
@@ -169,7 +169,7 @@ void CModule::BuildFunctionIndexAndReferences()
     };
 
     auto is_in_text_segment = [this](uintptr_t address) noexcept {
-        for (const auto& segment : _segments)
+        for (const auto& segment : m_segments)
         {
             if ((segment.flags & SegFlags::X) == 0) continue;
             if (segment.address <= address && address < segment.address + segment.size) return true;
@@ -178,7 +178,7 @@ void CModule::BuildFunctionIndexAndReferences()
     };
 
     const auto num_threads = std::max(1u, std::thread::hardware_concurrency());
-    const auto chunk_size  = (_function_entries.size() + num_threads - 1) / num_threads;
+    const auto chunk_size  = (m_function_entries.size() + num_threads - 1) / num_threads;
 
     std::vector<std::vector<ReferenceEntry>> chunk_results(num_threads);
     std::vector<std::thread>                 threads;
@@ -202,7 +202,7 @@ void CModule::BuildFunctionIndexAndReferences()
 
         for (size_t i = start_idx; i < end_idx; ++i)
         {
-            const auto& entry = _function_entries[i];
+            const auto& entry = m_function_entries[i];
             auto        start = entry.start;
             auto        end   = entry.end;
 
@@ -232,7 +232,7 @@ void CModule::BuildFunctionIndexAndReferences()
                     const auto& src = operands[1];
                     if (src.type == ZYDIS_OPERAND_TYPE_MEMORY && src.mem.index != ZYDIS_REGISTER_NONE && (src.mem.segment == ZYDIS_REGISTER_DS || src.mem.segment == ZYDIS_REGISTER_SS) && src.mem.scale != 0 && src.mem.disp.value > 0)
                     {
-                        auto target = src.mem.disp.value + _base_address;
+                        auto target = src.mem.disp.value + m_base_address;
 
                         if (is_in_text_segment(target)) jumptable_start_address = target;
                     }
@@ -246,9 +246,9 @@ void CModule::BuildFunctionIndexAndReferences()
     for (auto i = 0u; i < num_threads; ++i)
     {
         const auto start_idx = i * chunk_size;
-        const auto end_idx   = std::min(start_idx + chunk_size, _function_entries.size());
+        const auto end_idx   = std::min(start_idx + chunk_size, m_function_entries.size());
 
-        if (start_idx >= _function_entries.size()) break;
+        if (start_idx >= m_function_entries.size()) break;
 
         threads.emplace_back(disassemble_chunk, i, start_idx, end_idx);
     }
@@ -260,11 +260,11 @@ void CModule::BuildFunctionIndexAndReferences()
     size_t total_refs = 0;
     for (const auto& r : chunk_results) total_refs += r.size();
 
-    _references.reserve(total_refs);
+    m_references.reserve(total_refs);
 
-    for (auto& r : chunk_results) _references.insert(_references.end(), std::make_move_iterator(r.begin()), std::make_move_iterator(r.end()));
+    for (auto& r : chunk_results) m_references.insert(m_references.end(), std::make_move_iterator(r.begin()), std::make_move_iterator(r.end()));
 
-    std::ranges::sort(_references, std::less{}, &ReferenceEntry::target);
+    std::ranges::sort(m_references, std::less{}, &ReferenceEntry::target);
 }
 
 void CModule::DumpVtables()
@@ -278,26 +278,26 @@ void CModule::DumpVtables()
     auto type_descriptor_address = FindString(type_info_type_descriptor_name, false);
     if (!type_descriptor_address.IsValid())
     {
-        plg::print(LS_ERROR, "Failed to find type descriptor address for \"{}\" in module {}\n", type_info_type_descriptor_name, _module_name);
+        plg::print(LS_ERROR, "Failed to find type descriptor address for \"{}\" in module {}\n", type_info_type_descriptor_name, m_module_name);
         return;
     }
 
     auto type_info = type_descriptor_address.Offset(-0x10).Deref();
 
     const auto type_info_xrefs = FindPtrs(type_info);
-    _vtables.reserve(type_info_xrefs.size());
+    m_vtables.reserve(type_info_xrefs.size());
 
     std::vector<uint32_t> valid_type_rvas;
     valid_type_rvas.reserve(type_info_xrefs.size());
 
-    for (const auto& xref : type_info_xrefs) valid_type_rvas.push_back(static_cast<uint32_t>(xref.GetPtr() - _base_address));
+    for (const auto& xref : type_info_xrefs) valid_type_rvas.push_back(static_cast<uint32_t>(xref.GetPtr() - m_base_address));
 
     // sort for binary search
     std::ranges::sort(valid_type_rvas);
 
-    std::unordered_map<std::type_info*, VTable*> vtable_map;
+    plg::flat_hash_map<std::type_info*, VTable*> vtable_map;
 
-    for (const auto& segment : _segments)
+    for (const auto& segment : m_segments)
     {
         if (segment.flags & (SegFlags::X | SegFlags::W))
 			continue;
@@ -327,29 +327,29 @@ void CModule::DumpVtables()
             if (std::ranges::binary_search(valid_type_rvas, col->pTypeDescriptor))
             {
                 uintptr_t vtable_start = ptr + sizeof(void*);
-                auto      ti           = reinterpret_cast<std::type_info*>(_base_address + col->pTypeDescriptor);
+                auto      ti           = reinterpret_cast<std::type_info*>(m_base_address + col->pTypeDescriptor);
 
                 auto node = std::make_unique<VTable>(ti, vtable_start, ti->name(), col->offset, col);
 
                 if (col->offset == 0) vtable_map[ti] = node.get();
 
-                _vtables.push_back(std::move(node));
+                m_vtables.push_back(std::move(node));
             }
         }
     }
 
-    for (const auto& vtable : _vtables)
+    for (const auto& vtable : m_vtables)
     {
         auto locator = vtable->object_locator;
 
-        auto hierarchy_descriptor = reinterpret_cast<_s_RTTIClassHierarchyDescriptor*>(_base_address + locator->pClassDescriptor);
-        auto base_class_array     = reinterpret_cast<int32_t*>(_base_address + hierarchy_descriptor->pBaseClassArray);
+        auto hierarchy_descriptor = reinterpret_cast<_s_RTTIClassHierarchyDescriptor*>(m_base_address + locator->pClassDescriptor);
+        auto base_class_array     = reinterpret_cast<int32_t*>(m_base_address + hierarchy_descriptor->pBaseClassArray);
 
         // starts at 1 to skip the class itself
         for (uint32_t i = 1; i < hierarchy_descriptor->numBaseClasses; i++)
         {
-            auto base_class_descriptor = reinterpret_cast<_s_RTTIBaseClassDescriptor*>(_base_address + base_class_array[i]);
-            auto base_class_ti         = reinterpret_cast<std::type_info*>(_base_address + base_class_descriptor->pTypeDescriptor);
+            auto base_class_descriptor = reinterpret_cast<_s_RTTIBaseClassDescriptor*>(m_base_address + base_class_array[i]);
+            auto base_class_ti         = reinterpret_cast<std::type_info*>(m_base_address + base_class_descriptor->pTypeDescriptor);
 
             auto it = vtable_map.find(base_class_ti);
             if (it != vtable_map.end()) vtable->children.push_back(it->second);
@@ -359,7 +359,7 @@ void CModule::DumpVtables()
 
 CAddress CModule::GetFunctionByName(std::string_view proc_name) const
 {
-    return GetProcAddress(reinterpret_cast<HMODULE>(_base_address), proc_name.data());
+    return GetProcAddress(reinterpret_cast<HMODULE>(m_base_address), proc_name.data());
 }
 
 #endif

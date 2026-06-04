@@ -20,7 +20,7 @@ CModule::CModule(std::string_view str)
 
 CAddress CModule::FindPattern(std::string_view pattern) const
 {
-    for (const auto& segment : _segments)
+    for (const auto& segment : m_segments)
     {
         if ((segment.flags & SegFlags::X) == 0)
             continue;
@@ -39,7 +39,7 @@ CAddress CModule::FindPattern(std::string_view pattern) const
 
 std::vector<CAddress> CModule::FindPatternMulti(std::string_view pattern) const
 {
-	for (const auto& segment : _segments)
+	for (const auto& segment : m_segments)
 	{
 		if ((segment.flags & SegFlags::X) == 0)
 			continue;
@@ -62,7 +62,7 @@ std::vector<CAddress> CModule::FindPatternMulti(std::string_view pattern) const
 
 CAddress CModule::FindString(std::string_view str, bool read_only, bool exact) const
 {
-    for (const auto& segment : _segments)
+    for (const auto& segment : m_segments)
     {
         if ((segment.flags & SegFlags::X) != 0)
             continue;
@@ -84,7 +84,7 @@ std::vector<CAddress> CModule::FindStringMulti(std::string_view str, bool read_o
 {
 	std::vector<CAddress> results{};
 
-	for (const auto& segment : _segments)
+	for (const auto& segment : m_segments)
 	{
 		if ((segment.flags & SegFlags::X) != 0)
 			continue;
@@ -107,7 +107,7 @@ std::vector<CAddress> CModule::FindStringMulti(std::string_view str, bool read_o
 
 CAddress CModule::FindData(const uint8_t* needle, size_t needle_size, bool read_only) const
 {
-    for (const auto& segment : _segments)
+    for (const auto& segment : m_segments)
     {
         if ((segment.flags & SegFlags::X) != 0)
             continue;
@@ -129,7 +129,7 @@ std::vector<CAddress> CModule::FindDataMulti(const uint8_t* needle, size_t needl
 {
     std::vector<CAddress> results{};
 
-    for (const auto& segment : _segments)
+    for (const auto& segment : m_segments)
     {
         if ((segment.flags & SegFlags::X) != 0)
             continue;
@@ -152,7 +152,7 @@ std::vector<CAddress> CModule::FindDataMulti(const uint8_t* needle, size_t needl
 
 CAddress CModule::FindPtr(uintptr_t ptr) const
 {
-    for (const auto& segment : _segments)
+    for (const auto& segment : m_segments)
     {
         const auto flags = segment.flags;
 
@@ -173,7 +173,7 @@ std::vector<CAddress> CModule::FindPtrs(uintptr_t ptr) const
 {
     std::vector<CAddress> results{};
 
-    for (const auto& segment : _segments)
+    for (const auto& segment : m_segments)
     {
         if ((segment.flags & SegFlags::X) != 0)
             continue;
@@ -193,17 +193,17 @@ std::vector<CAddress> CModule::FindPtrs(uintptr_t ptr) const
 
 CAddress CModule::FindInterface(std::string_view name) const
 {
-	if (!_createInterFaceFn)
+	if (!m_createInterface)
 		return {};
 
-    return _createInterFaceFn(name.data(), nullptr);
+    return m_createInterface(name.data(), nullptr);
 }
 
 std::vector<CAddress> CModule::GetVFunctionsFromVTable(std::string_view vtableName) const
 {
 	{
 		std::shared_lock lock(_mutex);
-		if (auto it = _vtable_functions.find(vtableName); it != _vtable_functions.end())
+		if (auto it = m_vtable_functions.find(vtableName); it != m_vtable_functions.end())
 		{
 			return it->second;
 		}
@@ -220,7 +220,7 @@ std::vector<CAddress> CModule::GetVFunctionsFromVTable(std::string_view vtableNa
     
 	{
 		std::unique_lock lock(_mutex);
-		_vtable_functions.emplace(vtableName, funcs);
+		m_vtable_functions.emplace(vtableName, funcs);
 	}
 
     return funcs;
@@ -235,7 +235,7 @@ void CModule::LoopVFunctions(std::string_view vtable_name, const std::function<b
     uintptr_t sectionStart = 0;
     uintptr_t sectionEnd   = 0;
 
-    for (const auto& segment : _segments)
+    for (const auto& segment : m_segments)
     {
         if ((segment.flags & SegFlags::X) != 0)
         {
@@ -254,7 +254,7 @@ void CModule::LoopVFunctions(std::string_view vtable_name, const std::function<b
         if (callback(address))
             return;
 
-        vtable = vtable.Offset(sizeof(uintptr_t));
+       vtable.OffsetSelf(sizeof(uintptr_t));
     }
 }
 
@@ -265,7 +265,7 @@ CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
 {
 	{
 		std::shared_lock lock(_mutex);
-		if (const auto it = _cached_vtables.find(name); it != _cached_vtables.end())
+		if (const auto it = m_cached_vtables.find(name); it != m_cached_vtables.end())
 		{
 			return it->second;
 		}
@@ -277,7 +277,7 @@ CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
     auto vtable_name = is_raw_name ? name : std::format("{}{}", name.length(), name);
 #endif
 
-    auto it = std::ranges::find_if(_vtables, [&](const std::unique_ptr<VTable>& vtable) {
+    auto it = std::ranges::find_if(m_vtables, [&](const std::unique_ptr<VTable>& vtable) {
         // final class
         if (vtable->offset != 0)
             return false;
@@ -308,13 +308,13 @@ CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
 #endif
     });
 
-    if (it == _vtables.end()) [[unlikely]]
+    if (it == m_vtables.end()) [[unlikely]]
         plg::print(LS_ERROR, "Failed to find vtable \"{}\"", name);
 
     CAddress address = it->get()->vtable_address;
 	{
 		std::unique_lock lock(_mutex);
-		_cached_vtables.emplace(name, address);
+		m_cached_vtables.emplace(name, address);
 	}
     return address;
 }
@@ -323,7 +323,7 @@ std::vector<RunTimeVTableInfo> CModule::FindVtablePartial(std::string_view vtabl
 {
     std::vector<RunTimeVTableInfo> result{};
 
-    for (const auto& vtable : _vtables)
+    for (const auto& vtable : m_vtables)
     {
         std::string_view name = vtable->demangled_name;
         if (name.contains(vtable_name))
@@ -348,11 +348,11 @@ bool CModule::IsPointerDerivedFrom(void* ptr, std::string_view vtable_name) cons
     if (vtable_address == 0) [[unlikely]]
         return false;
 
-    auto it = std::ranges::find_if(_vtables, [vtable_address](const std::unique_ptr<VTable>& a) {
+    auto it = std::ranges::find_if(m_vtables, [vtable_address](const std::unique_ptr<VTable>& a) {
         return a->vtable_address == vtable_address;
     });
 
-    if (it == _vtables.end())
+    if (it == m_vtables.end())
         return false;
 
     auto vtable = it->get();
@@ -365,7 +365,7 @@ bool CModule::IsPointerDerivedFrom(void* ptr, std::string_view vtable_name) cons
 
 CAddress CModule::GetTypeInfoFromName(std::string_view name) const
 {
-    for (const auto& vtable : _vtables)
+    for (const auto& vtable : m_vtables)
     {
         std::string_view demangled_name = vtable->demangled_name;
 
@@ -392,9 +392,9 @@ CAddress CModule::GetTypeInfoFromName(std::string_view name) const
 
 uintptr_t CModule::GetFunctionEntry(uintptr_t middle) const
 {
-    auto it = std::ranges::upper_bound(_function_entries, middle, {}, &FunctionEntry::start);
+    auto it = std::ranges::upper_bound(m_function_entries, middle, {}, &FunctionEntry::start);
 
-    if (it == _function_entries.begin())
+    if (it == m_function_entries.begin())
     {
         return {};
     }
@@ -446,7 +446,6 @@ std::vector<CAddress> CModule::IntersectFunctionReferences(std::vector<std::span
         auto next_funcs = get_unique_funcs(reference_sets[i]);
         std::vector<CAddress> intersection;
         intersection.reserve(std::min(candidates.size(), next_funcs.size()));
-
         std::ranges::set_intersection(candidates, next_funcs, std::back_inserter(intersection));
         std::swap(candidates, intersection);
     }
@@ -456,7 +455,7 @@ std::vector<CAddress> CModule::IntersectFunctionReferences(std::vector<std::span
 
 std::span<const CModule::ReferenceEntry> CModule::GetReferenceRange(uintptr_t address) const
 {
-    auto subrange = std::ranges::equal_range(_references, address, std::less{}, &ReferenceEntry::target);
+    auto subrange = std::ranges::equal_range(m_references, address, std::less{}, &ReferenceEntry::target);
 
     if (subrange.empty())
         return {};
@@ -484,7 +483,7 @@ Result<CAddress> CModule::FindFunctionFromStringRefs(std::span<const std::string
 
         for (size_t i = 0; i < matches->size(); i++)
         {
-            std::format_to(std::back_inserter(error), "\n#{} {}+0x{:x}", i, _module_name, matches->at(i) - _base_address);
+            std::format_to(std::back_inserter(error), "\n#{} {}+0x{:x}", i, m_module_name, matches->at(i) - m_base_address);
         }
 
         return MakeError(std::move(error));

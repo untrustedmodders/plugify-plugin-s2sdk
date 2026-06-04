@@ -10,7 +10,6 @@
 #    include <cstring>
 #    include <memory>
 #    include <ranges>
-#    include <unordered_set>
 
 void CModule::GetModuleInfo(std::string_view module_name)
 {
@@ -20,15 +19,15 @@ void CModule::GetModuleInfo(std::string_view module_name)
 		if (!name.contains(module_name))
 			return 0;
 
-		_base_address = info.dlpi_addr;
-		_module_name  = name.substr(name.find_last_of('/') + 1);
+		m_base_address = info.dlpi_addr;
+		m_module_name  = name.substr(name.find_last_of('/') + 1);
 
 		uintptr_t min_vaddr = std::numeric_limits<uintptr_t>::max();
 		uintptr_t max_vaddr = 0;
 
 		for (auto i = 0; i < info.dlpi_phnum; i++)
 		{
-			const auto address = _base_address + info.dlpi_phdr[i].p_paddr;
+			const auto address = m_base_address + info.dlpi_phdr[i].p_paddr;
 			const auto size               = static_cast<uintptr_t>(info.dlpi_phdr[i].p_memsz);
 			const auto type      = info.dlpi_phdr[i].p_type;
 			const auto is_dynamic_section = type == PT_DYNAMIC;
@@ -53,7 +52,7 @@ void CModule::GetModuleInfo(std::string_view module_name)
 
 			auto* data = reinterpret_cast<std::uint8_t*>(address);
 
-			auto& segment = _segments.emplace_back();
+			auto& segment = m_segments.emplace_back();
 
 			segment.address = address;
 			segment.data    = std::vector(data, data + size);
@@ -70,16 +69,16 @@ void CModule::GetModuleInfo(std::string_view module_name)
 				segment.flags |= SegFlags::W;
 		}
 
-		_size = max_vaddr - min_vaddr;
+		m_size = max_vaddr - min_vaddr;
 
-		_createInterFaceFn = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
+		m_createInterface = GetFunctionByName("CreateInterface").As<CreateInterfaceFn>();
 
 		{
-			[[maybe_unused]] plg::Scope scope(_module_name + "::DumpVTables");
+			[[maybe_unused]] plg::Scope scope(m_module_name + "::DumpVTables");
 			DumpVtables();
 		}
 		{
-			[[maybe_unused]] plg::Scope scope(_module_name + "::BuildFunctionIndexAndReferences");
+			[[maybe_unused]] plg::Scope scope(m_module_name + "::BuildFunctionIndexAndReferences");
 			BuildFunctionIndexAndReferences();
 		}
 		return 1;
@@ -109,7 +108,7 @@ void CModule::GetModuleInfo(std::string_view module_name)
 
 void CModule::DumpExports(void* module_base)
 {
-    auto dyn = reinterpret_cast<ElfW(Dyn)*>(module_base);
+    auto dyn = static_cast<ElfW(Dyn)*>(module_base);
     // thanks to https://stackoverflow.com/a/57099317
     auto GetNumberOfSymbolsFromGnuHash = [](ElfW(Addr) gnuHashAddress) {
         // See https://flapenguin.me/2017/05/10/elf-lookup-dt-gnu-hash/ and
@@ -207,7 +206,7 @@ void CModule::DumpExports(void* module_base)
             continue;
         }
 
-        auto             address = symbol.st_value + _base_address;
+        auto             address = symbol.st_value + m_base_address;
         std::string_view name    = &string_table[symbol.st_name];
 
         _exports.emplace(name, address);
@@ -233,7 +232,7 @@ static std::string demangle(const char* mangled_name)
     return status == 0 ? std::string(demangled_ptr.get()) : mangled_name;
 }
 
-std::vector<RunTimeTypeInfo> CModule::GetRuntimeTypeInfos() const
+std::vector<CModule::RunTimeTypeInfo> CModule::GetRuntimeTypeInfos() const
 {
 	std::vector<RunTimeTypeInfo> runtime_typeinfos;
 
@@ -276,7 +275,7 @@ std::vector<RunTimeTypeInfo> CModule::GetRuntimeTypeInfos() const
 	return runtime_typeinfos;
 }
 
-std::vector<TypeInfo> CModule::GetTypeInfos(std::span<const RunTimeTypeInfo> runtime_typeinfos) const
+std::vector<CModule::TypeInfo> CModule::GetTypeInfos(std::span<const RunTimeTypeInfo> runtime_typeinfos) const
 {
 	std::vector<TypeInfo> known_typeinfos;
 
@@ -323,12 +322,12 @@ void CModule::DumpVtables()
     const auto min_ti_addr = known_typeinfos.front().address();
     const auto max_ti_addr = known_typeinfos.back().address();
 
-    std::unordered_map<const std::type_info*, VTable*> ti_to_vtable_map;
+    plg::flat_hash_map<const std::type_info*, VTable*> ti_to_vtable_map;
     ti_to_vtable_map.reserve(known_typeinfos.size() / 2);
-    _vtables.reserve(known_typeinfos.size());
+    m_vtables.reserve(known_typeinfos.size());
 
     // bruteforcing vtable
-    for (const auto& segment : _segments)
+    for (const auto& segment : m_segments)
     {
         if (segment.flags & SegFlags::X)
             continue;
@@ -365,14 +364,14 @@ void CModule::DumpVtables()
             if (offset == 0) [[likely]]
                 ti_to_vtable_map[type_info] = vtable.get();
 
-            _vtables.push_back(std::move(vtable));
+            m_vtables.push_back(std::move(vtable));
         }
     }
 
     std::vector<const std::type_info*>        worklist;
-    std::unordered_set<const std::type_info*> visited;
+    plg::flat_hash_set<const std::type_info*> visited;
 
-    for (const auto& vtable_ptr : _vtables)
+    for (const auto& vtable_ptr : m_vtables)
     {
         VTable* start_node = vtable_ptr.get();
 
@@ -433,12 +432,12 @@ void CModule::BuildFunctionIndexAndReferences()
     uintptr_t exec_start{}, exec_end{}, exec_size{};
 
     std::vector<const Segment*> data_sections;
-    data_sections.reserve(_segments.size());
+    data_sections.reserve(m_segments.size());
 
     uintptr_t min_data_addr = std::numeric_limits<uintptr_t>::max();
     uintptr_t max_data_addr = 0;
 
-    for (const auto& seg : _segments)
+    for (const auto& seg : m_segments)
     {
         if (seg.flags & SegFlags::X)
         {
@@ -660,7 +659,7 @@ void CModule::BuildFunctionIndexAndReferences()
     seen_functions.erase(first, last);
 
     // phase3: build function boundary
-    _function_entries.reserve(seen_functions.size());
+    m_function_entries.reserve(seen_functions.size());
 
     auto       pad_it  = padding_addrs.begin();
     const auto pad_end = padding_addrs.end();
@@ -681,17 +680,17 @@ void CModule::BuildFunctionIndexAndReferences()
             end = *pad_it;
 
         if (start < end) [[likely]]
-            _function_entries.emplace_back(start, end);
+            m_function_entries.emplace_back(start, end);
     }
 
-    if (_function_entries.empty()) [[unlikely]]
+    if (m_function_entries.empty()) [[unlikely]]
         return;
 
     // phase4: build reference map
-    _references.reserve(temp_refs.size());
+    m_references.reserve(temp_refs.size());
 
-    auto       func_it     = _function_entries.begin();
-    const auto func_end_it = _function_entries.end();
+    auto       func_it     = m_function_entries.begin();
+    const auto func_end_it = m_function_entries.end();
 
     for (const auto& ref : temp_refs)
     {
@@ -704,9 +703,9 @@ void CModule::BuildFunctionIndexAndReferences()
             break;
 
         if (source_ip >= func_it->start)
-            _references.push_back(ref);
+            m_references.push_back(ref);
     }
 
-    std::ranges::sort(_references, std::less{}, &ReferenceEntry::target);
+    std::ranges::sort(m_references, std::less{}, &ReferenceEntry::target);
 }
 #endif

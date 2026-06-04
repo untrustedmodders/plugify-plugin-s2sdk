@@ -4,7 +4,6 @@
 #include <functional>
 #include <span>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "interface.h"
@@ -54,20 +53,20 @@ class CModule final
         uintptr_t end{};
     };
 
-    std::vector<Segment> _segments{};
-    uintptr_t            _base_address{};
-    size_t                _size{};
-    std::string          _module_name{};
-    CreateInterfaceFn    _createInterFaceFn;
+    std::vector<Segment> m_segments{};
+    uintptr_t            m_base_address{};
+    size_t               m_size{};
+    std::string          m_module_name{};
+    CreateInterfaceFn    m_createInterface;
 
-    mutable plg::flat_hash_map<std::string, CAddress, plg::string_hash, std::equal_to<>>              _cached_vtables{};
-    mutable plg::flat_hash_map<std::string, std::vector<CAddress>, plg::string_hash, std::equal_to<>> _vtable_functions{};
+    mutable plg::flat_hash_map<std::string, CAddress, plg::string_hash, std::equal_to<>>              m_cached_vtables{};
+    mutable plg::flat_hash_map<std::string, std::vector<CAddress>, plg::string_hash, std::equal_to<>> m_vtable_functions{};
 	mutable std::shared_mutex _mutex;
 
     void GetModuleInfo(std::string_view module_name);
 
-    std::vector<FunctionEntry>  _function_entries{};
-    std::vector<ReferenceEntry> _references{};
+    std::vector<FunctionEntry>  m_function_entries{};
+    std::vector<ReferenceEntry> m_references{};
 
     void BuildFunctionIndexAndReferences();
 
@@ -92,7 +91,7 @@ class CModule final
 	};
 
     void DumpVtables();
-    std::vector<std::unique_ptr<VTable>> _vtables{};
+    std::vector<std::unique_ptr<VTable>> m_vtables{};
 
 #ifndef PLATFORM_WINDOWS
 	struct RunTimeTypeInfo
@@ -117,7 +116,7 @@ class CModule final
 	std::vector<RunTimeTypeInfo> GetRuntimeTypeInfos() const;
 	std::vector<TypeInfo> GetTypeInfos(std::span<const RunTimeTypeInfo> runtime_typeinfos) const;
 
-    std::flat_hash_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>> _exports{};
+    plg::flat_hash_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>> _exports{};
     void DumpExports(void* module_base);
 #endif
 
@@ -139,17 +138,17 @@ public:
     // get base address of a module
     [[nodiscard]] uintptr_t Base() const
     {
-        return _base_address;
+        return m_base_address;
     }
 
     [[nodiscard]] std::string_view ModuleName() const
     {
-        return _module_name;
+        return m_module_name;
     }
 
 	[[nodiscard]] bool IsValid() const
 	{
-	    return _base_address != 0;
+	    return m_base_address != 0;
     }
 
     [[nodiscard]] CAddress              FindPattern(std::string_view pattern) const;
@@ -217,32 +216,30 @@ public:
 		}
 
 		std::vector<std::span<const ReferenceEntry>> ref_sets;
+		ref_sets.reserve(items.size());
 
 		for (const auto& item : items)
 		{
-			auto addrs = getter(item);
+			auto addr = getter(item);
 
-			if (!addrs)
+			if (!addr)
 			{
-				return MakeError(std::move(addrs.error()));
+				return MakeError(std::move(addr.error()));
 			}
 
-			for (const auto& addr : *addrs)
+			if (!addr->IsValid())
 			{
-				if (!addr.IsValid())
-				{
-					return MakeError("Reference \"{}\" not found.", formatter(item));
-				}
-
-				auto range = GetReferenceRange(*addr);
-
-				if (range.empty())
-				{
-					return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), addr.GetPtr());
-				}
-
-				ref_sets.push_back(range);
+				return MakeError("Reference \"{}\" not found.", formatter(item));
 			}
+
+			auto range = GetReferenceRange(*addr);
+
+			if (range.empty())
+			{
+				return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), addr->GetPtr());
+			}
+
+			ref_sets.push_back(range);
 		}
 
 		return IntersectFunctionReferences(ref_sets);

@@ -143,16 +143,16 @@
         "library": "vscript",
         "win64": "BE ? ? ? ? 2B D6",
         "linuxsteamrt64": "83 FE 01 0F 84 ? ? ? ? 83 FE 02 0F 85 ? ? ? ? BF ? ? ? ? E8"
-      },
+      }
       // String: "Player.Swim" and "player_jump"
       // patching 42C80000h
       // mov     dword ptr [rsi+40h], 42C80000h
       // jmp     short loc_18072BE63
-      "CheckJumpButtonWater": {
+      /*"CheckJumpButtonWater": {
         "library": "server",
         "win64": "C8 42 EB ? 4C 8B 77 ? 4D 39 66",
         "linuxsteamrt64": "C8 42 41 C7 85 ? ? ? ? 00 00 00 00 41 C7 85 ? ? ? ? 00 00 00 00 E9"
-      },
+      },*/
       // "Error - cannot add bots after game is over.\n"
       // patching jz
       // 48 83 EC 30             sub     rsp, 30h
@@ -162,11 +162,11 @@
       // 8B EA                   mov     ebp, edx
       // 48 85 C0                test    rax, rax
       // 0F 84 61 04 00 00       jz      loc_180213085
-      "BotNavIgnore": {
+      /*"BotNavIgnore": {
         "library": "server",
         "win64": "0F 84 ? ? ? ? 80 B8 ? ? ? ? 00 0F 84 ? ? ? ? 80 3D ? ? ? ? 00 74 15",
         "linuxsteamrt64": "0F 84 ? ? ? ? 44 0F B6 B8 ? ? ? ? 45 84 FF 0F 84"
-      },
+      },*/
       // Function after function where "FullWalkMovePreMove" passed
       // patching jbe
       // 45 0F C6 C0 55          shufps  xmm8, xmm8, 55h ; 'U'
@@ -180,17 +180,17 @@
       // F3 0F 58 CA             addss   xmm1, xmm2
       // 0F 2F C8                comiss  xmm1, xmm0
       // 0F 86 B0 00 00 00       jbe     loc_18074A7E5
-      "ServerMovementUnlock": {
+      /*"ServerMovementUnlock": {
         "library": "server",
         "win64": "0F 86 ? ? ? ? 0F 57 C0 0F 2E C2",
         "linuxsteamrt64": "0F 87 ? ? ? ? F3 0F 12 C2"
-      },
+      },*/
       // "Tried to set the source soundscape on positionless sound event %s\n" where 763651247
-      "EmitSoundVolume": {
+      /*"EmitSoundVolume": {
         "library": "server",
         "win64": "41 B9 ? ? ? ? 48 89 5C 24 ? 49 8B D5",
         "linuxsteamrt64": "E8 ? ? ? ? F3 0F 6F 03 48 83 EC ? 45 31 C9 89 C2 45 31 C0 4C 89 FE 0F 11 04 24 8B 43 ? 4C 89 E7"
-      }
+      }*/
     },
     "Offsets": {
       // Game entity system virtual table offset

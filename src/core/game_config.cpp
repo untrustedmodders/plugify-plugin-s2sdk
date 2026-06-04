@@ -274,11 +274,11 @@ Result<SignatureData> ConfigLoader::ParseSignatureConfig(configs::Config& config
 		return MakeError("No signature for " S2SDK_PLATFORM ": {}", sig.name);
 	}
 
-	bool onlyVtable = std::ranges::all_of(sig.refs, [](const ReferenceInfo& ref) {
+	bool onlyVtable = !sig.refs.empty() && std::ranges::all_of(sig.refs, [](const ReferenceInfo& ref) {
 		return ref.type == ReferenceInfo::Type::VTable;
 	});
 	if (onlyVtable) {
-		return MakeError();
+		return MakeError("No other references except vtables, add strings or cvars!");
 	}
 
 	// Determine type
@@ -1171,7 +1171,9 @@ Result<ResolvedSignature> SignatureResolver::Resolve(
 		ResolveSymbol(module, signature.value) :
 		ResolvePattern(module, signature.value);
 
-	if (!addrResult) addrResult = ResolveReferences(module, signature.refs);
+	if (!addrResult && !signature.refs.empty()) {
+		addrResult = ResolveReferences(module, signature.refs);
+	}
 
 	if (!addrResult) {
 		return MakeError(std::move(addrResult.error()));
@@ -1231,13 +1233,15 @@ Result<Memory> SignatureResolver::ResolveReferences(
 	const std::shared_ptr<Module>& module,
 	std::span<const ReferenceInfo> refs
 ) const {
-	auto result = module->FindFunctionFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<std::vector<CAddress>> {
+	bool vtable = false;
+	auto result = module->FindAllFunctionsFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<Memory> {
 		switch (ref.type) {
 			case ReferenceInfo::Type::String:
-				return module->FindStringMulti(ref.name, false, true);
+				return module->FindString(ref.name, false, true);
 
 			case ReferenceInfo::Type::VTable:
-				return module->GetVFunctionsFromVTable(ref.name);
+				vtable = true;
+				return {};
 
 			case ReferenceInfo::Type::CVar: {
 				auto conVarRef = g_pCVar->FindConVar(ref.name.data());
@@ -1248,59 +1252,57 @@ Result<Memory> SignatureResolver::ResolveReferences(
 				if (!conVarData) {
 					return MakeError("ConVarData not found: {}", ref.name);
 				}
-				return module->FindPtrs(reinterpret_cast<uintptr_t>(conVarData));
+				return module->FindPtr(reinterpret_cast<uintptr_t>(conVarData));
 			}
 			default:
 				return MakeError("Invalid reference type");
 		}
 	}, [&](const ReferenceInfo& ref) -> std::string_view { return ref.name; });
 
-	/*if (!result)
-	{
+	if (!result) {
 		return MakeError(std::move(result.error()));
 	}
 
-	if (result->empty())
-	{
+	if (result->empty()) {
 		return MakeError("No function found matching provided references.");
 	}
 
-	if (result->size() > 1)
-	{
-		auto singleCommon = [](std::span<const std::vector<CAddress>> vecs) -> Result<Memory> {
-			if (vecs.empty())
-				return MakeError("No function found matching provided references.");
+	if (result->size() > 1) {
+		if (vtable) {
+			std::vector<std::vector<CAddress>> funcs;
+			funcs.push_back(std::move(*result));
 
-			std::vector<CAddress> candidates = std::move(vecs.front());
+			for (const auto& [type, name] : refs) {
+				if (type == ReferenceInfo::Type::VTable) {
+					funcs.push_back(module->GetVFunctionsFromVTable(name));
+				}
+			}
 
-			for (const auto& next_funcs : vecs | std::views::drop(1)) {
+			std::vector<CAddress> candidates = std::move(funcs[0]);
+
+			for (size_t i = 1; i < funcs.size(); ++i) {
+				const auto& next_funcs = funcs[i];
 				std::vector<CAddress> intersection;
 				intersection.reserve(std::min(candidates.size(), next_funcs.size()));
 				std::ranges::set_intersection(candidates, next_funcs, std::back_inserter(intersection));
 				std::swap(candidates, intersection);
 			}
 
-			if (candidates.empty())
+			if (candidates.empty()) {
 				return MakeError("No function found matching provided references.");
-			if (candidates.size() > 1)
+			}
+
+			if (candidates.size() > 1) {
 				return MakeError("Ambiguous: {} functions match provided references.", candidates.size());
+			}
 
 			return candidates.front();
-		};
-
-		std::vector<std::vector<CAddress>> funcs;
-		funcs.push_back(std::move(*result));
-
-		for (const auto& [type, name] : refs) {
-			if (type == ReferenceInfo::Type::VTable) {
-				funcs.push_back(module->GetVFunctionsFromVTable(name));
-			}
 		}
 
-		return singleCommon(funcs);
-	}*/
+		return MakeError("Ambiguous: {} functions match provided references.", result->size());
+	}
 
-	return result;
+	return result->front();
 }
 
 Result<ResolvedAddress> AddressResolver::Resolve(
