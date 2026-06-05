@@ -216,30 +216,33 @@ public:
 		}
 
 		std::vector<std::span<const ReferenceEntry>> ref_sets;
-		ref_sets.reserve(items.size());
+		ref_sets.reserve(std::size(items));
 
 		for (const auto& item : items)
 		{
-			auto addr = getter(item);
+			auto addrs = getter(item);
 
-			if (!addr)
+			if (!addrs)
 			{
-				return MakeError(std::move(addr.error()));
+				return MakeError(std::move(addrs.error()));
 			}
 
-			if (!addr->IsValid())
+			for (const auto& addr : *addrs)
 			{
-				return MakeError("Reference \"{}\" not found.", formatter(item));
+				if (!addr.IsValid())
+				{
+					return MakeError("Reference \"{}\" not found.", formatter(item));
+				}
+
+				auto range = GetReferenceRange(addr);
+
+				if (range.empty())
+				{
+					return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), addr.GetPtr());
+				}
+
+				ref_sets.push_back(range);
 			}
-
-			auto range = GetReferenceRange(*addr);
-
-			if (range.empty())
-			{
-				return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), addr->GetPtr());
-			}
-
-			ref_sets.push_back(range);
 		}
 
 		return IntersectFunctionReferences(ref_sets);

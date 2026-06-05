@@ -1193,17 +1193,17 @@ Result<Memory> SignatureResolver::ResolveReferences(
 	std::span<const ReferenceInfo> refs
 ) const {
 	bool vtable = false;
-	auto result = module.FindAllFunctionsFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<Memory> {
+	auto result = module.FindAllFunctionsFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<std::vector<Memory>> {
 		switch (ref.type) {
 			case ReferenceInfo::Type::String:
-				return module.FindString(ref.name, false, true);
+				return module.FindStringMulti(ref.name, false, true);
 
 			case ReferenceInfo::Type::VTable:
 				vtable = true;
 				return {};
 
 			case ReferenceInfo::Type::CVar: {
-				auto conVarRef = g_pCVar->FindConVar(ref.name.data());
+				auto conVarRef = g_pCVar->FindConVar(ref.name.data(), true);
 				if (!conVarRef.IsValidRef()) {
 					return MakeError("ConVarRef not found: {}", ref.name);
 				}
@@ -1211,7 +1211,7 @@ Result<Memory> SignatureResolver::ResolveReferences(
 				if (!conVarData) {
 					return MakeError("ConVarData not found: {}", ref.name);
 				}
-				return module.FindPtr(reinterpret_cast<uintptr_t>(conVarData));
+				return module.FindPtrs(reinterpret_cast<uintptr_t>(conVarData));
 			}
 			default:
 				return MakeError("Invalid reference type");
