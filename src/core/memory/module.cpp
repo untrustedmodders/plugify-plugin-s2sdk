@@ -29,8 +29,7 @@ CAddress CModule::FindPattern(std::string_view pattern) const
 
         if (auto result = scan::FindPattern(data.data(), data.size(), pattern))
         {
-            if (result > 0)
-                return segment.address + result;
+            return segment.address + result;
         }
     }
 
@@ -72,8 +71,7 @@ CAddress CModule::FindString(std::string_view str, bool read_only, bool exact) c
 
         if (auto result = scan::FindStr(reinterpret_cast<uint8_t*>(segment.address), segment.size, str, true, exact))
         {
-            if (result > 0)
-                return segment.address + result;
+            return segment.address + result;
         }
     }
 
@@ -117,8 +115,7 @@ CAddress CModule::FindData(const uint8_t* needle, size_t needle_size, bool read_
 
         if (auto result = scan::FindData(reinterpret_cast<uint8_t*>(segment.address), segment.size, needle, needle_size))
         {
-            if (result > 0)
-                return segment.address + result;
+            return segment.address + result;
         }
     }
 
@@ -161,8 +158,7 @@ CAddress CModule::FindPtr(uintptr_t ptr) const
 
     	if (auto result = scan::FindPtr(segment.address, segment.size, ptr))
     	{
-    		if (result > 0)
-    			return segment.address + result;
+    		return segment.address + result;
     	}
     }
 
