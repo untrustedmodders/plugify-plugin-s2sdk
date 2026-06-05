@@ -220,29 +220,26 @@ public:
 
 		for (const auto& item : items)
 		{
-			auto addrs = getter(item);
+			auto addr = getter(item);
 
-			if (!addrs)
+			if (!addr)
 			{
-				return MakeError(std::move(addrs.error()));
+				return MakeError(std::move(addr.error()));
 			}
 
-			for (const auto& addr : *addrs)
+			if (!addr->IsValid())
 			{
-				if (!addr.IsValid())
-				{
-					return MakeError("Reference \"{}\" not found.", formatter(item));
-				}
-
-				auto range = GetReferenceRange(addr);
-
-				if (range.empty())
-				{
-					return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), addr.GetPtr());
-				}
-
-				ref_sets.push_back(range);
+				return MakeError("Reference \"{}\" not found.", formatter(item));
 			}
+
+			auto range = GetReferenceRange(*addr);
+
+			if (range.empty())
+			{
+				return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), addr->GetPtr());
+			}
+
+			ref_sets.push_back(range);
 		}
 
 		return IntersectFunctionReferences(ref_sets);
