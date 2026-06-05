@@ -1166,7 +1166,6 @@ Result<Memory> SignatureResolver::ResolvePattern(
 		return MakeError("Pattern not found: {}", pattern);
 	}
 
-	// Identical thunks (e.g. CNetMessage::AsProto) may match multiple times — first is fine.
 	return result.front();
 }
 
