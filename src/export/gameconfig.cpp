@@ -160,6 +160,9 @@ extern "C" PLUGIN_API plg::string GetGameConfigPatchAll(const plg::string& name)
 	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
 		if (auto patch = gameConfig->GetPatch(name)) {
 			return *patch;
+		} else {
+			plg::print(LS_WARNING, "Could not find patch: {} - {}\n", name, patch.error());
+			return {};
 		}
 	}
 	plg::print(LS_WARNING, "Could not find patch: {} in any loaded config\n", name);
@@ -179,6 +182,9 @@ extern "C" PLUGIN_API int GetGameConfigOffsetAll(const plg::string& name) {
 	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
 		if (auto offset = gameConfig->GetOffset(name)) {
 			return *offset;
+		} else {
+			plg::print(LS_WARNING, "Could not find offset: {} - {}\n", name, offset.error());
+			return -1;
 		}
 	}
 	plg::print(LS_WARNING, "Could not find offset: {} in any loaded config\n", name);
@@ -198,6 +204,9 @@ extern "C" PLUGIN_API void* GetGameConfigAddressAll(const plg::string& name) {
 	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
 		if (auto address = gameConfig->GetAddress(name)) {
 			return *address;
+		} else {
+			plg::print(LS_WARNING, "Could not find address: {} - {}\n", name, address.error());
+			return nullptr;
 		}
 	}
 	plg::print(LS_WARNING, "Could not find address: {} in any loaded config\n", name);
@@ -217,6 +226,9 @@ extern "C" PLUGIN_API void* GetGameConfigVTableAll(const plg::string& name) {
 	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
 		if (auto vtable = gameConfig->GetVTable(name)) {
 			return *vtable;
+		} else {
+			plg::print(LS_WARNING, "Could not vtable: {} - {}\n", name, vtable.error());
+			return nullptr;
 		}
 	}
 	plg::print(LS_WARNING, "Could not find vtable: {} in any loaded config\n", name);
@@ -236,6 +248,9 @@ extern "C" PLUGIN_API void* GetGameConfigSignatureAll(const plg::string& name) {
 	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
 		if (auto signature = gameConfig->GetSignature(name)) {
 			return *signature;
+		} else {
+			plg::print(LS_WARNING, "Could not find signature: {} - {}\n", name, signature.error());
+			return nullptr;
 		}
 	}
 	plg::print(LS_WARNING, "Could not find signature: {} in any loaded config\n", name);
