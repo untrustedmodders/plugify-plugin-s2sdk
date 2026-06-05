@@ -1192,18 +1192,36 @@ Result<Memory> SignatureResolver::ResolveReferences(
 	const Module& module,
 	std::span<const ReferenceInfo> refs
 ) const {
+	if (refs.empty()) {
+		return MakeError("No references provided to search for.");
+	}
+
 	bool vtable = false;
-	auto result = module.FindAllFunctionsFromRefs(refs, [&](const ReferenceInfo& ref) -> Result<Memory> {
+	std::vector<std::vector<CAddress>> allCandidates;
+
+	for (const auto& ref : refs) {
+		if (ref.type == ReferenceInfo::Type::VTable) {
+			vtable = true;
+			continue;
+		}
+
+		std::vector<CAddress> opts;
+
 		switch (ref.type) {
 			case ReferenceInfo::Type::String:
-				return module.FindString(ref.name, false, true);
-
-			case ReferenceInfo::Type::VTable:
-				vtable = true;
-				return {};
+				// Common strings (e.g. "default") appear many times — pick by intersection, not first match.
+				for (const auto loc : module.FindStringMulti(ref.name, false, true)) {
+					if (!module.GetReferenceRange(loc.GetPtr()).empty()) {
+						opts.push_back(loc);
+					}
+				}
+				if (opts.empty()) {
+					return MakeError("String \"{}\" has no code references", ref.name);
+				}
+				break;
 
 			case ReferenceInfo::Type::CVar: {
-				auto conVarRef = g_pCVar->FindConVar(ref.name.data());
+				auto conVarRef = g_pCVar->FindConVar(ref.name.data(), true);
 				if (!conVarRef.IsValidRef()) {
 					return MakeError("ConVarRef not found: {}", ref.name);
 				}
@@ -1216,52 +1234,85 @@ Result<Memory> SignatureResolver::ResolveReferences(
 			default:
 				return MakeError("Invalid reference type");
 		}
-	}, [&](const ReferenceInfo& ref) -> std::string_view { return ref.name; });
 
-	if (!result) {
-		return MakeError(std::move(result.error()));
+		allCandidates.push_back(std::move(opts));
 	}
 
-	if (result->empty()) {
+	if (allCandidates.empty()) {
 		return MakeError("No function found matching provided references.");
 	}
 
-	if (result->size() > 1) {
-		if (vtable) {
-			std::vector<std::vector<CAddress>> funcs;
-			funcs.push_back(std::move(*result));
+	std::vector<size_t> indices(allCandidates.size(), 0);
+	std::optional<CAddress> uniqueMatch;
+	using RefSpan = decltype(std::declval<const Module&>().GetReferenceRange(0));
 
-			for (const auto& [type, name] : refs) {
-				if (type == ReferenceInfo::Type::VTable) {
-					funcs.push_back(module.GetVFunctionsFromVTable(name));
+	for (;;) {
+		std::vector<RefSpan> ref_sets;
+		ref_sets.reserve(allCandidates.size());
+
+		for (size_t i = 0; i < allCandidates.size(); ++i) {
+			auto range = module.GetReferenceRange(allCandidates[i][indices[i]].GetPtr());
+			if (range.empty()) {
+				ref_sets.clear();
+				break;
+			}
+			ref_sets.push_back(range);
+		}
+
+		if (ref_sets.size() == allCandidates.size()) {
+			auto matches = module.IntersectFunctionReferences(ref_sets);
+			if (matches.size() == 1) {
+				if (!uniqueMatch) {
+					uniqueMatch = matches.front();
+				} else if (*uniqueMatch != matches.front()) {
+					return MakeError("Ambiguous: {} functions match provided references.", 2);
 				}
 			}
+		}
 
-			std::vector<CAddress> candidates = std::move(funcs[0]);
+		size_t carry = allCandidates.size();
+		while (carry > 0) {
+			--carry;
+			if (++indices[carry] < allCandidates[carry].size()) {
+				break;
+			}
+			indices[carry] = 0;
+			if (carry == 0) {
+				goto done;
+			}
+		}
+	}
+done:
 
-			for (size_t i = 1; i < funcs.size(); ++i) {
-				const auto& next_funcs = funcs[i];
+	if (!uniqueMatch) {
+		return MakeError("No function found matching provided references.");
+	}
+
+	if (vtable) {
+		std::vector<CAddress> candidates = { *uniqueMatch };
+
+		for (const auto& [type, name] : refs) {
+			if (type == ReferenceInfo::Type::VTable) {
+				auto next_funcs = module.GetVFunctionsFromVTable(name);
 				std::vector<CAddress> intersection;
 				intersection.reserve(std::min(candidates.size(), next_funcs.size()));
 				std::ranges::set_intersection(candidates, next_funcs, std::back_inserter(intersection));
 				std::swap(candidates, intersection);
 			}
-
-			if (candidates.empty()) {
-				return MakeError("No function found matching provided references.");
-			}
-
-			if (candidates.size() > 1) {
-				return MakeError("Ambiguous: {} functions match provided references.", candidates.size());
-			}
-
-			return candidates.front();
 		}
 
-		return MakeError("Ambiguous: {} functions match provided references.", result->size());
+		if (candidates.empty()) {
+			return MakeError("No function found matching provided references.");
+		}
+
+		if (candidates.size() > 1) {
+			return MakeError("Ambiguous: {} functions match provided references.", candidates.size());
+		}
+
+		return candidates.front();
 	}
 
-	return result->front();
+	return *uniqueMatch;
 }
 
 Result<ResolvedAddress> AddressResolver::Resolve(
