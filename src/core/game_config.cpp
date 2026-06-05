@@ -1211,7 +1211,7 @@ Result<Memory> SignatureResolver::ResolveReferences(
 				if (!conVarData) {
 					return MakeError("ConVarData not found: {}", ref.name);
 				}
-				return module.FindPtr(reinterpret_cast<uintptr_t>(conVarData));
+				return module.FindPtr(reinterpret_cast<uintptr_t>(conVarData)) - sizeof(ConVarRef);
 			}
 			default:
 				return MakeError("Invalid reference type");
