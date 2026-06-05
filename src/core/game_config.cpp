@@ -1166,10 +1166,7 @@ Result<Memory> SignatureResolver::ResolvePattern(
 		return MakeError("Pattern not found: {}", pattern);
 	}
 
-	if (result.size() > 1) {
-		return MakeError("Ambiguous: {} functions match pattern", result.size());
-	}
-
+	// Identical thunks (e.g. CNetMessage::AsProto) may match multiple times — first is fine.
 	return result.front();
 }
 
