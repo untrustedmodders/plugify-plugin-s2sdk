@@ -1211,21 +1211,34 @@ Result<Memory> SignatureResolver::ResolveReferences(
 						opts.push_back(loc);
 					}
 				}
+
 				if (opts.empty()) {
 					return MakeError("String \"{}\" has no code references", ref.name);
 				}
-				break;
 
+				break;
 			case ReferenceInfo::Type::CVar: {
 				auto conVarRef = g_pCVar->FindConVar(ref.name.data(), true);
 				if (!conVarRef.IsValidRef()) {
 					return MakeError("ConVarRef not found: {}", ref.name);
 				}
+
 				auto conVarData = g_pCVar->GetConVarData(conVarRef);
 				if (!conVarData) {
 					return MakeError("ConVarData not found: {}", ref.name);
 				}
-				return module.FindPtr(reinterpret_cast<uintptr_t>(conVarData));
+
+				for (const auto loc : module.FindPtrs(reinterpret_cast<uintptr_t>(conVarData))) {
+					if (!module.GetReferenceRange(loc.GetPtr()).empty()) {
+						opts.push_back(loc);
+					}
+				}
+
+				if (opts.empty()) {
+					return MakeError("ConVar \"{}\" has no code references", ref.name);
+				}
+
+				break;
 			}
 			default:
 				return MakeError("Invalid reference type");
