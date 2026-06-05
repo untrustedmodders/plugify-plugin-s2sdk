@@ -402,35 +402,35 @@ std::optional<PatchData> ConfigLoader::GetPatch(std::string_view name) const {
 
 template <typename Fn>
 void ConfigLoader::ForEachSignature(Fn&& fn) const {
-	std::for_each(m_options.processStrategy, m_signatures.begin(), m_signatures.end(), [&](const auto& kv) {
+	std::for_each(m_signatures.begin(), m_signatures.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachAddress(Fn&& fn) const  {
-	std::for_each(m_options.processStrategy, m_addresses.begin(), m_addresses.end(), [&](const auto& kv) {
+	std::for_each(m_addresses.begin(), m_addresses.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachVTable(Fn&& fn) const  {
-	std::for_each(m_options.processStrategy, m_vtables.begin(), m_vtables.end(), [&](const auto& kv) {
+	std::for_each(m_vtables.begin(), m_vtables.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachOffset(Fn&& fn) const  {
-	std::for_each(m_options.processStrategy, m_offsets.begin(), m_offsets.end(), [&](const auto& kv) {
+	std::for_each(m_offsets.begin(), m_offsets.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
 
 template <typename Fn>
 void ConfigLoader::ForEachPatch(Fn&& fn) const  {
-	std::for_each(m_options.processStrategy, m_patches.begin(), m_patches.end(), [&](const auto& kv) {
+	std::for_each(m_patches.begin(), m_patches.end(), [&](const auto& kv) {
 		fn(kv.second);
 	});
 }
