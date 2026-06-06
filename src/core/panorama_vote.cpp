@@ -323,7 +323,3 @@ void PanoramaVoteHandler::SendVotePassed() const {
 GAME_EVENT_F(vote_cast) {
 	g_PanoramaVoteHandler.VoteCast(event);
 }
-
-GAME_EVENT_F(round_start) {
-	g_PanoramaVoteHandler.Init();
-}

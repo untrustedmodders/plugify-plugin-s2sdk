@@ -2,6 +2,7 @@
 #include <playerslot.h>
 #include <core/sdk/utils.hpp>
 #include <core/sdk/helpers.hpp>
+#include <core/transmit_manager.hpp>
 
 PLUGIFY_WARN_PUSH()
 
@@ -447,6 +448,82 @@ extern "C" PLUGIN_API void SetTransmitInfoFullUpdate(CCheckTransmitInfo* info, b
 		return;
 	}
 	info->m_bFullUpdate = fullUpdate;
+}
+
+// ============================================================================
+// Transmit Manager Methods
+// ============================================================================
+
+/**
+ * @brief Hides entities from a player's transmit list.
+ *
+ * @param playerSlot The player slot to hide entities from.
+ * @param entHandles Entity handles to hide.
+ */
+extern "C" PLUGIN_API void HideTransmitEntities(int playerSlot, const plg::vector<int>& entHandles) {
+	g_TransmitManager.HideEntities(playerSlot, entHandles);
+}
+
+/**
+ * @brief Shows previously hidden entities to a player.
+ *
+ * @param playerSlot The player slot to show entities to.
+ * @param entHandles Entity handles to show.
+ */
+extern "C" PLUGIN_API void ShowTransmitEntities(int playerSlot, const plg::vector<int>& entHandles) {
+	g_TransmitManager.ShowEntities(playerSlot, entHandles);
+}
+
+/**
+ * @brief Gets all hidden entity handles for a player.
+ *
+ * @param playerSlot The player slot to query.
+ * @return Array of hidden entity handles.
+ */
+extern "C" PLUGIN_API plg::vector<int> GetHiddenTransmitEntities(int playerSlot) {
+	return g_TransmitManager.GetHiddenEntities(playerSlot);
+}
+
+/**
+ * @brief Hides a single entity from a player's transmit list.
+ *
+ * @param playerSlot The player slot to hide the entity from.
+ * @param entityHandle Entity handle to hide.
+ */
+extern "C" PLUGIN_API void HideTransmitEntity(int playerSlot, int entityHandle) {
+	const int32_t handle = entityHandle;
+	g_TransmitManager.HideEntities(playerSlot, std::span<const int32_t>(&handle, 1));
+}
+
+/**
+ * @brief Shows a previously hidden entity to a player.
+ *
+ * @param playerSlot The player slot to show the entity to.
+ * @param entityHandle Entity handle to show.
+ */
+extern "C" PLUGIN_API void ShowTransmitEntity(int playerSlot, int entityHandle) {
+	const int32_t handle = entityHandle;
+	g_TransmitManager.ShowEntities(playerSlot, std::span<const int32_t>(&handle, 1));
+}
+
+/**
+ * @brief Hides an entity from all players except the owner.
+ *
+ * @param playerSlot The owner player slot who will still see the entity.
+ * @param entityHandle Entity handle to hide from other players.
+ */
+extern "C" PLUGIN_API void HideTransmitEntityFromOtherPlayers(int playerSlot, int entityHandle) {
+	g_TransmitManager.HideEntityFromOtherPlayers(playerSlot, entityHandle);
+}
+
+/**
+ * @brief Shows a previously hidden entity to all players except the owner.
+ *
+ * @param playerSlot The owner player slot who was excluded from hiding.
+ * @param entityHandle Entity handle to show to other players.
+ */
+extern "C" PLUGIN_API void ShowTransmitEntityToOtherPlayers(int playerSlot, int entityHandle) {
+	g_TransmitManager.ShowEntityToOtherPlayers(playerSlot, entityHandle);
 }
 
 PLUGIFY_WARN_POP()

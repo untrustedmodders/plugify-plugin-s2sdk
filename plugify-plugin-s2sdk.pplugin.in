@@ -7351,6 +7351,162 @@
       }
     },
     {
+      "name": "HideTransmitEntities",
+      "group": "Transmit",
+      "description": "Hides entities from a player's transmit list.",
+      "funcName": "HideTransmitEntities",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The player slot to hide entities from."
+        },
+        {
+          "name": "entHandles",
+          "type": "int32[]",
+          "ref": false,
+          "description": "Entity handles to hide."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ShowTransmitEntities",
+      "group": "Transmit",
+      "description": "Shows previously hidden entities to a player.",
+      "funcName": "ShowTransmitEntities",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The player slot to show entities to."
+        },
+        {
+          "name": "entHandles",
+          "type": "int32[]",
+          "ref": false,
+          "description": "Entity handles to show."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetHiddenTransmitEntities",
+      "group": "Transmit",
+      "description": "Gets all hidden entity handles for a player.",
+      "funcName": "GetHiddenTransmitEntities",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The player slot to query."
+        }
+      ],
+      "retType": {
+        "type": "int32[]",
+        "description": "Array of hidden entity handles."
+      }
+    },
+    {
+      "name": "HideTransmitEntity",
+      "group": "Transmit",
+      "description": "Hides a single entity from a player's transmit list.",
+      "funcName": "HideTransmitEntity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The player slot to hide the entity from."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "Entity handle to hide."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ShowTransmitEntity",
+      "group": "Transmit",
+      "description": "Shows a previously hidden entity to a player.",
+      "funcName": "ShowTransmitEntity",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The player slot to show the entity to."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "Entity handle to show."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "HideTransmitEntityFromOtherPlayers",
+      "group": "Transmit",
+      "description": "Hides an entity from all players except the owner.",
+      "funcName": "HideTransmitEntityFromOtherPlayers",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The owner player slot who will still see the entity."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "Entity handle to hide from other players."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "ShowTransmitEntityToOtherPlayers",
+      "group": "Transmit",
+      "description": "Shows a previously hidden entity to all players except the owner.",
+      "funcName": "ShowTransmitEntityToOtherPlayers",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The owner player slot who was excluded from hiding."
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "Entity handle to show to other players."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "AddBodyImpulseAtPosition",
       "group": "Bodies",
       "description": "Applies an impulse to an entity at a specific world position.",

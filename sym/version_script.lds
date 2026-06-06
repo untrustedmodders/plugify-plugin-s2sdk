@@ -849,6 +849,13 @@
         SetTransmitInfoPlayerSlot;
         GetTransmitInfoFullUpdate;
         SetTransmitInfoFullUpdate;
+        HideTransmitEntities;
+        ShowTransmitEntities;
+        GetHiddenTransmitEntities;
+        HideTransmitEntity;
+        ShowTransmitEntity;
+        HideTransmitEntityFromOtherPlayers;
+        ShowTransmitEntityToOtherPlayers;
 
         GetWeaponVDataFromKey;
         GetWeaponVData;
