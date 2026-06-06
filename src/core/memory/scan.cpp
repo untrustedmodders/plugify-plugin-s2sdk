@@ -1044,7 +1044,7 @@ CAddress scan::FindStr(const uint8_t* data, size_t size, std::string_view str, b
 	const auto base = reinterpret_cast<uintptr_t>(data);
 
 	auto callback = [&result, base, data](CAddress match) {
-		auto offset = match.GetPtr() - base;
+		auto offset = match - base;
 		if (offset == 0 || data[offset - 1] == '\0')
 		{
 			result = offset;
@@ -1078,7 +1078,7 @@ std::vector<CAddress> scan::FindStrMulti(const uint8_t* data, size_t size, std::
 	const auto base = reinterpret_cast<uintptr_t>(data);
 
 	auto callback = [&result, base, data](CAddress match) {
-		auto offset = match.GetPtr() - base;
+		auto offset = match - base;
 		if (offset == 0 || data[offset - 1] == '\0')
 		{
 			result.emplace_back(offset);

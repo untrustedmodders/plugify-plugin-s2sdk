@@ -236,7 +236,7 @@ public:
 
 			if (range.empty())
 			{
-				return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), addr->GetPtr());
+				return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), *addr);
 			}
 
 			ref_sets.push_back(range);

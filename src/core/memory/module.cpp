@@ -546,7 +546,7 @@ Result<std::vector<CAddress>> CModule::FindAllFunctionsFromPointerRefs(std::span
         auto range = GetReferenceRange(ptr);
         if (range.empty())
         {
-            return MakeError("Pointer \"{}\" has no references.", ptr.GetPtr());
+            return MakeError("Pointer \"{}\" has no references.", ptr);
         }
 
         ref_sets.push_back(range);
@@ -570,13 +570,13 @@ Result<std::vector<CAddress>> CModule::FindAllFunctionsFromAddressRefs(std::span
     	auto ptr_addr = FindPtr(addr);
     	if (!ptr_addr.IsValid())
     	{
-    		return MakeError("Address \"{}\" not found.", addr.GetPtr());
+    		return MakeError("Address \"{}\" not found.", addr);
     	}
 
         auto range = GetReferenceRange(ptr_addr);
         if (range.empty())
         {
-            return MakeError("Address \"{}\" (at {}) has no references.", addr.GetPtr(), ptr_addr.GetPtr());
+            return MakeError("Address \"{}\" (at {}) has no references.", addr, ptr_addr);
         }
 
         ref_sets.push_back(range);
@@ -595,18 +595,18 @@ Result<std::vector<CAddress>> CModule::FindAllFunctionsFromStringRefs(std::span<
     std::vector<std::span<const ReferenceEntry>> ref_sets;
     ref_sets.reserve(strs.size());
 
-    for (const auto& s : strs)
+    for (const auto& str : strs)
     {
-        auto str_addr = FindString(s, false, true);
+        auto str_addr = FindString(str, false, true);
         if (!str_addr.IsValid())
         {
-            return MakeError("String \"{}\" not found.", s);
+            return MakeError("String \"{}\" not found.", str);
         }
 
         auto range = GetReferenceRange(str_addr);
         if (range.empty())
         {
-            return MakeError("String \"{}\" (at {}) has no references.", s, str_addr.GetPtr());
+            return MakeError("String \"{}\" (at {}) has no references.", str, str_addr);
         }
 
         ref_sets.push_back(range);

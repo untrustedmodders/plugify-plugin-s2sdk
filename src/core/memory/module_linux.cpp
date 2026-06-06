@@ -28,8 +28,8 @@ void CModule::GetModuleInfo(std::string_view module_name)
 		for (auto i = 0; i < info.dlpi_phnum; i++)
 		{
 			const auto address = m_base_address + info.dlpi_phdr[i].p_paddr;
-			const auto size               = static_cast<uintptr_t>(info.dlpi_phdr[i].p_memsz);
-			const auto type      = info.dlpi_phdr[i].p_type;
+			const auto size    = static_cast<uintptr_t>(info.dlpi_phdr[i].p_memsz);
+			const auto type    = info.dlpi_phdr[i].p_type;
 			const auto is_dynamic_section = type == PT_DYNAMIC;
 
 			const auto flags = info.dlpi_phdr[i].p_flags;
@@ -251,7 +251,7 @@ std::vector<CModule::RunTimeTypeInfo> CModule::GetRuntimeTypeInfos() const
 			auto get_vtable = [](void* handle, const char* name) -> CAddress {
 				CAddress symbol_address = dlsym(handle, name);
 				if (symbol_address.IsValid()) {
-					return symbol_address.Offset(0x10);
+					return symbol_address + 0x10;
 				}
 				return {};
 			};
@@ -282,7 +282,7 @@ std::vector<CModule::TypeInfo> CModule::GetTypeInfos(std::span<const RunTimeType
 	std::vector<TypeInfo> known_typeinfos;
 
 	auto collect_typeinfos = [&](CAddress root_rtti_vtable) {
-		auto instances = FindPtrs(root_rtti_vtable.GetPtr());
+		auto instances = FindPtrs(root_rtti_vtable);
 		known_typeinfos.reserve(known_typeinfos.size() + instances.size());
 
 		for (const auto& xref : instances) {
@@ -410,12 +410,12 @@ void CModule::DumpVtables()
 
             for (const auto& [class_typeinfo, si_class_typeinfo, vmi_class_typeinfo] : runtime_typeinfos)
 			{
-				if (ti_vtable_ptr == si_class_typeinfo.GetPtr())
+				if (ti_vtable_ptr == si_class_typeinfo)
 				{
 					auto* si_type_info = static_cast<const __cxxabiv1::__si_class_type_info*>(current_ti);
 					process_base(si_type_info->__base_type);
 				}
-				else if (ti_vtable_ptr == vmi_class_typeinfo.GetPtr())
+				else if (ti_vtable_ptr == vmi_class_typeinfo)
 				{
 					auto* vmi_type_info = static_cast<const __cxxabiv1::__vmi_class_type_info*>(current_ti);
 					for (auto i = 0u; i < vmi_type_info->__base_count; ++i)

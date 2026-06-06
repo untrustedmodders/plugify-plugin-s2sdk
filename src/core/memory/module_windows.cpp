@@ -36,7 +36,7 @@ void CModule::GetModuleInfo(std::string_view module_name)
 
     m_module_name = m_module_name.substr(m_module_name.find_last_of('\\') + 1);
 
-    m_base_address = reinterpret_cast<uintptr_t>(handle);
+    m_base_address = handle;
 
     const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(handle);
 
@@ -73,7 +73,7 @@ void CModule::GetModuleInfo(std::string_view module_name)
         if (isWritable)
             segment.flags |= SegFlags::W;
 
-        const auto data = reinterpret_cast<uint8_t*>(start);
+        const auto data = static_cast<uint8_t*>(start);
         segment.data    = std::vector(data, data + size);
 		//segment.name    = reinterpret_cast<const char*>(section->Name);
     }
@@ -93,15 +93,15 @@ void CModule::GetModuleInfo(std::string_view module_name)
 void CModule::BuildFunctionIndexAndReferences()
 {
     // from praydog https://github.com/cursey/kananlib/blob/7a99a94cea3dbcbd46b54885bd3d04f1d242e21a/src/Scan.cpp#L1329-L1344
-    const auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(m_base_address);
-    const auto nt_header  = reinterpret_cast<PIMAGE_NT_HEADERS>(m_base_address + dos_header->e_lfanew);
+    const auto dos_header = m_base_address.As<PIMAGE_DOS_HEADER>();
+    const auto nt_header  = (m_base_address + dos_header->e_lfanew).As<PIMAGE_NT_HEADERS>();
 
     const auto directory = &nt_header->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
 
     const auto rva  = directory->VirtualAddress;
     const auto size = directory->Size;
 
-    const auto directory_ptr = reinterpret_cast<PIMAGE_RUNTIME_FUNCTION_ENTRY>(m_base_address + rva);
+    const auto directory_ptr = (m_base_address + rva).As<PIMAGE_RUNTIME_FUNCTION_ENTRY>();
 
     const auto entries = size / sizeof(IMAGE_RUNTIME_FUNCTION_ENTRY);
 
@@ -137,7 +137,7 @@ void CModule::BuildFunctionIndexAndReferences()
             // if that flag is set, meaning the next entry belongs to current entry, we should merge it
             // otherwise we treat it as a new function
             auto next_unwind_rva = directory_ptr[next_i].UnwindData;
-            auto next_unwind_ptr = reinterpret_cast<UNWIND_INFO*>(m_base_address + next_unwind_rva);
+            auto next_unwind_ptr = (m_base_address + next_unwind_rva).As<UNWIND_INFO*>();
 
             if ((next_unwind_ptr->Flags & UNW_FLAG_CHAININFO) == 0) break;
 
@@ -282,7 +282,7 @@ void CModule::DumpVtables()
         return;
     }
 
-    auto type_info = type_descriptor_address.Offset(-0x10).Deref();
+    auto type_info = type_descriptor_address.Deref(-0x10);
 
     const auto type_info_xrefs = FindPtrs(type_info);
     m_vtables.reserve(type_info_xrefs.size());
@@ -290,7 +290,8 @@ void CModule::DumpVtables()
     std::vector<uint32_t> valid_type_rvas;
     valid_type_rvas.reserve(type_info_xrefs.size());
 
-    for (const auto& xref : type_info_xrefs) valid_type_rvas.push_back(static_cast<uint32_t>(xref.GetPtr() - m_base_address));
+    for (const auto& xref : type_info_xrefs)
+    	valid_type_rvas.push_back(static_cast<uint32_t>(xref - m_base_address));
 
     // sort for binary search
     std::ranges::sort(valid_type_rvas);
@@ -327,7 +328,7 @@ void CModule::DumpVtables()
             if (std::ranges::binary_search(valid_type_rvas, col->pTypeDescriptor))
             {
                 auto vtable_start = ptr + sizeof(void*);
-                auto ti           = reinterpret_cast<std::type_info*>(m_base_address + col->pTypeDescriptor);
+                auto ti = (m_base_address + col->pTypeDescriptor).As<std::type_info*>();
 
                 auto node = std::make_unique<VTable>(ti, vtable_start, ti->name(), col->offset, col);
 
@@ -342,14 +343,14 @@ void CModule::DumpVtables()
     {
         auto locator = vtable->object_locator;
 
-        auto hierarchy_descriptor = reinterpret_cast<_s_RTTIClassHierarchyDescriptor*>(m_base_address + locator->pClassDescriptor);
-        auto base_class_array     = reinterpret_cast<int32_t*>(m_base_address + hierarchy_descriptor->pBaseClassArray);
+        auto hierarchy_descriptor = (m_base_address + locator->pClassDescriptor).As<_s_RTTIClassHierarchyDescriptor*>();
+        auto base_class_array     = (m_base_address + hierarchy_descriptor->pBaseClassArray).As<int32_t*>();
 
         // starts at 1 to skip the class itself
         for (uint32_t i = 1; i < hierarchy_descriptor->numBaseClasses; i++)
         {
-            auto base_class_descriptor = reinterpret_cast<_s_RTTIBaseClassDescriptor*>(m_base_address + base_class_array[i]);
-            auto base_class_ti         = reinterpret_cast<std::type_info*>(m_base_address + base_class_descriptor->pTypeDescriptor);
+            auto base_class_descriptor = (m_base_address + base_class_array[i]).As<_s_RTTIBaseClassDescriptor*>();
+            auto base_class_ti         = (m_base_address + base_class_descriptor->pTypeDescriptor).As<std::type_info*>();
 
             auto it = vtable_map.find(base_class_ti);
             if (it != vtable_map.end()) vtable->children.push_back(it->second);
@@ -359,7 +360,7 @@ void CModule::DumpVtables()
 
 CAddress CModule::GetFunctionByName(std::string_view proc_name) const
 {
-    return GetProcAddress(reinterpret_cast<HMODULE>(m_base_address), proc_name.data());
+    return GetProcAddress(m_base_address.As<HMODULE>(), proc_name.data());
 }
 
 #endif

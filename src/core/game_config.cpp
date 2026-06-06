@@ -1327,10 +1327,10 @@ Result<Memory> AddressResolver::ApplyStep(Memory current, const IndirectionStep&
 			return current.Offset(step.offset);
 
 		case IndirectionStep::Type::Index:
-			return current.Deref(1, step.offset * sizeof(uintptr_t));
+			return current.Deref(step.offset * sizeof(uintptr_t));
 
 		case IndirectionStep::Type::Dereference:
-			return current.Deref(1, step.offset);
+			return current.Deref(step.offset);
 
 		case IndirectionStep::Type::Relative: {
 			auto target = current.Offset(step.offset);

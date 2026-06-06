@@ -97,14 +97,8 @@ struct ConVal {
 	EConVarType type;
 };
 
-// format support
-#ifdef FMT_HEADER_ONLY
-namespace fmt {
-#else
-namespace std {
-#endif
-template<>
-struct formatter<ConVal> {
+template <>
+struct std::formatter<ConVal> {
 	constexpr auto parse(std::format_parse_context& ctx) {
 		return ctx.begin();
 	}
@@ -149,7 +143,6 @@ struct formatter<ConVal> {
 		}
 	}
 };
-}// namespace std
 
 class ConVarConfigGenerator {
 public:
