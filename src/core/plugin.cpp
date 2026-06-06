@@ -27,6 +27,7 @@
 #include "player_manager.hpp"
 #include "server_manager.hpp"
 #include "timer_system.hpp"
+#include "transmit_manager.hpp"
 #include "user_message_manager.hpp"
 
 Source2SDK g_sdk;
@@ -41,6 +42,12 @@ extern Result<void> ServerStartup();
 
 namespace {
 inline char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
+
+GAME_EVENT_F(round_start) {
+	g_PanoramaVoteHandler.Init();
+	g_TransmitManager.RoundStart();
+}
+
 
 polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	//auto config = polyhook::GetArgument<const GameSessionConfiguration_t *>(params, 1);
@@ -497,6 +504,7 @@ polyhook::ResultType Hook_CheckTransmit(polyhook::HookHandle hook, polyhook::Par
 	plg::view view(infoList, infoCount);
 
 	g_ServerCheckTransmitListenerManager(view.get());
+	g_TransmitManager.OnCheckTransmit(view.get());
 
 	return polyhook::ResultType::Ignored;
 }
