@@ -56,7 +56,7 @@ Result<void> ConfigLoader::ParseConfigFile(std::string_view gameName) {
 		Result<void> (ConfigLoader::*loader)(configs::Config&);
 	};
 
-	constexpr SectionLoader loaders[] = {
+	SectionLoader loaders[] = {
 		{"Signatures", &ConfigLoader::LoadSignatures},
 		{"Offsets", &ConfigLoader::LoadOffsets},
 		{"Patches", &ConfigLoader::LoadPatches},

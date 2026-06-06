@@ -34,7 +34,7 @@ template<typename T>
 using Result = std::expected<T, std::string>;
 
 template <plg::string_like First>
-	constexpr auto MakeError(First&& error) {
+constexpr auto MakeError(First&& error) {
 	return std::unexpected(std::forward<First>(error));
 }
 

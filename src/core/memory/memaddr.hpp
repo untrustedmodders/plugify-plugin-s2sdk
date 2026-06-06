@@ -7,9 +7,14 @@ public:
     constexpr CAddress(const void* addr) : m_addr(const_cast<void*>(addr)) {}
     constexpr CAddress(uintptr_t ptr) : m_ptr(ptr) {}
 
-    constexpr operator uintptr_t() const noexcept
+	constexpr explicit operator bool() const noexcept
     {
-        return m_ptr;
+    	return m_ptr != 0;
+    }
+
+	constexpr operator uintptr_t() const noexcept
+    {
+    	return m_ptr;
     }
 
     constexpr operator uint8_t*() const noexcept
@@ -22,33 +27,28 @@ public:
         return m_addr;
     }
 
-    constexpr explicit operator bool() const noexcept
-    {
-        return m_ptr != 0;
-    }
-
     template <typename T = void*>
     [[nodiscard]] constexpr T As() noexcept
     {
-        return reinterpret_cast<T>(m_ptr);
+        return reinterpret_cast<T>(m_addr);
     }
 
     template <typename T = const void*>
     [[nodiscard]] constexpr T As() const noexcept
     {
-        return reinterpret_cast<T>(m_ptr);
+        return reinterpret_cast<T>(m_addr);
     }
 
     template <typename T = void*>
     [[nodiscard]] constexpr T Get() noexcept
     {
-        return *reinterpret_cast<T*>(m_ptr);
+        return *static_cast<T*>(m_addr);
     }
 
     template <typename T = const void*>
     [[nodiscard]] constexpr T Get() const noexcept
     {
-        return *reinterpret_cast<T*>(m_ptr);
+        return *static_cast<T*>(m_addr);
     }
 
 	[[nodiscard]] constexpr CAddress Offset(ptrdiff_t offset) const noexcept
@@ -108,11 +108,6 @@ public:
 
 	// ── Arithmetic operators ────────────────────────────────────────────────────
 
-	[[nodiscard]] constexpr ptrdiff_t operator-(const CAddress& other) const noexcept
-    {
-    	return static_cast<ptrdiff_t>(m_ptr) - static_cast<ptrdiff_t>(other.m_ptr);
-    }
-
 	[[nodiscard]] constexpr CAddress operator+(const auto& offset) const noexcept
     {
     	return m_ptr + static_cast<uintptr_t>(offset);
@@ -123,16 +118,9 @@ public:
     	return m_ptr - static_cast<uintptr_t>(offset);
     }
 
-	template <typename T> requires (!std::is_same_v<T, CAddress>)
-	[[nodiscard]] friend constexpr CAddress operator+(const T& offset, const CAddress& addr)noexcept
+	[[nodiscard]] constexpr ptrdiff_t operator-(const CAddress& other) const noexcept
     {
-    	return addr.m_ptr + static_cast<uintptr_t>(offset);
-    }
-
-	template <typename T> requires (!std::is_same_v<T, CAddress>)
-	[[nodiscard]] friend constexpr CAddress operator-(const T& offset, const CAddress& addr)noexcept
-    {
-    	return addr.m_ptr - static_cast<uintptr_t>(offset);
+    	return static_cast<ptrdiff_t>(m_ptr) - static_cast<ptrdiff_t>(other.m_ptr);
     }
 
 	constexpr CAddress& operator+=(const auto& offset) noexcept
