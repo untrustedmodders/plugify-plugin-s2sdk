@@ -159,7 +159,7 @@ void CModule::BuildFunctionIndexAndReferences()
                           return a.start < b.start;
                       });
 
-    auto is_in_data_segment = [this](uintptr_t address) noexcept {
+    auto is_in_data_segment = [this](CAddress address) noexcept {
         for (const auto& segment : m_segments)
         {
             if (segment.flags & SegFlags::X) continue;
@@ -168,7 +168,7 @@ void CModule::BuildFunctionIndexAndReferences()
         return false;
     };
 
-    auto is_in_text_segment = [this](uintptr_t address) noexcept {
+    auto is_in_text_segment = [this](CAddress address) noexcept {
         for (const auto& segment : m_segments)
         {
             if ((segment.flags & SegFlags::X) == 0) continue;
@@ -212,7 +212,7 @@ void CModule::BuildFunctionIndexAndReferences()
             {
                 if (jumptable_start_address != 0 && ip >= jumptable_start_address) break;
 
-                if (!ZYAN_SUCCESS(ZydisDecoderDecodeFull(&decoder, reinterpret_cast<void*>(ip), ZYDIS_MAX_INSTRUCTION_LENGTH, &instr, operands)))
+                if (!ZYAN_SUCCESS(ZydisDecoderDecodeFull(&decoder, ip, ZYDIS_MAX_INSTRUCTION_LENGTH, &instr, operands)))
                 {
                     ip += instr.length;
                     continue;
@@ -305,7 +305,7 @@ void CModule::DumpVtables()
         auto start_addr = segment.address;
         auto end_addr   = start_addr + segment.size;
 
-        auto is_in_current_section = [&](uintptr_t ptr) {
+        auto is_in_current_section = [&](CAddress ptr) {
             return start_addr <= ptr && ptr < end_addr;
         };
 

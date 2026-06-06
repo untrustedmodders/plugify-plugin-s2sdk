@@ -69,7 +69,7 @@ CAddress CModule::FindString(std::string_view str, bool read_only, bool exact) c
         if (read_only && (segment.flags & SegFlags::W) != 0)
             continue;
 
-        if (auto result = scan::FindStr(reinterpret_cast<uint8_t*>(segment.address), segment.size, str, true, exact))
+        if (auto result = scan::FindStr(segment.address, segment.size, str, true, exact))
         {
             return segment.address + result;
         }
@@ -90,7 +90,7 @@ std::vector<CAddress> CModule::FindStringMulti(std::string_view str, bool read_o
 		if (read_only && (segment.flags & SegFlags::W) != 0)
 			continue;
 
-		auto ptrs = scan::FindStrMulti(reinterpret_cast<uint8_t*>(segment.address), segment.size, str, true, exact);
+		auto ptrs = scan::FindStrMulti(segment.address, segment.size, str, true, exact);
 		if (ptrs.empty())
 			continue;
 
@@ -113,7 +113,7 @@ CAddress CModule::FindData(const uint8_t* needle, size_t needle_size, bool read_
         if (read_only && (segment.flags & SegFlags::W) != 0)
             continue;
 
-        if (auto result = scan::FindData(reinterpret_cast<uint8_t*>(segment.address), segment.size, needle, needle_size))
+        if (auto result = scan::FindData(segment.address, segment.size, needle, needle_size))
         {
             return segment.address + result;
         }
@@ -134,7 +134,7 @@ std::vector<CAddress> CModule::FindDataMulti(const uint8_t* needle, size_t needl
         if (read_only && (segment.flags & SegFlags::W) != 0)
             continue;
 
-    	auto ptrs = scan::FindDataMulti(reinterpret_cast<uint8_t*>(segment.address), segment.size, needle, needle_size);
+    	auto ptrs = scan::FindDataMulti(segment.address, segment.size, needle, needle_size);
     	if (ptrs.empty())
     		continue;
 
@@ -147,7 +147,7 @@ std::vector<CAddress> CModule::FindDataMulti(const uint8_t* needle, size_t needl
     return results;
 }
 
-CAddress CModule::FindPtr(uintptr_t ptr) const
+CAddress CModule::FindPtr(CAddress ptr) const
 {
     for (const auto& segment : m_segments)
     {
@@ -165,7 +165,7 @@ CAddress CModule::FindPtr(uintptr_t ptr) const
     return {};
 }
 
-std::vector<CAddress> CModule::FindPtrs(uintptr_t ptr) const
+std::vector<CAddress> CModule::FindPtrs(CAddress ptr) const
 {
     std::vector<CAddress> results{};
 
@@ -340,8 +340,8 @@ bool CModule::IsPointerDerivedFrom(void* ptr, std::string_view vtable_name) cons
     if (ptr == nullptr) [[unlikely]]
         return false;
 
-    auto vtable_address = *static_cast<uintptr_t*>(ptr);
-    if (vtable_address == 0) [[unlikely]]
+    CAddress vtable_address = *static_cast<uintptr_t*>(ptr);
+    if (!vtable_address) [[unlikely]]
         return false;
 
     auto it = std::ranges::find_if(m_vtables, [vtable_address](const std::unique_ptr<VTable>& a) {
@@ -386,7 +386,7 @@ CAddress CModule::GetTypeInfoFromName(std::string_view name) const
     return {};
 }
 
-uintptr_t CModule::GetFunctionEntry(uintptr_t middle) const
+CAddress CModule::GetFunctionEntry(CAddress middle) const
 {
     auto it = std::ranges::upper_bound(m_function_entries, middle, {}, &FunctionEntry::start);
 
@@ -420,8 +420,8 @@ std::vector<CAddress> CModule::IntersectFunctionReferences(std::vector<std::span
 
         for (const auto& [target, source_ip] : refs)
         {
-            if (auto f = GetFunctionEntry(source_ip); f != 0)
-                funcs.emplace_back(f);
+            if (auto func = GetFunctionEntry(source_ip))
+                funcs.emplace_back(func);
         }
 
         std::ranges::sort(funcs);
@@ -449,7 +449,7 @@ std::vector<CAddress> CModule::IntersectFunctionReferences(std::vector<std::span
     return candidates;
 }
 
-std::span<const CModule::ReferenceEntry> CModule::GetReferenceRange(uintptr_t address) const
+std::span<const CModule::ReferenceEntry> CModule::GetReferenceRange(CAddress address) const
 {
     auto subrange = std::ranges::equal_range(m_references, address, std::less{}, &ReferenceEntry::target);
 
@@ -470,30 +470,23 @@ Result<CAddress> CModule::FindFunctionFromStringRefs(std::span<const std::string
 
     if (matches->empty())
     {
-        return MakeError("No function found matching provided strings:\n{}", plg::join(strs, "\n"));
+        return MakeError("No function found matching provided strings:");
     }
 
     if (matches->size() > 1)
     {
-    	std::string error = std::format("Ambiguous: {} functions match provided strings:\n{}", matches->size(), plg::join(strs, "\n"));
-
-        for (size_t i = 0; i < matches->size(); i++)
-        {
-            std::format_to(std::back_inserter(error), "\n#{} {}+0x{:x}", i, m_module_name, matches->at(i) - m_base_address);
-        }
-
-        return MakeError(std::move(error));
+        return MakeError("Ambiguous: {} functions match provided strings.", matches->size());
     }
 
     return matches->front();
 }
 
-Result<CAddress> CModule::FindFunctionFromPointerRef(uintptr_t ptr) const
+Result<CAddress> CModule::FindFunctionFromPointerRef(CAddress ptr) const
 {
     return FindFunctionFromPointerRefs(std::span(&ptr, 1));
 }
 
-Result<CAddress> CModule::FindFunctionFromPointerRefs(std::span<const uintptr_t> ptrs) const
+Result<CAddress> CModule::FindFunctionFromPointerRefs(std::span<const CAddress> ptrs) const
 {
     auto matches = FindAllFunctionsFromPointerRefs(ptrs);
 
@@ -513,12 +506,12 @@ Result<CAddress> CModule::FindFunctionFromPointerRefs(std::span<const uintptr_t>
 	return matches->front();
 }
 
-Result<CAddress> CModule::FindFunctionFromAddressRef(uintptr_t addr) const
+Result<CAddress> CModule::FindFunctionFromAddressRef(CAddress addr) const
 {
     return FindFunctionFromAddressRefs(std::span(&addr, 1));
 }
 
-Result<CAddress> CModule::FindFunctionFromAddressRefs(std::span<const uintptr_t> addrs) const
+Result<CAddress> CModule::FindFunctionFromAddressRefs(std::span<const CAddress> addrs) const
 {
     auto matches = FindAllFunctionsFromAddressRefs(addrs);
 
@@ -538,7 +531,7 @@ Result<CAddress> CModule::FindFunctionFromAddressRefs(std::span<const uintptr_t>
     return matches->front();
 }
 
-Result<std::vector<CAddress>> CModule::FindAllFunctionsFromPointerRefs(std::span<const uintptr_t> ptrs) const
+Result<std::vector<CAddress>> CModule::FindAllFunctionsFromPointerRefs(std::span<const CAddress> ptrs) const
 {
 	if (ptrs.empty()) [[unlikely]]
 	{
@@ -553,7 +546,7 @@ Result<std::vector<CAddress>> CModule::FindAllFunctionsFromPointerRefs(std::span
         auto range = GetReferenceRange(ptr);
         if (range.empty())
         {
-            return MakeError("Pointer \"{}\" has no references.", ptr);
+            return MakeError("Pointer \"{}\" has no references.", ptr.GetPtr());
         }
 
         ref_sets.push_back(range);
@@ -562,7 +555,7 @@ Result<std::vector<CAddress>> CModule::FindAllFunctionsFromPointerRefs(std::span
     return IntersectFunctionReferences(ref_sets);
 }
 
-Result<std::vector<CAddress>> CModule::FindAllFunctionsFromAddressRefs(std::span<const uintptr_t> addrs) const
+Result<std::vector<CAddress>> CModule::FindAllFunctionsFromAddressRefs(std::span<const CAddress> addrs) const
 {
 	if (addrs.empty()) [[unlikely]]
 	{
@@ -577,13 +570,13 @@ Result<std::vector<CAddress>> CModule::FindAllFunctionsFromAddressRefs(std::span
     	auto ptr_addr = FindPtr(addr);
     	if (!ptr_addr.IsValid())
     	{
-    		return MakeError("Address \"{}\" not found.", addr);
+    		return MakeError("Address \"{}\" not found.", addr.GetPtr());
     	}
 
         auto range = GetReferenceRange(ptr_addr);
         if (range.empty())
         {
-            return MakeError("Address \"{}\" (at {}) has no references.", addr, ptr_addr.GetPtr());
+            return MakeError("Address \"{}\" (at {}) has no references.", addr.GetPtr(), ptr_addr.GetPtr());
         }
 
         ref_sets.push_back(range);

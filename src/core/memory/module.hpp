@@ -12,8 +12,8 @@
 struct RunTimeVTableInfo
 {
     std::string_view demangled_name;
-    uintptr_t  address;
-	uint64_t   offset;
+    CAddress address;
+	uint64_t offset;
 
 	bool operator==(const RunTimeVTableInfo& other) const noexcept = default;
 	auto operator<=>(const RunTimeVTableInfo& other) const noexcept = default;
@@ -36,21 +36,21 @@ class CModule final
         Segment& operator=(Segment&&)      = delete;
 
         SegFlags             flags{};
-        uintptr_t            address{};
+        CAddress             address{};
         size_t               size{};
         std::vector<uint8_t> data{};
     };
 
     struct ReferenceEntry
     {
-        uintptr_t target{};
-        uintptr_t source_ip{};
+        CAddress target{};
+        CAddress source_ip{};
     };
 
     struct FunctionEntry
     {
-        uintptr_t start{};
-        uintptr_t end{};
+        CAddress start{};
+        CAddress end{};
     };
 
     std::vector<Segment> m_segments{};
@@ -73,7 +73,7 @@ class CModule final
 	struct VTable
 	{
 		std::type_info* type_info;
-		uintptr_t       vtable_address;
+		CAddress        vtable_address;
 		std::string     demangled_name;
 		uint64_t        offset;
 
@@ -82,11 +82,11 @@ class CModule final
 #ifdef PLATFORM_WINDOWS
 		_s_RTTICompleteObjectLocator* object_locator;
 
-		VTable(std::type_info* ti, uintptr_t vtable, std::string name, uint64_t off, _s_RTTICompleteObjectLocator* locator) :
-			type_info(ti), vtable_address(vtable), demangled_name(std::move(name)), offset(off), object_locator(locator) {}
+		VTable(std::type_info* ti, CAddress vtable, std::string_view name, uint64_t off, _s_RTTICompleteObjectLocator* locator) :
+			type_info(ti), vtable_address(vtable), demangled_name(name), offset(off), object_locator(locator) {}
 #else
-		VTable(std::type_info* ti, uintptr_t vtable, std::string name, uint64_t off) :
-			type_info(ti), vtable_address(vtable), demangled_name(std::move(name)), offset(off) {}
+		VTable(std::type_info* ti, CAddress vtable, std::string_view name, uint64_t off) :
+			type_info(ti), vtable_address(vtable), demangled_name(name), offset(off) {}
 #endif
 	};
 
@@ -116,11 +116,11 @@ class CModule final
 	std::vector<RunTimeTypeInfo> GetRuntimeTypeInfos() const;
 	std::vector<TypeInfo> GetTypeInfos(std::span<const RunTimeTypeInfo> runtime_typeinfos) const;
 
-    plg::flat_hash_map<std::string, uintptr_t, plg::string_hash, std::equal_to<>> _exports{};
+    plg::flat_hash_map<std::string, CAddress, plg::string_hash, std::equal_to<>> _exports{};
     void DumpExports(void* module_base);
 #endif
 
-    uintptr_t GetFunctionEntry(uintptr_t middle) const;
+    CAddress GetFunctionEntry(CAddress middle) const;
 
 public:
     CModule() = default;
@@ -136,7 +136,7 @@ public:
     //CModule(const std::filesystem::path& path, int flags);
 
     // get base address of a module
-    [[nodiscard]] uintptr_t Base() const
+    [[nodiscard]] CAddress Base() const
     {
         return m_base_address;
     }
@@ -148,7 +148,7 @@ public:
 
 	[[nodiscard]] bool IsValid() const
 	{
-	    return m_base_address != 0;
+	    return m_base_address;
     }
 
     [[nodiscard]] CAddress              FindPattern(std::string_view pattern) const;
@@ -160,8 +160,8 @@ public:
     [[nodiscard]] CAddress              FindData(const uint8_t* needle, size_t needle_size, bool read_only) const;
     [[nodiscard]] std::vector<CAddress> FindDataMulti(const uint8_t* needle, size_t needle_size, bool read_only) const;
 
-    [[nodiscard]] CAddress              FindPtr(uintptr_t ptr) const;
-    [[nodiscard]] std::vector<CAddress> FindPtrs(uintptr_t ptr) const;
+    [[nodiscard]] CAddress              FindPtr(CAddress ptr) const;
+    [[nodiscard]] std::vector<CAddress> FindPtrs(CAddress ptr) const;
 
 	[[nodiscard]] CAddress              FindInterface(std::string_view name) const;
 
@@ -175,14 +175,14 @@ public:
 	[[nodiscard]] std::vector<RunTimeVTableInfo>  FindVtablePartial(std::string_view vtable_name) const;
     [[nodiscard]] bool                            IsPointerDerivedFrom(void* ptr, std::string_view vtable_name) const;
     [[nodiscard]] std::vector<CAddress>           IntersectFunctionReferences(std::vector<std::span<const ReferenceEntry>>& reference_sets) const;
-    [[nodiscard]] std::span<const ReferenceEntry> GetReferenceRange(uintptr_t address) const;
+    [[nodiscard]] std::span<const ReferenceEntry> GetReferenceRange(CAddress address) const;
 
     [[nodiscard]] Result<CAddress> FindFunctionFromStringRef(std::string_view str) const;
     [[nodiscard]] Result<CAddress> FindFunctionFromStringRefs(std::span<const std::string_view> strs) const;
-    [[nodiscard]] Result<CAddress> FindFunctionFromPointerRef(uintptr_t ptr) const;
-    [[nodiscard]] Result<CAddress> FindFunctionFromPointerRefs(std::span<const uintptr_t> ptrs) const;
-    [[nodiscard]] Result<CAddress> FindFunctionFromAddressRef(uintptr_t addr) const;
-	[[nodiscard]] Result<CAddress> FindFunctionFromAddressRefs(std::span<const uintptr_t> addrs) const;
+    [[nodiscard]] Result<CAddress> FindFunctionFromPointerRef(CAddress ptr) const;
+    [[nodiscard]] Result<CAddress> FindFunctionFromPointerRefs(std::span<const CAddress> ptrs) const;
+    [[nodiscard]] Result<CAddress> FindFunctionFromAddressRef(CAddress addr) const;
+	[[nodiscard]] Result<CAddress> FindFunctionFromAddressRefs(std::span<const CAddress> addrs) const;
 	template<typename Range, typename Getter, typename Formatter>
 	[[nodiscard]] Result<CAddress> FindFunctionFromRefs(Range&& items, Getter&& getter, Formatter&& formatter) const
 	{
@@ -205,8 +205,8 @@ public:
 	}
 
     [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromStringRefs(std::span<const std::string_view> strs) const;
-    [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromPointerRefs(std::span<const uintptr_t> ptrs) const;
-    [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromAddressRefs(std::span<const uintptr_t> addrs) const;
+    [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromPointerRefs(std::span<const CAddress> ptrs) const;
+    [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromAddressRefs(std::span<const CAddress> addrs) const;
 	template<typename Range, typename Getter, typename Formatter>
 	[[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromRefs(Range&& items, Getter&& getter, Formatter&& formatter) const
 	{
@@ -254,7 +254,7 @@ enum class SegFlags : uint8_t
 	X = 1 << 2,
 };
 
-constexpr SegFlags operator|(SegFlags lhs, SegFlags rhs)
+constexpr SegFlags operator|(SegFlags lhs, SegFlags rhs) noexcept
 {
 	using underlying = std::underlying_type_t<SegFlags>;
 	return static_cast<SegFlags> (static_cast<underlying>(lhs) | static_cast<underlying>(rhs));

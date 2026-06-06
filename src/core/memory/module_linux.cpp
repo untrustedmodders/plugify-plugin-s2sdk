@@ -126,7 +126,7 @@ void CModule::DumpExports(void* module_base)
 
         // Locate the chain that handles the largest index bucket.
         uint32_t lastSymbol    = 0;
-        auto     bucketAddress = (uint32_t*)bucketsAddress;
+        uint32_t     bucketAddress = reinterpret_cast<uint32_t*>(bucketsAddress);
         for (uint32_t i = 0; i < header->nbuckets; ++i)
         {
             uint32_t bucket = *bucketAddress;
@@ -162,7 +162,7 @@ void CModule::DumpExports(void* module_base)
     ElfW(Sym)*  symbols{};
     ElfW(Word)* hash_ptr{};
 
-    char*       string_table{};
+    char*  string_table{};
     size_t symbol_count{};
 
     while (dyn->d_tag != DT_NULL)

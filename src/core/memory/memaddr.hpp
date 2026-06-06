@@ -12,6 +12,11 @@ public:
         return m_ptr;
     }
 
+    constexpr operator uint8_t*() const noexcept
+    {
+        return static_cast<uint8_t*>(m_addr);
+    }
+
     constexpr operator void*() const noexcept
     {
         return m_addr;
@@ -89,15 +94,92 @@ public:
     	return m_ptr;
     }
 
-	[[nodiscard]] constexpr bool operator==(const CAddress& other) const noexcept
+	// ── Equality operators ────────────────────────────────────────────────────
+
+	[[nodiscard]] constexpr bool operator==(const auto& other) const noexcept
     {
-    	return m_ptr == other.m_ptr;
+    	return m_ptr == static_cast<uintptr_t>(other);
     }
 
-	[[nodiscard]] constexpr auto operator<=>(const CAddress& other) const noexcept
+	[[nodiscard]] constexpr auto operator<=>(const auto& other) const noexcept
     {
-    	return m_ptr <=> other.m_ptr;
+    	return m_ptr <=> static_cast<uintptr_t>(other);
     }
+
+	// ── Arithmetic operators ────────────────────────────────────────────────────
+
+	[[nodiscard]] constexpr ptrdiff_t operator-(const CAddress& other) const noexcept
+    {
+    	return static_cast<ptrdiff_t>(m_ptr) - static_cast<ptrdiff_t>(other.m_ptr);
+    }
+
+	[[nodiscard]] constexpr CAddress operator+(const auto& offset) const noexcept
+    {
+    	return m_ptr + static_cast<uintptr_t>(offset);
+    }
+
+	[[nodiscard]] constexpr CAddress operator-(const auto& offset) const noexcept
+    {
+    	return m_ptr - static_cast<uintptr_t>(offset);
+    }
+
+	template <typename T> requires (!std::is_same_v<T, CAddress>)
+	[[nodiscard]] friend constexpr CAddress operator+(const T& offset, const CAddress& addr)noexcept
+    {
+    	return addr.m_ptr + static_cast<uintptr_t>(offset);
+    }
+
+	template <typename T> requires (!std::is_same_v<T, CAddress>)
+	[[nodiscard]] friend constexpr CAddress operator-(const T& offset, const CAddress& addr)noexcept
+    {
+    	return addr.m_ptr - static_cast<uintptr_t>(offset);
+    }
+
+	constexpr CAddress& operator+=(const auto& offset) noexcept
+    {
+    	m_ptr += static_cast<uintptr_t>(offset);
+    	return *this;
+    }
+
+	constexpr CAddress& operator-=(const auto& offset) noexcept
+    {
+    	m_ptr -= static_cast<uintptr_t>(offset);
+    	return *this;
+    }
+
+	// ── Bitwise operators ───────────────────────────────────────────────────────
+
+	[[nodiscard]] constexpr CAddress operator&(const auto& mask) const noexcept
+	{
+	    return m_ptr & static_cast<uintptr_t>(mask);
+	}
+
+	[[nodiscard]] constexpr CAddress operator|(const auto& mask) const noexcept
+	{
+	    return m_ptr | static_cast<uintptr_t>(mask);
+	}
+
+	[[nodiscard]] constexpr CAddress operator^(const auto& mask) const noexcept
+	{
+	    return m_ptr ^ static_cast<uintptr_t>(mask);
+	}
+
+	[[nodiscard]] constexpr CAddress operator>>(const auto& shift) const noexcept
+	{
+	    return m_ptr >> static_cast<uintptr_t>(shift);
+	}
+
+	[[nodiscard]] constexpr CAddress operator<<(const auto& shift) const noexcept
+	{
+	    return m_ptr << static_cast<uintptr_t>(shift);
+	}
+
+	// ── Increment / Decrement ───────────────────────────────────────────────────
+
+	constexpr CAddress& operator++() noexcept    { ++m_ptr; return *this; }
+	constexpr CAddress  operator++(int) noexcept { auto t = *this; ++m_ptr; return t; }
+	constexpr CAddress& operator--() noexcept    { --m_ptr; return *this; }
+	constexpr CAddress  operator--(int) noexcept { auto t = *this; --m_ptr; return t; }
 
 private:
 	union {
