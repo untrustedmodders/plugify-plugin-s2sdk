@@ -152,4 +152,7 @@ def __lldb_init_module(debugger, internal_dict):
     debugger.HandleCommand('type summary add -x "^GameTime_t$" --summary-string "${var.m_Value}"')
     debugger.HandleCommand('type summary add -x "^GameTick_t$" --summary-string "${var.m_Value}"')
 
+    # CAddress
+    debugger.HandleCommand('type summary add CAddress -summary-string "${var.m_value%p}""')
+
     print("✅ Game formatter loaded!")

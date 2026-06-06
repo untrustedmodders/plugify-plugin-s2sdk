@@ -22,8 +22,8 @@ void CModule::GetModuleInfo(std::string_view module_name)
 		m_base_address = info.dlpi_addr;
 		m_module_name  = name.substr(name.find_last_of('/') + 1);
 
-		uintptr_t min_vaddr = std::numeric_limits<uintptr_t>::max();
-		uintptr_t max_vaddr = 0;
+		CAddress min_vaddr = std::numeric_limits<uintptr_t>::max();
+		CAddress max_vaddr = nullptr;
 
 		for (auto i = 0; i < info.dlpi_phnum; i++)
 		{
@@ -40,7 +40,7 @@ void CModule::GetModuleInfo(std::string_view module_name)
 
 			if (is_dynamic_section)
 			{
-				DumpExports(reinterpret_cast<void*>(address));
+				DumpExports(address);
 				continue;
 			}
 
@@ -50,7 +50,7 @@ void CModule::GetModuleInfo(std::string_view module_name)
 			/*if (info.dlpi_phdr[i].p_paddr == 0)
 				continue;*/
 
-			auto* data = reinterpret_cast<std::uint8_t*>(address);
+			auto* data = static_cast<uint8_t*>(address);
 
 			auto& segment = m_segments.emplace_back();
 
@@ -121,12 +121,12 @@ void CModule::DumpExports(void* module_base)
             uint32_t bloom_shift;
         };
 
-        auto       header         = reinterpret_cast<Header*>(gnuHashAddress);
+        const auto header = reinterpret_cast<Header*>(gnuHashAddress);
         const auto bucketsAddress = gnuHashAddress + sizeof(Header) + (sizeof(uintptr_t) * header->bloom_size);
 
         // Locate the chain that handles the largest index bucket.
-        uint32_t lastSymbol    = 0;
-        uint32_t     bucketAddress = reinterpret_cast<uint32_t*>(bucketsAddress);
+        uint32_t  lastSymbol = 0;
+        uint32_t* bucketAddress = reinterpret_cast<uint32_t*>(bucketsAddress);
         for (uint32_t i = 0; i < header->nbuckets; ++i)
         {
             uint32_t bucket = *bucketAddress;
@@ -146,7 +146,7 @@ void CModule::DumpExports(void* module_base)
         const auto chainBaseAddress = bucketsAddress + (sizeof(uint32_t) * header->nbuckets);
         for (;;)
         {
-            auto chainEntry = (uint32_t*)(chainBaseAddress + (lastSymbol - header->symoffset) * sizeof(uint32_t));
+            const auto chainEntry = reinterpret_cast<uint32_t*>(chainBaseAddress + (lastSymbol - header->symoffset) * sizeof(uint32_t));
             lastSymbol++;
 
             // If the low bit is set, this entry is the end of the chain.
@@ -206,8 +206,8 @@ void CModule::DumpExports(void* module_base)
             continue;
         }
 
-        auto             address = symbol.st_value + m_base_address;
-        std::string_view name    = &string_table[symbol.st_name];
+        auto address = symbol.st_value + m_base_address;
+        auto name  = &string_table[symbol.st_name];
 
         _exports.emplace(name, address);
     }
@@ -339,7 +339,7 @@ void CModule::DumpVtables()
 
         for (auto current_addr = scan_start; current_addr < scan_end; current_addr += sizeof(void*))
         {
-            auto ptr = *reinterpret_cast<uintptr_t*>(current_addr);
+            auto ptr = current_addr.Get<uintptr_t>();
 
 			if (ptr < min_ti_addr || ptr > max_ti_addr)
                 continue;
@@ -349,7 +349,7 @@ void CModule::DumpVtables()
             if (it == known_typeinfos.end() || it->address() != ptr)
                 continue;
 
-            auto offset = *reinterpret_cast<std::intptr_t*>(current_addr - 0x8);
+            auto offset = (current_addr - 0x8).Get<intptr_t>();
             // offset_to_top: 0 for primary vtable, negative for secondary vtables
             if (offset > 0)
                 continue;
@@ -431,13 +431,13 @@ void CModule::DumpVtables()
 
 void CModule::BuildFunctionIndexAndReferences()
 {
-    uintptr_t exec_start{}, exec_end{}, exec_size{};
+    CAddress exec_start{}, exec_end{}, exec_size{};
 
     std::vector<const Segment*> data_sections;
     data_sections.reserve(m_segments.size());
 
-    uintptr_t min_data_addr = std::numeric_limits<uintptr_t>::max();
-    uintptr_t max_data_addr = 0;
+    CAddress min_data_addr = std::numeric_limits<uintptr_t>::max();
+    CAddress max_data_addr = nullptr;
 
     for (const auto& seg : m_segments)
     {
@@ -458,11 +458,11 @@ void CModule::BuildFunctionIndexAndReferences()
         }
     }
 
-    auto is_function_pointer = [=](uintptr_t addr) noexcept {
+    auto is_function_pointer = [=](CAddress addr) noexcept {
         return exec_start <= addr && addr < exec_end;
     };
 
-    auto is_data_pointer = [&](uintptr_t addr) noexcept {
+    auto is_data_pointer = [&](CAddress addr) noexcept {
         if (addr < min_data_addr || addr >= max_data_addr)
             return false;
         return std::ranges::any_of(data_sections, [addr](const Segment* s) noexcept {
@@ -470,7 +470,7 @@ void CModule::BuildFunctionIndexAndReferences()
         });
     };
 
-    std::vector<uintptr_t> seen_functions;
+    std::vector<CAddress> seen_functions;
     seen_functions.reserve(exec_size / 32);
 
     // phase1: scan data for function ptrs
@@ -479,7 +479,7 @@ void CModule::BuildFunctionIndexAndReferences()
         const auto seg_end = seg->address + seg->size;
         for (auto current_ptr = seg->address; current_ptr + sizeof(void*) <= seg_end; current_ptr += sizeof(void*))
         {
-            const auto potential_addr = *reinterpret_cast<uintptr_t*>(current_ptr);
+            const auto potential_addr = current_ptr.Get<uintptr_t>();
 
             if (is_function_pointer(potential_addr))
                 seen_functions.push_back(potential_addr);
@@ -493,8 +493,8 @@ void CModule::BuildFunctionIndexAndReferences()
 
     struct ChunkResult
     {
-        std::vector<uintptr_t> functions;
-        std::vector<uintptr_t> paddings;
+        std::vector<CAddress> functions;
+        std::vector<CAddress> paddings;
         std::vector<ReferenceEntry> refs;
     };
 
@@ -516,10 +516,10 @@ void CModule::BuildFunctionIndexAndReferences()
         if (ZYAN_FAILED(ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64)))
             return;
 
-        auto& result = chunk_results[idx];
-        result.functions.reserve(chunk_size / 64);
-        result.paddings.reserve(chunk_size / 200);
-        result.refs.reserve(chunk_size / 8);
+        auto& [functions, paddings, refs] = chunk_results[idx];
+        functions.reserve(chunk_size / 64);
+        paddings.reserve(chunk_size / 200);
+        refs.reserve(chunk_size / 8);
 
         ZydisDecodedInstruction instr{};
 
@@ -527,12 +527,11 @@ void CModule::BuildFunctionIndexAndReferences()
         ZydisMnemonic            prev_mnemonic{};
         bool                     has_prev = false;
 
-        for (auto ip = decode_start; ip < chunk_end;)
+        for (CAddress ip = decode_start; ip < chunk_end;)
         {
-            if (ZYAN_FAILED(ZydisDecoderDecodeInstruction(&decoder, nullptr,
-                                                          reinterpret_cast<const void*>(ip), exec_end - ip, &instr)))
+            if (ZYAN_FAILED(ZydisDecoderDecodeInstruction(&decoder, nullptr, ip, exec_end - ip, &instr)))
             {
-                ip++;
+                ++ip;
                 has_prev = false;
                 continue;
             }
@@ -544,10 +543,10 @@ void CModule::BuildFunctionIndexAndReferences()
             {
                 if (instr.mnemonic == ZYDIS_MNEMONIC_INT3)
                 {
-                    result.paddings.push_back(ip);
+                    paddings.push_back(ip);
                     ip += length;
 
-                    while (ip < chunk_end && *reinterpret_cast<const std::uint8_t*>(ip) == 0xCC)
+                    while (ip < chunk_end && ip.Get<uint8_t>() == 0xCC)
                         ++ip;
 
                     has_prev = false;
@@ -560,7 +559,7 @@ void CModule::BuildFunctionIndexAndReferences()
                     {
                         const auto target = ip + length + instr.raw.imm[0].value.s;
                         if (is_function_pointer(target))
-                            result.functions.push_back(target);
+                            functions.push_back(target);
                     }
                     else if (instr.meta.category == ZYDIS_CATEGORY_UNCOND_BR && instr.opcode == 0xE9 && prev_category != ZYDIS_CATEGORY_CALL)
                     {
@@ -575,7 +574,7 @@ void CModule::BuildFunctionIndexAndReferences()
                             // very likely to have false positive so we dont add it here
                             if (has_prev && (prev_category == ZYDIS_CATEGORY_POP || prev_mnemonic == ZYDIS_MNEMONIC_LEAVE))
                             {
-                                result.functions.push_back(target);
+                                functions.push_back(target);
                             }
                         }
                     }
@@ -584,9 +583,9 @@ void CModule::BuildFunctionIndexAndReferences()
                         const auto target = ip + length + instr.raw.disp.value;
 
                         if (is_data_pointer(target))
-                            result.refs.emplace_back(target, ip);
+                            refs.emplace_back(target, ip);
                         else if (is_function_pointer(target))
-                            result.functions.push_back(target);
+                            functions.push_back(target);
                     }
                 }
             }
@@ -597,7 +596,7 @@ void CModule::BuildFunctionIndexAndReferences()
             ip += length;
         }
 
-        std::ranges::sort(result.functions);
+        std::ranges::sort(functions);
     };
 
     // each chunk decodes 24 bytes early to handle boundaries landing in the middle of an instruction
@@ -627,11 +626,11 @@ void CModule::BuildFunctionIndexAndReferences()
     size_t total_pads  = 0;
     size_t total_refs  = 0;
 
-    for (const auto& r : chunk_results)
+    for (const auto& [functions, paddings, refs] : chunk_results)
     {
-        total_funcs += r.functions.size();
-        total_pads += r.paddings.size();
-        total_refs += r.refs.size();
+        total_funcs += functions.size();
+        total_pads += paddings.size();
+        total_refs += refs.size();
     }
 
     std::vector<uintptr_t> padding_addrs;

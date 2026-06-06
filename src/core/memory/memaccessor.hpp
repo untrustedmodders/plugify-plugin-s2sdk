@@ -1,6 +1,6 @@
 #pragma once
 
-#include "memaddr.hpp"
+#include "address.hpp"
 #include "protflag.hpp"
 
 /**

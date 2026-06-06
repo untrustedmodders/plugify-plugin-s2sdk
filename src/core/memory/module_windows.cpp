@@ -309,16 +309,16 @@ void CModule::DumpVtables()
             return start_addr <= ptr && ptr < end_addr;
         };
 
-        for (uintptr_t ptr = start_addr; ptr < end_addr - sizeof(void*); ptr += sizeof(void*))
+        for (auto ptr = start_addr; ptr < end_addr - sizeof(void*); ptr += sizeof(void*))
         {
-            uintptr_t potential_col_ptr = *reinterpret_cast<uintptr_t*>(ptr);
+            CAddress potential_col_ptr = ptr.Get<uintptr_t>();
 
             // check for alignment, struct _s_RTTICompleteObjectLocator aligns to 4 bytes
             if ((potential_col_ptr & 3) != 0) continue;
 
             if (!is_in_current_section(potential_col_ptr)) continue;
 
-            auto col = reinterpret_cast<_s_RTTICompleteObjectLocator*>(potential_col_ptr);
+            auto col = potential_col_ptr.As<_s_RTTICompleteObjectLocator*>();
 
             // 0 --> RTTI Class Hierarchy Descriptor
             // 1 --> RTTI Complete Object Locator
@@ -326,8 +326,8 @@ void CModule::DumpVtables()
 
             if (std::ranges::binary_search(valid_type_rvas, col->pTypeDescriptor))
             {
-                uintptr_t vtable_start = ptr + sizeof(void*);
-                auto      ti           = reinterpret_cast<std::type_info*>(m_base_address + col->pTypeDescriptor);
+                auto vtable_start = ptr + sizeof(void*);
+                auto ti           = reinterpret_cast<std::type_info*>(m_base_address + col->pTypeDescriptor);
 
                 auto node = std::make_unique<VTable>(ti, vtable_start, ti->name(), col->offset, col);
 

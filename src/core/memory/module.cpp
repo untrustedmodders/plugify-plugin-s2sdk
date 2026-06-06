@@ -46,14 +46,14 @@ std::vector<CAddress> CModule::FindPatternMulti(std::string_view pattern) const
 		const auto& data = segment.data;
 
 		auto result = scan::FindPatternMulti(data.data(), data.size(), pattern);
-		if (!result.empty())
-		{
-			std::ranges::transform(result, result.begin(), [&](CAddress address) {
-				return address + segment.address;
-			});
+		if (result.empty())
+			continue;
 
-			return result;
-		}
+		std::ranges::transform(result, result.begin(), [&](CAddress address) {
+			return address + segment.address;
+		});
+
+		return result;
 	}
 
 	return {};

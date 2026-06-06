@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "address.hpp"
 #include "interface.h"
-#include "memaddr.hpp"
 
 struct RunTimeVTableInfo
 {
@@ -54,7 +54,7 @@ class CModule final
     };
 
     std::vector<Segment> m_segments{};
-    uintptr_t            m_base_address{};
+    CAddress             m_base_address{};
     size_t               m_size{};
     std::string          m_module_name{};
     CreateInterfaceFn    m_createInterface;

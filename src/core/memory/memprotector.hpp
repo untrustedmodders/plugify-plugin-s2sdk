@@ -1,6 +1,6 @@
 #pragma once
 
-#include "memaddr.hpp"
+#include "address.hpp"
 #include "protflag.hpp"
 
 class CMemAccessor;
@@ -47,7 +47,7 @@ public:
 	bool IsValid() const noexcept { return m_status; }
 
 private:
-	void* m_address; /**< The memory address to protect. */
+	CAddress m_address; /**< The memory address to protect. */
 	size_t m_length; /**< The length of the memory region to protect. */
 	bool m_status; /**< The status of the memory protection operation. */
 	bool m_unsetLater; /**< Whether to unset the protection on destruction. */
