@@ -46,7 +46,7 @@ public:
 
 	bool Register(const Func& handler, int priority = 0) {
 		UniqueLock lock(m_mutex);
-		auto it = std::upper_bound(m_priorities.begin(), m_priorities.end(), priority,
+		auto it = std::ranges::upper_bound(m_priorities, priority,
 								   [](int p, int cur){ return p > cur; });
 		auto index = std::distance(m_priorities.begin(), it);
 		m_handlers.insert(m_handlers.begin() + index, handler);
@@ -56,7 +56,7 @@ public:
 
 	bool Unregister(const Func& handler) {
 		UniqueLock lock(m_mutex);
-		auto it = std::find(m_handlers.begin(), m_handlers.end(), handler);
+		auto it = std::ranges::find(m_handlers, handler);
 		if (it == m_handlers.end()) return false;
         auto index = std::distance(m_handlers.begin(), it);
 		m_handlers.erase(m_handlers.begin() + index);

@@ -87,7 +87,7 @@ uint32_t TimerSystem::CreateTimer(double delay, TimerCallback callback, TimerFla
 void TimerSystem::KillTimer(uint32_t id) {
 	std::scoped_lock lock(m_mutex);
 
-	auto it = std::find_if(m_timers.begin(), m_timers.end(), [id](const Timer& timer) {
+	auto it = std::ranges::find_if(m_timers, [id](const Timer& timer) {
 		return timer.id == id;
 	});
 
@@ -103,7 +103,7 @@ void TimerSystem::KillTimer(uint32_t id) {
 void TimerSystem::RescheduleTimer(uint32_t id, double newDelay) {
 	std::scoped_lock lock(m_mutex);
 
-	auto it = std::find_if(m_timers.begin(), m_timers.end(), [id](const Timer& timer) {
+	auto it = std::ranges::find_if(m_timers, [id](const Timer& timer) {
 		return timer.id == id;
 	});
 

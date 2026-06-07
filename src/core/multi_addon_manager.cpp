@@ -101,7 +101,7 @@ bool MultiAddonManager::MountAddon(PublishedFileId_t addon, bool addToTail) {
 		path.replace(path.size() - current.size(), current.size(), legacy);
 	}
 
-	if (std::find(m_mountedAddons.begin(), m_mountedAddons.end(), addon) != m_mountedAddons.end()) {
+	if (std::ranges::contains(m_mountedAddons, addon)) {
 		plg::print(LS_WARNING, "{}: Addon {} is already mounted\n", __func__, addon);
 		return false;
 	}
@@ -166,7 +166,7 @@ bool MultiAddonManager::DownloadAddon(PublishedFileId_t addon, bool important, b
 		return false;
 	}
 
-	if (std::find(m_downloadQueue.begin(), m_downloadQueue.end(), addon) != m_downloadQueue.end()) {
+	if (std::ranges::contains(m_downloadQueue, addon)) {
 		plg::print(LS_WARNING, "{}: Addon {} is already queued for download!\n", __func__, addon);
 		return false;
 	}
@@ -184,7 +184,7 @@ bool MultiAddonManager::DownloadAddon(PublishedFileId_t addon, bool important, b
 		return false;
 	}
 
-	if (important && std::find(m_importantDownloads.begin(), m_importantDownloads.end(), addon) == m_importantDownloads.end()) {
+	if (important && !std::ranges::contains(m_importantDownloads, addon)) {
 		m_importantDownloads.push_back(addon);
 	}
 
@@ -248,7 +248,7 @@ void MultiAddonManager::OnAddonDownloaded(DownloadItemResult_t* result) {
 		plg::print(LS_WARNING, "Addon {} download failed with status {}\n", static_cast<PublishedFileId_t>(result->m_nPublishedFileId), static_cast<int>(result->m_eResult));
 
 	// This download isn't triggered by us, don't do anything
-	if (std::find(m_downloadQueue.begin(), m_downloadQueue.end(), result->m_nPublishedFileId) == m_downloadQueue.end())
+	if (!std::ranges::contains(m_downloadQueue, result->m_nPublishedFileId))
 		return;
 
 	m_downloadQueue.pop_front();
@@ -263,7 +263,7 @@ void MultiAddonManager::OnAddonDownloaded(DownloadItemResult_t* result) {
 }
 
 bool MultiAddonManager::AddAddon(PublishedFileId_t addon, bool refresh) {
-	if (std::find(m_extraAddons.begin(), m_extraAddons.end(), addon) != m_extraAddons.end()) {
+	if (std::ranges::contains(m_extraAddons, addon)) {
 		plg::print(LS_WARNING, "Addon {} is already in the list!\n", addon);
 		return false;
 	}
@@ -370,7 +370,7 @@ bool MultiAddonManager::HasUGCConnection() {
 
 void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64, bool refresh) {
 	if (!steamID64) {
-		if (std::find(m_globalClientAddons.begin(), m_globalClientAddons.end(), addon) != m_globalClientAddons.end()) {
+		if (std::ranges::contains(m_globalClientAddons, addon)) {
 			plg::print(LS_WARNING, "Addon {} is already in the list!\n", addon);
 			return;
 		}
@@ -380,7 +380,7 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 
-		if (std::find(clientInfo.addonsToLoad.begin(), clientInfo.addonsToLoad.end(), addon) != clientInfo.addonsToLoad.end()) {
+		if (std::ranges::contains(clientInfo.addonsToLoad, addon)) {
 			plg::print(LS_WARNING, "Addon {} is already in the list!\n", addon);
 			return;
 		}
@@ -460,7 +460,7 @@ plg::vector<PublishedFileId_t> MultiAddonManager::GetClientAddons(uint64 steamID
 
 	// Also make sure we don't have duplicates.
 	for (const auto& addon : m_globalClientAddons) {
-		if (std::find(addons.begin(), addons.end(), addon) == addons.end()) {
+		if (!std::ranges::contains(addons, addon)) {
 			addons.push_back(addon);
 		}
 	}
@@ -469,7 +469,7 @@ plg::vector<PublishedFileId_t> MultiAddonManager::GetClientAddons(uint64 steamID
 	if (steamID64) {
 		auto& addonsToLoad = g_ClientAddons[steamID64].addonsToLoad;
 		for (const auto& addon : addonsToLoad) {
-			if (std::find(addonsToLoad.begin(), addonsToLoad.end(), addon) == addonsToLoad.end()) {
+			if (!std::ranges::contains(addonsToLoad, addon)) {
 				addonsToLoad.push_back(addon);
 			}
 		}
@@ -635,7 +635,7 @@ void MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServe
 	auto& downloadedAddons = clientInfo.downloadedAddons;
 
 	// Handle the first addon here. The rest should be handled in the SendNetMessage hook.
-	if (std::find(downloadedAddons.begin(), downloadedAddons.end(), clientAddons[0]) == downloadedAddons.end()) {
+	if (!std::ranges::contains(downloadedAddons, clientAddons[0])) {
 		clientInfo.currentPendingAddon = clientAddons[0];
 	}
 

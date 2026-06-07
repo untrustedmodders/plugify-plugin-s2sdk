@@ -19,11 +19,7 @@ void cvars::NotifyConVar(ConVarRefAbstract conVar, std::string_view value) {
 	}
 
 	event->SetString("cvarname", conVar.GetName());
-	if (conVar.IsFlagSet(FCVAR_PROTECTED)) {
-		event->SetString("cvarvalue", "***PROTECTED***");
-	} else {
-		event->SetString("cvarvalue", value.data());
-	}
+	event->SetString("cvarvalue", conVar.IsFlagSet(FCVAR_PROTECTED) ? "***PROTECTED***" : value.data());
 
 	g_pGameEventManager->FireEvent(event);
 }

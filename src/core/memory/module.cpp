@@ -213,7 +213,7 @@ std::vector<CAddress> CModule::GetVFunctionsFromVTable(std::string_view vtableNa
     });
 
 	std::ranges::sort(funcs);
-    
+
 	{
 		std::unique_lock lock(_mutex);
 		m_vtable_functions.emplace(vtableName, funcs);

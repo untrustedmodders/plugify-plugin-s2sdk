@@ -121,7 +121,14 @@ void CModule::BuildFunctionIndexAndReferences()
         uint8_t SizeOfProlog;
         uint8_t CountOfCodes;
         uint8_t FrameRegister : 4;
-        uint8_t FrameOffset : 4;
+    	uint8_t FrameOffset : 4;
+    	/* UNWIND_CODE UnwindCode[1];
+    	*  UNWIND_CODE MoreUnwindCode[((CountOfCodes + 1) & ~1) - 1];
+		*   union {
+		*       OPTIONAL ULONG ExceptionHandler;
+		*       OPTIONAL ULONG FunctionEntry;
+		*   };
+		*   OPTIONAL ULONG ExceptionData[]; */
     };
 
     for (size_t i = 0; i < entries;)
@@ -190,7 +197,7 @@ void CModule::BuildFunctionIndexAndReferences()
     // not to mention safetyhook also uses zydis and i use the encoder feature from zydis too.
     // hopefully no one copies or recodes this function in another language and claims they coded it without giving credit 😭🙏
 
-    auto disassemble_chunk = [&](std::uint32_t idx, size_t start_idx, size_t end_idx) {
+    auto disassemble_chunk = [&](uint32_t idx, size_t start_idx, size_t end_idx) {
         ZydisDecoder decoder{};
         if (ZYAN_FAILED(ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64))) return;
 

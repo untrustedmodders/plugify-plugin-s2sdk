@@ -13,7 +13,7 @@ struct region_t {
 	ProtFlag prot;
 };
 
-static region_t GetRegionFromAddr(uintptr_t addr)
+static region_t get_region_from_addr(uintptr_t addr)
 {
 	region_t res{};
 
@@ -59,7 +59,7 @@ bool CMemAccessor::MemCopy(CAddress dest, CAddress src, size_t size)
 
 bool CMemAccessor::SafeMemCopy(CAddress dest, CAddress src, size_t size, size_t& written) noexcept
 {
-	region_t region_infos = GetRegionFromAddr(src);
+	region_t region_infos = get_region_from_addr(src);
 
 	// Make sure that the region we query is writable
 	if (!(region_infos.prot & ProtFlag::W))
@@ -75,7 +75,7 @@ bool CMemAccessor::SafeMemCopy(CAddress dest, CAddress src, size_t size, size_t&
 
 bool CMemAccessor::SafeMemRead(CAddress src, CAddress dest, size_t size, size_t& read) noexcept
 {
-	region_t region_infos = GetRegionFromAddr(src);
+	region_t region_infos = get_region_from_addr(src);
 
 	// Make sure that the region we query is readable
 	if (!(region_infos.prot & ProtFlag::R))
@@ -92,7 +92,7 @@ bool CMemAccessor::SafeMemRead(CAddress src, CAddress dest, size_t size, size_t&
 ProtFlag CMemAccessor::MemProtect(CAddress dest, size_t size, ProtFlag prot, bool& status)
 {
 	static auto pageSize = static_cast<size_t>(sysconf(_SC_PAGESIZE));
-	region_t regionInfo = GetRegionFromAddr(dest);
+	region_t regionInfo = get_region_from_addr(dest);
 	uintptr_t alignedDest = MemoryRound(dest, pageSize);
 	uintptr_t alignedSize = MemoryRoundUp(size, pageSize);
 	status = mprotect(reinterpret_cast<void*>(alignedDest), alignedSize, TranslateProtection(prot)) == 0;

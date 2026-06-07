@@ -51,7 +51,7 @@ void PanoramaVoteHandler::RemovePlayerFromVote(CPlayerSlot slot) {
 	if (!m_voteInProgress)
 		return;
 
-	auto it = std::find(m_voters.begin(), m_voters.end(), slot);
+	auto it = std::ranges::find(m_voters, slot);
 	if (it != m_voters.end()) {
 		m_voters.erase(it);
 	}
@@ -61,8 +61,7 @@ bool PanoramaVoteHandler::IsPlayerInVotePool(CPlayerSlot slot) const {
 	if (!m_voteInProgress)
 		return false;
 
-	auto it = std::find(m_voters.begin(), m_voters.end(), slot);
-	return it != m_voters.end();
+	return std::ranges::contains(m_voters, slot);
 }
 
 // Removes a client's vote and redraws the vote

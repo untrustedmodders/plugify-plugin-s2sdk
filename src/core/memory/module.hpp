@@ -25,6 +25,7 @@ enum class SegFlags : uint8_t;
 struct _s_RTTICompleteObjectLocator;
 #endif
 
+// from https://github.com/Kxnrl/modsharp-public/blob/master/Engine/src/module.cpp
 class CModule final
 {
     struct Segment
@@ -210,13 +211,13 @@ public:
 	template<typename Range, typename Getter, typename Formatter>
 	[[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromRefs(Range&& items, Getter&& getter, Formatter&& formatter) const
 	{
-		if (std::begin(items) == std::end(items)) [[unlikely]]
+		if (std::ranges::begin(items) == std::ranges::end(items)) [[unlikely]]
 		{
 			return MakeError("No references provided to search for.");
 		}
 
 		std::vector<std::span<const ReferenceEntry>> ref_sets;
-		ref_sets.reserve(std::size(items));
+		ref_sets.reserve(std::ranges::size(items));
 
 		for (const auto& item : items)
 		{
