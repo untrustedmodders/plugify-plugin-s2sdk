@@ -129,7 +129,7 @@ endif()
 #
 # SourceSDK
 #
-set(SOURCESDK_LINK_STRIP_CPP_EXPORTS ON CACHE INTERNAL "")
+#set(SOURCESDK_LINK_STRIP_CPP_EXPORTS ON CACHE INTERNAL "")
 set(SOURCESDK_LINK_STEAMWORKS ON CACHE INTERNAL "")
 set(SOURCESDK_MALLOC_OVERRIDE ON CACHE INTERNAL "")
 set(SOURCESDK_CONFIGURE_EXPORT_MAP OFF CACHE INTERNAL "")
@@ -223,10 +223,6 @@ endif()
 if(MACOS)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/sym/exported_symbols.lds")
 elseif(LINUX)
-    target_link_options(${PROJECT_NAME} PRIVATE
-            #-Wl,--wrap=_ZNSs12_S_empty_repEv
-            #-Wl,--wrap=_ZNSbIwSt11char_traitsIwESaIwEE12_S_empty_repEv
-    )
     target_link_libraries(${PROJECT_NAME} PRIVATE "-Wl,--version-script,${CMAKE_CURRENT_SOURCE_DIR}/sym/version_script.lds")
 endif()
 
