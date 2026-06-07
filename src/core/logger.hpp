@@ -60,7 +60,7 @@ inline Logger& g_Logger = Logger::Instance();
 namespace plg {
 	class Level {
 	public:
-		Level(LoggingSeverity_t severity, std::source_location location = std::source_location::current()) :
+		Level(LoggingSeverity_t severity, const std::source_location& location = std::source_location::current()) :
 			m_severity(severity), m_location(location) {
 		}
 

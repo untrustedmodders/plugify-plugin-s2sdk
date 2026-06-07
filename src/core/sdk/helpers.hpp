@@ -8,7 +8,7 @@ namespace helpers {
 	template<typename T = CBaseEntity>
 	T* GetEntity(
 		int entityHandle,
-		std::source_location location = std::source_location::current()
+		const std::source_location& location = std::source_location::current()
 	) {
 		auto* entity = static_cast<T*>(g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle)));
 		if (!entity) {
@@ -21,7 +21,7 @@ namespace helpers {
 
 	inline CPlayerController* GetController(
 		int playerSlot,
-		std::source_location location = std::source_location::current()
+		const std::source_location& location = std::source_location::current()
 	) {
 		auto* controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
 		if (!controller) {
@@ -35,7 +35,7 @@ namespace helpers {
 
 	inline std::pair<CPlayerController*, CPlayerPawn*> GetController2(
 		int playerSlot,
-		std::source_location location = std::source_location::current()
+		const std::source_location& location = std::source_location::current()
 	) {
 		auto* controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
 		if (!controller) {
@@ -58,7 +58,7 @@ namespace helpers {
 	S* GetService(
 		int playerSlot,
 		M T::*member,
-		std::source_location location = std::source_location::current()
+		const std::source_location& location = std::source_location::current()
 	) {
 		auto* controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
 		if (!controller) {
@@ -82,7 +82,7 @@ namespace helpers {
 	S* GetService2(
 		int playerSlot,
 		M T::*member,
-		std::source_location location = std::source_location::current()
+		const std::source_location& location = std::source_location::current()
 	) {
 		auto* controller = static_cast<CPlayerController*>(utils::GetController(playerSlot));
 		if (!controller) {

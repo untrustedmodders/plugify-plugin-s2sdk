@@ -104,7 +104,7 @@ struct LoadOptions {
 	plg::vector<plg::string> configPaths;
 	plg::string gameDirectory = S2SDK_GAME_NAME;
 	CacheStrategy cacheStrategy = CacheStrategy::Eager;
-	std::execution::parallel_policy processStrategy = std::execution::par;
+	//std::execution::parallel_policy processStrategy = std::execution::par;
 	bool strictMode = false;
 	bool validateOnLoad = true;
 	bool allowPartialApply = false;

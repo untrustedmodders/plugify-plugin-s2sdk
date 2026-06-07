@@ -64,24 +64,24 @@ void Logger::SetChannelFlags(LoggingChannelFlags_t flags) const {
 }
 
 void Logger::Log(std::string_view message, LoggingSeverity_t severity, const std::source_location& location) const  {
-	/*LoggingRareOptions_t options {
-		.m_File = loc.file_name(),
-		.m_Line = static_cast<int>(loc.line()),
-		.m_Function = loc.function_name(),
-	};*/
+	const LoggingRareOptions_t options {
+		.m_File = location.file_name(),
+		.m_Line = static_cast<int>(location.line()),
+		.m_Function = location.function_name(),
+	};
 	std::unique_lock lock(m_mutex);
 	switch (severity) {
 		case LS_ERROR:
-			LoggingSystem_LogDirect(m_channelID, LS_ERROR, RED, message.data());
+			LoggingSystem_LogDirect(m_channelID, LS_ERROR, options, RED, message.data());
 		break;
 		case LS_WARNING:
-			LoggingSystem_LogDirect(m_channelID, LS_WARNING, YELLOW, message.data());
+			LoggingSystem_LogDirect(m_channelID, LS_WARNING, options, YELLOW, message.data());
 		break;
 		case LS_MESSAGE:
-			LoggingSystem_LogDirect(m_channelID, LS_MESSAGE, WHITE, message.data());
+			LoggingSystem_LogDirect(m_channelID, LS_MESSAGE, options, WHITE, message.data());
 		break;
 		case LS_DETAILED:
-			LoggingSystem_LogDirect(m_channelID, LS_MESSAGE, GREEN, message.data());
+			LoggingSystem_LogDirect(m_channelID, LS_MESSAGE, options, GREEN, message.data());
 		break;
 		default:
 			break;

@@ -1211,7 +1211,7 @@ Result<Memory> SignatureResolver::ResolveReferences(
 				if (!conVarData) {
 					return MakeError("ConVarData not found: {}", ref.name);
 				}
-				return module.FindPtr(reinterpret_cast<uintptr_t>(conVarData)) - sizeof(ConVarRef);
+				return module.FindPtr(conVarData) - sizeof(ConVarRef);
 			}
 			default:
 				return MakeError("Invalid reference type");
@@ -1273,7 +1273,6 @@ Result<ResolvedAddress> AddressResolver::Resolve(
 	}
 
 	auto finalAddr = ApplyIndirections(baseAddress, address.steps);
-
 	if (!finalAddr) {
 		return MakeError(std::move(finalAddr.error()));
 	}
