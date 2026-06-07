@@ -143,6 +143,7 @@ def __lldb_init_module(debugger, internal_dict):
     debugger.HandleCommand('type summary add -x "^CUtlSymbolLarge$" --summary-string "${var.u.m_pAsString}"')
     debugger.HandleCommand('type summary add -x "^CUtlSymbol$" --summary-string "${var.u.m_pAsString}"')
 
+    # structs
     debugger.HandleCommand('type summary add -x "^Vector$"   --summary-string "(${var.x}, ${var.y}, ${var.z})"')
     debugger.HandleCommand('type summary add -x "^QAngle$"   --summary-string "(${var.x}, ${var.y}, ${var.z})"')
     debugger.HandleCommand('type summary add -x "^Vector2D$" --summary-string "(${var.x}, ${var.y})"')
@@ -152,7 +153,8 @@ def __lldb_init_module(debugger, internal_dict):
     debugger.HandleCommand('type summary add -x "^GameTime_t$" --summary-string "${var.m_Value}"')
     debugger.HandleCommand('type summary add -x "^GameTick_t$" --summary-string "${var.m_Value}"')
 
-    # CAddress
+    # others
     debugger.HandleCommand('type summary add CAddress -summary-string "${var.m_value%p}"')
+    debugger.HandleCommand('type summary add CModule -summary-string "${var.m_module_name}"')
 
     print("✅ Game formatter loaded!")
