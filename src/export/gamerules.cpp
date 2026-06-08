@@ -51,8 +51,8 @@ extern "C" PLUGIN_API void* GetGameRules() {
  * @return A pointer to the corresponding CTeam instance, or nullptr if the team was not found.
  */
 extern "C" PLUGIN_API CTeam* GetGameTeamManager(CSTeam team) {
-	auto it = g_pTeamManagers.find(team);
-	if (it == g_pTeamManagers.end()) {
+	auto it = g_TeamManagers.find(team);
+	if (it == g_TeamManagers.end()) {
 		plg::print(LS_WARNING, "Failed to find {} team\n", plg::enum_to_string(team));
 		return nullptr;
 	}
@@ -71,8 +71,8 @@ extern "C" PLUGIN_API CTeam* GetGameTeamManager(CSTeam team) {
  * @return The current score of the team, or -1 if the team could not be found.
  */
 extern "C" PLUGIN_API int GetGameTeamScore(CSTeam team) {
-	auto it = g_pTeamManagers.find(team);
-	if (it == g_pTeamManagers.end()) {
+	auto it = g_TeamManagers.find(team);
+	if (it == g_TeamManagers.end()) {
 		plg::print(LS_WARNING, "Failed to find {} team\n", plg::enum_to_string(team));
 		return -1;
 	}

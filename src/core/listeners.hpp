@@ -19,6 +19,7 @@ using Manager = ListenerManager<Name, Func, std::shared_mutex>;
 	X(ClientAuthenticated, void, int playerSlot, uint64 steamID) \
 	X(RoundTerminated, void, float delay, CRoundEndReason reason) \
 	X(EntityCreated, void, int entityHandle) \
+	X(EntitySpawned, void, int entityHandle) \
 	X(EntityDeleted, void, int entityHandle) \
 	X(EntityParentChanged, void, int entityHandle, int parentHandle) \
 	X(ServerCheckTransmit, void, const plg::vector<CCheckTransmitInfo*>&) \

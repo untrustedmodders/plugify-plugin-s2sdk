@@ -16,7 +16,7 @@
     },
     {
       "name": "polyhook",
-      "constraints": ">=2.5.1"
+      "constraints": ">=2.5.2"
     }
   ],
   "methods": [
@@ -31444,6 +31444,72 @@
                 "name": "entityHandle",
                 "type": "int32",
                 "description": "The created entity handle"
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnEntitySpawned_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnEntitySpawned_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnEntitySpawnedCallback",
+            "funcName": "OnEntitySpawnedCallback",
+            "description": "Called when an entity is spawned.",
+            "paramTypes": [
+              {
+                "name": "entityHandle",
+                "type": "int32",
+                "description": "The spawned entity handle"
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnEntitySpawned_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnEntitySpawned_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnEntitySpawnedCallback",
+            "funcName": "OnEntitySpawnedCallback",
+            "description": "Called when an entity is spawned.",
+            "paramTypes": [
+              {
+                "name": "entityHandle",
+                "type": "int32",
+                "description": "The spawned entity handle"
               }
             ],
             "retType": {

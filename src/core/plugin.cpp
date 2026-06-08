@@ -91,21 +91,6 @@ polyhook::ResultType Hook_DisconnectGameNow(polyhook::HookHandle hook, polyhook:
 	return polyhook::ResultType::Ignored;
 }
 
-polyhook::ResultType Hook_Release(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	auto server = polyhook::GetArgument<CNetworkGameServerBase*>(params, 0);
-
-	if (server->m_nRefCount > 1)
-		return polyhook::ResultType::Ignored;
-
-	// g_HookManager.RemoveHookMemFunc(STR(CNetworkGameServerBase::Release), &CNetworkGameServerBase::Release, server);
-	// g_HookManager.RemoveHookMemFunc(STR(CNetworkGameServerBase::ActivateServer), &CNetworkGameServerBase::ActivateServer, server);
-	// g_HookManager.RemoveHookMemFunc(STR(CNetworkGameServerBase::SpawnServer), &CNetworkGameServerBase::SpawnServer, server);
-	// g_HookManager.RemoveHookMemFunc(STR(CNetworkGameServerBase::StartChangeLevel), &CNetworkGameServerBase::StartChangeLevel, server);
-	// g_HookManager.RemoveHookMemFunc(STR(CNetworkGameServerBase::FinishChangeLevel), &CNetworkGameServerBase::FinishChangeLevel, server);
-
-	return polyhook::ResultType::Ignored;
-}
-
 void LoadMOTDFile() {
 	if (!g_pNetworkStringTableServer) {
 		return;
@@ -551,7 +536,7 @@ polyhook::ResultType Hook_SendNetMessage(polyhook::HookHandle hook, polyhook::Pa
 	return polyhook::ResultType::Ignored;
 }
 
-polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
@@ -571,18 +556,28 @@ polyhook::ResultType Hook_OnAddEntity(polyhook::HookHandle hook, polyhook::Param
 			{"target_name", "script_main"},
 			{"cs_script", CS_SCRIPT_PATH}
 		});
-#endif
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
 		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pointScript) + offset);
-	} else if (name.ends_with("team_manager")) {
-		g_pTeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
+#endif
 	}
 
 	g_EntityCreatedListenerManager(handle.ToInt());
 	return polyhook::ResultType::Ignored;
 }
 
-polyhook::ResultType Hook_OnRemoveEntity(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+polyhook::ResultType Hook_OnEntitySpawned(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
+	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
+	std::string_view name(entity->GetClassname());
+	if (name.ends_with("team_manager")) {
+		g_TeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
+	}
+
+	g_EntitySpawnedListenerManager(handle.ToInt());
+	return polyhook::ResultType::Ignored;
+}
+
+polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
@@ -590,7 +585,7 @@ polyhook::ResultType Hook_OnRemoveEntity(polyhook::HookHandle hook, polyhook::Pa
 		g_pGameRulesProxy = nullptr;
 		g_pGameRules = nullptr;
 	} else if (name.ends_with("team_manager")) {
-		g_pTeamManagers.erase(entity->m_iTeamNum);
+		g_TeamManagers.erase(entity->m_iTeamNum);
 	}
 
 	g_EntityDeletedListenerManager(handle.ToInt());
@@ -648,78 +643,7 @@ polyhook::ResultType Hook_RegisterInstance(polyhook::HookHandle hook, polyhook::
 	vscript::RegisterScriptClass(classDesc, instance);
 	return polyhook::ResultType::Ignored;
 }
-/*
-plg::flat_hash_map<HSCRIPT, const char*> scriptFunctionMap = {};
 
-polyhook::ResultType Hook_LookupFunction(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	//g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
-	auto pszFunction = polyhook::GetArgument<const char *>(params, 1);
-	//auto hScope = polyhook::GetArgument<HSCRIPT>(params, 2);
-	//auto raw = polyhook::GetArgument<bool>(params, 3);
-	auto hScript = polyhook::GetReturn<HSCRIPT>(ret);
-	scriptFunctionMap[hScript] = pszFunction;
-	plg::print(LS_MESSAGE, "LookupFunction - {}\n", pszFunction);
-	return polyhook::ResultType::Ignored;
-}
-
-polyhook::ResultType Hook_ReleaseFunction(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	//g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
-	auto hScript = polyhook::GetArgument<HSCRIPT>(params, 1);
-	//scriptFunctionMap.erase(hScript);
-	return polyhook::ResultType::Ignored;
-}
-
-polyhook::ResultType Hook_ExecuteFunction(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	//g_pScriptVM = polyhook::GetArgument<IScriptVM*>(params, 0);
-	auto hFunction = polyhook::GetArgument<HSCRIPT>(params, 1);
-	auto pArgs = polyhook::GetArgument<ScriptVariant_t*>(params, 2);
-	//auto nArgs = polyhook::GetArgument<int>(params, 3);
-	//auto pReturn = polyhook::GetArgument<ScriptVariant_t*>(params, 4);
-	auto hScope = polyhook::GetArgument<HSCRIPT>(params, 5);
-	//auto bWait = polyhook::GetArgument<bool>(params, 6);
-
-	std::string_view current = scriptFunctionMap[hFunction];
-
-	plg::print(LS_MESSAGE, "ExecuteFunction - {}\n", current);
-
-	CBaseEntity* entity = nullptr;
-	ScriptVariant_t thisEntity;
-	if (g_pScriptVM->GetValue(hScope, "thisEntity", STR(thisEntity))), &thisEntity)) {
-		entity = (CBaseEntity*)g_pScriptVM->GetInstanceValue(thisEntity);
-	}
-	if (entity == nullptr) {
-		return polyhook::ResultType::Ignored;
-	}
-
-	if (current == "OnSpawn") {
-		CScriptKeyValues* spawnkeys = reinterpret_cast<CScriptKeyValues*>(g_pScriptVM->GetInstanceValue(pArgs[0]));
-
-		//g_EntitySpawnListenerManager(entity->GetRefEHandle().ToInt(), spawnkeys->m_pKeyValues);
-
-	} else if (currentlyExecutingScriptFunction == "OnDelete") {
-	} else if (current == "DispatchPrecache") {
-		CScriptPrecacheContext* context = reinterpret_cast<CScriptPrecacheContext*>(g_pScriptVM->GetInstanceValue(pArgs[0]));
-		auto funcs = GetOnEntityPrecacheListenerManager().Get();
-		for (const auto& func : funcs) {
-			auto precached = func(entity->GetRefEHandle().ToInt());
-			for (const auto& precache : precached) {
-				context->m_pContext->m_pManifest->AddResource(precache.c_str());
-			}
-		}
-		if (context != nullptr) {
-		}
-	}
-
-	return polyhook::ResultType::Ignored;
-}
-
-polyhook::ResultType Hook_SetValue(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	auto pScript = polyhook::GetArgument<IScriptVM*>(params, 0);
-	auto value = polyhook::GetArgument<const ScriptVariant_t*>(params, 3);
-	//vscript::SetValue(pScript, *value);
-	return polyhook::ResultType::Ignored;
-}
-*/
 #if defined (CS2)
 polyhook::ResultType Hook_IsolateEnter(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto isolate = polyhook::GetArgument<v8::Isolate*>(params, 0);
@@ -791,6 +715,13 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookVTableFunc(STR(ICvar::DispatchConCommand), &ICvar::DispatchConCommand, g_pCVar, Hook_DispatchConCommand, {Pre, Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(ICvar::CallGlobalChangeCallbacks), &ICvar::CallGlobalChangeCallbacks, g_pCVar, Hook_CallGlobalChangeCallbacks, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(ISource2GameEntities::CheckTransmit), &ISource2GameEntities::CheckTransmit, g_pSource2GameEntities, Hook_CheckTransmit, {Post}));
+
+	IEntityListener* pSource2GameEntitiesEntityListener = dynamic_cast<IEntityListener*>(g_pSource2GameEntities);
+
+	CHECK(g_HookManager.AddHookVTableFunc(STR(IEntityListener::OnEntityCreated), &IEntityListener::OnEntityCreated, pSource2GameEntitiesEntityListener, Hook_OnEntityCreated, {Post}));
+	CHECK(g_HookManager.AddHookVTableFunc(STR(IEntityListener::OnEntitySpawned), &IEntityListener::OnEntitySpawned, pSource2GameEntitiesEntityListener, Hook_OnEntitySpawned, {Post}));
+	CHECK(g_HookManager.AddHookVTableFunc(STR(IEntityListener::OnEntityDeleted), &IEntityListener::OnEntityDeleted, pSource2GameEntitiesEntityListener, Hook_OnEntityDeleted, {Post}));
+	CHECK(g_HookManager.AddHookVTableFunc(STR(IEntityListener::OnEntityParentChanged), &IEntityListener::OnEntityParentChanged, pSource2GameEntitiesEntityListener, Hook_OnEntityParentChanged, {Post}));
 
 	//using LogDirect = LoggingResponse_t (*)(void* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, LeafCodeInfo_t*, LoggingMetaData_t*, Color, char const*, va_list*);
 	//CHECK(g_HookManager.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, {Pre}));
@@ -866,27 +797,14 @@ Result<void> ServerStartup() {
 	using enum polyhook::CallbackType;
 
 	g_pNetworkGameServer = g_pNetworkServerService->GetIGameServer();
-
 	if (g_pNetworkGameServer != nullptr) {
 		gpGlobals = g_pNetworkGameServer->GetGlobals();
-		CHECK(g_HookManager.AddHookVTableFunc(STR(CNetworkGameServerBase::Release), &CNetworkGameServerBase::Release, g_pNetworkGameServer, Hook_Release, {Pre}));
 		CHECK(g_HookManager.AddHookVTableFunc(STR(CNetworkGameServerBase::ActivateServer), &CNetworkGameServerBase::ActivateServer, g_pNetworkGameServer, Hook_ActivateServer, {Post}));
 		CHECK(g_HookManager.AddHookVTableFunc(STR(CNetworkGameServerBase::SpawnServer), &CNetworkGameServerBase::SpawnServer, g_pNetworkGameServer, Hook_SpawnServer, {Post}));
 	}
 
-	if (g_pGameEntitySystem != nullptr) {
-		g_HookManager.RemoveHookVirtualFunc(&CEntitySystem::OnAddEntity, g_pGameEntitySystem);
-		g_HookManager.RemoveHookVirtualFunc(&CEntitySystem::OnRemoveEntity, g_pGameEntitySystem);
-		g_HookManager.RemoveHookVirtualFunc(&CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem);
-	}
-
 	g_pGameEntitySystem = GameEntitySystem();
-
 	if (g_pGameEntitySystem != nullptr) {
-		CHECK(g_HookManager.AddHookVTableFunc(STR(CEntitySystem::OnAddEntity), &CEntitySystem::OnAddEntity, g_pGameEntitySystem, Hook_OnAddEntity, {Post}));
-		CHECK(g_HookManager.AddHookVTableFunc(STR(CEntitySystem::OnRemoveEntity), &CEntitySystem::OnRemoveEntity, g_pGameEntitySystem, Hook_OnRemoveEntity, {Post}));
-		CHECK(g_HookManager.AddHookVTableFunc(STR(CEntitySystem::OnEntityParentChanged), &CEntitySystem::OnEntityParentChanged, g_pGameEntitySystem, Hook_OnEntityParentChanged, {Post}));
-
 		g_pEntityNetworkSerializerInfo = g_pGameEntitySystem->FindClassByName("CBaseEntity")->m_pNetworkSerializerInfo->m_pDatabase;
 	}
 
