@@ -4,7 +4,7 @@
 #include "globals.hpp"
 #include "sdk/helpers.hpp"
 
-void TransmitManger::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& transmitList) {
+void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& transmitList) {
 	if (m_playerHiddenEntities.empty()) {
 		return;
 	}
@@ -20,27 +20,27 @@ void TransmitManger::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& tra
 		}
 
 		for (const int32_t handle : it->second) {
-			auto* entity = helpers::GetEntity(handle);
+			auto* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(handle));
 			if (!entity) {
 				continue;
 			}
-			info->m_pTransmitEntity->Clear(entity->entindex());
+			info->m_pTransmitEntity->Clear(entity->GetEntityIndex());
 		}
 	}
 }
 
-void TransmitManger::RoundStart() {
+void TransmitManager::RoundStart() {
 	m_playerHiddenEntities.clear();
 }
 
-void TransmitManger::HideEntities(int32_t playerSlot, std::span<const int32_t> entHandles) {
+void TransmitManager::HideEntities(int32_t playerSlot, std::span<const int32_t> entHandles) {
 	auto& hidden = m_playerHiddenEntities[playerSlot];
 	for (const int32_t handle : entHandles) {
 		hidden.insert(handle);
 	}
 }
 
-void TransmitManger::ShowEntities(int32_t playerSlot, std::span<const int32_t> entHandles) {
+void TransmitManager::ShowEntities(int32_t playerSlot, std::span<const int32_t> entHandles) {
 	auto it = m_playerHiddenEntities.find(playerSlot);
 	if (it == m_playerHiddenEntities.end()) {
 		return;
@@ -56,7 +56,7 @@ void TransmitManger::ShowEntities(int32_t playerSlot, std::span<const int32_t> e
 	}
 }
 
-plg::vector<int32_t> TransmitManger::GetHiddenEntities(int32_t playerSlot) {
+plg::vector<int32_t> TransmitManager::GetHiddenEntities(int32_t playerSlot) {
 	auto it = m_playerHiddenEntities.find(playerSlot);
 	if (it == m_playerHiddenEntities.end()) {
 		return {};
@@ -65,7 +65,7 @@ plg::vector<int32_t> TransmitManger::GetHiddenEntities(int32_t playerSlot) {
 	return plg::vector<int32_t>(it->second.begin(), it->second.end());
 }
 
-void TransmitManger::HideEntityFromOtherPlayers(int32_t playerSlot, int32_t entHandle) {
+void TransmitManager::HideEntityFromOtherPlayers(int32_t playerSlot, int32_t entHandle) {
 	for (int32_t slot = 0; slot < MaxPlayers; ++slot) {
 		if (slot == playerSlot) {
 			continue;
@@ -75,7 +75,7 @@ void TransmitManger::HideEntityFromOtherPlayers(int32_t playerSlot, int32_t entH
 	}
 }
 
-void TransmitManger::ShowEntityToOtherPlayers(int32_t playerSlot, int32_t entHandle) {
+void TransmitManager::ShowEntityToOtherPlayers(int32_t playerSlot, int32_t entHandle) {
 	for (int32_t slot = 0; slot < MaxPlayers; ++slot) {
 		if (slot == playerSlot) {
 			continue;

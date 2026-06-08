@@ -1,10 +1,10 @@
 #pragma once
 #include <iservernetworkable.h>
 
-class TransmitManger {
+class TransmitManager {
 public:
 	static auto& Instance() {
-		static TransmitManger instance;
+		static TransmitManager instance;
 		return instance;
 	}
 
@@ -22,4 +22,4 @@ public:
 private:
 	plg::flat_hash_map<int32_t, plg::flat_hash_set<int32_t>> m_playerHiddenEntities;
 };
-inline TransmitManger& g_TransmitManager = TransmitManger::Instance();
+inline TransmitManager& g_TransmitManager = TransmitManager::Instance();
