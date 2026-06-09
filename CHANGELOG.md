@@ -1,5 +1,39 @@
 # Changelog
 
+## [2.10.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.9.1...v2.10.0) (2026-06-09)
+
+
+### Features
+
+* add IEntityListener hooks and new callback ([99fd5ea](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/99fd5ea7424ef6a7933e852997581d856aa04bfb))
+
+
+### Bug Fixes
+
+* add LoggingRareOptions_t to log ([b2b89a3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b2b89a3047f065465c64815ffb0c74e9732fb5ce))
+* add more address wrappers ([5719208](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5719208305a205cf6e32b3216e98937fe37d24f0))
+* add more verbose warnings for gameconfigs ([6c2fc07](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6c2fc078308f4156795f5190c54f488c2f5e936a))
+* compilation fixes on windows ([6d53cb6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6d53cb60896819ba9c9e356ece2064ed66c481c2))
+* cvar lookup ([0cdee82](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0cdee82d4310611cb88d4aca42441068c8e86b38))
+* disable tier0 stripping ([3bd5f08](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3bd5f08e32dd931d052fdfc3e146a312b2cf2814))
+* imrpove vtabledump on linux ([9cd271d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9cd271d28a6e0ec39ebd4debe82349594a913c34))
+* make interface querys run first ([f32f914](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f32f914cd75babe1273eb499a3dbcdb327035b88))
+* make ref search by all occurrences ([25ba209](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/25ba209c0764b6b0d2d7a263654441196bf071a9))
+* more improvements for MSVC ([c18a218](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c18a218e1fff6b38c6b4626a32339698eba62927))
+* more improvements of CAddress ([e7592d0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e7592d0ab3b5c4dd0e663085f5a79b1e9aab66d8))
+* more improvements of configs ([dcf6def](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dcf6defdca2e94c224de02a192fff12c3f51a542))
+* more refactor ([7604443](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7604443ea2cfb35d94a03437b9bb2b81c0df5065))
+* other improvements of gameconfigs ([eb50624](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/eb5062481d76235316a89b41b06d28dd1de29b85))
+* remove par policy ([594fdfa](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/594fdfa174c77d2c112943454e874ae960a15dc6))
+* replace some algo by ranges variant ([12fd028](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/12fd0280e4af7962e1aa8866480ea0e145c0b694))
+* revert changes to segments back ([de5564e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/de5564e693e8c0ec7290a694385b6e8244fc41eb))
+* revert ref search by all occurrences ([fc477af](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fc477af6c7776792958457e105781331caa0f616))
+* rework entity listener hook params ([36b28d4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/36b28d409eb27b3ba2efcb73634e6141f12a1d5c))
+* some addr lookup improvements ([4b9af09](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4b9af095a5b5022b7576facb731a10fb0437a656))
+* some addr lookup improvements (2) ([e0eb90e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e0eb90ee8a93e82cd2ec4778e10da2dad97d99d2))
+* some compilation warnings on win ([0126033](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/012603326021ce5fbd67c9f0c46d59bb33e6c375))
+* typo in formatter ([e67f004](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e67f004a819561e7ecfd2a0fa6102c7042d61095))
+
 ## [2.9.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.9.0...v2.9.1) (2026-05-31)
 
 
