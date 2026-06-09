@@ -537,7 +537,6 @@ polyhook::ResultType Hook_SendNetMessage(polyhook::HookHandle hook, polyhook::Pa
 }
 
 polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
 	if (name.ends_with("gamerules")) {
@@ -550,35 +549,31 @@ polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::P
 		v8::Isolate::Scope isolateScope(isolate);
 		v8::HandleScope handleScope(isolate);
 
-		auto pointScript = addresses::CreateEntityByName("point_script", -1);
-		g_pPointScript = static_cast<CBaseEntity*>(pointScript);
+		g_pPointScript = static_cast<CBaseEntity*>(addresses::CreateEntityByName("point_script", -1));
 		g_pPointScript->DispatchSpawn({
 			{"target_name", "script_main"},
 			{"cs_script", CS_SCRIPT_PATH}
 		});
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
-		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(pointScript) + offset);
+		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);
 #endif
 	}
 
-	g_EntityCreatedListenerManager(handle.ToInt());
+	g_EntityCreatedListenerManager(entity->GetRefEHandle().ToInt());
 	return polyhook::ResultType::Ignored;
 }
 
 polyhook::ResultType Hook_OnEntitySpawned(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
 	if (name.ends_with("team_manager")) {
 		g_TeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
 	}
-
-	g_EntitySpawnedListenerManager(handle.ToInt());
+	g_EntitySpawnedListenerManager(entity->GetRefEHandle().ToInt());
 	return polyhook::ResultType::Ignored;
 }
 
 polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	auto handle = (CEntityHandle) polyhook::GetArgument<int>(params, 2);
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
 	if (name.ends_with("gamerules")) {
@@ -588,7 +583,7 @@ polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::P
 		g_TeamManagers.erase(entity->m_iTeamNum);
 	}
 
-	g_EntityDeletedListenerManager(handle.ToInt());
+	g_EntityDeletedListenerManager(entity->GetRefEHandle().ToInt());
 	return polyhook::ResultType::Ignored;
 }
 
