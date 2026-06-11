@@ -64,13 +64,17 @@ public:
 		return m_fFlags & FL_CONTROLLER_FAKECLIENT;
 	}
 
+	void ChangeTeam(CSTeam team) {
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayerController::ChangeTeam"));
+		CALL_VIRTUAL(void, offset, this, team);
+	}
+
 	void SwitchTeam(CSTeam team) {
 		if (!IsPlayerController())
 			return;
 
 		if (team == CSTeam::Spectator) {
-			GetCurrentPawn()->m_iTeamNum = team;
-			SetTeam(team);
+			ChangeTeam(team);
 		} else {
 			GetPlayerPawn()->m_iTeamNum = team;
 			addresses::CCSPlayerController_SwitchTeam(this, team);
