@@ -76,7 +76,6 @@ public:
 		if (team == CSTeam::Spectator) {
 			ChangeTeam(team);
 		} else {
-			GetPlayerPawn()->m_iTeamNum = team;
 			addresses::CCSPlayerController_SwitchTeam(this, team);
 		}
 	}
