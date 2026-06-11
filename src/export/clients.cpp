@@ -1608,6 +1608,18 @@ extern "C" PLUGIN_API void SwitchClientTeam(int playerSlot, CSTeam team) {
 }
 
 /**
+ * @brief Changes the player's team.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param team The team index to change the client to.
+ */
+extern "C" PLUGIN_API void ChangeClientTeam(int playerSlot, CSTeam team) {
+	auto controller = helpers::GetController(playerSlot);
+	if (!controller) return;
+	controller->ChangeTeam(team);
+}
+
+/**
  * @brief Respawns a player.
  *
  * @param playerSlot The index of the player's slot to respawn.
