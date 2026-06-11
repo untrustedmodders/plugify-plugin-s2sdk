@@ -144,6 +144,7 @@
         GetClientPawn;
         ProcessTargetString;
         SwitchClientTeam;
+        ChangeClientTeam;
         RespawnClient;
         ForcePlayerSuicide;
         KickClient;
