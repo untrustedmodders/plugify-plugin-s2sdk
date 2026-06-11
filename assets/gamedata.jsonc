@@ -253,6 +253,11 @@
       "CCSScript_EntityScript": {
         "win64": 1288,
         "linuxsteamrt64": 2032
+      },
+      // String: "%s<%i><%s><%s>" ChangeTeam() CTMDBG..."
+      "CCSPlayerController::ChangeTeam": {
+        "win64": 103,
+        "linuxsteamrt64": 102
       }
     },
     "Addresses": {
