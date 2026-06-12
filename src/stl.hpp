@@ -2,6 +2,7 @@
 
 #include <plugin_export.h>
 
+#include <plg/bitmask.hpp>
 #include <plg/enum.hpp>
 #include <plg/enum_array.hpp>
 #include <plg/hybrid_vector.hpp>

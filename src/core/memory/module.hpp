@@ -255,20 +255,4 @@ enum class SegFlags : uint8_t
 	X = 1 << 2,
 };
 
-constexpr SegFlags operator|(SegFlags lhs, SegFlags rhs) noexcept
-{
-	using underlying = std::underlying_type_t<SegFlags>;
-	return static_cast<SegFlags> (static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
-}
-
-constexpr bool operator&(SegFlags lhs, SegFlags rhs) noexcept
-{
-	using underlying = std::underlying_type_t<SegFlags>;
-	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
-}
-
-constexpr SegFlags& operator|=(SegFlags& lhs, SegFlags rhs) noexcept
-{
-	lhs = lhs | rhs;
-	return lhs;
-}
+consteval void enable_bitmask_operators(SegFlags);

@@ -22,7 +22,7 @@ CAddress CModule::FindPattern(std::string_view pattern) const
 {
     for (const auto& segment : m_segments)
     {
-        if ((segment.flags & SegFlags::X) == 0)
+        if (!(segment.flags & SegFlags::X))
             continue;
 
         const auto& data = segment.data;
@@ -40,7 +40,7 @@ std::vector<CAddress> CModule::FindPatternMulti(std::string_view pattern) const
 {
 	for (const auto& segment : m_segments)
 	{
-		if ((segment.flags & SegFlags::X) == 0)
+		if (!(segment.flags & SegFlags::X))
 			continue;
 
 		const auto& data = segment.data;
@@ -63,10 +63,10 @@ CAddress CModule::FindString(std::string_view str, bool read_only, bool exact) c
 {
     for (const auto& segment : m_segments)
     {
-        if ((segment.flags & SegFlags::X) != 0)
+        if (segment.flags & SegFlags::X)
             continue;
 
-        if (read_only && (segment.flags & SegFlags::W) != 0)
+        if (read_only && segment.flags & SegFlags::W)
             continue;
 
         if (auto result = scan::FindStr(segment.address, segment.size, str, true, exact))
@@ -84,10 +84,10 @@ std::vector<CAddress> CModule::FindStringMulti(std::string_view str, bool read_o
 
 	for (const auto& segment : m_segments)
 	{
-		if ((segment.flags & SegFlags::X) != 0)
+		if (segment.flags & SegFlags::X)
 			continue;
 
-		if (read_only && (segment.flags & SegFlags::W) != 0)
+		if (read_only && segment.flags & SegFlags::W)
 			continue;
 
 		auto ptrs = scan::FindStrMulti(segment.address, segment.size, str, true, exact);
@@ -107,10 +107,10 @@ CAddress CModule::FindData(const uint8_t* needle, size_t needle_size, bool read_
 {
     for (const auto& segment : m_segments)
     {
-        if ((segment.flags & SegFlags::X) != 0)
+        if (segment.flags & SegFlags::X)
             continue;
 
-        if (read_only && (segment.flags & SegFlags::W) != 0)
+        if (read_only && segment.flags & SegFlags::W)
             continue;
 
         if (auto result = scan::FindData(segment.address, segment.size, needle, needle_size))
@@ -128,10 +128,10 @@ std::vector<CAddress> CModule::FindDataMulti(const uint8_t* needle, size_t needl
 
     for (const auto& segment : m_segments)
     {
-        if ((segment.flags & SegFlags::X) != 0)
+        if (segment.flags & SegFlags::X)
             continue;
 
-        if (read_only && (segment.flags & SegFlags::W) != 0)
+        if (read_only && segment.flags & SegFlags::W)
             continue;
 
     	auto ptrs = scan::FindDataMulti(segment.address, segment.size, needle, needle_size);
@@ -151,9 +151,7 @@ CAddress CModule::FindPtr(CAddress ptr) const
 {
     for (const auto& segment : m_segments)
     {
-        const auto flags = segment.flags;
-
-        if ((flags & SegFlags::X) != 0)
+        if (segment.flags & SegFlags::X)
             continue;
 
     	if (auto result = scan::FindPtr(segment.address, segment.size, ptr))
@@ -171,7 +169,7 @@ std::vector<CAddress> CModule::FindPtrs(CAddress ptr) const
 
     for (const auto& segment : m_segments)
     {
-        if ((segment.flags & SegFlags::X) != 0)
+        if (segment.flags & SegFlags::X)
             continue;
 
         auto ptrs = scan::FindPtrs(segment.address, segment.size, ptr);
@@ -233,7 +231,7 @@ void CModule::LoopVFunctions(std::string_view vtable_name, const std::function<b
 
     for (const auto& segment : m_segments)
     {
-        if ((segment.flags & SegFlags::X) != 0)
+        if (segment.flags & SegFlags::X)
         {
             sectionStart = segment.address;
             sectionEnd   = segment.address + segment.size;

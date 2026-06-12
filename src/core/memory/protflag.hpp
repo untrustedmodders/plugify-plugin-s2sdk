@@ -1,13 +1,12 @@
 #pragma once
 
 #include <cstdint>
-#include <type_traits>
 
 /**
  * @enum ProtFlag
  * @brief Enum representing memory protection flags.
  */
-enum class ProtFlag
+enum class ProtFlag : uint32_t
 {
 	UNSET = 0, /**< Value means this gives no information about protection state (un-read) */
 	X = 1 << 1, /**< Execute permission */
@@ -19,41 +18,4 @@ enum class ProtFlag
 	RWX = R | W | X /**< Read, Write, and Execute permissions */
 };
 
-/**
- * @brief Overloads the binary OR operator for ProtFlag.
- *
- * @param lhs The left-hand side ProtFlag value.
- * @param rhs The right-hand side ProtFlag value.
- * @return The combined ProtFlag value.
- */
-constexpr ProtFlag operator|(ProtFlag lhs, ProtFlag rhs) noexcept
-{
-	using underlying = std::underlying_type_t<ProtFlag>;
-	return static_cast<ProtFlag> (static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
-}
-
-/**
- * @brief Overloads the binary AND operator for ProtFlag.
- *
- * @param lhs The left-hand side ProtFlag value.
- * @param rhs The right-hand side ProtFlag value.
- * @return True if lhs contains rhs, false otherwise.
- */
-constexpr bool operator&(ProtFlag lhs, ProtFlag rhs) noexcept
-{
-	using underlying = std::underlying_type_t<ProtFlag>;
-	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
-}
-
-/**
- * @brief Bitwise OR assignment operator for ProtFlag enum class.
- *
- * @param lhs Left-hand side ProtFlag.
- * @param rhs Right-hand side ProtFlag.
- * @return Reference to the left-hand side ProtFlag.
- */
-constexpr ProtFlag& operator|=(ProtFlag& lhs, ProtFlag rhs) noexcept
-{
-	lhs = lhs | rhs;
-	return lhs;
-}
+consteval void enable_bitmask_operators(ProtFlag);

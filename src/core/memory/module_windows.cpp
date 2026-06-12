@@ -178,7 +178,7 @@ void CModule::BuildFunctionIndexAndReferences()
     auto is_in_text_segment = [this](CAddress address) noexcept {
         for (const auto& segment : m_segments)
         {
-            if ((segment.flags & SegFlags::X) == 0) continue;
+            if (!(segment.flags & SegFlags::X)) continue;
             if (segment.address <= address && address < segment.address + segment.size) return true;
         }
         return false;
