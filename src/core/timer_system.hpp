@@ -32,9 +32,9 @@ class TimerSystem {
 	~TimerSystem() = default;
 	NONCOPYABLE(TimerSystem)
 
+	static TimerSystem instance;
 public:
-	static auto& Instance() {
-		static TimerSystem instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

@@ -17,9 +17,9 @@ class UserMessageManager {
 	~UserMessageManager() = default;
 	NONCOPYABLE(UserMessageManager)
 
+	static UserMessageManager instance;
 public:
-	static auto& Instance() {
-		static UserMessageManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

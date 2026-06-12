@@ -166,6 +166,8 @@ void Player::OnRepondCvarValue(const CCLCMsg_RespondCvarValue_t& msg) {
 	}
 }
 
+PlayerManager PlayerManager::instance;
+
 void PlayerManager::OnGameFrame() {
 	static double s_nextUpdate = 0.0;
 

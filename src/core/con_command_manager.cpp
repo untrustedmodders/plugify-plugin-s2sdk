@@ -19,6 +19,8 @@ ConCommandInfo::~ConCommandInfo() {
 	g_pCVar->UnregisterConCommandCallbacks(commandRef);
 }
 
+ConCommandManager ConCommandManager::instance;
+
 bool ConCommandManager::AddCommandListener(std::string_view name, ConCommandListenerCallback callback, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 

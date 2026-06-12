@@ -61,9 +61,9 @@ class ConVarManager {
 	~ConVarManager();
 	NONCOPYABLE(ConVarManager)
 
+	static ConVarManager instance;
 public:
-	static auto& Instance() {
-		static ConVarManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 	static void Init();

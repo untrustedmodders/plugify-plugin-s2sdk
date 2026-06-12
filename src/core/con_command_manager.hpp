@@ -28,9 +28,9 @@ class ConCommandManager {
 	~ConCommandManager() = default;
 	NONCOPYABLE(ConCommandManager)
 
+	static ConCommandManager instance;
 public:
-	static auto& Instance() {
-		static ConCommandManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

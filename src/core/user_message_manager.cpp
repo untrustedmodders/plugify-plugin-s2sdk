@@ -1,6 +1,8 @@
 #include "user_message_manager.hpp"
 #include "user_message.hpp"
 
+UserMessageManager UserMessageManager::instance;
+
 bool UserMessageManager::HookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 

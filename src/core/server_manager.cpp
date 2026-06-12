@@ -2,6 +2,8 @@
 
 #include <edict.h>
 
+ServerManager ServerManager::instance;
+
 void ServerManager::OnGameFrame() {
 	std::vector<Task> tasksToExecute;
 
@@ -47,3 +49,4 @@ void ServerManager::AddTaskForNextWorldUpdate(TaskCallback task, const plg::vect
 	std::scoped_lock lock(m_worldUpdateMutex);
 	m_nextWorldUpdateTasks.emplace_back(task, userData);
 }
+

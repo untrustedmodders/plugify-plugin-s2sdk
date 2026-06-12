@@ -7,9 +7,9 @@ class ServerManager {
 	~ServerManager() = default;
 	NONCOPYABLE(ServerManager)
 
+	static ServerManager instance;
 public:
-	static auto& Instance() {
-		static ServerManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

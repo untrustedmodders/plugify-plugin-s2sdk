@@ -13,9 +13,9 @@ class Logger {
 	~Logger() = default;
 	NONCOPYABLE(Logger)
 
+	static Logger instance;
 public:
-	static auto& Instance() {
-		static Logger instance{S2SDK_PACKAGE};
+	static auto& Instance() noexcept {
 		return instance;
 	}
 
@@ -52,8 +52,7 @@ public:
 	LoggingResponse_t LogFormat(LoggingSeverity_t severity, const LoggingRareOptions_t& code, const Color& color, const char* format, ...) const;
 
 private:
-	LoggingChannelID_t m_channelID;
-	mutable std::shared_mutex m_mutex;
+	LoggingChannelID_t m_channelID{ INVALID_LOGGING_CHANNEL_ID };
 };
 inline Logger& g_Logger = Logger::Instance();
 

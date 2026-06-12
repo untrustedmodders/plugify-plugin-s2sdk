@@ -12,6 +12,8 @@
 #include <cstrike15/usermessages.h>
 #endif
 
+PanoramaVoteHandler PanoramaVoteHandler::instance;
+
 void PanoramaVoteHandler::Reset() {
 	m_voteInProgress = false;
 	m_voteController = nullptr;

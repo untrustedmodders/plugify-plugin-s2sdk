@@ -1,5 +1,7 @@
 #include "output_manager.hpp"
 
+EntityOutputManager EntityOutputManager::instance;
+
 bool EntityOutputManager::HookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 

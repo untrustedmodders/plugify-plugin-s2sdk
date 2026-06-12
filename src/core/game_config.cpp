@@ -1387,6 +1387,8 @@ Result<Memory> VTableResolver::ResolveTable(const Module& module, std::string_vi
 	return address;
 }
 
+GameConfigManager GameConfigManager::instance;
+
 Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
 	std::unique_lock lock(m_mutex);
 

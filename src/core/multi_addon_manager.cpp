@@ -48,6 +48,8 @@ CConVar<CUtlString> s2_client_extra_addons("s2_client_extra_addons", FCVAR_NONE,
 		g_MultiAddonManager.m_globalClientAddons = plg::parse<PublishedFileId_t>(*new_val, ",");
 	});
 
+MultiAddonManager MultiAddonManager::instance;
+
 std::string MultiAddonManager::BuildAddonPath(PublishedFileId_t addon) {
     // The workshop on a dedicated server is stored relative to the working directory for whatever reason
     static CBufferStringN<MAX_PATH> s_sWorkingDir;

@@ -1,5 +1,7 @@
 #include "event_manager.hpp"
 
+EventManager EventManager::instance;
+
 EventManager::~EventManager() {
 	if (!m_hookMap.empty()) {
 		g_pGameEventManager->RemoveListener(this);

@@ -6,9 +6,9 @@ class TransmitManager {
 	~TransmitManager() = default;
 	NONCOPYABLE(TransmitManager)
 
+	static TransmitManager instance;
 public:
-	static auto& Instance() {
-		static TransmitManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

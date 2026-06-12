@@ -4,6 +4,8 @@
 #include "globals.hpp"
 #include "sdk/helpers.hpp"
 
+TransmitManager TransmitManager::instance;
+
 void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& transmitList) {
 	if (m_playerHiddenEntities.empty()) {
 		return;

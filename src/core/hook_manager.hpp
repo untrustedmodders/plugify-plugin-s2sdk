@@ -10,9 +10,9 @@ class HookManager {
 	~HookManager() = default;
 	NONCOPYABLE(HookManager)
 
+	static HookManager instance;
 public:
-	static auto& Instance() {
-		static HookManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

@@ -14,9 +14,9 @@ class MultiAddonManager {
 	~MultiAddonManager() = default;
 	NONCOPYABLE(MultiAddonManager)
 
+	static MultiAddonManager instance;
 public:
-	static auto& Instance() {
-		static MultiAddonManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

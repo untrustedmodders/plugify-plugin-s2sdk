@@ -19,9 +19,9 @@ class EntityOutputManager {
 	~EntityOutputManager() = default;
 	NONCOPYABLE(EntityOutputManager)
 
+	static EntityOutputManager instance;
 public:
-	static auto& Instance() {
-		static EntityOutputManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

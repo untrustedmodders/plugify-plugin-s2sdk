@@ -6,6 +6,8 @@ double universalTime = 0.0f;
 double timerNextThink = 0.0f;
 const double engineFixedTickInterval = 0.015625;
 
+TimerSystem TimerSystem::instance;
+
 void TimerSystem::OnMapEnd() {
 	RemoveMapChangeTimers();
 

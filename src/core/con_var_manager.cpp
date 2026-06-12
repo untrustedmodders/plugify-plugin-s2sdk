@@ -3,6 +3,8 @@
 #include <core/sdk/utils.hpp>
 #include <core/sdk/cvars.hpp>
 
+ConVarManager ConVarManager::instance;
+
 ConVarManager::~ConVarManager() {
 	if (!g_pCVar) {
 		return;

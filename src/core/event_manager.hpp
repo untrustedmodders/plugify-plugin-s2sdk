@@ -25,9 +25,9 @@ class EventManager : public IGameEventListener2 {
 	~EventManager() override;
 	NONCOPYABLE(EventManager)
 
+	static EventManager instance;
 public:
-	static auto& Instance() {
-		static EventManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

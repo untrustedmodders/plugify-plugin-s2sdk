@@ -1,46 +1,40 @@
 #include "logger.hpp"
 
+Logger Logger::instance{S2SDK_PACKAGE};
+
 Logger::Logger(const char* name, RegisterTagsFunc registerTagsFunc, int flags, LoggingVerbosity_t verbosity, const Color& defaultColor) {
 	m_channelID = LoggingSystem_RegisterLoggingChannel(name, registerTagsFunc, flags, verbosity, defaultColor);
 }
 
 void Logger::AddTagToChannel(const char* tagName) const {
-	std::unique_lock lock(m_mutex);
 	LoggingSystem_AddTagToChannel(m_channelID, tagName);
 }
 
 bool Logger::HasTag(const char* tag) const {
-	std::shared_lock lock(m_mutex);
 	return LoggingSystem_HasTag(m_channelID, tag);
 }
 
 bool Logger::IsChannelEnabled(LoggingSeverity_t severity) const {
-	std::shared_lock lock(m_mutex);
 	return LoggingSystem_IsChannelEnabled(m_channelID, severity);
 }
 
 bool Logger::IsChannelEnabled(LoggingVerbosity_t verbosity) const {
-	std::shared_lock lock(m_mutex);
 	return LoggingSystem_IsChannelEnabled(m_channelID, verbosity);
 }
 
 LoggingVerbosity_t Logger::GetChannelVerbosity() const {
-	std::shared_lock lock(m_mutex);
 	return LoggingSystem_GetChannelVerbosity(m_channelID);
 }
 
 void Logger::SetChannelVerbosity(LoggingVerbosity_t verbosity) const {
-	std::unique_lock lock(m_mutex);
 	return LoggingSystem_SetChannelVerbosity(m_channelID, verbosity);
 }
 
 void Logger::SetChannelVerbosityByName(const char* name, LoggingVerbosity_t verbosity) {
-	std::unique_lock lock(m_mutex);
 	return LoggingSystem_SetChannelVerbosityByName(name, verbosity);
 }
 
 void Logger::SetChannelVerbosityByTag(const char* tag, LoggingVerbosity_t verbosity) {
-	std::unique_lock lock(m_mutex);
 	LoggingSystem_SetChannelVerbosityByTag(tag, verbosity);
 }
 
@@ -49,17 +43,14 @@ int Logger::GetChannelColor() const {
 }
 
 void Logger::SetChannelColor(int color) const {
-	std::unique_lock lock(m_mutex);
 	LoggingSystem_SetChannelColor(m_channelID, color);
 }
 
 LoggingChannelFlags_t Logger::GetChannelFlags() const {
-	std::shared_lock lock(m_mutex);
 	return LoggingSystem_GetChannelFlags(m_channelID);
 }
 
 void Logger::SetChannelFlags(LoggingChannelFlags_t flags) const {
-	std::unique_lock lock(m_mutex);
 	LoggingSystem_SetChannelFlags(m_channelID, flags);
 }
 
@@ -69,7 +60,6 @@ void Logger::Log(std::string_view message, LoggingSeverity_t severity, const std
 		.m_Line = static_cast<int>(location.line()),
 		.m_Function = location.function_name(),
 	};
-	std::unique_lock lock(m_mutex);
 	switch (severity) {
 		case LS_ERROR:
 			LoggingSystem_LogDirect(m_channelID, LS_ERROR, options, RED, message.data());
@@ -92,7 +82,6 @@ LoggingResponse_t Logger::Log(LoggingSeverity_t severity, const char* message) c
 	LoggingResponse_t response = LR_ABORT;
 
 	if (IsChannelEnabled(severity)) {
-		std::unique_lock lock(m_mutex);
 		response = LoggingSystem_LogDirect(m_channelID, severity, message);
 	}
 
@@ -103,7 +92,6 @@ LoggingResponse_t Logger::Log(LoggingSeverity_t severity, const Color& color, co
 	LoggingResponse_t response = LR_ABORT;
 
 	if (IsChannelEnabled(severity)) {
-		std::unique_lock lock(m_mutex);
 		response = LoggingSystem_LogDirect(m_channelID, severity, color, message);
 	}
 
@@ -114,7 +102,6 @@ LoggingResponse_t Logger::Log(LoggingSeverity_t severity, const LoggingRareOptio
 	LoggingResponse_t response = LR_ABORT;
 
 	if (IsChannelEnabled(severity)) {
-		std::unique_lock lock(m_mutex);
 		response = LoggingSystem_LogDirect(m_channelID, severity, code, message);
 	}
 
@@ -125,7 +112,6 @@ LoggingResponse_t Logger::Log(LoggingSeverity_t severity, const LoggingRareOptio
 	LoggingResponse_t response = LR_ABORT;
 
 	if (IsChannelEnabled(severity)) {
-		std::unique_lock lock(m_mutex);
 		response = LoggingSystem_LogDirect(m_channelID, severity, code, color, message);
 	}
 

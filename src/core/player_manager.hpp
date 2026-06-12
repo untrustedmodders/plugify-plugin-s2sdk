@@ -107,9 +107,9 @@ class PlayerManager {
 	~PlayerManager() = default;
 	NONCOPYABLE(PlayerManager)
 
+	static PlayerManager instance;
 public:
-	static auto& Instance() {
-		static PlayerManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

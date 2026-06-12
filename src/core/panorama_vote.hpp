@@ -38,9 +38,9 @@ class PanoramaVoteHandler {
 	~PanoramaVoteHandler() = default;
 	NONCOPYABLE(PanoramaVoteHandler)
 
+	static PanoramaVoteHandler instance;
 public:
-	static auto& Instance() {
-		static PanoramaVoteHandler instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 

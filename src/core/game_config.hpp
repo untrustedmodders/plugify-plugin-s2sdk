@@ -493,9 +493,9 @@ class GameConfigManager {
 	~GameConfigManager() = default;
 	NONCOPYABLE(GameConfigManager)
 
+	static GameConfigManager instance;
 public:
-	static auto& Instance() {
-		static GameConfigManager instance;
+	static auto& Instance() noexcept {
 		return instance;
 	}
 
