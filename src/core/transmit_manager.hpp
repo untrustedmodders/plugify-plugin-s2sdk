@@ -2,6 +2,10 @@
 #include <iservernetworkable.h>
 
 class TransmitManager {
+	TransmitManager() = default;
+	~TransmitManager() = default;
+	NONCOPYABLE(TransmitManager)
+
 public:
 	static auto& Instance() {
 		static TransmitManager instance;
