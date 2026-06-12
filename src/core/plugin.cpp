@@ -663,15 +663,6 @@ polyhook::ResultType Hook_IsolateExit(polyhook::HookHandle hook, polyhook::Param
 #endif
 
 #if _WIN32
-
-#if PLUGIFY_ARCH_BITS == 64
-constexpr WORD PE_FILE_MACHINE = IMAGE_FILE_MACHINE_AMD64;
-constexpr WORD PE_NT_OPTIONAL_HDR_MAGIC = IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-#else
-constexpr WORD PE_FILE_MACHINE = IMAGE_FILE_MACHINE_I386;
-constexpr WORD PE_NT_OPTIONAL_HDR_MAGIC = IMAGE_NT_OPTIONAL_HDR32_MAGIC;
-#endif // PLUGIFY_ARCH_BITS
-
 polyhook::ResultType Hook_PreloadLibrary(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	HMODULE hModule = (HMODULE) polyhook::GetArgument<void*>(params, 0);
 
