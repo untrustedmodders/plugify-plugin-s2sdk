@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.11.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.10.0...v2.11.0) (2026-06-14)
+
+
+### Features
+
+* add changeteam and fix switchteam ([9396798](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/939679845434ae2b30d0c36af8176a0b45f49e64))
+* add method ChangeClientTeam ([6334e47](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6334e47db8d4579d357b196d4594f827b880d9a3))
+* add TransmitManager ([026f935](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/026f93513f7c61146cace7c25b9151335ecc3267))
+
+
+### Bug Fixes
+
+* name and check ([753fbb2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/753fbb21fc66b8aea46337ec4ff83f026e46d89b))
+* remove set pawn team ([182870e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/182870ec2469447fd8bf1df35d0b7babc35da989))
+
 ## [2.10.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.9.1...v2.10.0) (2026-06-09)
 
 
