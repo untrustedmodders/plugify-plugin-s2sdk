@@ -5,11 +5,7 @@
 
 PLUGIFY_WARN_PUSH()
 
-#if defined(__clang)
-PLUGIFY_WARN_IGNORE("-Wreturn-type-c-linkage")
-#elif defined(_MSC_VER)
-PLUGIFY_WARN_IGNORE(4190)
-#endif
+PLUGIFY_LINKAGE()
 
 /**
  * @brief Performs a collideable trace using the VScript-compatible table call, exposing it through C++ exports.

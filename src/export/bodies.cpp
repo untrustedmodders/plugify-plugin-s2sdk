@@ -6,11 +6,7 @@
 
 PLUGIFY_WARN_PUSH()
 
-#if defined(__clang)
-PLUGIFY_WARN_IGNORE("-Wreturn-type-c-linkage")
-#elif defined(_MSC_VER)
-PLUGIFY_WARN_IGNORE(4190)
-#endif
+PLUGIFY_LINKAGE()
 
 /**
  * @brief Applies an impulse to an entity at a specific world position.
