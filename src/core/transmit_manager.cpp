@@ -4,29 +4,18 @@
 #include "globals.hpp"
 #include "sdk/helpers.hpp"
 
-void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& transmitList) {
-	if (m_playerHiddenEntities.empty()) {
-		return;
+bool TransmitManager::ShouldHide(int32_t playerSlot, CEntityInstance* entity) const {
+	if (m_playerHiddenEntities.empty() || !entity) {
+		return false;
 	}
 
-	for (auto* info : transmitList) {
-		if (!info || !info->m_pTransmitEntity) {
-			continue;
-		}
-
-		auto it = m_playerHiddenEntities.find(info->m_nPlayerSlot);
-		if (it == m_playerHiddenEntities.end()) {
-			continue;
-		}
-
-		for (const int32_t handle : it->second) {
-			auto* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(handle));
-			if (!entity) {
-				continue;
-			}
-			info->m_pTransmitEntity->Clear(entity->GetEntityIndex());
-		}
+	auto it = m_playerHiddenEntities.find(playerSlot);
+	if (it == m_playerHiddenEntities.end()) {
+		return false;
 	}
+
+	const auto& hidden = it->second;
+	return hidden.find(entity->GetRefEHandle().ToInt()) != hidden.end();
 }
 
 void TransmitManager::RoundStart() {

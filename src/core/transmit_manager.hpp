@@ -8,7 +8,7 @@ public:
 		return instance;
 	}
 
-	void OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& transmitList);
+	bool ShouldHide(int32_t playerSlot, CEntityInstance* entity) const;
 
 	void HideEntities(int32_t playerSlot, std::span<const int32_t> entHandles);
 	void ShowEntities(int32_t playerSlot, std::span<const int32_t> entHandles);

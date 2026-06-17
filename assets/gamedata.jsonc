@@ -42,6 +42,12 @@
         "win64": "44 88 4C 24 ? 53 57 41 54 41 56 41 57 48 83 EC",
         "linuxsteamrt64": "55 48 8D 87 ? ? ? ? 48 89 E5 41 57 41 56 41 89 CE 41 55 45 89 CD"
       },
+      // CBaseEntity::SetTransmit(CCheckTransmitInfo*, bool bAlways) - vtable slot 94 (linuxsteamrt64).
+      // Sets the entity's bit in pInfo->m_pTransmitEntity and recurses on its move parent/owner.
+      "CBaseEntity::SetTransmit": {
+        "library": "server",
+        "linuxsteamrt64": "55 48 89 E5 41 57 41 BF 01 00 00 00 41 56 41 89 D6 41 55 49 89 FD 41 54 49 89 F4 53"
+      },
       // String: "CSource2GameClients::StartHLTVServer: game event %s not found.\n"Function right before the first virtual function call
       "LegacyGameEventListener": {
         "library": "server",

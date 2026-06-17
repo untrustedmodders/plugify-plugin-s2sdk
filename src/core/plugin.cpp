@@ -489,7 +489,17 @@ polyhook::ResultType Hook_CheckTransmit(polyhook::HookHandle hook, polyhook::Par
 	plg::view view(infoList, infoCount);
 
 	g_ServerCheckTransmitListenerManager(view.get());
-	g_TransmitManager.OnCheckTransmit(view.get());
+
+	return polyhook::ResultType::Ignored;
+}
+
+polyhook::ResultType Hook_SetTransmit(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	auto* entity = polyhook::GetArgument<CEntityInstance*>(params, 0);
+	auto* info = polyhook::GetArgument<CCheckTransmitInfo*>(params, 1);
+
+	if (info && entity && g_TransmitManager.ShouldHide(info->m_nPlayerSlot.Get(), entity)) {
+		return polyhook::ResultType::Supercede;
+	}
 
 	return polyhook::ResultType::Ignored;
 }
@@ -718,6 +728,13 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookVTableFunc(STR(ICvar::DispatchConCommand), &ICvar::DispatchConCommand, g_pCVar, Hook_DispatchConCommand, {Pre, Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(ICvar::CallGlobalChangeCallbacks), &ICvar::CallGlobalChangeCallbacks, g_pCVar, Hook_CallGlobalChangeCallbacks, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(ISource2GameEntities::CheckTransmit), &ISource2GameEntities::CheckTransmit, g_pSource2GameEntities, Hook_CheckTransmit, {Post}));
+
+	// Per-entity transmit gate used by TransmitManager to hide entities from specific clients.
+	// Non-fatal: if the signature is missing on this platform, entity hiding is simply disabled.
+	using SetTransmitFn = void(*)(CEntityInstance*, CCheckTransmitInfo*, bool);
+	if (auto result = g_HookManager.AddHookDetourFunc<SetTransmitFn>("CBaseEntity::SetTransmit", Hook_SetTransmit, {Pre}); !result) {
+		plg::print(LS_WARNING, "TransmitManager: CBaseEntity::SetTransmit hook unavailable ({}); entity hiding is disabled.\n", result.error());
+	}
 
 	IEntityListener* pSource2GameEntitiesEntityListener = dynamic_cast<IEntityListener*>(g_pSource2GameEntities);
 
