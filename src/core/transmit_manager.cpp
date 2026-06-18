@@ -24,6 +24,13 @@ void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& tr
 			if (!entity) {
 				continue;
 			}
+
+			// Keeping a player pawn hidden through death crashes nearby clients
+			auto* baseEntity = static_cast<CBaseEntity*>(entity);
+			if (baseEntity->m_lifeState != LIFE_ALIVE && baseEntity->IsPlayerPawn()) {
+				continue;
+			}
+
 			info->m_pTransmitEntity->Clear(entity->GetEntityIndex());
 		}
 	}
