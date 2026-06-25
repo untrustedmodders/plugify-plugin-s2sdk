@@ -23,6 +23,10 @@ extern "C" PLUGIN_API void PrintToServer(const plg::string& msg) {
  * @param message The message to be sent to the client's console.
  */
 extern "C" PLUGIN_API void PrintToConsole(int playerSlot, const plg::string& message) {
+	if (playerSlot < 0) {
+		PrintToServer(message);
+		return;
+	}
 	utils::PrintConsole(playerSlot, message);
 }
 
