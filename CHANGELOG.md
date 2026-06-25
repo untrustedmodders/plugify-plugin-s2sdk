@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.11.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.11.0...v2.11.1) (2026-06-25)
+
+
+### Bug Fixes
+
+* redirect to server console when playerSlot &lt; 0 ([197f6e9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/197f6e9dae8fb28e1a8e21bdf0b17fcd1b0ba5fb))
+
 ## [2.11.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.10.0...v2.11.0) (2026-06-14)
 
 
