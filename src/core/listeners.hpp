@@ -4,7 +4,7 @@
 #include <core/sdk/entity/cgamerules.h>
 
 template<char const* Name, typename Func>
-using Manager = ListenerManager<Name, Func, std::shared_mutex>;
+using Manager = ListenerManager<Name, Func>;
 
 #define LISTENER_LIST(X) \
 	X(ClientConnect, bool, int playerSlot, const plg::string& playerName, const plg::string& networkID) \
