@@ -7042,10 +7042,10 @@
       }
     },
     {
-      "name": "SetTransmitInfoHLTV",
+      "name": "SetTransmitInfoAlways",
       "group": "Transmit",
-      "description": "Sets a bit in the TransmitHLTV bitvec, marking an entity to always transmit.",
-      "funcName": "SetTransmitInfoHLTV",
+      "description": "Sets a bit in the TransmitAlways bitvec, marking an entity to always transmit.",
+      "funcName": "SetTransmitInfoAlways",
       "paramTypes": [
         {
           "name": "info",
@@ -7065,10 +7065,10 @@
       }
     },
     {
-      "name": "ClearTransmitInfoHLTV",
+      "name": "ClearTransmitInfoAlways",
       "group": "Transmit",
-      "description": "Clears a bit in the TransmitHLTV bitvec, unmarking an entity from always transmit.",
-      "funcName": "ClearTransmitInfoHLTV",
+      "description": "Clears a bit in the TransmitAlways bitvec, unmarking an entity from always transmit.",
+      "funcName": "ClearTransmitInfoAlways",
       "paramTypes": [
         {
           "name": "info",
@@ -7088,10 +7088,10 @@
       }
     },
     {
-      "name": "IsTransmitInfoHLTVSet",
+      "name": "IsTransmitInfoAlwaysSet",
       "group": "Transmit",
-      "description": "Checks if a bit is set in the TransmitHLTV bitvec.",
-      "funcName": "IsTransmitInfoHLTVSet",
+      "description": "Checks if a bit is set in the TransmitAlways bitvec.",
+      "funcName": "IsTransmitInfoAlwaysSet",
       "paramTypes": [
         {
           "name": "info",
@@ -7112,10 +7112,10 @@
       }
     },
     {
-      "name": "SetTransmitInfoHLTVAll",
+      "name": "SetTransmitInfoAlwaysAll",
       "group": "Transmit",
-      "description": "Sets all bits in the TransmitHLTV bitvec, marking all entities to always transmit.",
-      "funcName": "SetTransmitInfoHLTVAll",
+      "description": "Sets all bits in the TransmitAlways bitvec, marking all entities to always transmit.",
+      "funcName": "SetTransmitInfoAlwaysAll",
       "paramTypes": [
         {
           "name": "info",
@@ -7129,10 +7129,10 @@
       }
     },
     {
-      "name": "ClearTransmitInfoHLTVAll",
+      "name": "ClearTransmitInfoAlwaysAll",
       "group": "Transmit",
-      "description": "Clears all bits in the TransmitHLTV bitvec, unmarking all entities from always transmit.",
-      "funcName": "ClearTransmitInfoHLTVAll",
+      "description": "Clears all bits in the TransmitAlways bitvec, unmarking all entities from always transmit.",
+      "funcName": "ClearTransmitInfoAlwaysAll",
       "paramTypes": [
         {
           "name": "info",
@@ -38990,27 +38990,27 @@
         },
         {
           "name": "SetHLTV",
-          "method": "SetTransmitInfoHLTV",
+          "method": "SetTransmitInfoAlways",
           "bindSelf": true
         },
         {
           "name": "ClearHLTV",
-          "method": "ClearTransmitInfoHLTV",
+          "method": "ClearTransmitInfoAlways",
           "bindSelf": true
         },
         {
           "name": "IsHLTVSet",
-          "method": "IsTransmitInfoHLTVSet",
+          "method": "IsTransmitInfoAlwaysSet",
           "bindSelf": true
         },
         {
           "name": "SetHLTVAll",
-          "method": "SetTransmitInfoHLTVAll",
+          "method": "SetTransmitInfoAlwaysAll",
           "bindSelf": true
         },
         {
           "name": "ClearHLTVAll",
-          "method": "ClearTransmitInfoHLTVAll",
+          "method": "ClearTransmitInfoAlwaysAll",
           "bindSelf": true
         },
         {

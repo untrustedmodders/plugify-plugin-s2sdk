@@ -834,11 +834,11 @@
         IsTransmitInfoOutOfPVSSet;
         SetTransmitInfoOutOfPVSAll;
         ClearTransmitInfoOutOfPVSAll;
-        SetTransmitInfoHLTV;
-        ClearTransmitInfoHLTV;
-        IsTransmitInfoHLTVSet;
-        SetTransmitInfoHLTVAll;
-        ClearTransmitInfoHLTVAll;
+        SetTransmitInfoAlways;
+        ClearTransmitInfoAlways;
+        IsTransmitInfoAlwaysSet;
+        SetTransmitInfoAlwaysAll;
+        ClearTransmitInfoAlwaysAll;
         GetTransmitInfoTargetSlotsCount;
         GetTransmitInfoTargetSlot;
         AddTransmitInfoTargetSlot;
