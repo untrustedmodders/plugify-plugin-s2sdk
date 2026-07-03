@@ -6,7 +6,7 @@ using GameEventListenerCallback = void (*)(IGameEvent* event);
 
 class CGameEventListener;
 
-extern plg::hybrid_vector<CGameEventListener*, 64> g_vecEventListeners;
+extern std::vector<CGameEventListener*> g_vecEventListeners;
 
 class CGameEventListener : public IGameEventListener2 {
 public:

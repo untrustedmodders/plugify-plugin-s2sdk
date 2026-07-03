@@ -1,7 +1,7 @@
 #include <tier0/logging.h>
 #include <convar.h>
 
-plg::hybrid_vector<plg::string, 32> g_ServerCommandBuffer;
+std::vector<plg::string> g_ServerCommandBuffer;
 std::atomic<bool> g_ShouldCatchSpew = false;
 
 class LoggingListener final : public ILoggingListener {

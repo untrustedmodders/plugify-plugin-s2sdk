@@ -1,6 +1,6 @@
 #include "event_listener.hpp"
 
-plg::hybrid_vector<CGameEventListener*, 64> g_vecEventListeners;
+std::vector<CGameEventListener*> g_vecEventListeners;
 bool g_registered = false;
 
 void RegisterEventListeners() {
