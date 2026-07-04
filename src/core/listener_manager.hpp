@@ -25,130 +25,94 @@ class ListenerManager;
 template<const char* Name, class Ret, class... Args>
 class ListenerManager<Name, Ret(*)(Args...)> {
 public:
-	ListenerManager() = default;
-	~ListenerManager() = default;
-	NONCOPYABLE(ListenerManager)
+    ListenerManager() = default;
+    ~ListenerManager() = default;
+    NONCOPYABLE(ListenerManager)
 
-	using Func = Ret(*)(Args...);
+    using Func = Ret(*)(Args...);
 
-	bool Register(const Func& handler, int priority = 0) {
-		std::unique_lock lock(m_mutex, std::try_to_lock);
-		if (!lock.owns_lock()) {
-			std::unique_lock lk(m_mut);
-			m_pending.emplace_back(
-				PendingOp::Mode::Add,
-				priority,
-				handler
-			);
-			return true;
-		}
-		return Add(handler, priority);
-	}
+    struct HandlerSet {
+        std::vector<Func> handlers;
+        std::vector<int> priorities;
+    };
 
-	bool Unregister(const Func& handler) {
-		std::unique_lock lock(m_mutex, std::try_to_lock);
-		if (!lock.owns_lock()) {
-			std::unique_lock lk(m_mut);
-			m_pending.emplace_back(
-				PendingOp::Mode::Remove,
-				-1,
-				handler
-			);
-			return true;
-		}
-		return Remove(handler);
-	}
+    bool Register(const Func& handler, int priority = 0) {
+        std::unique_lock lock(m_mutex);
 
-	auto operator()(Args... args, const plg::source_location& loc = plg::source_location::current()) {
-		[[maybe_unused]] plg::Scope zone(Name, loc);
-		[[maybe_unused]] plg::scope_guard guard = plg::make_scope_guard([&]{ ApplyPending(); });
-		std::shared_lock lock(m_mutex);
-		return Dispatch(m_handlers, std::forward<Args>(args)...);
-	}
+        auto old = m_state;
+        if (old && std::ranges::any_of(old->handlers, [&](const auto& h){ return h == handler; }))
+            return false;
 
-	void Clear() {
-		std::unique_lock lock(m_mutex);
-		m_handlers.clear();
-		m_priorities.clear();
-	}
+        auto fresh = std::make_shared<HandlerSet>(old ? *old : HandlerSet{});
+        auto it = std::ranges::upper_bound(fresh->priorities, priority,
+            [](int p, int cur){ return p > cur; });
 
-	std::vector<Func> Get() const {
-		std::shared_lock lock(m_mutex);
-		return m_handlers;
-	}
+        auto index = std::distance(fresh->priorities.begin(), it);
+        fresh->handlers.insert(fresh->handlers.begin() + index, handler);
+        fresh->priorities.insert(fresh->priorities.begin() + index, priority);
 
-	bool Empty() const {
-		std::shared_lock lock(m_mutex);
-		return m_handlers.empty();
-	}
+        m_state = std::move(fresh);
+        return true;
+    }
+
+    bool Unregister(const Func& handler) {
+        std::unique_lock lock(m_mutex);
+
+        auto old = m_state;
+        if (!old)
+            return false;
+
+        auto it = std::ranges::find(old->handlers, handler);
+        if (it == old->handlers.end())
+            return false; // no copy made for a no-op
+
+        auto index = std::distance(old->handlers.begin(), it);
+        auto fresh = std::make_shared<HandlerSet>(*old);
+        fresh->handlers.erase(fresh->handlers.begin() + index);
+        fresh->priorities.erase(fresh->priorities.begin() + index);
+
+        m_state = std::move(fresh);
+        return true;
+    }
+
+    auto operator()(Args... args, const plg::source_location& loc = plg::source_location::current()) {
+        [[maybe_unused]] plg::Scope zone(Name, loc);
+
+    	std::shared_ptr<const HandlerSet> snapshot;
+	    {
+        	std::shared_lock lock(m_mutex);
+        	snapshot = m_state;
+	    }
+
+        if (!snapshot)
+            return Dispatch(std::span<Func>{}, std::forward<Args>(args)...);
+        return Dispatch(snapshot->handlers, std::forward<Args>(args)...);
+    }
+
+    void Clear() {
+        std::unique_lock lock(m_mutex);
+        m_state.reset();
+    }
+
+    bool Empty() const {
+        std::shared_lock lock(m_mutex);
+        return !m_state || m_state->handlers.empty();
+    }
 
 protected:
-	bool Add(const Func& handler, int priority) {
-		auto it = std::ranges::upper_bound(m_priorities, priority,
-								   [](int p, int cur){ return p > cur; });
-		auto index = std::distance(m_priorities.begin(), it);
-		m_handlers.insert(m_handlers.begin() + index, handler);
-		m_priorities.insert(m_priorities.begin() + index, priority);
-		return true;
-	}
+    void Dispatch(const auto& funcs, Args&&... args) requires (!std::same_as<Ret, bool>) {
+        for (const auto& f : funcs)
+            f(std::forward<Args>(args)...);
+    }
 
-	bool Remove(const Func& handler) {
-		auto it = std::ranges::find(m_handlers, handler);
-		if (it == m_handlers.end()) return false;
-		auto index = std::distance(m_handlers.begin(), it);
-		m_handlers.erase(m_handlers.begin() + index);
-		m_priorities.erase(m_priorities.begin() + index);
-		return true;
-	}
-
-	void ApplyPending() {
-		std::unique_lock lk(m_mut);
-
-		if (m_pending.empty())
-			return;
-
-		std::unique_lock lock(m_mutex);
-
-		for (const auto& [mode, priority, handler] : m_pending) {
-			switch (mode) {
-				case PendingOp::Mode::Add:
-					Add(handler, priority);
-					break;
-
-				case PendingOp::Mode::Remove:
-					Remove(handler);
-					break;
-			}
-		}
-
-		m_pending.clear();
-	}
-
-	void Dispatch(const auto& funcs, Args&&... args) requires (!std::same_as<Ret, bool>) {
-		for (const auto& f : funcs)
-			f(std::forward<Args>(args)...);
-	}
-
-	bool Dispatch(const auto& funcs, Args&&... args) requires (std::same_as<Ret, bool>) {
-		bool result = false;
-
-		for (const auto& f : funcs)
-			result |= !f(std::forward<Args>(args)...);
-
-		return result;
-	}
+    bool Dispatch(const auto& funcs, Args&&... args) requires (std::same_as<Ret, bool>) {
+        bool result = false;
+        for (const auto& f : funcs)
+            result |= !f(std::forward<Args>(args)...);
+        return result;
+    }
 
 private:
-	std::vector<Func> m_handlers;
-	std::vector<int> m_priorities;
-	struct PendingOp {
-		enum class Mode { Add, Remove };
-
-		Mode mode;
-		int priority;
-		Func handler;
-	};
-	std::vector<PendingOp> m_pending;
-	mutable std::shared_mutex m_mutex;
-	std::mutex m_mut;
+    std::shared_ptr<const HandlerSet> m_state;
+    std::shared_mutex m_mutex;
 };
