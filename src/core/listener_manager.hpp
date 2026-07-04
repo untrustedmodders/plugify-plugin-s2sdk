@@ -94,6 +94,11 @@ public:
         m_state.reset();
     }
 
+    std::shared_ptr<const HandlerSet> Get() const {
+        std::shared_lock lock(m_mutex);
+        return m_state;
+    }
+
     bool Empty() const {
         std::shared_lock lock(m_mutex);
         return !m_state || m_state->handlers.empty();
@@ -114,5 +119,5 @@ protected:
 
 private:
     std::shared_ptr<const HandlerSet> m_state;
-    std::shared_mutex m_mutex;
+    mutable std::shared_mutex m_mutex;
 };

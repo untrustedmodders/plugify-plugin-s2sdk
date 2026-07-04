@@ -70,7 +70,7 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 
 	for (const auto& hook : m_callbackHooks) {
 		auto funcs = hook->callbacks[HookMode::Pre].Get();
-		for (const auto& func : funcs) {
+		for (const auto& func : funcs->handlers) {
 			auto thisResult = func(activatorHandle, callerHandle, delay);
 			if (thisResult >= ResultType::Stop) {
 				break;

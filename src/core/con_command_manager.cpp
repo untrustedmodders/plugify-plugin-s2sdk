@@ -159,7 +159,7 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, con
 
 	{
 		auto funcs = m_globalCallbacks[mode].Get();
-		for (const auto& func : funcs) {
+		for (const auto& func : funcs->handlers) {
 			auto thisResult = func(caller, callingContext, arguments);
 			if (thisResult >= ResultType::Stop) {
 				if (mode == HookMode::Pre) {
@@ -184,7 +184,7 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, con
 		}*/
 
 		auto funcs = commandInfo->callbacks[mode].Get();
-		for (const auto& func : funcs) {
+		for (const auto& func : funcs->handlers) {
 			auto thisResult = func(caller, callingContext, arguments);
 			if (thisResult >= ResultType::Handled) {
 				return thisResult;

@@ -61,7 +61,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 
 	{
 		auto funcs = m_global.callbacks[mode].Get();
-		for (const auto& func : funcs) {
+		for (const auto& func : funcs->handlers) {
 			auto thisResult = func(&message);
 			if (thisResult >= ResultType::Stop) {
 				if (mode == HookMode::Pre) {
@@ -83,7 +83,7 @@ ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* 
 	if (it != m_hookMap.end()) {
 		auto hook = it->second;
 		auto funcs = hook->callbacks[mode].Get();
-		for (const auto& func : funcs) {
+		for (const auto& func : funcs->handlers) {
 			auto thisResult = func(&message);
 			if (thisResult >= ResultType::Handled) {
 				if (mode == HookMode::Pre) {
