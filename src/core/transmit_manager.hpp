@@ -25,5 +25,6 @@ public:
 
 private:
 	plg::flat_hash_map<int32_t, plg::flat_hash_set<int32_t>> m_playerHiddenEntities;
+	//std::mutex m_mutex;
 };
 inline TransmitManager& g_TransmitManager = TransmitManager::Instance();

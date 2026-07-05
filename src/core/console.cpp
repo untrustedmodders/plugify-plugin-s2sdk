@@ -2,7 +2,7 @@
 #include <convar.h>
 
 std::vector<plg::string> g_ServerCommandBuffer;
-std::atomic<bool> g_ShouldCatchSpew = false;
+bool g_ShouldCatchSpew = false;
 
 class LoggingListener final : public ILoggingListener {
 public:
