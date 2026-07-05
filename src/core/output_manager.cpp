@@ -12,12 +12,12 @@ bool EntityOutputManager::HookEntityOutput(std::string_view classname, std::stri
 
 	std::shared_ptr<EntityOutputHook> hook;
 	{
-		auto it = m_hookMap.find(outputKey);
+		auto it = m_hookMap.find(OutputView{classname, output});
 		if (it != m_hookMap.end()) {
 			hook = it->second;
 		} else {
 			hook = std::make_shared<EntityOutputHook>();
-			m_hookMap.emplace(std::move(outputKey), hook);
+			m_hookMap.emplace(OutputStr(classname, output), hook);
 		}
 	}
 	return hook->callbacks[mode].Register(callback);
