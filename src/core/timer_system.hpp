@@ -7,6 +7,8 @@ enum class TimerFlag {
 	NoMapChange = (1 << 1)
 };
 
+consteval void enable_bitmask_operators(TimerFlag);
+
 using TimerCallback = void (*)(uint32_t, const plg::vector<plg::any>& userData);
 
 struct Timer {
@@ -60,18 +62,3 @@ private:
 	uint32_t m_nextId{};
 };
 inline TimerSystem& g_TimerSystem = TimerSystem::Instance();
-
-inline TimerFlag operator|(TimerFlag lhs, TimerFlag rhs) noexcept {
-	using underlying = std::underlying_type_t<TimerFlag>;
-	return static_cast<TimerFlag>(static_cast<underlying>(lhs) | static_cast<underlying>(rhs));
-}
-
-inline bool operator&(TimerFlag lhs, TimerFlag rhs) noexcept {
-	using underlying = std::underlying_type_t<TimerFlag>;
-	return static_cast<underlying>(lhs) & static_cast<underlying>(rhs);
-}
-
-inline TimerFlag& operator|=(TimerFlag& lhs, TimerFlag rhs) noexcept {
-	lhs = lhs | rhs;
-	return lhs;
-}

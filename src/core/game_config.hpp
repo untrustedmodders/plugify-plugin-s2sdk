@@ -488,6 +488,14 @@ private:
 	friend class VTableResolver;
 };
 
+struct ConfigEntry {
+	std::unique_ptr<GameConfig> config;
+	size_t refCount;
+
+	explicit ConfigEntry(std::unique_ptr<GameConfig> cfg)
+		: config(std::move(cfg)), refCount(1) {}
+};
+
 class GameConfigManager {
 	GameConfigManager() = default;
 	~GameConfigManager() = default;
@@ -507,17 +515,9 @@ public:
 	ModuleProvider& GetModuleProvider();
 	PatchManager& GetPatchManager();
 
-	plg::vector<GameConfig*> GetConfigs() const;
+	const plg::flat_hash_map<uint32_t, ConfigEntry>& GetConfigs() const;
 
 private:
-	struct ConfigEntry {
-		std::unique_ptr<GameConfig> config;
-		size_t refCount;
-
-		explicit ConfigEntry(std::unique_ptr<GameConfig> cfg)
-			: config(std::move(cfg)), refCount(1) {}
-	};
-
 	plg::flat_hash_map<uint32_t, ConfigEntry> m_configs;
 	mutable std::shared_mutex m_mutex;
 	uint32_t m_nextId{};

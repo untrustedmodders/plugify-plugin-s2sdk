@@ -153,8 +153,8 @@ extern "C" PLUGIN_API void* GetGameConfigSignature(uint32_t id, const plg::strin
  * @return A string containing the patch, or an empty string if not found.
  */
 extern "C" PLUGIN_API plg::string GetGameConfigPatchAll(const plg::string& name) {
-	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
-		if (auto patch = gameConfig->GetPatch(name)) {
+	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (auto patch = gameConfig.config->GetPatch(name)) {
 			return *patch;
 		} else {
 			plg::print(LS_WARNING, "Could not find patch: {} - {}\n", name, patch.error());
@@ -175,8 +175,8 @@ extern "C" PLUGIN_API plg::string GetGameConfigPatchAll(const plg::string& name)
  * @return The offset associated with the specified name, or -1 if not found.
  */
 extern "C" PLUGIN_API int GetGameConfigOffsetAll(const plg::string& name) {
-	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
-		if (auto offset = gameConfig->GetOffset(name)) {
+	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (auto offset = gameConfig.config->GetOffset(name)) {
 			return *offset;
 		} else {
 			plg::print(LS_WARNING, "Could not find offset: {} - {}\n", name, offset.error());
@@ -197,8 +197,8 @@ extern "C" PLUGIN_API int GetGameConfigOffsetAll(const plg::string& name) {
  * @return A pointer to the address associated with the specified name, or nullptr if not found.
  */
 extern "C" PLUGIN_API void* GetGameConfigAddressAll(const plg::string& name) {
-	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
-		if (auto address = gameConfig->GetAddress(name)) {
+	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (auto address = gameConfig.config->GetAddress(name)) {
 			return *address;
 		} else {
 			plg::print(LS_WARNING, "Could not find address: {} - {}\n", name, address.error());
@@ -219,8 +219,8 @@ extern "C" PLUGIN_API void* GetGameConfigAddressAll(const plg::string& name) {
  * @return A pointer to the vtable associated with the specified name, or nullptr if not found.
  */
 extern "C" PLUGIN_API void* GetGameConfigVTableAll(const plg::string& name) {
-	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
-		if (auto vtable = gameConfig->GetVTable(name)) {
+	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (auto vtable = gameConfig.config->GetVTable(name)) {
 			return *vtable;
 		} else {
 			plg::print(LS_WARNING, "Could not vtable: {} - {}\n", name, vtable.error());
@@ -241,8 +241,8 @@ extern "C" PLUGIN_API void* GetGameConfigVTableAll(const plg::string& name) {
  * @return A pointer to the signature associated with the specified name, or nullptr if not found.
  */
 extern "C" PLUGIN_API void* GetGameConfigSignatureAll(const plg::string& name) {
-	for (auto* gameConfig : g_GameConfigManager.GetConfigs()) {
-		if (auto signature = gameConfig->GetSignature(name)) {
+	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (auto signature = gameConfig.config->GetSignature(name)) {
 			return *signature;
 		} else {
 			plg::print(LS_WARNING, "Could not find signature: {} - {}\n", name, signature.error());
