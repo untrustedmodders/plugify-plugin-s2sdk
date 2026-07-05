@@ -17,7 +17,7 @@ bool EntityOutputManager::HookEntityOutput(std::string_view classname, std::stri
 			hook = it->second;
 		} else {
 			hook = std::make_shared<EntityOutputHook>();
-			m_hookMap.emplace(OutputStr(classname, output), hook);
+			m_hookMap.emplace(OutputStr{classname, output}, hook);
 		}
 	}
 	return hook->callbacks[mode].Register(callback);
@@ -75,15 +75,16 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 	int callerHandle = caller != nullptr ? caller->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
 
 	for (const auto& hook : m_callbackHooks) {
-		auto funcs = hook->callbacks[HookMode::Pre].Get();
-		for (const auto& func : funcs->handlers) {
-			auto thisResult = func(activatorHandle, callerHandle, delay);
-			if (thisResult >= ResultType::Stop) {
-				break;
-			}
+		if (auto funcs = hook->callbacks[HookMode::Pre].Get()) {
+			for (const auto& func : funcs->handlers) {
+				auto thisResult = func(activatorHandle, callerHandle, delay);
+				if (thisResult >= ResultType::Stop) {
+					break;
+				}
 
-			if (thisResult > result) {
-				result = thisResult;
+				if (thisResult > result) {
+					result = thisResult;
+				}
 			}
 		}
 	}

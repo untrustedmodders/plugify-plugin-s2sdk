@@ -100,15 +100,16 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 		if (!preHook.Empty()) {
 			plg::print(LS_DETAILED, "Pushing event `{}` pointer: {}, dont broadcast: {}, post: {}\n", event->GetName(), static_cast<const void*>(event), dontBroadcast, false);
 
-			auto funcs = preHook.Get();
-			for (const auto& func : funcs->handlers) {
-				auto result = func(name, event, dontBroadcast);
-				localDontBroadcast = event->GetBool("dont_broadcast");
+			if (auto funcs = preHook.Get()) {
+				for (const auto& func : funcs->handlers) {
+					auto result = func(name, event, dontBroadcast);
+					localDontBroadcast = event->GetBool("dont_broadcast");
 
-				if (result >= ResultType::Handled) {
-					// m_EventCopies.push(g_gameEventManager->DuplicateEvent(pEvent));
-					g_pGameEventManager->FreeEvent(event);
-					return ResultType::Handled;
+					if (result >= ResultType::Handled) {
+						// m_EventCopies.push(g_gameEventManager->DuplicateEvent(pEvent));
+						g_pGameEventManager->FreeEvent(event);
+						return ResultType::Handled;
+					}
 				}
 			}
 		}

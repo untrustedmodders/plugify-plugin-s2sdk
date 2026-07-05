@@ -1426,7 +1426,7 @@ Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
 	}
 
 	uint32_t id = m_nextId++;
-	m_configs.emplace(id, ConfigEntry{std::move(config)});
+	m_configs.emplace(id, GameConfigEntry{std::move(config)});
 	return id;
 }
 
@@ -1460,7 +1460,7 @@ PatchManager& GameConfigManager::GetPatchManager() {
 	return m_patchManager;
 }
 
-const plg::flat_hash_map<uint32_t, ConfigEntry>& GameConfigManager::GetConfigs() const {
+const plg::flat_hash_map<uint32_t, GameConfigEntry>& GameConfigManager::GetConfigs() const {
 	return m_configs;
 }
 

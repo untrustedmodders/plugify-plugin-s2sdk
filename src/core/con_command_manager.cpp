@@ -170,20 +170,21 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, con
 	std::scoped_lock lock(m_mutex);
 
 	{
-		auto funcs = m_globalCallbacks[mode].Get();
-		for (const auto& func : funcs->handlers) {
-			auto thisResult = func(caller, callingContext, arguments);
-			if (thisResult >= ResultType::Stop) {
-				if (mode == HookMode::Pre) {
-					return ResultType::Stop;
+		if (auto funcs = m_globalCallbacks[mode].Get()) {
+			for (const auto& func : funcs->handlers) {
+				auto thisResult = func(caller, callingContext, arguments);
+				if (thisResult >= ResultType::Stop) {
+					if (mode == HookMode::Pre) {
+						return ResultType::Stop;
+					}
+
+					result = thisResult;
+					break;
 				}
 
-				result = thisResult;
-				break;
-			}
-
-			if (thisResult >= ResultType::Handled) {
-				result = thisResult;
+				if (thisResult >= ResultType::Handled) {
+					result = thisResult;
+				}
 			}
 		}
 	}
@@ -195,13 +196,14 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, con
 			return result;
 		}*/
 
-		auto funcs = commandInfo->callbacks[mode].Get();
-		for (const auto& func : funcs->handlers) {
-			auto thisResult = func(caller, callingContext, arguments);
-			if (thisResult >= ResultType::Handled) {
-				return thisResult;
-			} else if (thisResult > result) {
-				result = thisResult;
+		if (auto funcs = commandInfo->callbacks[mode].Get()) {
+			for (const auto& func : funcs->handlers) {
+				auto thisResult = func(caller, callingContext, arguments);
+				if (thisResult >= ResultType::Handled) {
+					return thisResult;
+				} else if (thisResult > result) {
+					result = thisResult;
+				}
 			}
 		}
 	}
