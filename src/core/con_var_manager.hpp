@@ -81,7 +81,7 @@ public:
 		std::scoped_lock lock(m_mutex);
 
 		if (name.empty()) {
-			plg::print(LS_WARNING, "ConVar name empty\n", name);
+			plg::print(LS_WARNING, "ConVar name empty\n");
 			return {};
 		}
 
@@ -114,6 +114,11 @@ public:
 	template<typename T>
 	ConVarRef FindConVar(std::string_view name) {
 		std::scoped_lock lock(m_mutex);
+
+		if (name.empty()) {
+			plg::print(LS_WARNING, "ConVar name empty\n");
+			return {};
+		}
 
 		auto it = m_cnvLookup.find(name);
 		if (it != m_cnvLookup.end()) {

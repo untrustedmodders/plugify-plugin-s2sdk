@@ -11,8 +11,14 @@ EventManager::~EventManager() {
 EventHookError EventManager::HookEvent(std::string_view name, EventListenerCallback callback, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 
+	if (name.empty()) {
+		plg::print(LS_WARNING, "Event name empty\n");
+		return EventHookError::InvalidEvent;
+	}
+
 	if (!g_pGameEventManager->FindListener(this, name.data())) {
-		if (!g_pGameEventManager->AddListener(this, name.data(), true)) {
+		if (g_pGameEventManager->AddListener(this, name.data(), true) == -1) {
+			plg::print(LS_WARNING, "Event name invalid: {}\n", name);
 			return EventHookError::InvalidEvent;
 		}
 	}
@@ -33,6 +39,11 @@ EventHookError EventManager::HookEvent(std::string_view name, EventListenerCallb
 EventHookError EventManager::UnhookEvent(std::string_view name, EventListenerCallback callback, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 
+	if (name.empty()) {
+		plg::print(LS_WARNING, "Event name empty\n");
+		return EventHookError::InvalidEvent;
+	}
+
 	auto it = m_hookMap.find(name);
 	if (it != m_hookMap.end()) {
 		auto hook = it->second;
@@ -43,7 +54,7 @@ EventHookError EventManager::UnhookEvent(std::string_view name, EventListenerCal
 		return status;
 	}
 
-	return EventHookError::Okay;
+	return EventHookError::NotActive;
 }
 
 void EventManager::FireGameEvent(IGameEvent* event) {

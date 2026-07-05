@@ -16,7 +16,9 @@ ConCommandInfo::~ConCommandInfo() {
 		return;
 	}
 
-	g_pCVar->UnregisterConCommandCallbacks(commandRef);
+	if (commandRef.IsValidRef()) {
+		g_pCVar->UnregisterConCommandCallbacks(commandRef);
+	}
 }
 
 ConCommandManager ConCommandManager::instance;
@@ -72,7 +74,7 @@ bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view 
 	std::scoped_lock lock(m_mutex);
 
 	if (name.empty()) {
-		plg::print(LS_WARNING, "Command name empty\n", name);
+		plg::print(LS_WARNING, "Command name empty\n");
 		return false;
 	}
 
@@ -102,6 +104,11 @@ bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view 
 bool ConCommandManager::RemoveValveCommand(std::string_view name) {
 	std::scoped_lock lock(m_mutex);
 
+	if (name.empty()) {
+		plg::print(LS_WARNING, "Command name empty\n");
+		return false;
+	}
+
 	auto commandRef = g_pCVar->FindConCommand(name.data());
 	if (!commandRef.IsValidRef()) {
 		return false;
@@ -117,6 +124,11 @@ bool ConCommandManager::RemoveValveCommand(std::string_view name) {
 
 bool ConCommandManager::IsValidValveCommand(std::string_view name) {
 	std::scoped_lock lock(m_mutex);
+
+	if (name.empty()) {
+		plg::print(LS_WARNING, "Command name empty\n");
+		return false;
+	}
 
 	ConCommandRef commandRef = g_pCVar->FindConCommand(name.data());
 	return commandRef.IsValidRef();

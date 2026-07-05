@@ -1393,7 +1393,7 @@ Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
 	std::unique_lock lock(m_mutex);
 
 	// Check for existing config with same paths
-	for (const auto& [id, entry] : m_configs) {
+	for (auto& [id, entry] : m_configs) {
 		const auto& existingPaths = entry.config->GetOptions().configPaths;
 
 		bool matchFound = false;
@@ -1409,7 +1409,7 @@ Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
 
 		if (matchFound) {
 			// Reuse existing config
-			const_cast<ConfigEntry&>(entry).refCount++;
+			entry.refCount++;
 			return id;
 		}
 	}

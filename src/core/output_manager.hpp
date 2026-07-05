@@ -6,7 +6,8 @@
 
 #include <entity2/entitysystem.h>
 
-using OutputKey = std::pair<plg::string, plg::string>;
+using OutputStr = std::pair<plg::string, plg::string>;
+using OutputView = std::pair<std::string_view, std::string_view>;
 using EntityListenerCallback = ResultType (*)(int activatorHandle, int callerHandle, float delay);
 inline char EntityListenerStr[] = S2SDK_PACKAGE "::EntityListener";
 
@@ -25,14 +26,14 @@ public:
 		return instance;
 	}
 
-	bool HookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode);
-	bool UnhookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode);
+	bool HookEntityOutput(std::string_view classname, std::string_view output, EntityListenerCallback callback, HookMode mode);
+	bool UnhookEntityOutput(std::string_view classname, std::string_view output, EntityListenerCallback callback, HookMode mode);
 
 	ResultType FireOutputInternal(CEntityIOOutput* self, CEntityInstance* activator, CEntityInstance* caller, float delay);
 	ResultType FireOutputInternal_Post(CEntityIOOutput* self, CEntityInstance* activator, CEntityInstance* caller, float delay);
 
 private:
-	plg::flat_hash_map<OutputKey, std::shared_ptr<EntityOutputHook>, plg::pair_hash<plg::string, plg::string>> m_hookMap;
+	plg::flat_hash_map<OutputStr, std::shared_ptr<EntityOutputHook>, plg::pair_hash, std::equal_to<>> m_hookMap;
 	std::recursive_mutex m_mutex;
 	std::inplace_vector<std::shared_ptr<EntityOutputHook>, 4> m_callbackHooks;
 };

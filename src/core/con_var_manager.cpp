@@ -11,7 +11,9 @@ ConVarManager::~ConVarManager() {
 	}
 
 	for (const auto& [_, cv] : m_cnvLookup) {
-		g_pCVar->UnregisterConVarCallbacks(*cv->conVar);
+		if (cv->conVar->IsValidRef()) {
+			g_pCVar->UnregisterConVarCallbacks(*cv->conVar);
+		}
 	}
 
 	//ConVar_Unregister();
@@ -24,11 +26,21 @@ void ConVarManager::Init() {
 bool ConVarManager::RemoveConVar(std::string_view name) {
 	std::scoped_lock lock(m_mutex);
 
+	if (name.empty()) {
+		plg::print(LS_WARNING, "ConVar name empty\n");
+		return {};
+	}
+
 	return m_cnvLookup.erase(name) != 0;
 }
 
 ConVarRef ConVarManager::FindConVar(std::string_view name) {
 	std::scoped_lock lock(m_mutex);
+
+	if (name.empty()) {
+		plg::print(LS_WARNING, "ConVar name empty\n");
+		return {};
+	}
 
 	auto it = m_cnvLookup.find(name);
 	if (it != m_cnvLookup.end()) {

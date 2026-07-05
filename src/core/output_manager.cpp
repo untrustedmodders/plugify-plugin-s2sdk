@@ -2,10 +2,13 @@
 
 EntityOutputManager EntityOutputManager::instance;
 
-bool EntityOutputManager::HookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode) {
+bool EntityOutputManager::HookEntityOutput(std::string_view classname, std::string_view output, EntityListenerCallback callback, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 
-	OutputKey outputKey{std::move(classname), std::move(output)};
+	if (classname.empty() || output.empty()) {
+		plg::print(LS_WARNING, "Class/output name empty\n");
+		return false;
+	}
 
 	std::shared_ptr<EntityOutputHook> hook;
 	{
@@ -20,12 +23,15 @@ bool EntityOutputManager::HookEntityOutput(plg::string classname, plg::string ou
 	return hook->callbacks[mode].Register(callback);
 }
 
-bool EntityOutputManager::UnhookEntityOutput(plg::string classname, plg::string output, EntityListenerCallback callback, HookMode mode) {
+bool EntityOutputManager::UnhookEntityOutput(std::string_view classname, std::string_view output, EntityListenerCallback callback, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 
-	OutputKey outputKey{std::move(classname), std::move(output)};
+	if (classname.empty() || output.empty()) {
+		plg::print(LS_WARNING, "Class/output name empty\n");
+		return false;
+	}
 
-	auto it = m_hookMap.find(outputKey);
+	auto it = m_hookMap.find(OutputView{classname, output});
 	if (it != m_hookMap.end()) {
 		auto hook = it->second;
 		auto status = hook->callbacks[mode].Unregister(callback);
@@ -45,10 +51,10 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 		plg::print(LS_DETAILED, "[EntityOutputManager][FireOutputHook] - {}, {}\n", self->m_pDesc->m_pName, caller->GetClassname());
 
 		std::array searchKeys{
-				OutputKey{"*", self->m_pDesc->m_pName},
-				OutputKey{"*", "*"},
-				OutputKey{caller->GetClassname(), self->m_pDesc->m_pName},
-				OutputKey{caller->GetClassname(), "*"}
+				OutputView{"*", self->m_pDesc->m_pName},
+				OutputView{"*", "*"},
+				OutputView{caller->GetClassname(), self->m_pDesc->m_pName},
+				OutputView{caller->GetClassname(), "*"}
 		};
 
 		m_callbackHooks.clear();
