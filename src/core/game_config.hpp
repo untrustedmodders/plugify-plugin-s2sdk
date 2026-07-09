@@ -388,7 +388,7 @@ public:
 	void ForEachVTable(Fn&& fn) const;
 
 private:
-	mutable StatsT<std::atomic_unsigned_lock_free> m_stats;
+	mutable StatsT<std::atomic_size_t> m_stats;
 	plg::flat_hash_map<plg::string, ResolvedSignature, plg::string_hash, std::equal_to<>> m_signatures;
 	plg::flat_hash_map<plg::string, ResolvedAddress, plg::string_hash, std::equal_to<>> m_addresses;
 	plg::flat_hash_map<plg::string, ResolvedVTable, plg::string_hash, std::equal_to<>> m_vtables;
