@@ -1,5 +1,35 @@
 # Changelog
 
+## [2.12.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.11.1...v2.12.0) (2026-07-09)
+
+
+### Features
+
+* rename transmit methods ([45e2191](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/45e21919fc71c92467dec1965c6c0a4e8e2e7595))
+
+
+### Bug Fixes
+
+* add bitwise enum operators ([395395e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/395395ef502ea89bb608abceba0f3689ba6afbc3))
+* add empty name checks ([011a008](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/011a008fb982a443b95843cca00a5c4cee855cae))
+* build ([9821d41](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9821d41a1687cfad8909351a1a3c61adb3be7867))
+* build on linux ([d218064](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d2180641aec9072a99bd0872538985f32b1c8292))
+* compilation issues ([e282fd8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e282fd862c56fd7e65c7ae7cd5539ba796a3b9e2))
+* compilation issues (2) ([bf15967](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bf1596755804ea2eb42c3909528f249cda040d9d))
+* improve performance of listeners ([6c9cf78](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6c9cf78c99085b0a285877f42659a7794886f65e))
+* improve performance of singletons and remove mutex from logger ([64f208e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/64f208ebb444ce71c3d891e8d17eb66dbff6eb0c))
+* more improvements ([f42bf3f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f42bf3fd0f550a8073adea922e214abda623afb0))
+* remove copy ctors ([51c2fc3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/51c2fc35dc9b4e76f321ff31ff162b99f4bcf65e))
+* remove hybrid vectors ([06c5971](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/06c597185540fb7b692eedb9056097ff24e7dd58))
+* remove listeners ([e73d265](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e73d2650548e8d54ff13e1c4b1ce5b0c4d7bc8b7))
+* replace atomic flags by bools ([96b756d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/96b756dd13896192f7b1743291b1a3c651dd2e86))
+* replace warn ignore by plugin's macro ([ccfb288](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ccfb28891bad0043082b03c94261b0e1719d7b3f))
+* some issues with listeners ([f89b83f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f89b83f99e83e38c8c893b5e08294b0f87c81c6a))
+* transmit crash client ([4c44a22](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4c44a229d325206553c3c85c7d837a3c94b16908))
+* update deps ([aeb3ff8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/aeb3ff86d18d8a018097226df62dc39e950feaf0))
+* update hashers ([db24a23](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/db24a2364583f3e70d988a3e244c8d9f1cd744f1))
+* update sdk ([971f207](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/971f207e406997e265f75d7878c223539d442321))
+
 ## [2.11.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.11.0...v2.11.1) (2026-06-25)
 
 
