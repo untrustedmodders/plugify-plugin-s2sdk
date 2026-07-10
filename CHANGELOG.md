@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.12.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.12.0...v2.12.1) (2026-07-10)
+
+
+### Bug Fixes
+
+* update gamedata & sdk ([81699f4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/81699f446189e5400b599375cd1cc4b9483c612a))
+* update sdk ([b147c94](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b147c94e8e95e9f0c20985bfeb076c34193afb4c))
+
 ## [2.12.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.11.1...v2.12.0) (2026-07-09)
 
 
