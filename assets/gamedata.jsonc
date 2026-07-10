@@ -22,19 +22,34 @@
       "CCSPlayerController::SwitchTeam": {
         "library": "server",
         "win64": "40 53 57 48 81 EC ? ? ? ? 48 8B D9 8B FA",
-        "linuxsteamrt64": "55 48 89 E5 41 54 49 89 FC 89 F7"
+        "linuxsteamrt64": "55 48 89 E5 41 54 49 89 FC 89 F7",
+        "refs": [
+          {
+            "string": "\"%s<%i><%s><%s>\" SwitchTeam => ChangeBasePlayerTeamAndPendingTeam =%d , req team %d %.2f \n"
+          }
+        ]
       },
       // String: "Discarding pending request '%s, %u'\n"
       "CHostStateMgr::StartNewRequest": {
         "library": "engine2",
         "win64": "48 89 74 24 ? 57 48 83 EC ? 33 F6 48 8B FA 48 39 35",
-        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 49 89 FC 53 48 89 F3 48 83 EC 18 48 83 7F 30 00"
+        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 49 89 FC 53 48 89 F3 48 83 EC 18 48 83 7F 30 00",
+        "refs": [
+          {
+            "string": "Discarding pending request '%s, %u'\n"
+          }
+        ]
       },
       // String: "Sending S2C_CONNECTION to %s [addons:'%s']\n"
       "CNetworkGameServer::ReplyConnection": {
         "library": "engine2",
         "win64": "48 8B C4 55 41 55 41 56",
-        "linuxsteamrt64": "55 48 8D 05 ? ? ? ? 66 0F EF C0 48 89 E5 41 57 41 56 41 55 41 54 49 89 FC"
+        "linuxsteamrt64": "55 48 8D 05 ? ? ? ? 66 0F EF C0 48 89 E5 41 57 41 56 41 55 41 54 49 89 FC",
+        "refs": [
+          {
+            "string": "Sending S2C_CONNECTION to %s [addons:'%s']\n"
+          }
+        ]
       },
       // String: "player_disconnect" at bottom func with 6 params (v12, a1, 0LL, 0, 0, 0)
       "CBasePlayerController::SetPawn": {
@@ -61,13 +76,18 @@
       "CSource2Server::Init": {
         "library": "server",
         "win64": "48 83 EC ? 48 83 3D ? ? ? ? ? 74 ? 33 C9 E8 ? ? ? ? FF 15",
-        "linuxsteamrt64": "55 48 89 E5 41 55 41 54 53 48 83 EC ? 48 8D 05 ? ? ? ? 48 83 38"
+        "linuxsteamrt64": "55 48 89 E5 41 55 41 54 53 48 83 EC ? 48 8D 05 ? ? ? ? 48 83 38",
+        "refs": [
+          {
+            "string": "CEngineServiceRegistry::RegisterEngineServices()"
+          }
+        ]
       },
       // "InPass" is passed to this
       "CEntityInstance::AcceptInput": {
         "library": "server",
         "win64": "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 49 8B F0 48 8B D9 48 8B 0D",
-        "linuxsteamrt64": "55 48 89 F0 48 89 E5 41 57 49 89 FF 41 56 48 8D 7D"
+        "linuxsteamrt64": "55 48 89 E5 41 56 49 89 FE 41 55 48 8D 7D"
       },
       // String: "Multisource %s enabled (%d inputs)\n"
       "CEntityIOOutput::FireOutputInternal": {
@@ -78,8 +98,8 @@
       // String: "TerminateRound"
       "CGameRules::TerminateRound": {
         "library": "server",
-        "win64": "48 8B C4 4C 89 48 ? 48 89 48 ? 55 56 41 56",
-        "linuxsteamrt64": "55 48 89 E5 41 57 49 89 FF 41 56 41 55 41 54 53 48 81 EC ? ? ? ? 48 8D 05 ? ? ? ? F3 0F 11 85"
+        "win64": "48 8B C4 4C 89 48 ? 48 89 48 ? 55 41 54",
+        "linuxsteamrt64": "55 48 89 E5 41 57 41 89 F7 41 56 48 8D 35"
       },
       // "chicken" is passed to this
       "CGameEntitySystem::CreateEntityByName": {
@@ -104,7 +124,7 @@
       "CBaseEntity::SetMoveType": {
         "library": "server",
         "win64": "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 41 0F B6 F0",
-        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 41 89 D4 53 48 89 FB 48 81 EC ? ? ? ? E8 ? ? ? ? 48 8D BB ? ? ? ? 44 89 E6 E8"
+        "linuxsteamrt64": "55 48 89 E5 41 57 49 89 FF 41 56 41 55 41 54 53 89 D3 48 81 EC ? ? ? ? 40 38 B7"
       },
       // String: "DestroyWeapon"
       "CCSPlayer_WeaponServices::RemoveItem": {
@@ -132,7 +152,7 @@
       "GetCSWeaponDataFromKey": {
         "library": "server",
         "win64": "48 89 5C 24 ? 57 48 83 EC ? 33 FF 4C 8B CA 8B D9",
-        "linuxsteamrt64": "48 85 F6 0F 84 ? ? ? ? 55 48 89 E5 41 57 41 56 41 55 49 89 F5 41 54 53 48 81 EC ? ? ? ? 80 3E ? 75 ? 31 C0 48 81 C4 ? ? ? ? 5B 41 5C 41 5D 41 5E 41 5F 5D C3 0F 1F 80 ? ? ? ? 4C 8D A5"
+        "linuxsteamrt64": "48 85 F6 0F 84 ? ? ? ? 55 48 89 E5 41 57 41 56 41 55 49 89 F5 41 54 53 48 81 EC ? ? ? ? 80 3E ? 75 ? 31 C0 48 81 C4 ? ? ? ? 5B 41 5C 41 5D 41 5E 41 5F 5D C3 0F 1F 80 ? ? ? ? 4C 8D A5 ? ? ? ? 89 FB"
       },
 
       // patches
@@ -143,16 +163,16 @@
         "library": "vscript",
         "win64": "BE ? ? ? ? 2B D6",
         "linuxsteamrt64": "83 FE 01 0F 84 ? ? ? ? 83 FE 02 0F 85 ? ? ? ? BF ? ? ? ? E8"
-      }
+      },
       // String: "Player.Swim" and "player_jump"
       // patching 42C80000h
       // mov     dword ptr [rsi+40h], 42C80000h
       // jmp     short loc_18072BE63
-      /*"CheckJumpButtonWater": {
+      "CheckJumpButtonWater": {
         "library": "server",
-        "win64": "C8 42 EB ? 4C 8B 77 ? 4D 39 66",
+        "win64": "TODO",
         "linuxsteamrt64": "C8 42 41 C7 85 ? ? ? ? 00 00 00 00 41 C7 85 ? ? ? ? 00 00 00 00 E9"
-      },*/
+      },
       // "Error - cannot add bots after game is over.\n"
       // patching jz
       // 48 83 EC 30             sub     rsp, 30h
@@ -162,11 +182,11 @@
       // 8B EA                   mov     ebp, edx
       // 48 85 C0                test    rax, rax
       // 0F 84 61 04 00 00       jz      loc_180213085
-      /*"BotNavIgnore": {
+      "BotNavIgnore": {
         "library": "server",
-        "win64": "0F 84 ? ? ? ? 80 B8 ? ? ? ? 00 0F 84 ? ? ? ? 80 3D ? ? ? ? 00 74 15",
-        "linuxsteamrt64": "0F 84 ? ? ? ? 44 0F B6 B8 ? ? ? ? 45 84 FF 0F 84"
-      },*/
+        "win64": "TODO",
+        "linuxsteamrt64": "0F 84 ? ? ? ? 44 0F B6 B8"
+      },
       // Function after function where "FullWalkMovePreMove" passed
       // patching jbe
       // 45 0F C6 C0 55          shufps  xmm8, xmm8, 55h ; 'U'
@@ -180,17 +200,22 @@
       // F3 0F 58 CA             addss   xmm1, xmm2
       // 0F 2F C8                comiss  xmm1, xmm0
       // 0F 86 B0 00 00 00       jbe     loc_18074A7E5
-      /*"ServerMovementUnlock": {
+      "ServerMovementUnlock": {
         "library": "server",
         "win64": "0F 86 ? ? ? ? 0F 57 C0 0F 2E C2",
-        "linuxsteamrt64": "0F 87 ? ? ? ? F3 0F 12 C2"
-      },*/
+        "linuxsteamrt64": "0F 87 ? ? ? ? F3 0F 10 25 ? ? ? ? F3 0F 11 A5 ? ? ? ? 48 89 DE"
+      },
       // "Tried to set the source soundscape on positionless sound event %s\n" where 763651247
-      /*"EmitSoundVolume": {
+      "EmitSoundVolume": {
         "library": "server",
-        "win64": "41 B9 ? ? ? ? 48 89 5C 24 ? 49 8B D5",
+        "win64": "TODO",
         "linuxsteamrt64": "E8 ? ? ? ? F3 0F 6F 03 48 83 EC ? 45 31 C9 89 C2 45 31 C0 4C 89 FE 0F 11 04 24 8B 43 ? 4C 89 E7"
-      }*/
+      },
+      "SetSchemaHammerUniqueId": {
+        "library": "server",
+        "win64": "TODO",
+        "linuxsteamrt64": "75 ? 48 8B 03 48 89 DF FF 90 ? ? ? ? 84 C0 74 ? 48 8D 05"
+      }
     },
     "Offsets": {
       // Game entity system virtual table offset
@@ -205,8 +230,8 @@
       },
       // StringL "item_pickup_failed"
       "CBaseEntity::IsWeapon": {
-        "win64": 181,
-        "linuxsteamrt64": 180
+        "win64": 177,
+        "linuxsteamrt64": 176
       },
       // String "can't teleport object (%s) as it has a parent (%s)!" The vfunc call this
       "CBaseEntity::Teleport": {
@@ -226,28 +251,28 @@
         "linuxsteamrt64": 390
       },
       "CCSPlayer_WeaponServices::CanUse": {
-        "win64": 24,
-        "linuxsteamrt64": 25
-      },
-      "CCSPlayer_WeaponServices::DropWeapon": {
-        "win64": 25,
-        "linuxsteamrt64": 26
-      },
-      "CCSPlayer_WeaponServices::SelectItem": {
         "win64": 27,
         "linuxsteamrt64": 28
       },
+      "CCSPlayer_WeaponServices::DropWeapon": {
+        "win64": 28,
+        "linuxsteamrt64": 29
+      },
+      "CCSPlayer_WeaponServices::SelectItem": {
+        "win64": 30,
+        "linuxsteamrt64": 31
+      },
       "CCSPlayer_WeaponServices::SwitchWeapon": {
-        "win64": 21,
-        "linuxsteamrt64": 22
-      },
-      "CCSPlayer_ItemServices::GiveNamedItem": {
-        "win64": 20,
-        "linuxsteamrt64": 21
-      },
-      "CCSPlayer_ItemServices::RemoveAllItems": {
         "win64": 24,
         "linuxsteamrt64": 25
+      },
+      "CCSPlayer_ItemServices::GiveNamedItem": {
+        "win64": 23,
+        "linuxsteamrt64": 24
+      },
+      "CCSPlayer_ItemServices::RemoveAllItems": {
+        "win64": 27,
+        "linuxsteamrt64": 28
       },
       // "InitialActivate" and "OnActivate"
       "CCSScript_EntityScript": {
@@ -292,7 +317,7 @@
         ],
         "linuxsteamrt64": [
           {
-            "read_offs32": 383
+            "read_offs32": 367
           }
         ]
       },
@@ -305,7 +330,7 @@
         ],
         "linuxsteamrt64": [
           {
-            "read_offs32": 45
+            "read_offs32": 38
           }
         ]
       },
@@ -318,7 +343,7 @@
         ],
         "linuxsteamrt64": [
           {
-            "read_offs32": 242
+            "read_offs32": 231
           }
         ]
       },
@@ -420,7 +445,7 @@
       // String: "CSource2GameClients::StartHLTVServer: game event %s not found.\n" Function right before the first virtual function call
       "LegacyGameEventListener": {
         "library": "server",
-        "win64": "48 8B 15 ? ? ? ? 48 85 D2 74 ? 83 F9 20 77 ? 48 63 C1 48 C1 E0 04",
+        "win64": "48 8B 05 ? ? ? ? 48 85 C0 74 16 83 FF 3F",
         "linuxsteamrt64": "TODO"
       },
       // String: "-pressdemo",

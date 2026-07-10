@@ -10,7 +10,7 @@ PLUGIFY_LINKAGE()
  * @param msg The message to be sent to the server console.
  */
 extern "C" PLUGIN_API void PrintToServer(const plg::string& msg) {
-	ConMsg("%s", msg.c_str());
+	ConMsg("%s\n", msg.c_str());
 }
 
 /**
