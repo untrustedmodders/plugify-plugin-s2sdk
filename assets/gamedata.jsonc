@@ -359,6 +359,23 @@
             "index": 110
           }
         ]
+      },
+      // Base CBaseEntity::SetTransmit(CCheckTransmitInfo*, bool) resolved from the
+      // CBaseEntity vtable slot. That base impl sets the entity's transmit bit and every
+      // class override calls into it, so a single detour on this address covers every
+      // entity. Used by the transmit manager to hide entities from specific players.
+      "CBaseEntity::SetTransmit": {
+        "vtable": "CBaseEntity",
+        "win64": [
+          {
+            "index": 95
+          }
+        ],
+        "linuxsteamrt64": [
+          {
+            "index": 94
+          }
+        ]
       }
     },
     "Patches": {
@@ -414,6 +431,10 @@
       "CPointEntity": {
         "library": "server",
         "table": "CPointEntity"
+      },
+      "CBaseEntity": {
+        "library": "server",
+        "table": "CBaseEntity"
       }
     }
   },

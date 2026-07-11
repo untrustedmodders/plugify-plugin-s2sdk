@@ -1,45 +1,69 @@
 #include "transmit_manager.hpp"
 
-#include "event_listener.hpp"
+#include "game_config.hpp"
 #include "globals.hpp"
+#include "hook_manager.hpp"
+#include "sdk/entity/cbaseentity.h"
 #include "sdk/helpers.hpp"
 
 TransmitManager TransmitManager::instance;
 
-void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& transmitList) {
-	if (m_playerHiddenEntities.empty()) {
+namespace {
+	constexpr std::string_view kSetTransmitName = "CBaseEntity::SetTransmit";
+	using SetTransmitFn = void(CBaseEntity*, CCheckTransmitInfo*, bool);
+}
+
+polyhook::ResultType TransmitManager::OnSetTransmit(polyhook::HookHandle, polyhook::ParametersHandle params, int, polyhook::ReturnHandle, polyhook::CallbackType) {
+	auto& self = Instance();
+	if (self.m_playerHiddenEntities.empty()) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	auto* entity = polyhook::GetArgument<CBaseEntity*>(params, 0);
+	auto* info = polyhook::GetArgument<CCheckTransmitInfo*>(params, 1);
+	if (!entity || !info) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	auto it = self.m_playerHiddenEntities.find(info->m_nPlayerSlot.Get());
+	if (it == self.m_playerHiddenEntities.end()) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	if (!it->second.contains(entity->GetRefEHandle().ToInt())) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	return polyhook::ResultType::Supercede;
+}
+
+void TransmitManager::UpdateActiveState() {
+	const bool shouldBeActive = !m_playerHiddenEntities.empty();
+	if (shouldBeActive == m_active) {
 		return;
 	}
 
-	for (auto* info : transmitList) {
-		if (!info || !info->m_pTransmitEntity) {
-			continue;
+	if (shouldBeActive) {
+		auto address = g_pGameConfig->GetAddress(kSetTransmitName);
+		if (!address) {
+			plg::print(LS_WARNING, "Failed to resolve CBaseEntity::SetTransmit: {}\n", address.error());
+			return;
 		}
-
-		auto it = m_playerHiddenEntities.find(info->m_nPlayerSlot);
-		if (it == m_playerHiddenEntities.end()) {
-			continue;
+		auto result = g_HookManager.AddHookDetourFunc<SetTransmitFn>(kSetTransmitName, static_cast<uintptr_t>(*address), &TransmitManager::OnSetTransmit, {polyhook::CallbackType::Pre});
+		if (!result) {
+			plg::print(LS_WARNING, "Failed to hook CBaseEntity::SetTransmit: {}\n", result.error());
+			return;
 		}
-
-		for (const int32_t handle : it->second) {
-			auto* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(handle));
-			if (!entity) {
-				continue;
-			}
-
-			// Keeping a player pawn hidden through death crashes nearby clients
-			auto* baseEntity = static_cast<CBaseEntity*>(entity);
-			if (baseEntity->m_lifeState != LIFE_ALIVE && baseEntity->IsPlayerPawn()) {
-				continue;
-			}
-
-			info->m_pTransmitEntity->Clear(entity->GetEntityIndex());
-		}
+		m_active = true;
+	} else {
+		g_HookManager.RemoveHookDetourFunc(kSetTransmitName);
+		m_active = false;
 	}
 }
 
 void TransmitManager::RoundStart() {
 	m_playerHiddenEntities.clear();
+	UpdateActiveState();
 }
 
 void TransmitManager::HideEntities(int32_t playerSlot, std::span<const int32_t> entHandles) {
@@ -47,6 +71,7 @@ void TransmitManager::HideEntities(int32_t playerSlot, std::span<const int32_t> 
 	for (const int32_t handle : entHandles) {
 		hidden.insert(handle);
 	}
+	UpdateActiveState();
 }
 
 void TransmitManager::ShowEntities(int32_t playerSlot, std::span<const int32_t> entHandles) {
@@ -63,6 +88,7 @@ void TransmitManager::ShowEntities(int32_t playerSlot, std::span<const int32_t> 
 	if (hidden.empty()) {
 		m_playerHiddenEntities.erase(it);
 	}
+	UpdateActiveState();
 }
 
 plg::vector<int32_t> TransmitManager::GetHiddenEntities(int32_t playerSlot) {
@@ -82,6 +108,7 @@ void TransmitManager::HideEntityFromOtherPlayers(int32_t playerSlot, int32_t ent
 
 		m_playerHiddenEntities[slot].insert(entHandle);
 	}
+	UpdateActiveState();
 }
 
 void TransmitManager::ShowEntityToOtherPlayers(int32_t playerSlot, int32_t entHandle) {
@@ -100,4 +127,5 @@ void TransmitManager::ShowEntityToOtherPlayers(int32_t playerSlot, int32_t entHa
 			m_playerHiddenEntities.erase(it);
 		}
 	}
+	UpdateActiveState();
 }

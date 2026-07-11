@@ -489,7 +489,6 @@ polyhook::ResultType Hook_CheckTransmit(polyhook::HookHandle hook, polyhook::Par
 	plg::view view(infoList, infoCount);
 
 	g_ServerCheckTransmitListenerManager(view.get());
-	g_TransmitManager.OnCheckTransmit(view.get());
 
 	return polyhook::ResultType::Ignored;
 }
