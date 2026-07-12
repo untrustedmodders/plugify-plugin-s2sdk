@@ -14,6 +14,11 @@ public:
 
 	void OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& transmitList);
 
+	// Force a just-spawned player pawn to transmit for the next CheckTransmit pass,
+	// so the client can build its scene node before it may be hidden again. Hiding a
+	// pawn on the spawn tick crashes nearby clients.
+	void MarkRecentlySpawned(int32_t entHandle);
+
 	void HideEntities(int32_t playerSlot, std::span<const int32_t> entHandles);
 	void ShowEntities(int32_t playerSlot, std::span<const int32_t> entHandles);
 
@@ -25,6 +30,8 @@ public:
 
 private:
 	plg::flat_hash_map<int32_t, plg::flat_hash_set<int32_t>> m_playerHiddenEntities;
+	// Pawns that spawned since the last CheckTransmit pass; shown for one tick.
+	plg::flat_hash_set<int32_t> m_recentlySpawned;
 	//std::mutex m_mutex;
 };
 inline TransmitManager& g_TransmitManager = TransmitManager::Instance();

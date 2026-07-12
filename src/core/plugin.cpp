@@ -48,6 +48,14 @@ GAME_EVENT_F(round_start) {
 	g_TransmitManager.RoundStart();
 }
 
+GAME_EVENT_F(player_spawn) {
+	// Let a just-spawned pawn transmit for one tick before it can be hidden again,
+	// otherwise hiding it on the spawn tick crashes nearby clients.
+	if (CEntityInstance* pawn = event->GetPlayerPawn("userid")) {
+		g_TransmitManager.MarkRecentlySpawned(pawn->GetRefEHandle().ToInt());
+	}
+}
+
 
 polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	//auto config = polyhook::GetArgument<const GameSessionConfiguration_t *>(params, 1);
