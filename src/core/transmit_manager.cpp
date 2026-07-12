@@ -30,11 +30,27 @@ polyhook::ResultType TransmitManager::OnSetTransmit(polyhook::HookHandle, polyho
 		return polyhook::ResultType::Ignored;
 	}
 
-	if (!it->second.contains(entity->GetRefEHandle().ToInt())) {
+	const int32_t handle = entity->GetRefEHandle().ToInt();
+	if (!it->second.contains(handle)) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	// A just-spawned pawn must transmit for a tick so the client can build its
+	// scene node before it is hidden again; hiding it on the spawn tick crashes
+	// nearby clients.
+	if (self.m_recentlySpawned.contains(handle)) {
 		return polyhook::ResultType::Ignored;
 	}
 
 	return polyhook::ResultType::Supercede;
+}
+
+void TransmitManager::MarkRecentlySpawned(int32_t entHandle) {
+	m_recentlySpawned.insert(entHandle);
+}
+
+void TransmitManager::ClearRecentlySpawned() {
+	m_recentlySpawned.clear();
 }
 
 void TransmitManager::UpdateActiveState() {
@@ -63,6 +79,7 @@ void TransmitManager::UpdateActiveState() {
 
 void TransmitManager::RoundStart() {
 	m_playerHiddenEntities.clear();
+	m_recentlySpawned.clear();
 	UpdateActiveState();
 }
 
