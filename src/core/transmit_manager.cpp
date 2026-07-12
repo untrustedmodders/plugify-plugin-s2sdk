@@ -8,6 +8,7 @@ TransmitManager TransmitManager::instance;
 
 void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& transmitList) {
 	if (m_playerHiddenEntities.empty()) {
+		m_recentlySpawned.clear();
 		return;
 	}
 
@@ -22,24 +23,33 @@ void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& tr
 		}
 
 		for (const int32_t handle : it->second) {
-			auto* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(handle));
-			if (!entity) {
+			// A just-spawned pawn must transmit for a tick so the client can build
+			// its scene node before it is hidden again; hiding it on the spawn tick
+			// crashes nearby clients.
+			if (m_recentlySpawned.contains(handle)) {
 				continue;
 			}
 
-			// Keeping a player pawn hidden through death crashes nearby clients
-			auto* baseEntity = static_cast<CBaseEntity*>(entity);
-			if (baseEntity->m_lifeState != LIFE_ALIVE && baseEntity->IsPlayerPawn()) {
+			auto* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(handle));
+			if (!entity) {
 				continue;
 			}
 
 			info->m_pTransmitEntity->Clear(entity->GetEntityIndex());
 		}
 	}
+
+	// Grace consumed for this tick; hidden pawns resume hiding next pass.
+	m_recentlySpawned.clear();
+}
+
+void TransmitManager::MarkRecentlySpawned(int32_t entHandle) {
+	m_recentlySpawned.insert(entHandle);
 }
 
 void TransmitManager::RoundStart() {
 	m_playerHiddenEntities.clear();
+	m_recentlySpawned.clear();
 }
 
 void TransmitManager::HideEntities(int32_t playerSlot, std::span<const int32_t> entHandles) {
