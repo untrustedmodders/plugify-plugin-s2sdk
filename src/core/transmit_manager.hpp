@@ -39,6 +39,10 @@ public:
 	void MarkRecentlySpawned(int32_t entHandle);
 	void ClearRecentlySpawned();
 
+	// Drop a deleted entity from every hidden set so its handle can't linger (or be
+	// matched by a reused handle), and uninstall the detour once nothing is hidden.
+	void OnEntityDeleted(int32_t entHandle);
+
 	// Pre-callback for the detoured CBaseEntity::SetTransmit.
 	static polyhook::ResultType OnSetTransmit(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type);
 

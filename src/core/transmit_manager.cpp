@@ -53,6 +53,32 @@ void TransmitManager::ClearRecentlySpawned() {
 	m_recentlySpawned.clear();
 }
 
+void TransmitManager::OnEntityDeleted(int32_t entHandle) {
+	m_recentlySpawned.erase(entHandle);
+
+	if (m_playerHiddenEntities.empty()) {
+		return;
+	}
+
+	bool changed = false;
+	for (auto it = m_playerHiddenEntities.begin(); it != m_playerHiddenEntities.end();) {
+		if (it->second.erase(entHandle) != 0) {
+			changed = true;
+		}
+
+		if (it->second.empty()) {
+			it = m_playerHiddenEntities.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	if (changed) {
+		// Removing the last hidden entity uninstalls the detour.
+		UpdateActiveState();
+	}
+}
+
 void TransmitManager::UpdateActiveState() {
 	const bool shouldBeActive = !m_playerHiddenEntities.empty();
 	if (shouldBeActive == m_active) {

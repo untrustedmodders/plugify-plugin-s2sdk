@@ -602,6 +602,8 @@ polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::P
 		g_TeamManagers.erase(entity->m_iTeamNum);
 	}
 
+	g_TransmitManager.OnEntityDeleted(entity->GetRefEHandle().ToInt());
+
 	g_EntityDeletedListenerManager(entity->GetRefEHandle().ToInt());
 	return polyhook::ResultType::Ignored;
 }
