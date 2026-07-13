@@ -25,27 +25,31 @@
           "type": "number"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1
     },
 
     "signatureObject": {
       "description": "Represents a single signature resolution step used in pattern-based memory scanning. Each field defines a different method of locating or resolving a target symbol.",
       "type": "object",
-      "properties": {
-        "string": {
-          "description": "Matches a raw string pattern against memory or module contents during signature scanning.",
-          "type": "string"
+      "patternProperties": {
+        "^string!?$": {
+          "type": "string",
+          "description": "Matches a raw string pattern against memory or module contents. If the property name ends with '!', the match is negated (excluded)."
         },
-        "cvar": {
-          "description": "Resolves a console variable (cvar) used for engine-level configuration or runtime state lookup.",
-          "type": "string"
+        "^cvar!?$": {
+          "type": "string",
+          "description": "Resolves a console variable (cvar). If the property name ends with '!', the lookup is negated (excluded)."
         },
-        "vtable": {
-          "description": "Resolves a target via virtual function table (vtable) lookup for class or interface-based dispatch structures.",
-          "type": "string"
+        "^vtable!?$": {
+          "type": "string",
+          "description": "Resolves a target via virtual function table (vtable) lookup. If the property name ends with '!', the lookup is negated (excluded)."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1
     }
   },
 

@@ -14,6 +14,7 @@ struct ReferenceInfo {
 	};
 
 	Type type{Type::Invalid};
+	bool exclude{false};
 	plg::string name;
 };
 

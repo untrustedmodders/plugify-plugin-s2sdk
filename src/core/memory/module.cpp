@@ -403,6 +403,23 @@ CAddress CModule::GetFunctionEntry(CAddress middle) const
     return {};
 }
 
+std::vector<CAddress> CModule::GetFunctionsFromReferences(std::span<const ReferenceEntry> refs) const
+{
+	std::vector<CAddress> funcs;
+	funcs.reserve(refs.size());
+
+	for (const auto& [target, source_ip] : refs)
+	{
+		if (auto func = GetFunctionEntry(source_ip))
+			funcs.emplace_back(func);
+	}
+
+	std::ranges::sort(funcs);
+	auto [first, last] = std::ranges::unique(funcs);
+	funcs.erase(first, last);
+	return funcs;
+}
+
 std::vector<CAddress> CModule::IntersectFunctionReferences(std::vector<std::span<const ReferenceEntry>>& reference_sets) const
 {
     if (reference_sets.empty()) [[unlikely]]
@@ -412,24 +429,8 @@ std::vector<CAddress> CModule::IntersectFunctionReferences(std::vector<std::span
         return a.size() < b.size();
     });
 
-    auto get_unique_funcs = [&](std::span<const ReferenceEntry> refs) {
-        std::vector<CAddress> funcs;
-        funcs.reserve(refs.size());
-
-        for (const auto& [target, source_ip] : refs)
-        {
-            if (auto func = GetFunctionEntry(source_ip))
-                funcs.emplace_back(func);
-        }
-
-        std::ranges::sort(funcs);
-        auto [first, last] = std::ranges::unique(funcs);
-        funcs.erase(first, last);
-        return funcs;
-    };
-
     // process the smallest set
-    auto candidates = get_unique_funcs(reference_sets[0]);
+    auto candidates = GetFunctionsFromReferences(reference_sets[0]);
 
     // intersect with remaining sets
     for (size_t i = 1; i < reference_sets.size(); ++i)
@@ -437,14 +438,58 @@ std::vector<CAddress> CModule::IntersectFunctionReferences(std::vector<std::span
         if (candidates.empty())
             break;
 
-        auto next_funcs = get_unique_funcs(reference_sets[i]);
+        auto next_funcs = GetFunctionsFromReferences(reference_sets[i]);
         std::vector<CAddress> intersection;
         intersection.reserve(std::min(candidates.size(), next_funcs.size()));
         std::ranges::set_intersection(candidates, next_funcs, std::back_inserter(intersection));
-        std::swap(candidates, intersection);
+    	candidates = std::move(intersection);
     }
 
     return candidates;
+}
+
+std::vector<CAddress> CModule::UnionFunctionReferences(std::vector<std::span<const ReferenceEntry>>& reference_sets) const
+{
+	if (reference_sets.empty())
+		return {};
+
+	std::ranges::sort(reference_sets, [](const auto& a, const auto& b) {
+		return a.size() < b.size();
+	});
+
+	// process the smallest set
+	auto candidates = GetFunctionsFromReferences(reference_sets[0]);
+
+	// union with remaining sets
+	for (size_t i = 1; i < reference_sets.size(); ++i)
+	{
+		auto next_funcs = GetFunctionsFromReferences(reference_sets[i]);
+		std::vector<CAddress> merged;
+		merged.reserve(candidates.size() + next_funcs.size());
+		std::ranges::set_union(candidates, next_funcs, std::back_inserter(merged));
+		candidates = std::move(merged);
+	}
+
+	return candidates;
+}
+
+std::vector<CAddress> CModule::SubtractFunctionReferences(
+	std::vector<std::span<const ReferenceEntry>>& include_sets,
+	std::vector<std::span<const ReferenceEntry>>& exclude_sets
+) const
+{
+	auto candidates = IntersectFunctionReferences(include_sets);
+
+	if (!exclude_sets.empty() && !candidates.empty()) {
+		auto excluded = UnionFunctionReferences(exclude_sets);
+
+		std::vector<CAddress> filtered;
+		filtered.reserve(candidates.size());
+		std::ranges::set_difference(candidates, excluded, std::back_inserter(filtered));
+		candidates = std::move(filtered);
+	}
+
+	return candidates;
 }
 
 std::span<const CModule::ReferenceEntry> CModule::GetReferenceRange(CAddress address) const

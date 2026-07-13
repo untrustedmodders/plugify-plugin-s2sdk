@@ -69,7 +69,10 @@ class CModule final
     std::vector<FunctionEntry>  m_function_entries{};
     std::vector<ReferenceEntry> m_references{};
 
-    void BuildFunctionIndexAndReferences();
+	void BuildFunctionIndexAndReferences();
+
+	// unique, sorted list of functions that contain any of the given references
+	[[nodiscard]] std::vector<CAddress> GetFunctionsFromReferences(std::span<const ReferenceEntry> refs) const;
 
 	struct VTable
 	{
@@ -176,6 +179,8 @@ public:
 	[[nodiscard]] std::vector<RunTimeVTableInfo>  FindVtablePartial(std::string_view vtable_name) const;
     [[nodiscard]] bool                            IsPointerDerivedFrom(void* ptr, std::string_view vtable_name) const;
     [[nodiscard]] std::vector<CAddress>           IntersectFunctionReferences(std::vector<std::span<const ReferenceEntry>>& reference_sets) const;
+	[[nodiscard]] std::vector<CAddress>           UnionFunctionReferences(std::vector<std::span<const ReferenceEntry>>& reference_sets) const;
+	[[nodiscard]] std::vector<CAddress>           SubtractFunctionReferences(std::vector<std::span<const ReferenceEntry>>& include_sets, std::vector<std::span<const ReferenceEntry>>& exclude_sets) const;
     [[nodiscard]] std::span<const ReferenceEntry> GetReferenceRange(CAddress address) const;
 
     [[nodiscard]] Result<CAddress> FindFunctionFromStringRef(std::string_view str) const;
@@ -184,10 +189,10 @@ public:
     [[nodiscard]] Result<CAddress> FindFunctionFromPointerRefs(std::span<const CAddress> ptrs) const;
     [[nodiscard]] Result<CAddress> FindFunctionFromAddressRef(CAddress addr) const;
 	[[nodiscard]] Result<CAddress> FindFunctionFromAddressRefs(std::span<const CAddress> addrs) const;
-	template<typename Range, typename Getter, typename Formatter>
-	[[nodiscard]] Result<CAddress> FindFunctionFromRefs(Range&& items, Getter&& getter, Formatter&& formatter) const
+	template<typename Range, typename Getter, typename Excluder, typename Formatter>
+	[[nodiscard]] Result<CAddress> FindFunctionFromRefs(Range&& items, Getter&& getter, Excluder&& excluder, Formatter&& formatter) const
 	{
-		auto matches = FindAllFunctionsFromRefs(items, getter, formatter);
+		auto matches = FindAllFunctionsFromRefs(items, getter, excluder, formatter);
 
 		if (!matches)
 		{
@@ -208,20 +213,24 @@ public:
     [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromStringRefs(std::span<const std::string_view> strs) const;
     [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromPointerRefs(std::span<const CAddress> ptrs) const;
     [[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromAddressRefs(std::span<const CAddress> addrs) const;
-	template<typename Range, typename Getter, typename Formatter>
-	[[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromRefs(Range&& items, Getter&& getter, Formatter&& formatter) const
+
+	template <typename Range, typename Getter, typename Excluder, typename Formatter>
+	[[nodiscard]] Result<std::vector<CAddress>> FindAllFunctionsFromRefs(Range&& items, Getter&& getter, Excluder&& excluder, Formatter&& formatter) const
 	{
 		if (std::ranges::begin(items) == std::ranges::end(items)) [[unlikely]]
 		{
 			return MakeError("No references provided to search for.");
 		}
 
-		std::vector<std::span<const ReferenceEntry>> ref_sets;
-		ref_sets.reserve(std::ranges::size(items));
+		std::vector<std::span<const ReferenceEntry>> include_sets;
+		std::vector<std::span<const ReferenceEntry>> exclude_sets;
+		include_sets.reserve(std::ranges::size(items));
+		exclude_sets.reserve(std::ranges::size(items));
 
 		for (const auto& item : items)
 		{
 			auto addr = getter(item);
+			auto excl = excluder(item);
 
 			if (!addr)
 			{
@@ -240,10 +249,19 @@ public:
 				return MakeError("Reference \"{}\" (at {}) has no references.", formatter(item), *addr);
 			}
 
-			ref_sets.push_back(range);
+			if (excl) {
+				exclude_sets.push_back(range);
+			} else {
+				include_sets.push_back(range);
+			}
 		}
 
-		return IntersectFunctionReferences(ref_sets);
+		if (include_sets.empty())
+		{
+			return MakeError("No include references provided to search for.");
+		}
+
+		return SubtractFunctionReferences(include_sets, exclude_sets);
 	}
 };
 
