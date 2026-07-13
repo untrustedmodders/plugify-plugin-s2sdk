@@ -55,6 +55,7 @@ public:
 	void OnHostStateRequest(CHostStateMgr* manager, CHostStateRequest* request);
 	void OnReplyConnection(CNetworkGameServerBase* server, CServerSideClient* client);
 	void OnReplyConnection_Post(CNetworkGameServerBase* server, CServerSideClient* client);
+	uint64 OnScriptGetAddon();
 
 public:
 	plg::vector<PublishedFileId_t> m_extraAddons;
@@ -64,6 +65,7 @@ public:
 private:
 	plg::vector<PublishedFileId_t> m_importantDownloads; // Important addon downloads that will trigger a map reload when finished
 	std::deque<PublishedFileId_t> m_downloadQueue; // Queue of all addon downloads to print progress
+	std::set<uint64> m_timedOutClients;
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(MultiAddonManager, OnAddonDownloaded, DownloadItemResult_t, m_CallbackDownloadItemResult);
 

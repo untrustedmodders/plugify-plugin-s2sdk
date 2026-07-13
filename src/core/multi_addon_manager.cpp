@@ -24,13 +24,22 @@ CConVar<bool> s2_block_disconnect_messages("s2_block_disconnect_messages", FCVAR
 CConVar<bool> s2_cache_clients_with_addons("s2_cache_clients_with_addons", FCVAR_NONE, "Whether to cache clients addon download list, this will prevent reconnects on mapchange/rejoin", false);
 CConVar<double> s2_cache_clients_duration("s2_cache_clients_duration", FCVAR_NONE, "How long to cache clients' downloaded addons list in seconds, pass 0 for forever.", 0.0);
 CConVar<double> s2_extra_addons_timeout("s2_extra_addons_timeout", FCVAR_NONE, "How long until clients are timed out in between connects for extra addons in seconds, requires s2_extra_addons to be used", 10.0);
+CConVar<float> s2_addon_connection_timeout("s2_addon_connection_timeout", FCVAR_NONE, "How long until clients are timed out while downloading the first required addon (usually the current map), 0 disables", 30.f);
+
+enum ClientConnectedState_t {
+	CLIENTCONN_NONE,
+	CLIENTCONN_CONNECTING,
+	CLIENTCONN_JOINED
+};
 
 struct ClientAddonInfo {
-	uint64 steamID64;
-	double lastActiveTime;
+	uint64 steamID64{};
+	double lastActiveTime{};
 	plg::vector<PublishedFileId_t> addonsToLoad;
 	plg::vector<PublishedFileId_t> downloadedAddons;
-	PublishedFileId_t currentPendingAddon;
+	PublishedFileId_t currentPendingAddon{};
+	ClientConnectedState_t connectedState{CLIENTCONN_NONE};
+	double connectionStartTime{};
 };
 
 plg::parallel_node_hash_map_m<uint64, ClientAddonInfo> g_ClientAddons;
@@ -320,8 +329,10 @@ void MultiAddonManager::OnSteamAPIActivated() {
 	};
 	g_ConVarManager.AutoExecConfig(conVarHandles, true, "multi_addon_manager", "");
 
-	m_callbackRegistered = true;
-	m_CallbackDownloadItemResult.Register(this, &MultiAddonManager::OnAddonDownloaded);
+	if (g_pEngineServer->IsDedicatedServer()) {
+		m_callbackRegistered = true;
+		m_CallbackDownloadItemResult.Register(this, &MultiAddonManager::OnAddonDownloaded);
+	}
 
 	plg::print(LS_MESSAGE, "Refreshing addons to check for updates\n");
 	RefreshAddons(true);
@@ -336,6 +347,8 @@ void MultiAddonManager::OnSteamAPIDeactivated() {
 }
 
 void MultiAddonManager::OnStartupServer() {
+	m_timedOutClients.clear();
+
 	// Remove empty paths added when there are 2+ addons, they screw up file writes
 	g_pFullFileSystem->RemoveSearchPath("", "GAME");
 	g_pFullFileSystem->RemoveSearchPath("", "DEFAULT_WRITE_PATH");
@@ -631,15 +644,32 @@ void MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServe
 	if (clientAddons.empty()) {
 		// No addons to send. This means the list of original addons is empty as well.
 		//assert(originalAddons.IsEmpty());
+		clientInfo.currentPendingAddon = 0;
 		return;
 	}
 
-	auto& downloadedAddons = clientInfo.downloadedAddons;
+	if (clientInfo.connectedState != CLIENTCONN_CONNECTING) {
+		clientInfo.connectionStartTime = Plat_FloatTime();
+		clientInfo.connectedState = CLIENTCONN_CONNECTING;
+	}
+	else if (s2_addon_connection_timeout.Get() > 0 &&
+		clientInfo.connectedState == CLIENTCONN_CONNECTING &&
+		Plat_FloatTime() - clientInfo.connectionStartTime > s2_addon_connection_timeout.Get()) {
+		// Can't kick right now as this will crash on windows, so defer to the next frame
+		m_timedOutClients.insert(steamID64);
+		return;
+	}
 
 	// Handle the first addon here. The rest should be handled in the SendNetMessage hook.
-	if (!std::ranges::contains(downloadedAddons, clientAddons[0])) {
-		clientInfo.currentPendingAddon = clientAddons[0];
+	if (!std::ranges::contains(clientInfo.downloadedAddons, clientAddons.front())) {
+		clientInfo.currentPendingAddon = clientAddons.front();
 	}
+
+	// In some cases, clients can do a signature check on addons which fails and instantly disconnects them
+	// As a mitigation, remove all undownloaded addons so the client never does the failing signature check
+	plg::erase_if(clientAddons, [&](const auto& clientAddon) {
+		return !std::ranges::contains(clientInfo.downloadedAddons, clientAddon) && clientAddon != clientInfo.currentPendingAddon;
+	});
 
 	addon = plg::join(clientAddons, ",");
 
@@ -650,6 +680,13 @@ void MultiAddonManager::OnReplyConnection_Post(CNetworkGameServerBase* server, C
 	server->m_szAddons = std::move(originalAddons);
 }
 
+uint64 MultiAddonManager::OnScriptGetAddon() {
+	if (m_extraAddons.empty())
+		return 0;
+
+	return m_currentWorkshopMap;
+}
+
 void MultiAddonManager::OnSendNetMessage(CServerSideClient* client, CNetMessage* data, NetChannelBufType_t bufType) {
 	uint64 steamID64 = client->GetClientSteamID().ConvertToUint64();
 	ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
@@ -658,7 +695,7 @@ void MultiAddonManager::OnSendNetMessage(CServerSideClient* client, CNetMessage*
 	clientInfo.lastActiveTime = Plat_FloatTime();
 
 	INetworkSerializerPB* serializerPB = data->GetSerializerPB();
-	if (!serializerPB || serializerPB->GetNetMessageInfo()->m_MessageId != net_SignonState) {
+	if (!serializerPB || serializerPB->GetNetMessageInfo()->m_MessageId != net_SignonState || !g_pEngineServer->IsDedicatedServer()) {
 		return;
 	}
 
@@ -710,6 +747,22 @@ void MultiAddonManager::OnGameFrame() {
 		s_time = currentTime;
 		PrintDownloadProgress();
 	}
+
+	if (m_timedOutClients.empty())
+		return;
+
+	auto pClients = utils::GetClientList();
+
+	FOR_EACH_VEC(*pClients, i) {
+		auto pClient = (*pClients)[i];
+
+		uint64 steamID64 = pClient->GetClientSteamID().ConvertToUint64();
+
+		if (m_timedOutClients.erase(steamID64)) {
+			pClient->Disconnect(NETWORK_DISCONNECT_TIMEDOUT, "Required Workshop addon download was not accepted in time");
+			g_ClientAddons[steamID64].connectedState = CLIENTCONN_NONE;
+		}
+	}
 }
 
 void MultiAddonManager::OnPostEvent(INetworkMessageInternal* message, CNetMessage* data, uint64_t* clients) {
@@ -731,12 +784,13 @@ void MultiAddonManager::OnPostEvent(INetworkMessageInternal* message, CNetMessag
 }
 
 void MultiAddonManager::OnClientConnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID) {
+	ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
+	clientInfo.connectedState = CLIENTCONN_JOINED;
+
 	plg::vector<PublishedFileId_t> addons = GetClientAddons(steamID64);
 	// We don't have an extra addon set so do nothing here, also don't do anything if we're a listenserver
-	if (addons.empty())
+	if (addons.empty() || !g_pEngineServer->IsDedicatedServer())
 		return;
-
-	ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 
 	if (clientInfo.currentPendingAddon != 0) {
 		if (Plat_FloatTime() - clientInfo.lastActiveTime > s2_extra_addons_timeout.Get()) {
@@ -755,6 +809,7 @@ void MultiAddonManager::OnClientConnect(CPlayerSlot slot, const char* name, uint
 void MultiAddonManager::OnClientDisconnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID) {
 	// Mark the disconnection time for caching purposes.
 	g_ClientAddons[steamID64].lastActiveTime = Plat_FloatTime();
+	g_ClientAddons[steamID64].connectedState = CLIENTCONN_NONE;
 }
 
 void MultiAddonManager::OnClientActive(CPlayerSlot slot, bool loadGame, const char* name, uint64 steamID64) {

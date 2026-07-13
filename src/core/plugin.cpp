@@ -48,7 +48,6 @@ GAME_EVENT_F(round_start) {
 	g_TransmitManager.RoundStart();
 }
 
-
 polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	//auto config = polyhook::GetArgument<const GameSessionConfiguration_t *>(params, 1);
 	//auto worldSession = polyhook::GetArgument<ISource2WorldSession*>(params, 2);
@@ -385,6 +384,10 @@ polyhook::ResultType Hook_ClientCommand(polyhook::HookHandle hook, polyhook::Par
 }
 
 polyhook::ResultType Hook_GameServerSteamAPIActivated(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	// This is only intended for dedicated servers
+	if (!g_pEngineServer->IsDedicatedServer())
+		return polyhook::ResultType::Ignored;
+
 	plg::print(LS_DETAILED, "[GameServerSteamAPIActivated]\n");
 
 	g_pSteam = SteamGameServer();
@@ -468,6 +471,15 @@ polyhook::ResultType Hook_TerminateRound(polyhook::HookHandle hook, polyhook::Pa
 
 	return polyhook::ResultType::Ignored;
 }
+
+polyhook::ResultType Hook_ScriptGetAddon(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	if (auto addon = g_MultiAddonManager.OnScriptGetAddon()) {
+		polyhook::SetReturn<uint64_t>(hook, addon);
+		return polyhook::ResultType::Supercede;
+	}
+	return polyhook::ResultType::Ignored;
+}
+
 #endif
 
 polyhook::ResultType Hook_DispatchConCommand(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
@@ -552,7 +564,7 @@ polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::P
 		g_pGameRules = g_pGameRulesProxy->m_pGameRules;
 
 #if defined (CS2)
-		v8::Isolate* isolate = v8::Isolate::TryGetCurrent();
+		/*v8::Isolate* isolate = v8::Isolate::TryGetCurrent();
 		v8::Locker locker(isolate);
 		v8::Isolate::Scope isolateScope(isolate);
 		v8::HandleScope handleScope(isolate);
@@ -563,7 +575,7 @@ polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::P
 			{"cs_script", CS_SCRIPT_PATH}
 		});
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
-		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);
+		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);*/
 #endif
 	}
 
@@ -752,6 +764,10 @@ Result<void> SetupHooks() {
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
 	CHECK(g_HookManager.AddHookDetourFunc<TerminateRoundFn>("CGameRules::TerminateRound", Hook_TerminateRound, {Pre}));
 
+	using ScriptGetAddonFn = uint64(*)();
+	CHECK(g_HookManager.AddHookDetourFunc<ScriptGetAddonFn>("ScriptGetAddon", Hook_ScriptGetAddon, {Pre}));
+
+#if 0
 	using v8IsolateFn = void(*)(v8::Isolate*);
 
 	uint8_t* v8IsolateEnterPtr;
@@ -777,6 +793,7 @@ Result<void> SetupHooks() {
 		}
 		resolve(addresses::CSScript_ResolveModule);
 	}
+#endif
 #endif
 
 #if _WIN32
