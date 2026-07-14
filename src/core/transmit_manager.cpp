@@ -35,6 +35,14 @@ void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& tr
 				continue;
 			}
 
+			// Reveal a dead player pawn: keeping it hidden while the client builds
+			// the death ragdoll races the CharacterDecalRenderer and crashes nearby
+			// clients. Hiding resumes on respawn (with the one-tick spawn grace).
+			auto* baseEntity = static_cast<CBaseEntity*>(entity);
+			if (baseEntity->IsPlayerPawn() && baseEntity->m_lifeState != LIFE_ALIVE) {
+				continue;
+			}
+
 			info->m_pTransmitEntity->Clear(entity->GetEntityIndex());
 		}
 	}
