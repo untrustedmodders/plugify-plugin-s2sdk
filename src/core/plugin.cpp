@@ -49,6 +49,8 @@ GAME_EVENT_F(round_start) {
 }
 
 polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	g_ServerManager.Clear();
+
 	//auto config = polyhook::GetArgument<const GameSessionConfiguration_t *>(params, 1);
 	//auto worldSession = polyhook::GetArgument<ISource2WorldSession*>(params, 2);
 	auto mapName = polyhook::GetArgument<const char*>(params, 3);

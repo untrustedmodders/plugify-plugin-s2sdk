@@ -50,3 +50,15 @@ void ServerManager::AddTaskForNextWorldUpdate(TaskCallback task, const plg::vect
 	m_nextWorldUpdateTasks.emplace_back(task, userData);
 }
 
+void ServerManager::Clear() {
+	{
+		std::scoped_lock lock(m_frameTasksMutex);
+		m_nextTasks.clear();
+	}
+
+	{
+		std::scoped_lock lock(m_worldUpdateMutex);
+		m_nextWorldUpdateTasks.clear();
+	}
+}
+

@@ -19,6 +19,8 @@ public:
 	void OnGameFrame();
 	void OnPreWorldUpdate();
 
+	void Clear();
+
 private:
 	struct Task {
 		TaskCallback callback;
