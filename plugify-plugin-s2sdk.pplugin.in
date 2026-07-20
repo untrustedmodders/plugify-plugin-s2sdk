@@ -8005,6 +8005,29 @@
       }
     },
     {
+      "name": "SetClientName",
+      "group": "Clients",
+      "description": "Set client's name.",
+      "funcName": "SetClientName",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The client's name."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "GetClientTime",
       "group": "Clients",
       "description": "Returns the client's connection time in seconds.",

@@ -56,6 +56,7 @@
         GetClientLanguage;
         GetClientOS;
         GetClientName;
+        SetClientName;
         GetClientTime;
         GetClientLatency;
         GetUserFlagBits;

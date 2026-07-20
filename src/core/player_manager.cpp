@@ -93,6 +93,13 @@ std::string_view Player::GetName() const {
 	return client ? client->GetClientName() : "<unknown>";
 }
 
+void Player::SetName(const char* name) const {
+	auto client = GetClient();
+	auto controller = utils::GetController(client->GetPlayerSlot());
+	client->SetName(name);
+	controller->SetEntityName(name);
+}
+
 std::string_view Player::GetIpAddress() const {
 	auto client = GetClient();
 	return client ? client->GetNetChannel()->GetRemoteAddress().ToString(true) : "<unknown>";
