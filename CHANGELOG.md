@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.13.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.12.1...v2.13.0) (2026-07-20)
+
+
+### Features
+
+* add `SetClientName` ([0bd5d1c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0bd5d1c412cebef76a009ba69d88a8d0e6edb380))
+
+
+### Bug Fixes
+
+* add exluding option to gamedata refs ([8cef6e4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8cef6e403069475fabd0930e5515b72226065ae4))
+* update multi addon manager ([586cbe2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/586cbe2fb09db972478442d5216634e71e01adce))
+
 ## [2.12.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.12.0...v2.12.1) (2026-07-10)
 
 
