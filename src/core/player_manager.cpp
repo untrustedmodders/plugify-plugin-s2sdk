@@ -97,7 +97,7 @@ void Player::SetName(const char* name) const {
 	auto client = GetClient();
 	auto controller = utils::GetController(client->GetPlayerSlot());
 	client->SetName(name);
-	controller->SetEntityName(name);
+	controller->m_iszPlayerName.Set(name);
 }
 
 std::string_view Player::GetIpAddress() const {
