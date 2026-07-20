@@ -154,7 +154,19 @@ public:
 	}
 
 	void Set(this auto&& self, const T& val) {
-		*reinterpret_cast<ptr_t>(self.ThisPtr() + self.Offset()) = val;
+		if constexpr (std::is_array_v<T>) {
+        	std::memcpy(self.Get(), val, sizeof(T));
+		} else {
+			*reinterpret_cast<ptr_t>(self.ThisPtr() + self.Offset()) = val;
+		}
+		self.NotifyNetworkChange();
+	}
+
+	void Set(this auto&& self, std::string_view sv) requires (std::is_array_v<T> && std::is_same_v<std::remove_extent_t<T>, char>) {
+		auto* dst = self.Get();
+		size_t n = std::min(sv.size(), sizeof(T) - 1);
+		std::memcpy(dst, sv.data(), n);
+		dst[n] = '\0';
 		self.NotifyNetworkChange();
 	}
 
@@ -171,6 +183,9 @@ public:
 
     auto& operator=(this auto&& self, const T& val) {
 	    self.Set(val); return self;
+    }
+    auto& operator=(this auto&& self, std::string_view sv) requires (std::is_array_v<T> && std::is_same_v<std::remove_extent_t<T>, char>) {
+	    self.Set(sv); return self;
     }
 	[[nodiscard]] bool operator==(this auto&& self, std::nullptr_t) requires (std::is_pointer_v<T>) {
 		return self.Get() == nullptr;
