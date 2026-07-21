@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.13.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.13.0...v2.13.1) (2026-07-21)
+
+
+### Bug Fixes
+
+* `SetClientName` ([03a04e1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/03a04e17315985359bece5756544a3968fca6878))
+* add setters for arrays ([a536e80](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a536e80202693c5007d8f0affc7cb319732cc1f8))
+* update `ResolveModule` signature ([fca3bd3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fca3bd3179277364172d0cca183eaa8fa96004b9))
+* update ScriptGetAddon on windows ([fb5b229](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fb5b229182d3bb0af6607d80572ed2da5cb6507c))
+
 ## [2.13.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.12.1...v2.13.0) (2026-07-20)
 
 
