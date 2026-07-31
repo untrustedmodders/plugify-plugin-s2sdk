@@ -58,6 +58,8 @@ struct ConVarInfo {
 	ListenerManager<ConVarListenerStr, ConVarListenerCallback> callbacks;
 };
 
+using ConVarHandle = uint64_t;
+
 class ConVarManager {
 	ConVarManager() = default;
 	~ConVarManager();

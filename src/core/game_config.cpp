@@ -1417,7 +1417,7 @@ Result<Memory> VTableResolver::ResolveTable(const Module& module, std::string_vi
 
 GameConfigManager GameConfigManager::instance;
 
-Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
+Result<ConfigId> GameConfigManager::LoadConfig(LoadOptions options) {
 	std::unique_lock lock(m_mutex);
 
 	// Check for existing config with same paths
@@ -1453,12 +1453,12 @@ Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
 		return MakeError(std::move(result.error()));
 	}
 
-	uint32_t id = m_nextId++;
+	ConfigId id = m_nextId++;
 	m_configs.emplace(id, GameConfigEntry{std::move(config)});
 	return id;
 }
 
-void GameConfigManager::UnloadConfig(uint32_t id) {
+void GameConfigManager::UnloadConfig(ConfigId id) {
 	std::unique_lock lock(m_mutex);
 
 	auto it = m_configs.find(id);
@@ -1469,7 +1469,7 @@ void GameConfigManager::UnloadConfig(uint32_t id) {
 	}
 }
 
-GameConfig* GameConfigManager::GetConfig(uint32_t id) {
+GameConfig* GameConfigManager::GetConfig(ConfigId id) {
 	std::shared_lock lock(m_mutex);
 
 	auto it = m_configs.find(id);
@@ -1488,7 +1488,7 @@ PatchManager& GameConfigManager::GetPatchManager() {
 	return m_patchManager;
 }
 
-const plg::flat_hash_map<uint32_t, GameConfigEntry>& GameConfigManager::GetConfigs() const {
+const plg::flat_hash_map<ConfigId, GameConfigEntry>& GameConfigManager::GetConfigs() const {
 	return m_configs;
 }
 

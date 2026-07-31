@@ -23865,7 +23865,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration to be closed."
+          "description": "An id to the game configuration to be closed.",
+          "alias": {
+            "name": "ConfigId"
+          }
         }
       ],
       "retType": {
@@ -23887,7 +23890,10 @@
       ],
       "retType": {
         "type": "uint32",
-        "description": "A id to the loaded game configuration object, or -1 if loading fails."
+        "description": "A id to the loaded game configuration object, or -1 if loading fails.",
+        "alias": {
+          "name": "ConfigId"
+        }
       }
     },
     {
@@ -23900,7 +23906,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the patch."
+          "description": "An id to the game configuration from which to retrieve the patch.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -23924,7 +23933,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the offset."
+          "description": "An id to the game configuration from which to retrieve the offset.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -23948,7 +23960,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the address."
+          "description": "An id to the game configuration from which to retrieve the address.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -23972,7 +23987,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the vtable."
+          "description": "An id to the game configuration from which to retrieve the vtable.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -23996,7 +24014,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the signature."
+          "description": "An id to the game configuration from which to retrieve the signature.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -29310,7 +29331,10 @@
       ],
       "retType": {
         "type": "uint32",
-        "description": "A id to the newly created Timer object, or -1 if the timer could not be created."
+        "description": "A id to the newly created Timer object, or -1 if the timer could not be created.",
+        "alias": {
+          "name": "TimerId"
+        }
       }
     },
     {
@@ -29323,7 +29347,10 @@
           "name": "timer",
           "type": "uint32",
           "ref": false,
-          "description": "A id of the Timer object to be stopped and removed."
+          "description": "A id of the Timer object to be stopped and removed.",
+          "alias": {
+            "name": "TimerId"
+          }
         }
       ],
       "retType": {
@@ -29340,7 +29367,10 @@
           "name": "timer",
           "type": "uint32",
           "ref": false,
-          "description": "A id of the Timer object to be stopped and removed."
+          "description": "A id of the Timer object to be stopped and removed.",
+          "alias": {
+            "name": "TimerId"
+          }
         },
         {
           "name": "newDaly",

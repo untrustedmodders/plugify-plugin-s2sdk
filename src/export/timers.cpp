@@ -17,7 +17,7 @@ PLUGIFY_LINKAGE()
  * @param userData An array intended to hold user-related data, allowing for elements of any type.
  * @return An id of the newly created CTimer object, or -1 if the timer could not be created.
  */
-extern "C" PLUGIN_API uint32_t CreateTimer(double delay, TimerCallback callback, TimerFlag flags, const plg::vector<plg::any>& userData) {
+extern "C" PLUGIN_API TimerId CreateTimer(double delay, TimerCallback callback, TimerFlag flags, const plg::vector<plg::any>& userData) {
 	return g_TimerSystem.CreateTimer(delay, callback, flags, userData);
 }
 
@@ -29,7 +29,7 @@ extern "C" PLUGIN_API uint32_t CreateTimer(double delay, TimerCallback callback,
  *
  * @param id An id of the CTimer object to be stopped and removed.
  */
-extern "C" PLUGIN_API void KillsTimer(uint32_t id) {
+extern "C" PLUGIN_API void KillsTimer(TimerId id) {
 	g_TimerSystem.KillTimer(id);
 }
 
@@ -42,7 +42,7 @@ extern "C" PLUGIN_API void KillsTimer(uint32_t id) {
  * @param id An id of the CTimer object to be rescheduled.
  * @param newDelay The new delay in seconds between each callback execution.
  */
-extern "C" PLUGIN_API void RescheduleTimer(uint32_t id, double newDelay) {
+extern "C" PLUGIN_API void RescheduleTimer(TimerId id, double newDelay) {
 	g_TimerSystem.RescheduleTimer(id, newDelay);
 }
 

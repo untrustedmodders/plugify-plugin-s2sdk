@@ -78,15 +78,15 @@ void TimerSystem::RemoveMapChangeTimers() {
 	}
 }
 
-uint32_t TimerSystem::CreateTimer(double delay, TimerCallback callback, TimerFlag flags, const plg::vector<plg::any>& userData) {
+TimerId TimerSystem::CreateTimer(double delay, TimerCallback callback, TimerFlag flags, const plg::vector<plg::any>& userData) {
 	std::scoped_lock lock(m_mutex);
 	// Enforce minimum delay to prevent immediate execution and iterator invalidation
-	uint32_t id = m_nextId++;
+	TimerId id = m_nextId++;
 	m_timers.emplace(id, static_cast<bool>(flags & TimerFlag::Repeat), static_cast<bool>(flags & TimerFlag::NoMapChange), false, false, universalTime, universalTime + std::max(delay, engineFixedTickInterval), delay, callback, userData);
 	return id;
 }
 
-void TimerSystem::KillTimer(uint32_t id) {
+void TimerSystem::KillTimer(TimerId id) {
 	std::scoped_lock lock(m_mutex);
 
 	auto it = std::ranges::find_if(m_timers, [id](const Timer& timer) {
@@ -102,7 +102,7 @@ void TimerSystem::KillTimer(uint32_t id) {
 	}
 }
 
-void TimerSystem::RescheduleTimer(uint32_t id, double newDelay) {
+void TimerSystem::RescheduleTimer(TimerId id, double newDelay) {
 	std::scoped_lock lock(m_mutex);
 
 	auto it = std::ranges::find_if(m_timers, [id](const Timer& timer) {

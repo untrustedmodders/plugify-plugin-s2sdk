@@ -21,7 +21,7 @@ PLUGIFY_LINKAGE()
  * @param flags Additional flags for the console variable.
  * @return A handle to the created console variable.
  */
-extern "C" PLUGIN_API uint64_t CreateConVar(const plg::string& name, const plg::any& defaultValue, const plg::string& description, ConVarFlag flags) {
+extern "C" PLUGIN_API ConVarHandle CreateConVar(const plg::string& name, const plg::any& defaultValue, const plg::string& description, ConVarFlag flags) {
 	ConVarRef result{};
 	plg::visit([&](const auto& v) {
 		using T = std::decay_t<decltype(v)>;
@@ -64,7 +64,7 @@ extern "C" PLUGIN_API uint64_t CreateConVar(const plg::string& name, const plg::
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarBool(const plg::string& name, bool defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, bool min, bool hasMax, bool max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarBool(const plg::string& name, bool defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, bool min, bool hasMax, bool max) {
 	return g_ConVarManager.CreateConVar<bool>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -83,7 +83,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarBool(const plg::string& name, bool de
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarInt16(const plg::string& name, int16 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, int16 min, bool hasMax, int16 max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarInt16(const plg::string& name, int16 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, int16 min, bool hasMax, int16 max) {
 	return g_ConVarManager.CreateConVar<int16>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -102,7 +102,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarInt16(const plg::string& name, int16 
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarUInt16(const plg::string& name, uint16 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, uint16 min, bool hasMax, uint16 max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarUInt16(const plg::string& name, uint16 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, uint16 min, bool hasMax, uint16 max) {
 	return g_ConVarManager.CreateConVar<uint16>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -121,7 +121,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarUInt16(const plg::string& name, uint1
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarInt32(const plg::string& name, int32 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, int32 min, bool hasMax, int32 max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarInt32(const plg::string& name, int32 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, int32 min, bool hasMax, int32 max) {
 	return g_ConVarManager.CreateConVar<int32>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -140,7 +140,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarInt32(const plg::string& name, int32 
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarUInt32(const plg::string& name, uint32 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, uint32 min, bool hasMax, uint32 max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarUInt32(const plg::string& name, uint32 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, uint32 min, bool hasMax, uint32 max) {
 	return g_ConVarManager.CreateConVar<uint32>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -160,7 +160,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarUInt32(const plg::string& name, uint3
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarInt64(const plg::string& name, int64 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, int64 min, bool hasMax, int64 max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarInt64(const plg::string& name, int64 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, int64 min, bool hasMax, int64 max) {
 	return g_ConVarManager.CreateConVar<int64>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -179,7 +179,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarInt64(const plg::string& name, int64 
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarUInt64(const plg::string& name, uint64 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, uint64 min, bool hasMax, uint64 max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarUInt64(const plg::string& name, uint64 defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, uint64 min, bool hasMax, uint64 max) {
 	return g_ConVarManager.CreateConVar<uint64>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -198,7 +198,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarUInt64(const plg::string& name, uint6
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarFloat(const plg::string& name, float defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, float min, bool hasMax, float max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarFloat(const plg::string& name, float defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, float min, bool hasMax, float max) {
 	return g_ConVarManager.CreateConVar<float>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -217,7 +217,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarFloat(const plg::string& name, float 
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarDouble(const plg::string& name, double defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, double min, bool hasMax, double max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarDouble(const plg::string& name, double defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, double min, bool hasMax, double max) {
 	return g_ConVarManager.CreateConVar<double>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -237,7 +237,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarDouble(const plg::string& name, doubl
  * @param max The maximum color value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarColor(const plg::string& name, const plg::vec4& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const plg::vec4& min, bool hasMax, const plg::vec4& max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarColor(const plg::string& name, const plg::vec4& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const plg::vec4& min, bool hasMax, const plg::vec4& max) {
 	return g_ConVarManager.CreateConVar<Color>(name, description, NewColor(defaultValue), flags, hasMin, NewColor(min), hasMax, NewColor(max));
 }
 
@@ -256,7 +256,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarColor(const plg::string& name, const 
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarVector2(const plg::string& name, const Vector2D& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const Vector2D& min, bool hasMax, const Vector2D& max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarVector2(const plg::string& name, const Vector2D& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const Vector2D& min, bool hasMax, const Vector2D& max) {
 	return g_ConVarManager.CreateConVar<Vector2D>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -275,7 +275,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarVector2(const plg::string& name, cons
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarVector3(const plg::string& name, const Vector& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const Vector& min, bool hasMax, const Vector& max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarVector3(const plg::string& name, const Vector& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const Vector& min, bool hasMax, const Vector& max) {
 	return g_ConVarManager.CreateConVar<Vector>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -294,7 +294,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarVector3(const plg::string& name, cons
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarVector4(const plg::string& name, const Vector4D& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const Vector4D& min, bool hasMax, const Vector4D& max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarVector4(const plg::string& name, const Vector4D& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const Vector4D& min, bool hasMax, const Vector4D& max) {
 	return g_ConVarManager.CreateConVar<Vector4D>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -313,7 +313,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarVector4(const plg::string& name, cons
  * @param max The maximum value if hasMax is true.
  * @return A handle to the created console variable data.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarQAngle(const plg::string& name, const QAngle& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const QAngle& min, bool hasMax, const QAngle& max) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarQAngle(const plg::string& name, const QAngle& defaultValue, const plg::string& description, ConVarFlag flags, bool hasMin, const QAngle& min, bool hasMax, const QAngle& max) {
 	return g_ConVarManager.CreateConVar<QAngle>(name, description, defaultValue, flags, hasMin, min, hasMax, max);
 }
 
@@ -328,7 +328,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarQAngle(const plg::string& name, const
  * @param flags Additional flags for the console variable.
  * @return A handle to the created console variable.
  */
-extern "C" PLUGIN_API uint64_t CreateConVarString(const plg::string& name, const plg::string& defaultValue, const plg::string& description, ConVarFlag flags) {
+extern "C" PLUGIN_API ConVarHandle CreateConVarString(const plg::string& name, const plg::string& defaultValue, const plg::string& description, ConVarFlag flags) {
 	return g_ConVarManager.CreateConVar<CUtlString>(name, description, CUtlString(defaultValue), flags);
 }
 
@@ -337,7 +337,7 @@ extern "C" PLUGIN_API uint64_t CreateConVarString(const plg::string& name, const
  * @param name The name of the console variable to search for.
  * @return Pointer to the console variable data if found; otherwise, nullptr.
  */
-extern "C" PLUGIN_API uint64_t FindConVar(const plg::string& name) {
+extern "C" PLUGIN_API ConVarHandle FindConVar(const plg::string& name) {
 	return g_ConVarManager.FindConVar(name);
 }
 
@@ -347,7 +347,7 @@ extern "C" PLUGIN_API uint64_t FindConVar(const plg::string& name) {
  * @param type The type of the console variable to search for.
  * @return Pointer to the console variable data if found; otherwise, nullptr.
  */
-extern "C" PLUGIN_API uint64_t FindConVar2(const plg::string& name, EConVarType type) {
+extern "C" PLUGIN_API ConVarHandle FindConVar2(const plg::string& name, EConVarType type) {
 	switch (type) {
 		case EConVarType_Bool:
 			return g_ConVarManager.FindConVar<bool>(name);
