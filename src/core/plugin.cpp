@@ -21,6 +21,7 @@
 #include "event_manager.hpp"
 #include "hook_manager.hpp"
 #include "listeners.hpp"
+#include "menu/menu_manager.hpp"
 #include "multi_addon_manager.hpp"
 #include "output_manager.hpp"
 #include "panorama_vote.hpp"
@@ -241,6 +242,7 @@ polyhook::ResultType Hook_GameFrame(polyhook::HookHandle hook, polyhook::Paramet
 	g_ServerManager.OnGameFrame();
 	g_PlayerManager.OnGameFrame();
 	g_TimerSystem.OnGameFrame(simulating);
+	g_MenuManager.OnGameFrame();
 
 	g_GameFrameListenerManager(simulating, bFirstTick, bLastTick);
 	return polyhook::ResultType::Ignored;
@@ -282,6 +284,7 @@ polyhook::ResultType Hook_ClientDisconnect(polyhook::HookHandle hook, polyhook::
 	} else {
 		g_PlayerManager.OnClientDisconnect_Post(slot, reason);
 		g_PanoramaVoteHandler.RemovePlayerFromVote(slot);
+		g_MenuManager.OnClientDisconnect(slot);
 	}
 
 	return polyhook::ResultType::Ignored;
