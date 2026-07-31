@@ -75,112 +75,112 @@ extern "C" PLUGIN_API plg::string GetDefaultMenuType() {
  * @param menuType The name of the menu type backend to render with. Empty uses the current default menu type.
  * @return A handle to the created menu.
  */
-extern "C" PLUGIN_API uint64_t CreateMenuHandle(const plg::string& title, MenuHandlerCallback handler, const plg::string& menuType) {
+extern "C" PLUGIN_API MenuId CreateMenuHandle(const plg::string& title, MenuHandlerCallback handler, const plg::string& menuType) {
 	return g_MenuManager.CreateMenu(title, handler, menuType);
 }
 
 /**
  * @brief Destroys a menu. Any client currently viewing it is cancelled first (MenuCancelReason::Destroyed).
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @return True if the menu existed and was destroyed.
  */
-extern "C" PLUGIN_API bool DestroyMenuHandle(uint64_t menuHandle) {
-	return g_MenuManager.DestroyMenu(menuHandle);
+extern "C" PLUGIN_API bool DestroyMenuHandle(MenuId id) {
+	return g_MenuManager.DestroyMenu(id);
 }
 
 /**
  * @brief Checks whether a menu handle refers to an existing menu.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @return True if the handle is valid.
  */
-extern "C" PLUGIN_API bool IsValidMenu(uint64_t menuHandle) {
-	return g_MenuManager.IsValidMenu(menuHandle);
+extern "C" PLUGIN_API bool IsValidMenu(MenuId id) {
+	return g_MenuManager.IsValidMenu(id);
 }
 
 /**
  * @brief Sets a menu's title.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param title The new title.
  * @return True if the menu exists.
  */
-extern "C" PLUGIN_API bool SetMenuTitle(uint64_t menuHandle, const plg::string& title) {
-	return g_MenuManager.SetMenuTitle(menuHandle, title);
+extern "C" PLUGIN_API bool SetMenuTitle(MenuId id, const plg::string& title) {
+	return g_MenuManager.SetMenuTitle(id, title);
 }
 
 /**
  * @brief Gets a menu's title.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @return The menu's title, or an empty string if the handle is invalid.
  */
-extern "C" PLUGIN_API plg::string GetMenuTitle(uint64_t menuHandle) {
-	return g_MenuManager.GetMenuTitle(menuHandle);
+extern "C" PLUGIN_API plg::string GetMenuTitle(MenuId id) {
+	return g_MenuManager.GetMenuTitle(id);
 }
 
 /**
  * @brief Sets which registered menu type backend renders this menu.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param typeName The name of a registered menu type, or empty to use the default menu type.
  * @return True if the menu exists.
  */
-extern "C" PLUGIN_API bool SetMenuType(uint64_t menuHandle, const plg::string& typeName) {
-	return g_MenuManager.SetMenuType(menuHandle, typeName);
+extern "C" PLUGIN_API bool SetMenuType(MenuId id, const plg::string& typeName) {
+	return g_MenuManager.SetMenuType(id, typeName);
 }
 
 /**
  * @brief Gets the menu type backend name assigned to this menu.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @return The menu type name (may be empty, meaning "use the default").
  */
-extern "C" PLUGIN_API plg::string GetMenuType(uint64_t menuHandle) {
-	return g_MenuManager.GetMenuType(menuHandle);
+extern "C" PLUGIN_API plg::string GetMenuType(MenuId id) {
+	return g_MenuManager.GetMenuType(id);
 }
 
 /**
  * @brief Sets how many items are shown per page.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param itemsPerPage The number of items per page, or 0 to disable pagination (show every item on one page).
  * @return True if the menu exists and itemsPerPage is not negative.
  */
-extern "C" PLUGIN_API bool SetMenuPagination(uint64_t menuHandle, int itemsPerPage) {
-	return g_MenuManager.SetMenuPagination(menuHandle, itemsPerPage);
+extern "C" PLUGIN_API bool SetMenuPagination(MenuId id, int itemsPerPage) {
+	return g_MenuManager.SetMenuPagination(id, itemsPerPage);
 }
 
 /**
  * @brief Gets how many items are shown per page.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @return The items-per-page value, 0 meaning pagination is disabled.
  */
-extern "C" PLUGIN_API int GetMenuPagination(uint64_t menuHandle) {
-	return g_MenuManager.GetMenuPagination(menuHandle);
+extern "C" PLUGIN_API int GetMenuPagination(MenuId id) {
+	return g_MenuManager.GetMenuPagination(id);
 }
 
 /**
  * @brief Sets whether the menu shows an exit option.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param enabled True to show an exit option.
  * @return True if the menu exists.
  */
-extern "C" PLUGIN_API bool SetMenuExitButton(uint64_t menuHandle, bool enabled) {
-	return g_MenuManager.SetMenuExitButton(menuHandle, enabled);
+extern "C" PLUGIN_API bool SetMenuExitButton(MenuId id, bool enabled) {
+	return g_MenuManager.SetMenuExitButton(id, enabled);
 }
 
 /**
  * @brief Gets whether the menu shows an exit option.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @return True if the exit option is enabled.
  */
-extern "C" PLUGIN_API bool GetMenuExitButton(uint64_t menuHandle) {
-	return g_MenuManager.GetMenuExitButton(menuHandle);
+extern "C" PLUGIN_API bool GetMenuExitButton(MenuId id) {
+	return g_MenuManager.GetMenuExitButton(id);
 }
 
 /**
@@ -188,173 +188,173 @@ extern "C" PLUGIN_API bool GetMenuExitButton(uint64_t menuHandle) {
  * When disabled, the display stays open after MenuAction::Select and the handler is responsible
  * for closing/redisplaying it if desired.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param enabled True to auto-close on selection (the default).
  * @return True if the menu exists.
  */
-extern "C" PLUGIN_API bool SetMenuCloseOnSelect(uint64_t menuHandle, bool enabled) {
-	return g_MenuManager.SetMenuCloseOnSelect(menuHandle, enabled);
+extern "C" PLUGIN_API bool SetMenuCloseOnSelect(MenuId id, bool enabled) {
+	return g_MenuManager.SetMenuCloseOnSelect(id, enabled);
 }
 
 /**
  * @brief Gets whether selecting an item automatically closes the menu display for that client.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @return True if close-on-select is enabled.
  */
-extern "C" PLUGIN_API bool GetMenuCloseOnSelect(uint64_t menuHandle) {
-	return g_MenuManager.GetMenuCloseOnSelect(menuHandle);
+extern "C" PLUGIN_API bool GetMenuCloseOnSelect(MenuId id) {
+	return g_MenuManager.GetMenuCloseOnSelect(id);
 }
 
 /**
  * @brief Appends an item to the end of a menu.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param info An internal identifier for the item, not shown to the client; retrieve it with GetMenuItemInfo from within the handler callback.
  * @param display The text shown to the client.
  * @param style The item's draw style (Default/Disabled/Spacer).
  * @return The index of the newly added item, or -1 if the menu handle is invalid.
  */
-extern "C" PLUGIN_API int AddMenuItem(uint64_t menuHandle, const plg::string& info, const plg::string& display, MenuItemStyle style) {
-	return g_MenuManager.AddMenuItem(menuHandle, info, display, style);
+extern "C" PLUGIN_API int AddMenuItem(MenuId id, const plg::string& info, const plg::string& display, MenuItemStyle style) {
+	return g_MenuManager.AddMenuItem(id, info, display, style);
 }
 
 /**
  * @brief Inserts an item into a menu at a specific index.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param index The index to insert at; must be within [0, item count].
  * @param info An internal identifier for the item, not shown to the client.
  * @param display The text shown to the client.
  * @param style The item's draw style (Default/Disabled/Spacer).
  * @return The index the item was inserted at, or -1 on failure.
  */
-extern "C" PLUGIN_API int InsertMenuItemAt(uint64_t menuHandle, int index, const plg::string& info, const plg::string& display, MenuItemStyle style) {
-	return g_MenuManager.InsertMenuItem(menuHandle, index, info, display, style);
+extern "C" PLUGIN_API int InsertMenuItemAt(MenuId id, int index, const plg::string& info, const plg::string& display, MenuItemStyle style) {
+	return g_MenuManager.InsertMenuItem(id, index, info, display, style);
 }
 
 /**
  * @brief Removes an item from a menu.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param index The index of the item to remove.
  * @return True if the item existed and was removed.
  */
-extern "C" PLUGIN_API bool RemoveMenuItem(uint64_t menuHandle, int index) {
-	return g_MenuManager.RemoveMenuItem(menuHandle, index);
+extern "C" PLUGIN_API bool RemoveMenuItem(MenuId id, int index) {
+	return g_MenuManager.RemoveMenuItem(id, index);
 }
 
 /**
  * @brief Removes every item from a menu.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @return True if the menu exists.
  */
-extern "C" PLUGIN_API bool RemoveAllMenuItems(uint64_t menuHandle) {
-	return g_MenuManager.RemoveAllMenuItems(menuHandle);
+extern "C" PLUGIN_API bool RemoveAllMenuItems(MenuId id) {
+	return g_MenuManager.RemoveAllMenuItems(id);
 }
 
 /**
  * @brief Gets the number of items in a menu.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @return The item count, or 0 if the handle is invalid.
  */
-extern "C" PLUGIN_API int GetMenuItemsCount(uint64_t menuHandle) {
-	return g_MenuManager.GetMenuItemCount(menuHandle);
+extern "C" PLUGIN_API int GetMenuItemsCount(MenuId id) {
+	return g_MenuManager.GetMenuItemCount(id);
 }
 
 /**
  * @brief Gets an item's internal info string.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param index The index of the item.
  * @return The item's info string, or empty if out of range.
  */
-extern "C" PLUGIN_API plg::string GetMenuItemInfoText(uint64_t menuHandle, int index) {
-	return g_MenuManager.GetMenuItemInfo(menuHandle, index);
+extern "C" PLUGIN_API plg::string GetMenuItemInfoText(MenuId id, int index) {
+	return g_MenuManager.GetMenuItemInfo(id, index);
 }
 
 /**
  * @brief Gets an item's display text.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param index The index of the item.
  * @return The item's display text, or empty if out of range.
  */
-extern "C" PLUGIN_API plg::string GetMenuItemDisplay(uint64_t menuHandle, int index) {
-	return g_MenuManager.GetMenuItemDisplay(menuHandle, index);
+extern "C" PLUGIN_API plg::string GetMenuItemDisplay(MenuId id, int index) {
+	return g_MenuManager.GetMenuItemDisplay(id, index);
 }
 
 /**
  * @brief Gets an item's draw style.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param index The index of the item.
  * @return The item's style; MenuItemStyle::Disabled if out of range.
  */
-extern "C" PLUGIN_API MenuItemStyle GetMenuItemStyle(uint64_t menuHandle, int index) {
-	return g_MenuManager.GetMenuItemStyle(menuHandle, index);
+extern "C" PLUGIN_API MenuItemStyle GetMenuItemStyle(MenuId id, int index) {
+	return g_MenuManager.GetMenuItemStyle(id, index);
 }
 
 /**
  * @brief Checks whether an item can currently be selected (style is Default).
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param index The index of the item.
  * @return True if the item is selectable.
  */
-extern "C" PLUGIN_API bool IsMenuItemSelectable(uint64_t menuHandle, int index) {
-	return g_MenuManager.IsMenuItemSelectable(menuHandle, index);
+extern "C" PLUGIN_API bool IsMenuItemSelectable(MenuId id, int index) {
+	return g_MenuManager.IsMenuItemSelectable(id, index);
 }
 
 /**
  * @brief Changes an item's display text.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param index The index of the item.
  * @param display The new display text.
  * @return True if the item exists.
  */
-extern "C" PLUGIN_API bool SetMenuItemDisplay(uint64_t menuHandle, int index, const plg::string& display) {
-	return g_MenuManager.SetMenuItemDisplay(menuHandle, index, display);
+extern "C" PLUGIN_API bool SetMenuItemDisplay(MenuId id, int index, const plg::string& display) {
+	return g_MenuManager.SetMenuItemDisplay(id, index, display);
 }
 
 /**
  * @brief Changes an item's draw style.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param index The index of the item.
  * @param style The new style.
  * @return True if the item exists.
  */
-extern "C" PLUGIN_API bool SetMenuItemStyle(uint64_t menuHandle, int index, MenuItemStyle style) {
-	return g_MenuManager.SetMenuItemStyle(menuHandle, index, style);
+extern "C" PLUGIN_API bool SetMenuItemStyle(MenuId id, int index, MenuItemStyle style) {
+	return g_MenuManager.SetMenuItemStyle(id, index, style);
 }
 
 /**
  * @brief Displays a menu to a client, starting at the first item. Replaces whatever menu the client currently has open, if any.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param playerSlot The client's player slot.
  * @param time How long, in seconds, before the menu auto-closes (MenuCancelReason::Timeout). 0 or negative means no timeout.
  * @return True if the menu was displayed.
  */
-extern "C" PLUGIN_API bool DisplayMenu(uint64_t menuHandle, int playerSlot, int time) {
-	return g_MenuManager.DisplayMenu(menuHandle, playerSlot, time);
+extern "C" PLUGIN_API bool DisplayMenu(MenuId id, int playerSlot, int time) {
+	return g_MenuManager.DisplayMenu(id, playerSlot, time);
 }
 
 /**
  * @brief Displays a menu to a client, starting at a specific item.
  *
- * @param menuHandle The handle to the menu.
+ * @param id The handle to the menu.
  * @param playerSlot The client's player slot.
  * @param firstItem The index of the first item to show.
  * @param time How long, in seconds, before the menu auto-closes. 0 or negative means no timeout.
  * @return True if the menu was displayed.
  */
-extern "C" PLUGIN_API bool DisplayMenuAtItem(uint64_t menuHandle, int playerSlot, int firstItem, int time) {
-	return g_MenuManager.DisplayMenuAtItem(menuHandle, playerSlot, firstItem, time);
+extern "C" PLUGIN_API bool DisplayMenuAtItem(MenuId id, int playerSlot, int firstItem, int time) {
+	return g_MenuManager.DisplayMenuAtItem(id, playerSlot, firstItem, time);
 }
 
 /**
@@ -374,7 +374,7 @@ extern "C" PLUGIN_API bool CancelClientMenu(int playerSlot, MenuCancelReason rea
  * @param playerSlot The client's player slot.
  * @return The open menu's handle, or 0 if none.
  */
-extern "C" PLUGIN_API uint64_t GetClientMenu(int playerSlot) {
+extern "C" PLUGIN_API MenuId GetClientMenu(int playerSlot) {
 	return g_MenuManager.GetClientMenu(playerSlot);
 }
 

@@ -3,7 +3,7 @@
 /**
  * Action passed to a menu's handler callback.
  */
-enum class MenuAction : uint8_t {
+enum class MenuAction {
 	Start = 0,  // A display session has started for a client (param unused).
 	Select = 1, // The client selected an item (param = absolute item index).
 	Cancel = 2, // The display session ended without a final selection (param = MenuCancelReason).
@@ -13,7 +13,7 @@ enum class MenuAction : uint8_t {
 /**
  * Reason a menu display session was cancelled, passed as `param` on MenuAction::Cancel.
  */
-enum class MenuCancelReason : uint8_t {
+enum class MenuCancelReason {
 	Exit = 0,        // The client pressed the exit button.
 	Timeout = 1,     // The display time expired.
 	Disconnect = 2,  // The client disconnected while the menu was open.
@@ -24,20 +24,22 @@ enum class MenuCancelReason : uint8_t {
 /**
  * Draw style for an individual menu item.
  */
-enum class MenuItemStyle : uint8_t {
+enum class MenuItemStyle {
 	Default = 0,  // Shown, numbered, selectable.
 	Disabled = 1, // Shown, numbered, not selectable.
 	Spacer = 2,   // Blank line, not numbered, not selectable.
 };
 
-using MenuHandlerCallback = void (*)(uint64 menuHandle, MenuAction action, int playerSlot, int param);
+using MenuId = uint32_t;
+
+using MenuHandlerCallback = void (*)(MenuId id, MenuAction action, int playerSlot, int param);
 
 // Renders the menu's current state (title/items/page) to the client. Backends read state via the getters below.
-using MenuDisplayCallback = void (*)(uint64 menuHandle, int playerSlot);
+using MenuDisplayCallback = void (*)(MenuId id, int playerSlot);
 // Hides/cleans up whatever UI the backend showed to the client.
-using MenuCloseCallback = void (*)(uint64 menuHandle, int playerSlot);
+using MenuCloseCallback = void (*)(MenuId id, int playerSlot);
 // Optional: called every server frame while the client has a menu of this type open (e.g. for input polling).
-using MenuFrameCallback = void (*)(uint64 menuHandle, int playerSlot);
+using MenuFrameCallback = void (*)(MenuId id, int playerSlot);
 
 struct MenuItemData {
 	plg::string info;
@@ -61,14 +63,16 @@ struct MenuTypeCallbacks {
 	MenuFrameCallback frame{};
 };
 
+using TimerId = uint32_t;
+
 struct ClientMenuState {
-	uint64 menuHandle{};
+	MenuId id{};
 	int currentOffset{};
 	int page{};
 	int cursor{}; // absolute item index highlighted by cursor-driven backends (e.g. ButtonMenu)
-	int menuTime{}; // the `time` value passed to DisplayMenu; 0 = no timeout
+	double menuTime{}; // the `time` value passed to DisplayMenu; 0 = no timeout
 	std::vector<int> prevOffsets;
-	uint32_t timerId{};
+	TimerId timerId{};
 };
 
 class MenuManager {
@@ -95,40 +99,40 @@ public:
 	plg::string GetDefaultMenuType() const;
 
 	// Lifecycle ------------------------------------------------------------
-	uint64 CreateMenu(std::string_view title, MenuHandlerCallback handler, std::string_view menuType = {});
-	bool DestroyMenu(uint64 menuHandle);
-	bool IsValidMenu(uint64 menuHandle) const;
+	MenuId CreateMenu(std::string_view title, MenuHandlerCallback handler, std::string_view menuType = {});
+	bool DestroyMenu(MenuId id);
+	bool IsValidMenu(MenuId id) const;
 
 	// Properties -------------------------------------------------------------
-	bool SetMenuTitle(uint64 menuHandle, std::string_view title);
-	plg::string GetMenuTitle(uint64 menuHandle) const;
-	bool SetMenuType(uint64 menuHandle, std::string_view typeName);
-	plg::string GetMenuType(uint64 menuHandle) const;
-	bool SetMenuPagination(uint64 menuHandle, int itemsPerPage); // 0 = no pagination
-	int GetMenuPagination(uint64 menuHandle) const;
-	bool SetMenuExitButton(uint64 menuHandle, bool enabled);
-	bool GetMenuExitButton(uint64 menuHandle) const;
-	bool SetMenuCloseOnSelect(uint64 menuHandle, bool enabled);
-	bool GetMenuCloseOnSelect(uint64 menuHandle) const;
+	bool SetMenuTitle(MenuId id, std::string_view title);
+	plg::string GetMenuTitle(MenuId id) const;
+	bool SetMenuType(MenuId id, std::string_view typeName);
+	plg::string GetMenuType(MenuId id) const;
+	bool SetMenuPagination(MenuId id, int itemsPerPage); // 0 = no pagination
+	int GetMenuPagination(MenuId id) const;
+	bool SetMenuExitButton(MenuId id, bool enabled);
+	bool GetMenuExitButton(MenuId id) const;
+	bool SetMenuCloseOnSelect(MenuId id, bool enabled);
+	bool GetMenuCloseOnSelect(MenuId id) const;
 
 	// Items --------------------------------------------------------------
-	int AddMenuItem(uint64 menuHandle, std::string_view info, std::string_view display, MenuItemStyle style = MenuItemStyle::Default);
-	int InsertMenuItem(uint64 menuHandle, int index, std::string_view info, std::string_view display, MenuItemStyle style = MenuItemStyle::Default);
-	bool RemoveMenuItem(uint64 menuHandle, int index);
-	bool RemoveAllMenuItems(uint64 menuHandle);
-	int GetMenuItemCount(uint64 menuHandle) const;
-	plg::string GetMenuItemInfo(uint64 menuHandle, int index) const;
-	plg::string GetMenuItemDisplay(uint64 menuHandle, int index) const;
-	MenuItemStyle GetMenuItemStyle(uint64 menuHandle, int index) const;
-	bool IsMenuItemSelectable(uint64 menuHandle, int index) const;
-	bool SetMenuItemDisplay(uint64 menuHandle, int index, std::string_view display);
-	bool SetMenuItemStyle(uint64 menuHandle, int index, MenuItemStyle style);
+	int AddMenuItem(MenuId id, std::string_view info, std::string_view display, MenuItemStyle style = MenuItemStyle::Default);
+	int InsertMenuItem(MenuId id, int index, std::string_view info, std::string_view display, MenuItemStyle style = MenuItemStyle::Default);
+	bool RemoveMenuItem(MenuId id, int index);
+	bool RemoveAllMenuItems(MenuId id);
+	int GetMenuItemCount(MenuId id) const;
+	plg::string GetMenuItemInfo(MenuId id, int index) const;
+	plg::string GetMenuItemDisplay(MenuId id, int index) const;
+	MenuItemStyle GetMenuItemStyle(MenuId id, int index) const;
+	bool IsMenuItemSelectable(MenuId id, int index) const;
+	bool SetMenuItemDisplay(MenuId id, int index, std::string_view display);
+	bool SetMenuItemStyle(MenuId id, int index, MenuItemStyle style);
 
 	// Display / navigation ------------------------------------------------
-	bool DisplayMenu(uint64 menuHandle, int playerSlot, int time = 0);
-	bool DisplayMenuAtItem(uint64 menuHandle, int playerSlot, int firstItem, int time = 0);
+	bool DisplayMenu(MenuId id, int playerSlot, double time = 0.0);
+	bool DisplayMenuAtItem(MenuId id, int playerSlot, int firstItem, double time = 0.0);
 	bool CancelClientMenu(int playerSlot, MenuCancelReason reason = MenuCancelReason::Exit);
-	uint64 GetClientMenu(int playerSlot) const;
+	MenuId GetClientMenu(int playerSlot) const;
 	int GetClientMenuOffset(int playerSlot) const;
 	int GetClientMenuTime(int playerSlot) const;
 	int GetClientMenuCursor(int playerSlot) const;
@@ -144,19 +148,19 @@ public:
 	bool HandleDigitInput(int playerSlot, int digit);
 
 private:
-	std::shared_ptr<MenuData> Find(uint64 menuHandle) const;
+	std::shared_ptr<MenuData> Find(MenuId id) const;
 	const MenuTypeCallbacks* FindType(const MenuData& menu) const;
 	void RedisplayClient(int playerSlot);
 	void CloseClientDisplay(int playerSlot, bool notifyBackend);
 	void EndClientMenu(int playerSlot, MenuCancelReason reason);
-	static void OnMenuTimeout(uint32_t timerId, const plg::vector<plg::any>& userData);
+	static void OnMenuTimeout(TimerId timerId, const plg::vector<plg::any>& userData);
 
 private:
-	plg::flat_hash_map<uint64, std::shared_ptr<MenuData>> m_menus;
+	plg::flat_hash_map<MenuId, std::shared_ptr<MenuData>> m_menus;
 	plg::flat_hash_map<plg::string, MenuTypeCallbacks, plg::case_insensitive_hash, plg::case_insensitive_equal> m_menuTypes;
 	plg::string m_defaultMenuType{"button"};
 	std::array<ClientMenuState, MaxPlayers + 1> m_clientState{};
-	uint64 m_nextHandle{1};
+	MenuId m_nextId{};
 	mutable std::recursive_mutex m_mutex;
 };
 inline MenuManager& g_MenuManager = MenuManager::Instance();

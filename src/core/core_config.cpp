@@ -1,8 +1,45 @@
 #include "core_config.hpp"
+#include <core/sdk/entity/globaltypes.h>
 #include <core/sdk/utils.hpp>
 #include <configs/configs.hpp>
 
 using namespace std::string_view_literals;
+
+namespace {
+	uint64_t ParseButtonName(std::string_view name, uint64_t defaultValue) {
+		static const plg::flat_hash_map<std::string_view, uint64_t> buttons = {
+			{"IN_ATTACK", IN_ATTACK},
+			{"IN_JUMP", IN_JUMP},
+			{"IN_DUCK", IN_DUCK},
+			{"IN_FORWARD", IN_FORWARD},
+			{"IN_BACK", IN_BACK},
+			{"IN_USE", IN_USE},
+			{"IN_TURNLEFT", IN_TURNLEFT},
+			{"IN_TURNRIGHT", IN_TURNRIGHT},
+			{"IN_MOVELEFT", IN_MOVELEFT},
+			{"IN_MOVERIGHT", IN_MOVERIGHT},
+			{"IN_ATTACK2", IN_ATTACK2},
+			{"IN_RELOAD", IN_RELOAD},
+			{"IN_SPEED", IN_SPEED},
+			{"IN_JOYAUTOSPRINT", IN_JOYAUTOSPRINT},
+			{"IN_USEORRELOAD", IN_USEORRELOAD},
+			{"IN_SCORE", IN_SCORE},
+			{"IN_ZOOM", IN_ZOOM},
+			{"IN_LOOK_AT_WEAPON", IN_LOOK_AT_WEAPON},
+		};
+
+		if (name.empty()) {
+			return defaultValue;
+		}
+
+		auto it = buttons.find(name);
+		if (it == buttons.end()) {
+			plg::print(LS_WARNING, "CoreConfig: unknown menu button name '{}'\n", name);
+			return defaultValue;
+		}
+		return it->second;
+	}
+}// namespace
 
 CoreConfig::CoreConfig(plg::vector<plg::string> paths) : m_paths(std::move(paths)) {
 }
@@ -58,6 +95,41 @@ Result<bool> CoreConfig::Initialize() {
 	FixFlashAlertMessage = config.GetBool("FixFlashAlertMessage", true);
 	FixServerListPlayer = config.GetBool("FixServerListPlayer", true);
 	FixLoadMotd = config.GetBool("FixLoadMotd", true);
+
+	MenuEnabled = config.GetBool("MenuEnabled", true);
+
+	MenuCommandPrefixes.clear();
+	if (config.JumpKey("MenuCommandPrefixes")) {
+		if (config.IsArray() && config.JumpFirst()) {
+			do {
+				MenuCommandPrefixes.emplace_back(config.GetString());
+			} while (config.JumpNext());
+			config.JumpBack();
+		}
+		config.JumpBack();
+	}
+
+	MenuSelectCommands.clear();
+	if (config.JumpKey("MenuSelectCommands")) {
+		if (config.IsArray() && config.JumpFirst()) {
+			do {
+				MenuSelectCommands.emplace_back(config.GetString());
+			} while (config.JumpNext());
+			config.JumpBack();
+		}
+		config.JumpBack();
+	}
+
+	MenuDisabledColor = config.GetString("MenuDisabledColor", "#808080");
+	MenuHighlightColor = config.GetString("MenuHighlightColor", "#FFD700");
+	MenuCenterHtmlDuration = static_cast<int>(config.GetInt("MenuCenterHtmlDuration", 30));
+	MenuButtonHtmlDuration = static_cast<int>(config.GetInt("MenuButtonHtmlDuration", 2));
+	MenuButtonRefreshInterval = static_cast<float>(config.GetFloat("MenuButtonRefreshInterval", 1.5));
+	MenuButtonFreezePlayer = config.GetBool("MenuButtonFreezePlayer", true);
+	MenuButtonKeyUp = ParseButtonName(config.GetString("MenuButtonKeyUp", "IN_FORWARD"), IN_FORWARD);
+	MenuButtonKeyDown = ParseButtonName(config.GetString("MenuButtonKeyDown", "IN_BACK"), IN_BACK);
+	MenuButtonKeySelect = ParseButtonName(config.GetString("MenuButtonKeySelect", "IN_USE"), IN_USE);
+	MenuButtonKeyExit = ParseButtonName(config.GetString("MenuButtonKeyExit", "IN_ATTACK2"), IN_ATTACK2);
 
 	return {};
 }

@@ -1,5 +1,6 @@
 #include "menu_manager.hpp"
 
+#include <core/core_config.hpp>
 #include <core/sdk/utils.hpp>
 
 // Chat, console and center-html menus are all "digit driven": the client selects an
@@ -9,7 +10,7 @@
 namespace {
 	constexpr int kDigitKeysPerPage = 7; // keys 1-7 select items, 8 = back, 9 = next, 0 = exit
 
-	int VisibleItemCount(uint64 handle, int offset) {
+	int VisibleItemCount(MenuId handle, int offset) {
 		int count = g_MenuManager.GetMenuItemCount(handle);
 		int perPage = g_MenuManager.GetMenuPagination(handle);
 		int pageSize = perPage > 0 ? std::min(perPage, kDigitKeysPerPage) : std::min(count, kDigitKeysPerPage);
@@ -18,7 +19,7 @@ namespace {
 
 	// -- ChatMenu --------------------------------------------------------
 
-	void ChatMenu_Display(uint64 handle, int playerSlot) {
+	void ChatMenu_Display(MenuId handle, int playerSlot) {
 		CPlayerSlot slot(playerSlot);
 
 		utils::PrintChat(slot, std::format(" {}", g_MenuManager.GetMenuTitle(handle)));
@@ -50,13 +51,13 @@ namespace {
 		}
 	}
 
-	void ChatMenu_Close(uint64, int) {
+	void ChatMenu_Close(MenuId, int) {
 		// Chat history has no explicit "close" concept; nothing to do.
 	}
 
 	// -- ConsoleMenu -------------------------------------------------------
 
-	void ConsoleMenu_Display(uint64 handle, int playerSlot) {
+	void ConsoleMenu_Display(MenuId handle, int playerSlot) {
 		CPlayerSlot slot(playerSlot);
 
 		utils::PrintConsole(slot, std::format("{}", g_MenuManager.GetMenuTitle(handle)));
@@ -90,15 +91,13 @@ namespace {
 		utils::PrintConsole(slot, "Use 'css_<number>' to make a selection.");
 	}
 
-	void ConsoleMenu_Close(uint64, int) {
+	void ConsoleMenu_Close(MenuId, int) {
 		// Console output has no explicit "close" concept; nothing to do.
 	}
 
 	// -- CenterHtmlMenu ------------------------------------------------------
 
-	constexpr int kCenterHtmlDefaultDuration = 30;
-
-	void CenterHtmlMenu_Display(uint64 handle, int playerSlot) {
+	void CenterHtmlMenu_Display(MenuId handle, int playerSlot) {
 		CPlayerSlot slot(playerSlot);
 
 		std::string html = std::format("<b>{}</b><br>", g_MenuManager.GetMenuTitle(handle));
@@ -115,7 +114,7 @@ namespace {
 			}
 
 			if (style == MenuItemStyle::Disabled) {
-				html += std::format("<font color='#808080'>{}. {}</font><br>", i + 1, g_MenuManager.GetMenuItemDisplay(handle, index));
+				html += std::format("<font color='{}'>{}. {}</font><br>", g_pCoreConfig->MenuDisabledColor, i + 1, g_MenuManager.GetMenuItemDisplay(handle, index));
 			} else {
 				html += std::format("{}. {}<br>", i + 1, g_MenuManager.GetMenuItemDisplay(handle, index));
 			}
@@ -132,10 +131,10 @@ namespace {
 		}
 
 		int time = g_MenuManager.GetClientMenuTime(playerSlot);
-		utils::PrintHtmlCentre(slot, html, time > 0 ? time : kCenterHtmlDefaultDuration);
+		utils::PrintHtmlCentre(slot, html, time > 0 ? time : g_pCoreConfig->MenuCenterHtmlDuration);
 	}
 
-	void CenterHtmlMenu_Close(uint64, int playerSlot) {
+	void CenterHtmlMenu_Close(MenuId, int playerSlot) {
 		utils::PrintHtmlCentre(CPlayerSlot(playerSlot), " ", 1);
 	}
 }// namespace

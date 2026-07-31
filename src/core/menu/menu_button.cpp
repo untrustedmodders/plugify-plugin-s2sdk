@@ -1,27 +1,60 @@
 #include "menu_manager.hpp"
 
+#include <core/core_config.hpp>
 #include <core/player_manager.hpp>
 #include <core/sdk/entity/cbaseplayerpawn.h>
 #include <core/sdk/entity/globaltypes.h>
 #include <core/sdk/entity/services.h>
 #include <core/sdk/utils.hpp>
+#include <core/timer_system.hpp>
 
-// A WASD-style menu: navigated with movement keys and rendered as a center HTML panel
-// redrawn every server frame while it's open (built entirely on MenuManager's public API,
-// the same surface an out-of-module plugin registering its own menu type would use).
+// A WASD-style menu: navigated with movement keys and rendered as a center HTML panel,
+// redrawn only when the cursor/page changes or the keep-alive interval elapses (built
+// entirely on MenuManager's public API, the same surface an out-of-module plugin
+// registering its own menu type would use).
 
 namespace {
-	constexpr int kHtmlDuration = 2; // seconds; refreshed every frame so it never actually fades while open
+	struct ButtonMenuState {
+		MenuId id{};                 // the menu handle this state was last polled for; used to detect a fresh session
+		uint64_t lastHeld{};         // buttons held as of the previous frame, for edge detection
+		int lastDrawnCursor{-1};     // cursor position as of the last redraw
+		bool frozen{};               // whether we forced MOVETYPE_NONE on this client
+		double nextRefreshTime{};    // next time a keep-alive redraw is due, even with no input
+		MoveType_t savedMoveType{};  // the client's movement type before we froze it
+	};
 
-	std::array<uint64_t, MaxPlayers + 1> s_lastMenuHandle{};
-	std::array<uint64_t, MaxPlayers + 1> s_lastHeld{};
+	std::array<ButtonMenuState, MaxPlayers + 1> s_state{};
 
-	void ButtonMenu_Display(uint64 handle, int playerSlot) {
+	std::string_view ButtonName(uint64_t button) {
+		switch (button) {
+			case IN_ATTACK: return "ATTACK";
+			case IN_JUMP: return "JUMP";
+			case IN_DUCK: return "DUCK";
+			case IN_FORWARD: return "FORWARD";
+			case IN_BACK: return "BACK";
+			case IN_USE: return "USE";
+			case IN_TURNLEFT: return "TURNLEFT";
+			case IN_TURNRIGHT: return "TURNRIGHT";
+			case IN_MOVELEFT: return "MOVELEFT";
+			case IN_MOVERIGHT: return "MOVERIGHT";
+			case IN_ATTACK2: return "ATTACK2";
+			case IN_RELOAD: return "RELOAD";
+			case IN_SPEED: return "SPEED";
+			case IN_JOYAUTOSPRINT: return "SPRINT";
+			case IN_USEORRELOAD: return "USE/RELOAD";
+			case IN_SCORE: return "SCORE";
+			case IN_ZOOM: return "ZOOM";
+			case IN_LOOK_AT_WEAPON: return "LOOK_AT_WEAPON";
+			default: return "?";
+		}
+	}
+
+	void ButtonMenu_Display(MenuId handle, int playerSlot) {
 		CPlayerSlot slot(playerSlot);
 
 		int count = g_MenuManager.GetMenuItemCount(handle);
 		if (count == 0) {
-			utils::PrintHtmlCentre(slot, std::format("<b>{}</b><br>", g_MenuManager.GetMenuTitle(handle)), kHtmlDuration);
+			utils::PrintHtmlCentre(slot, std::format("<b>{}</b><br>", g_MenuManager.GetMenuTitle(handle)), g_pCoreConfig->MenuButtonHtmlDuration);
 			return;
 		}
 
@@ -49,28 +82,41 @@ namespace {
 
 			plg::string display = g_MenuManager.GetMenuItemDisplay(handle, index);
 			if (index == cursor) {
-				html += std::format("<font color='#FFD700'>&gt; {}</font><br>", display);
+				html += std::format("<font color='{}'>&gt; {}</font><br>", g_pCoreConfig->MenuHighlightColor, std::string_view(display));
 			} else if (style == MenuItemStyle::Disabled) {
-				html += std::format("<font color='#808080'>{}</font><br>", display);
+				html += std::format("<font color='{}'>{}</font><br>", g_pCoreConfig->MenuDisabledColor, std::string_view(display));
 			} else {
-				html += std::format("{}<br>", display);
+				html += std::format("{}<br>", std::string_view(display));
 			}
 		}
 
-		html += "<br><font class='fontSize-s'>[FORWARD/BACK] Move  [USE] Select";
+		html += std::format("<br><font class='fontSize-s'>[{}/{}] Move  [{}] Select",
+			ButtonName(g_pCoreConfig->MenuButtonKeyUp), ButtonName(g_pCoreConfig->MenuButtonKeyDown), ButtonName(g_pCoreConfig->MenuButtonKeySelect));
 		if (g_MenuManager.GetMenuExitButton(handle)) {
-			html += "  [ATTACK2] Exit";
+			html += std::format("  [{}] Exit", ButtonName(g_pCoreConfig->MenuButtonKeyExit));
 		}
 		html += "</font>";
 
-		utils::PrintHtmlCentre(slot, html, kHtmlDuration);
+		utils::PrintHtmlCentre(slot, html, g_pCoreConfig->MenuButtonHtmlDuration);
 	}
 
-	void ButtonMenu_Close(uint64, int playerSlot) {
+	void ButtonMenu_Close(MenuId, int playerSlot) {
 		utils::PrintHtmlCentre(CPlayerSlot(playerSlot), " ", 1);
+
+		ButtonMenuState& state = s_state[static_cast<size_t>(playerSlot)];
+		if (state.frozen) {
+			state.frozen = false;
+			auto* player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+			auto* pawn = player ? player->GetPlayerPawn() : nullptr;
+			if (pawn && pawn->m_MoveType == MOVETYPE_NONE) {
+				pawn->SetMoveType(state.savedMoveType);
+			}
+		}
+
+		state.id = 0;
 	}
 
-	void MoveCursor(uint64 handle, int playerSlot, int direction) {
+	void MoveCursor(MenuId handle, int playerSlot, int direction) {
 		int count = g_MenuManager.GetMenuItemCount(handle);
 		if (count <= 0) {
 			return;
@@ -104,7 +150,7 @@ namespace {
 		}
 	}
 
-	void ButtonMenu_Frame(uint64 handle, int playerSlot) {
+	void ButtonMenu_Frame(MenuId handle, int playerSlot) {
 		auto* player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
 		auto* pawn = player ? player->GetPlayerPawn() : nullptr;
 		if (!pawn) {
@@ -116,36 +162,54 @@ namespace {
 			return;
 		}
 
+		ButtonMenuState& state = s_state[static_cast<size_t>(playerSlot)];
+		bool freshSession = state.id != handle;
+
+		if (freshSession) {
+			state.id = handle;
+			state.lastDrawnCursor = -1; // force the first draw below
+			state.nextRefreshTime = 0;
+
+			if (g_pCoreConfig->MenuButtonFreezePlayer) {
+				state.savedMoveType = pawn->m_MoveType;
+				state.frozen = true;
+				pawn->SetMoveType(MOVETYPE_NONE);
+			} else {
+				state.frozen = false;
+			}
+		}
+
 		uint64 buttons[3];
 		movement->m_nButtons->GetButtons(buttons);
 		uint64 held = buttons[0];
-
-		size_t slotIndex = static_cast<size_t>(playerSlot);
-		bool freshSession = s_lastMenuHandle[slotIndex] != handle;
-		uint64 prevHeld = freshSession ? held : s_lastHeld[slotIndex];
-
-		s_lastMenuHandle[slotIndex] = handle;
-		s_lastHeld[slotIndex] = held;
+		uint64 prevHeld = freshSession ? held : state.lastHeld;
+		state.lastHeld = held;
 
 		auto released = [&](uint64 button) {
 			return (prevHeld & button) != 0 && (held & button) == 0;
 		};
 
 		if (!freshSession) {
-			if (released(IN_FORWARD)) {
+			if (released(g_pCoreConfig->MenuButtonKeyUp)) {
 				MoveCursor(handle, playerSlot, -1);
-			} else if (released(IN_BACK)) {
+			} else if (released(g_pCoreConfig->MenuButtonKeyDown)) {
 				MoveCursor(handle, playerSlot, 1);
-			} else if (released(IN_USE)) {
+			} else if (released(g_pCoreConfig->MenuButtonKeySelect)) {
 				g_MenuManager.SelectMenuItem(playerSlot, g_MenuManager.GetClientMenuCursor(playerSlot));
 				return; // the display session likely just ended; MenuManager already invoked our Close
-			} else if (released(IN_ATTACK2) && g_MenuManager.GetMenuExitButton(handle)) {
+			} else if (released(g_pCoreConfig->MenuButtonKeyExit) && g_MenuManager.GetMenuExitButton(handle)) {
 				g_MenuManager.CancelClientMenu(playerSlot, MenuCancelReason::Exit);
 				return;
 			}
 		}
 
-		ButtonMenu_Display(handle, playerSlot);
+		double now = TimerSystem::GetTickedTime();
+		int cursor = g_MenuManager.GetClientMenuCursor(playerSlot);
+		if (cursor != state.lastDrawnCursor || now >= state.nextRefreshTime) {
+			ButtonMenu_Display(handle, playerSlot);
+			state.lastDrawnCursor = cursor;
+			state.nextRefreshTime = now + g_pCoreConfig->MenuButtonRefreshInterval;
+		}
 	}
 }// namespace
 
