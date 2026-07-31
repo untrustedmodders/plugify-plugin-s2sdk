@@ -19,6 +19,7 @@ enum class MenuCancelReason {
 	Disconnect = 2,  // The client disconnected while the menu was open.
 	Interrupted = 3, // Another DisplayMenu call replaced this display for the client.
 	Destroyed = 4,   // The menu handle was destroyed while being displayed.
+	ExitBack = 5,    // The client pressed the back button (see SetMenuExitBackButton); handler is expected to redisplay the parent menu.
 };
 
 /**
@@ -54,6 +55,7 @@ struct MenuData {
 	MenuHandlerCallback handler{};
 	int itemsPerPage{7};
 	bool exitButton{true};
+	bool backButton{false}; // when set, takes over the exit slot: shown as "Back" and reports MenuCancelReason::ExitBack instead of Exit
 	bool closeOnSelect{true};
 };
 
@@ -112,6 +114,8 @@ public:
 	int GetMenuPagination(MenuId id) const;
 	bool SetMenuExitButton(MenuId id, bool enabled);
 	bool GetMenuExitButton(MenuId id) const;
+	bool SetMenuExitBackButton(MenuId id, bool enabled);
+	bool GetMenuExitBackButton(MenuId id) const;
 	bool SetMenuCloseOnSelect(MenuId id, bool enabled);
 	bool GetMenuCloseOnSelect(MenuId id) const;
 

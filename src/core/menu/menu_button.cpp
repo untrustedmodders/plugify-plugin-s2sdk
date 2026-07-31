@@ -27,7 +27,7 @@ namespace {
 	std::array<ButtonMenuState, MaxPlayers + 1> s_state{};
 
 	std::string_view ButtonName(InputBitMask_t button) {
-		/*switch (button) {
+		switch (button) {
 			case IN_ATTACK: return "ATTACK";
 			case IN_JUMP: return "JUMP";
 			case IN_DUCK: return "DUCK";
@@ -47,12 +47,12 @@ namespace {
 			case IN_ZOOM: return "ZOOM";
 			case IN_LOOK_AT_WEAPON: return "LOOK_AT_WEAPON";
 			default: return "?";
-		}*/
-		auto name = plg::enum_to_string(button);
+		}
+		/*auto name = plg::enum_to_string(button);
 		if (name.empty()) {
 			return "?";
 		}
-		return name.substr(3);
+		return name.substr(3);*/
 	}
 
 	// Renders as the configured icon HTML (e.g. an <img> tag) when set, otherwise falls back to "[BUTTONNAME]".
@@ -98,22 +98,23 @@ namespace {
 
 			plg::string display = g_MenuManager.GetMenuItemDisplay(id, index);
 			if (index == cursor) {
-				std::format_to(out, "<font color='{}'>&gt; {}</font><br>", g_pCoreConfig->MenuHighlightColor, std::string_view(display));
+				std::format_to(out, "<font color='{}'>&gt; {}</font><br>", g_pCoreConfig->MenuHighlightColor, display);
 			} else if (style == MenuItemStyle::Disabled) {
-				std::format_to(out, "<font color='{}'>{}</font><br>", g_pCoreConfig->MenuDisabledColor, std::string_view(display));
+				std::format_to(out, "<font color='{}'>{}</font><br>", g_pCoreConfig->MenuDisabledColor, display);
 			} else {
-				std::format_to(out, "{}<br>", std::string_view(display));
+				std::format_to(out, "{}<br>", display);
 			}
 		}
 
-		std::format_to(out, "<br><font class='fontSize-s'>{}/{}  {}",
+		std::format_to(out, "<br>{}/{}  {}",
 			ButtonLabel(g_pCoreConfig->MenuButtonIconUp, g_pCoreConfig->MenuButtonKeyUp, "Up"),
 			ButtonLabel(g_pCoreConfig->MenuButtonIconDown, g_pCoreConfig->MenuButtonKeyDown, "Down"),
 			ButtonLabel(g_pCoreConfig->MenuButtonIconSelect, g_pCoreConfig->MenuButtonKeySelect, "Select"));
-		if (g_MenuManager.GetMenuExitButton(id)) {
+		if (g_MenuManager.GetMenuExitBackButton(id)) {
+			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Back"));
+		} else if (g_MenuManager.GetMenuExitButton(id)) {
 			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Exit"));
 		}
-		html += "</font>";
 
 		utils::PrintHtmlCentre(slot, html, g_pCoreConfig->MenuButtonHtmlDuration);
 	}
@@ -215,6 +216,9 @@ namespace {
 			} else if (released(g_pCoreConfig->MenuButtonKeySelect)) {
 				g_MenuManager.SelectMenuItem(playerSlot, g_MenuManager.GetClientMenuCursor(playerSlot));
 				return; // the display session likely just ended; MenuManager already invoked our Close
+			} else if (released(g_pCoreConfig->MenuButtonKeyExit) && g_MenuManager.GetMenuExitBackButton(id)) {
+				g_MenuManager.CancelClientMenu(playerSlot, MenuCancelReason::ExitBack);
+				return;
 			} else if (released(g_pCoreConfig->MenuButtonKeyExit) && g_MenuManager.GetMenuExitButton(id)) {
 				g_MenuManager.CancelClientMenu(playerSlot, MenuCancelReason::Exit);
 				return;

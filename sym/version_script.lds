@@ -551,6 +551,8 @@
         GetMenuPagination;
         SetMenuExitButton;
         GetMenuExitButton;
+        SetMenuExitBackButton;
+        GetMenuExitBackButton;
         SetMenuCloseOnSelect;
         GetMenuCloseOnSelect;
         AddMenuItem;

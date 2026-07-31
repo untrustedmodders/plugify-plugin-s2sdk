@@ -37,7 +37,7 @@ public:
 	plg::string MenuHighlightColor{"#FFD700"};				// Hex color for the highlighted row in the WASD button menu
 	int MenuCenterHtmlDuration{30};						// Seconds the centerhtml menu panel is shown before it needs a redraw
 	int MenuButtonHtmlDuration{2};							// Seconds the WASD button menu's HTML panel is shown per redraw
-	float MenuButtonRefreshInterval{1.5f};					// Seconds between keep-alive redraws of the WASD button menu when there's no input
+	float MenuButtonRefreshInterval{0.1f};					// Seconds between keep-alive redraws of the WASD button menu when there's no input
 	bool MenuButtonFreezePlayer{true};						// Freeze the player's movement while a WASD button menu is open
 	InputBitMask_t MenuButtonKeyUp{};							// Button (InputBitMask_t name, e.g. "IN_FORWARD") that moves the WASD button-menu cursor up
 	InputBitMask_t MenuButtonKeyDown{};							// Button that moves the WASD button-menu cursor down

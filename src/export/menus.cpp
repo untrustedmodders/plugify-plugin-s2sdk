@@ -184,6 +184,29 @@ extern "C" PLUGIN_API bool GetMenuExitButton(MenuId id) {
 }
 
 /**
+ * @brief Sets whether the menu shows a "back" option in place of the exit option. Selecting
+ * it cancels the display with MenuCancelReason::ExitBack instead of MenuCancelReason::Exit,
+ * which a handler can use to redisplay a parent menu (SourceMod-style ExitBack).
+ *
+ * @param id The handle to the menu.
+ * @param enabled True to show a back option instead of the exit option.
+ * @return True if the menu exists.
+ */
+extern "C" PLUGIN_API bool SetMenuExitBackButton(MenuId id, bool enabled) {
+	return g_MenuManager.SetMenuExitBackButton(id, enabled);
+}
+
+/**
+ * @brief Gets whether the menu shows a "back" option in place of the exit option.
+ *
+ * @param id The handle to the menu.
+ * @return True if the back option is enabled.
+ */
+extern "C" PLUGIN_API bool GetMenuExitBackButton(MenuId id) {
+	return g_MenuManager.GetMenuExitBackButton(id);
+}
+
+/**
  * @brief Sets whether selecting an item automatically closes the menu display for that client.
  * When disabled, the display stays open after MenuAction::Select and the handler is responsible
  * for closing/redisplaying it if desired.

@@ -129,7 +129,7 @@ Result<bool> CoreConfig::Initialize() {
 	MenuButtonKeyUp = ParseButtonName(config.GetString("MenuButtonKeyUp", "IN_FORWARD"), IN_FORWARD);
 	MenuButtonKeyDown = ParseButtonName(config.GetString("MenuButtonKeyDown", "IN_BACK"), IN_BACK);
 	MenuButtonKeySelect = ParseButtonName(config.GetString("MenuButtonKeySelect", "IN_USE"), IN_USE);
-	MenuButtonKeyExit = ParseButtonName(config.GetString("MenuButtonKeyExit", "IN_SCORE"), IN_SCORE);
+	MenuButtonKeyExit = ParseButtonName(config.GetString("MenuButtonKeyExit", "IN_RELOAD"), IN_RELOAD);
 	MenuButtonIconUp = config.GetString("MenuButtonIconUp", "");
 	MenuButtonIconDown = config.GetString("MenuButtonIconDown", "");
 	MenuButtonIconSelect = config.GetString("MenuButtonIconSelect", "");

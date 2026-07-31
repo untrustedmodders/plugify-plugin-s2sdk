@@ -50,7 +50,7 @@
   // Seconds the WASD button menu's HTML panel is shown per redraw
   "MenuButtonHtmlDuration": 2,
   // Seconds between keep-alive redraws of the WASD button menu when there's no input
-  "MenuButtonRefreshInterval": 1.5,
+  "MenuButtonRefreshInterval": 0.1,
   // Freeze the player's movement while a WASD button menu is open
   "MenuButtonFreezePlayer": true,
   // Buttons driving the WASD button menu (InputBitMask_t names, e.g. IN_FORWARD, IN_BACK, IN_USE, IN_ATTACK2,
@@ -58,7 +58,7 @@
   "MenuButtonKeyUp": "IN_FORWARD",
   "MenuButtonKeyDown": "IN_BACK",
   "MenuButtonKeySelect": "IN_USE",
-  "MenuButtonKeyExit": "IN_SCORE",
+  "MenuButtonKeyExit": "IN_RELOAD",
   // Optional full HTML snippets (e.g. <img src='file://{images}/icons/equipment/...svg'> or an http(s) URL) shown
   // instead of the "[BUTTONNAME]" text hint in the WASD button menu. Leave empty to keep the text hint.
   "MenuButtonIconUp": "",

@@ -47,7 +47,9 @@ namespace {
 		if (g_MenuManager.ClientMenuHasNextPage(playerSlot)) {
 			utils::PrintChat(slot, " !9 Next");
 		}
-		if (g_MenuManager.GetMenuExitButton(id)) {
+		if (g_MenuManager.GetMenuExitBackButton(id)) {
+			utils::PrintChat(slot, " !0 Back");
+		} else if (g_MenuManager.GetMenuExitButton(id)) {
 			utils::PrintChat(slot, " !0 Exit");
 		}
 	}
@@ -85,7 +87,9 @@ namespace {
 		if (g_MenuManager.ClientMenuHasNextPage(playerSlot)) {
 			utils::PrintConsole(slot, "9. Next");
 		}
-		if (g_MenuManager.GetMenuExitButton(id)) {
+		if (g_MenuManager.GetMenuExitBackButton(id)) {
+			utils::PrintConsole(slot, "0. Back");
+		} else if (g_MenuManager.GetMenuExitButton(id)) {
 			utils::PrintConsole(slot, "0. Exit");
 		}
 
@@ -129,7 +133,9 @@ namespace {
 		if (g_MenuManager.ClientMenuHasNextPage(playerSlot)) {
 			html += "9. Next<br>";
 		}
-		if (g_MenuManager.GetMenuExitButton(id)) {
+		if (g_MenuManager.GetMenuExitBackButton(id)) {
+			html += "0. Back<br>";
+		} else if (g_MenuManager.GetMenuExitButton(id)) {
 			html += "0. Exit<br>";
 		}
 

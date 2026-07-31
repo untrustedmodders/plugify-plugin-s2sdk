@@ -58,6 +58,71 @@ namespace {
 
 		return ResultType::Continue;
 	}
+
+	// Sample "test" command: demonstrates MenuManager's public API with a menu
+	// whose items include one that opens a nested sub-menu, and shows how the
+	// sub-menu's "back" button (MenuCancelReason::ExitBack) returns to it.
+	void OnTestMenuAction(MenuId id, MenuAction action, int playerSlot, int param);
+
+	MenuId CreateTestMainMenu() {
+		MenuId menu = g_MenuManager.CreateMenu("Test Menu", &OnTestMenuAction);
+		g_MenuManager.AddMenuItem(menu, "hello", "Say Hello");
+		g_MenuManager.AddMenuItem(menu, "disabled", "Disabled Item", MenuItemStyle::Disabled);
+		g_MenuManager.AddMenuItem(menu, "submenu", "Open Sub-Menu");
+		return menu;
+	}
+
+	void OnTestSubMenuAction(MenuId id, MenuAction action, int playerSlot, int param) {
+		switch (action) {
+			case MenuAction::Select:
+				utils::PrintChat(playerSlot, std::format("You picked '{}' from the sub-menu.", std::string_view(g_MenuManager.GetMenuItemInfo(id, param))));
+				break;
+			case MenuAction::Cancel:
+				if (static_cast<MenuCancelReason>(param) == MenuCancelReason::ExitBack) {
+					g_MenuManager.DisplayMenu(CreateTestMainMenu(), playerSlot);
+				}
+				break;
+			case MenuAction::End:
+				g_MenuManager.DestroyMenu(id);
+				break;
+			default:
+				break;
+		}
+	}
+
+	void OnTestMenuAction(MenuId id, MenuAction action, int playerSlot, int param) {
+		switch (action) {
+			case MenuAction::Select: {
+				plg::string info = g_MenuManager.GetMenuItemInfo(id, param);
+				if (info == "hello") {
+					utils::PrintChat(playerSlot, "Hello from the test menu!");
+				} else if (info == "submenu") {
+					MenuId sub = g_MenuManager.CreateMenu("Test Sub-Menu", &OnTestSubMenuAction);
+					g_MenuManager.AddMenuItem(sub, "option_a", "Sub-option A");
+					g_MenuManager.AddMenuItem(sub, "option_b", "Sub-option B");
+					g_MenuManager.SetMenuExitBackButton(sub, true);
+					g_MenuManager.DisplayMenu(sub, playerSlot);
+				}
+				break;
+			}
+			case MenuAction::End:
+				g_MenuManager.DestroyMenu(id);
+				break;
+			default:
+				break;
+		}
+	}
+
+	ResultType OnTestMenuCommand(int caller, ConCommandContext, const plg::vector<plg::string>&) {
+		if (!utils::IsPlayerSlot(caller)) {
+			plg::print(LS_WARNING, "The 'test' command can only be used by an in-game player\n");
+			return ResultType::Handled;
+		}
+
+		g_MenuManager.DisplayMenu(CreateTestMainMenu(), caller);
+
+		return ResultType::Handled;
+	}
 }// namespace
 
 void MenuManager::Init() {
@@ -77,6 +142,9 @@ void MenuManager::Init() {
 		g_ConCommandManager.AddValveCommand(name, "Menu item select", ConVarFlag::None);
 		g_ConCommandManager.AddCommandListener(name, &OnMenuSelectCommand, HookMode::Pre);
 	}
+
+	g_ConCommandManager.AddValveCommand("test", "Opens a sample menu to check MenuManager", ConVarFlag::None);
+	g_ConCommandManager.AddCommandListener("test", &OnTestMenuCommand, HookMode::Pre);
 
 	RegisterBuiltinChatMenuType();
 	RegisterBuiltinConsoleMenuType();
@@ -268,6 +336,22 @@ bool MenuManager::GetMenuExitButton(MenuId id) const {
 	std::scoped_lock lock(m_mutex);
 	auto menu = FindMenu(id);
 	return menu && menu->exitButton;
+}
+
+bool MenuManager::SetMenuExitBackButton(MenuId id, bool enabled) {
+	std::scoped_lock lock(m_mutex);
+	auto menu = FindMenu(id);
+	if (!menu) {
+		return false;
+	}
+	menu->backButton = enabled;
+	return true;
+}
+
+bool MenuManager::GetMenuExitBackButton(MenuId id) const {
+	std::scoped_lock lock(m_mutex);
+	auto menu = FindMenu(id);
+	return menu && menu->backButton;
 }
 
 bool MenuManager::SetMenuCloseOnSelect(MenuId id, bool enabled) {
@@ -612,6 +696,9 @@ bool MenuManager::HandleDigitInput(int playerSlot, int digit) {
 
 	switch (digit) {
 		case 0:
+			if (menu->backButton) {
+				return CancelClientMenu(playerSlot, MenuCancelReason::ExitBack);
+			}
 			if (!menu->exitButton) {
 				return false;
 			}

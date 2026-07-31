@@ -25455,6 +25455,54 @@
       "description": "Gets whether the menu shows an exit option."
     },
     {
+      "name": "SetMenuExitBackButton",
+      "funcName": "SetMenuExitBackButton",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "ref": false,
+          "description": "True to show a back option instead of the exit option."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu exists."
+      },
+      "group": "Menus",
+      "description": "Sets whether the menu shows a \"back\" option in place of the exit option. Selecting it cancels the display with MenuCancelReason::ExitBack instead of MenuCancelReason::Exit, which a handler can use to redisplay a parent menu (SourceMod-style ExitBack)."
+    },
+    {
+      "name": "GetMenuExitBackButton",
+      "funcName": "GetMenuExitBackButton",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the back option is enabled."
+      },
+      "group": "Menus",
+      "description": "Gets whether the menu shows a \"back\" option in place of the exit option."
+    },
+    {
       "name": "SetMenuCloseOnSelect",
       "funcName": "SetMenuCloseOnSelect",
       "paramTypes": [
@@ -26011,6 +26059,10 @@
               {
                 "name": "Destroyed",
                 "value": 4
+              },
+              {
+                "name": "ExitBack",
+                "value": 5
               }
             ]
           }
