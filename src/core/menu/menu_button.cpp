@@ -17,7 +17,7 @@
 namespace {
 	struct ButtonMenuState {
 		MenuId id{};                 // the menu handle this state was last polled for; used to detect a fresh session
-		uint64_t lastHeld{};         // buttons held as of the previous frame, for edge detection
+		MenuId lastHeld{};           // buttons held as of the previous frame, for edge detection
 		int lastDrawnCursor{-1};     // cursor position as of the last redraw
 		bool frozen{};               // whether we forced MOVETYPE_NONE on this client
 		double nextRefreshTime{};    // next time a keep-alive redraw is due, even with no input
@@ -26,8 +26,8 @@ namespace {
 
 	std::array<ButtonMenuState, MaxPlayers + 1> s_state{};
 
-	std::string_view ButtonName(uint64_t button) {
-		switch (button) {
+	std::string_view ButtonName(InputBitMask_t button) {
+		/*switch (button) {
 			case IN_ATTACK: return "ATTACK";
 			case IN_JUMP: return "JUMP";
 			case IN_DUCK: return "DUCK";
@@ -47,7 +47,20 @@ namespace {
 			case IN_ZOOM: return "ZOOM";
 			case IN_LOOK_AT_WEAPON: return "LOOK_AT_WEAPON";
 			default: return "?";
+		}*/
+		auto name = plg::enum_to_string(button);
+		if (name.empty()) {
+			return "?";
 		}
+		return name.substr(3);
+	}
+
+	// Renders as the configured icon HTML (e.g. an <img> tag) when set, otherwise falls back to "[BUTTONNAME]".
+	std::string ButtonLabel(std::string_view icon, InputBitMask_t button, std::string_view action) {
+		if (!icon.empty()) {
+			return std::string(icon);
+		}
+		return std::format("[{}] {}", ButtonName(button), action);
 	}
 
 	void ButtonMenu_Display(MenuId handle, int playerSlot) {
@@ -93,10 +106,12 @@ namespace {
 			}
 		}
 
-		std::format_to(out, "<br><font class='fontSize-s'>[{}/{}] Move  [{}] Select",
-			ButtonName(g_pCoreConfig->MenuButtonKeyUp), ButtonName(g_pCoreConfig->MenuButtonKeyDown), ButtonName(g_pCoreConfig->MenuButtonKeySelect));
+		std::format_to(out, "<br><font class='fontSize-s'>{}/{}  {}",
+			ButtonLabel(g_pCoreConfig->MenuButtonIconUp, g_pCoreConfig->MenuButtonKeyUp, "Up"),
+			ButtonLabel(g_pCoreConfig->MenuButtonIconDown, g_pCoreConfig->MenuButtonKeyDown, "Down"),
+			ButtonLabel(g_pCoreConfig->MenuButtonIconSelect, g_pCoreConfig->MenuButtonKeySelect, "Select"));
 		if (g_MenuManager.GetMenuExitButton(handle)) {
-			std::format_to(out, "  [{}] Exit", ButtonName(g_pCoreConfig->MenuButtonKeyExit));
+			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Exit"));
 		}
 		html += "</font>";
 

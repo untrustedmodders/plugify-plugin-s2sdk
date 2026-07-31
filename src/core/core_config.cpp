@@ -6,8 +6,8 @@
 using namespace std::string_view_literals;
 
 namespace {
-	uint64_t ParseButtonName(std::string_view name, uint64_t defaultValue) {
-		static const plg::flat_hash_map<std::string_view, uint64_t> buttons = {
+	InputBitMask_t ParseButtonName(std::string_view name, InputBitMask_t defaultValue) {
+		static const plg::flat_hash_map<std::string_view, InputBitMask_t> buttons = {
 			{"IN_ATTACK", IN_ATTACK},
 			{"IN_JUMP", IN_JUMP},
 			{"IN_DUCK", IN_DUCK},
@@ -34,7 +34,7 @@ namespace {
 
 		auto it = buttons.find(name);
 		if (it == buttons.end()) {
-			plg::print(LS_WARNING, "CoreConfig: unknown menu button name '{}'\n", name);
+			plg::print(LS_WARNING, "Unknown menu button name '{}'\n", name);
 			return defaultValue;
 		}
 		return it->second;
@@ -130,6 +130,10 @@ Result<bool> CoreConfig::Initialize() {
 	MenuButtonKeyDown = ParseButtonName(config.GetString("MenuButtonKeyDown", "IN_BACK"), IN_BACK);
 	MenuButtonKeySelect = ParseButtonName(config.GetString("MenuButtonKeySelect", "IN_USE"), IN_USE);
 	MenuButtonKeyExit = ParseButtonName(config.GetString("MenuButtonKeyExit", "IN_SCORE"), IN_SCORE);
+	MenuButtonIconUp = config.GetString("MenuButtonIconUp", "");
+	MenuButtonIconDown = config.GetString("MenuButtonIconDown", "");
+	MenuButtonIconSelect = config.GetString("MenuButtonIconSelect", "");
+	MenuButtonIconExit = config.GetString("MenuButtonIconExit", "");
 
 	return {};
 }

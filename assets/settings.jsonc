@@ -58,5 +58,11 @@
   "MenuButtonKeyUp": "IN_FORWARD",
   "MenuButtonKeyDown": "IN_BACK",
   "MenuButtonKeySelect": "IN_USE",
-  "MenuButtonKeyExit": "IN_SCORE"
+  "MenuButtonKeyExit": "IN_SCORE",
+  // Optional full HTML snippets (e.g. <img src='file://{images}/icons/equipment/...svg'> or an http(s) URL) shown
+  // instead of the "[BUTTONNAME]" text hint in the WASD button menu. Leave empty to keep the text hint.
+  "MenuButtonIconUp": "",
+  "MenuButtonIconDown": "",
+  "MenuButtonIconSelect": "",
+  "MenuButtonIconExit": ""
 }

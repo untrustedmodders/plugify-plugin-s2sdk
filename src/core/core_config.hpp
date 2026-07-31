@@ -1,5 +1,7 @@
 #pragma once
 
+#include <core/sdk/entity/globaltypes.h>
+
 class CoreConfig {
 public:
 	explicit CoreConfig(plg::vector<plg::string> paths);
@@ -37,10 +39,14 @@ public:
 	int MenuButtonHtmlDuration{2};							// Seconds the WASD button menu's HTML panel is shown per redraw
 	float MenuButtonRefreshInterval{1.5f};					// Seconds between keep-alive redraws of the WASD button menu when there's no input
 	bool MenuButtonFreezePlayer{true};						// Freeze the player's movement while a WASD button menu is open
-	uint64_t MenuButtonKeyUp{};							// Button (InputBitMask_t name, e.g. "IN_FORWARD") that moves the WASD button-menu cursor up
-	uint64_t MenuButtonKeyDown{};							// Button that moves the WASD button-menu cursor down
-	uint64_t MenuButtonKeySelect{};						// Button that selects the highlighted item
-	uint64_t MenuButtonKeyExit{};							// Button that exits the WASD button menu
+	InputBitMask_t MenuButtonKeyUp{};							// Button (InputBitMask_t name, e.g. "IN_FORWARD") that moves the WASD button-menu cursor up
+	InputBitMask_t MenuButtonKeyDown{};							// Button that moves the WASD button-menu cursor down
+	InputBitMask_t MenuButtonKeySelect{};						// Button that selects the highlighted item
+	InputBitMask_t MenuButtonKeyExit{};							// Button that exits the WASD button menu
+	plg::string MenuButtonIconUp;							// Full HTML snippet (e.g. an <img src='...'> tag) shown in place of the "[BUTTONNAME]" text hint for the up button; empty falls back to text
+	plg::string MenuButtonIconDown;						// Same, for the down button
+	plg::string MenuButtonIconSelect;						// Same, for the select button
+	plg::string MenuButtonIconExit;						// Same, for the exit button
 
 private:
 	plg::vector<plg::string> m_paths;
