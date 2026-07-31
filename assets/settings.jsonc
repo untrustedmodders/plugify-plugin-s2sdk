@@ -33,7 +33,7 @@
   "MenuCommandPrefixes": [
     "css_",
     "sm_",
-    "c_",
+    "c_"
   ],
   // Command names that take a single 0-based item index argument (SourceMod-style "menuselect <index>").
   // Add aliases here if other installed plugins already claim "menuselect"; empty array disables this input path.
@@ -58,5 +58,5 @@
   "MenuButtonKeyUp": "IN_FORWARD",
   "MenuButtonKeyDown": "IN_BACK",
   "MenuButtonKeySelect": "IN_USE",
-  "MenuButtonKeyExit": "IN_ATTACK2"
+  "MenuButtonKeyExit": "IN_SCORE"
 }

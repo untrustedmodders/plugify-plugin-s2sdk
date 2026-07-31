@@ -119,12 +119,12 @@ bool MenuManager::RegisterMenuType(std::string_view name, MenuDisplayCallback di
 	std::scoped_lock lock(m_mutex);
 
 	if (name.empty() || !display || !close) {
-		plg::print(LS_WARNING, "MenuManager: cannot register menu type with empty name or null display/close callback\n");
+		plg::print(LS_WARNING, "Cannot register menu type with empty name or null display/close callback\n");
 		return false;
 	}
 
 	if (m_menuTypes.contains(name)) {
-		plg::print(LS_WARNING, "MenuManager: menu type '{}' is already registered\n", name);
+		plg::print(LS_WARNING, "Menu type '{}' is already registered\n", name);
 		return false;
 	}
 
@@ -155,7 +155,7 @@ plg::vector<plg::string> MenuManager::GetMenuTypes() const {
 bool MenuManager::SetDefaultMenuType(std::string_view name) {
 	std::scoped_lock lock(m_mutex);
 	if (!m_menuTypes.contains(name)) {
-		plg::print(LS_WARNING, "MenuManager: cannot set default menu type to unregistered type '{}'\n", name);
+		plg::print(LS_WARNING, "Cannot set default menu type to unregistered type '{}'\n", name);
 		return false;
 	}
 	m_defaultMenuType = name;
@@ -405,7 +405,7 @@ bool MenuManager::DisplayMenuAtItem(MenuId id, int playerSlot, int firstItem, do
 
 	const auto* type = FindType(*menu);
 	if (!type) {
-		plg::print(LS_WARNING, "MenuManager: unknown menu type '{}'\n", menu->typeName.empty() ? m_defaultMenuType : menu->typeName);
+		plg::print(LS_WARNING, "Unknown menu type '{}'\n", menu->typeName.empty() ? m_defaultMenuType : menu->typeName);
 		return false;
 	}
 

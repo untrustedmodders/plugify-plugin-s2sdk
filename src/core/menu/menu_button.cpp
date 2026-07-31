@@ -7,6 +7,7 @@
 #include <core/sdk/entity/services.h>
 #include <core/sdk/utils.hpp>
 #include <core/timer_system.hpp>
+#include <iterator>
 
 // A WASD-style menu: navigated with movement keys and rendered as a center HTML panel,
 // redrawn only when the cursor/page changes or the keep-alive interval elapses (built
@@ -71,7 +72,9 @@ namespace {
 			g_MenuManager.SetClientMenuCursor(playerSlot, cursor);
 		}
 
-		std::string html = std::format("<b>{}</b><br>", g_MenuManager.GetMenuTitle(handle));
+		std::string html;
+		auto out = std::back_inserter(html);
+		std::format_to(out, "<b>{}</b><br>", g_MenuManager.GetMenuTitle(handle));
 
 		for (int index = offset; index < pageEnd; ++index) {
 			MenuItemStyle style = g_MenuManager.GetMenuItemStyle(handle, index);
@@ -82,18 +85,18 @@ namespace {
 
 			plg::string display = g_MenuManager.GetMenuItemDisplay(handle, index);
 			if (index == cursor) {
-				html += std::format("<font color='{}'>&gt; {}</font><br>", g_pCoreConfig->MenuHighlightColor, std::string_view(display));
+				std::format_to(out, "<font color='{}'>&gt; {}</font><br>", g_pCoreConfig->MenuHighlightColor, std::string_view(display));
 			} else if (style == MenuItemStyle::Disabled) {
-				html += std::format("<font color='{}'>{}</font><br>", g_pCoreConfig->MenuDisabledColor, std::string_view(display));
+				std::format_to(out, "<font color='{}'>{}</font><br>", g_pCoreConfig->MenuDisabledColor, std::string_view(display));
 			} else {
-				html += std::format("{}<br>", std::string_view(display));
+				std::format_to(out, "{}<br>", std::string_view(display));
 			}
 		}
 
-		html += std::format("<br><font class='fontSize-s'>[{}/{}] Move  [{}] Select",
+		std::format_to(out, "<br><font class='fontSize-s'>[{}/{}] Move  [{}] Select",
 			ButtonName(g_pCoreConfig->MenuButtonKeyUp), ButtonName(g_pCoreConfig->MenuButtonKeyDown), ButtonName(g_pCoreConfig->MenuButtonKeySelect));
 		if (g_MenuManager.GetMenuExitButton(handle)) {
-			html += std::format("  [{}] Exit", ButtonName(g_pCoreConfig->MenuButtonKeyExit));
+			std::format_to(out, "  [{}] Exit", ButtonName(g_pCoreConfig->MenuButtonKeyExit));
 		}
 		html += "</font>";
 

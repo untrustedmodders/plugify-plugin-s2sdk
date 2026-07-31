@@ -2,6 +2,7 @@
 
 #include <core/core_config.hpp>
 #include <core/sdk/utils.hpp>
+#include <iterator>
 
 // Chat, console and center-html menus are all "digit driven": the client selects an
 // item by triggering the shared css_0..css_9 commands registered by MenuManager::Init.
@@ -100,7 +101,9 @@ namespace {
 	void CenterHtmlMenu_Display(MenuId handle, int playerSlot) {
 		CPlayerSlot slot(playerSlot);
 
-		std::string html = std::format("<b>{}</b><br>", g_MenuManager.GetMenuTitle(handle));
+		std::string html;
+		auto out = std::back_inserter(html);
+		std::format_to(out, "<b>{}</b><br>", g_MenuManager.GetMenuTitle(handle));
 
 		int offset = g_MenuManager.GetClientMenuOffset(playerSlot);
 		int shown = VisibleItemCount(handle, offset);
@@ -114,9 +117,9 @@ namespace {
 			}
 
 			if (style == MenuItemStyle::Disabled) {
-				html += std::format("<font color='{}'>{}. {}</font><br>", g_pCoreConfig->MenuDisabledColor, i + 1, g_MenuManager.GetMenuItemDisplay(handle, index));
+				std::format_to(out, "<font color='{}'>{}. {}</font><br>", g_pCoreConfig->MenuDisabledColor, i + 1, g_MenuManager.GetMenuItemDisplay(handle, index));
 			} else {
-				html += std::format("{}. {}<br>", i + 1, g_MenuManager.GetMenuItemDisplay(handle, index));
+				std::format_to(out, "{}. {}<br>", i + 1, g_MenuManager.GetMenuItemDisplay(handle, index));
 			}
 		}
 
