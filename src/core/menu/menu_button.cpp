@@ -63,23 +63,23 @@ namespace {
 		return std::format("[{}] {}", ButtonName(button), action);
 	}
 
-	void ButtonMenu_Display(MenuId handle, int playerSlot) {
+	void ButtonMenu_Display(MenuId id, int playerSlot) {
 		CPlayerSlot slot(playerSlot);
 
-		int count = g_MenuManager.GetMenuItemCount(handle);
+		int count = g_MenuManager.GetMenuItemCount(id);
 		if (count == 0) {
-			utils::PrintHtmlCentre(slot, std::format("<b>{}</b><br>", g_MenuManager.GetMenuTitle(handle)), g_pCoreConfig->MenuButtonHtmlDuration);
+			utils::PrintHtmlCentre(slot, std::format("<b>{}</b><br>", g_MenuManager.GetMenuTitle(id)), g_pCoreConfig->MenuButtonHtmlDuration);
 			return;
 		}
 
 		int offset = g_MenuManager.GetClientMenuOffset(playerSlot);
-		int perPage = g_MenuManager.GetMenuPagination(handle);
+		int perPage = g_MenuManager.GetMenuPagination(id);
 		int pageEnd = perPage > 0 ? std::min(offset + perPage, count) : count;
 
 		int cursor = g_MenuManager.GetClientMenuCursor(playerSlot);
-		if (cursor < offset || cursor >= pageEnd || !g_MenuManager.IsMenuItemSelectable(handle, cursor)) {
+		if (cursor < offset || cursor >= pageEnd || !g_MenuManager.IsMenuItemSelectable(id, cursor)) {
 			cursor = offset;
-			while (cursor < pageEnd && !g_MenuManager.IsMenuItemSelectable(handle, cursor)) {
+			while (cursor < pageEnd && !g_MenuManager.IsMenuItemSelectable(id, cursor)) {
 				++cursor;
 			}
 			g_MenuManager.SetClientMenuCursor(playerSlot, cursor);
@@ -87,16 +87,16 @@ namespace {
 
 		std::string html;
 		auto out = std::back_inserter(html);
-		std::format_to(out, "<b>{}</b><br>", g_MenuManager.GetMenuTitle(handle));
+		std::format_to(out, "<b>{}</b><br>", g_MenuManager.GetMenuTitle(id));
 
 		for (int index = offset; index < pageEnd; ++index) {
-			MenuItemStyle style = g_MenuManager.GetMenuItemStyle(handle, index);
+			MenuItemStyle style = g_MenuManager.GetMenuItemStyle(id, index);
 			if (style == MenuItemStyle::Spacer) {
 				html += "<br>";
 				continue;
 			}
 
-			plg::string display = g_MenuManager.GetMenuItemDisplay(handle, index);
+			plg::string display = g_MenuManager.GetMenuItemDisplay(id, index);
 			if (index == cursor) {
 				std::format_to(out, "<font color='{}'>&gt; {}</font><br>", g_pCoreConfig->MenuHighlightColor, std::string_view(display));
 			} else if (style == MenuItemStyle::Disabled) {
@@ -110,7 +110,7 @@ namespace {
 			ButtonLabel(g_pCoreConfig->MenuButtonIconUp, g_pCoreConfig->MenuButtonKeyUp, "Up"),
 			ButtonLabel(g_pCoreConfig->MenuButtonIconDown, g_pCoreConfig->MenuButtonKeyDown, "Down"),
 			ButtonLabel(g_pCoreConfig->MenuButtonIconSelect, g_pCoreConfig->MenuButtonKeySelect, "Select"));
-		if (g_MenuManager.GetMenuExitButton(handle)) {
+		if (g_MenuManager.GetMenuExitButton(id)) {
 			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Exit"));
 		}
 		html += "</font>";
@@ -134,8 +134,8 @@ namespace {
 		state.id = 0;
 	}
 
-	void MoveCursor(MenuId handle, int playerSlot, int direction) {
-		int count = g_MenuManager.GetMenuItemCount(handle);
+	void MoveCursor(MenuId id, int playerSlot, int direction) {
+		int count = g_MenuManager.GetMenuItemCount(id);
 		if (count <= 0) {
 			return;
 		}
@@ -146,19 +146,19 @@ namespace {
 			if (next < 0 || next >= count) {
 				return; // reached the boundary; no wraparound
 			}
-			if (g_MenuManager.IsMenuItemSelectable(handle, next)) {
+			if (g_MenuManager.IsMenuItemSelectable(id, next)) {
 				break;
 			}
 		}
 
-		if (next < 0 || next >= count || !g_MenuManager.IsMenuItemSelectable(handle, next)) {
+		if (next < 0 || next >= count || !g_MenuManager.IsMenuItemSelectable(id, next)) {
 			return;
 		}
 
 		g_MenuManager.SetClientMenuCursor(playerSlot, next);
 
 		int offset = g_MenuManager.GetClientMenuOffset(playerSlot);
-		int perPage = g_MenuManager.GetMenuPagination(handle);
+		int perPage = g_MenuManager.GetMenuPagination(id);
 		if (perPage > 0) {
 			if (next >= offset + perPage) {
 				g_MenuManager.MenuNextPage(playerSlot);
@@ -168,7 +168,7 @@ namespace {
 		}
 	}
 
-	void ButtonMenu_Frame(MenuId handle, int playerSlot) {
+	void ButtonMenu_Frame(MenuId id, int playerSlot) {
 		auto* player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
 		auto* pawn = player ? player->GetPlayerPawn() : nullptr;
 		if (!pawn) {
@@ -181,10 +181,10 @@ namespace {
 		}
 
 		ButtonMenuState& state = s_state[static_cast<size_t>(playerSlot)];
-		bool freshSession = state.id != handle;
+		bool freshSession = state.id != id;
 
 		if (freshSession) {
-			state.id = handle;
+			state.id = id;
 			state.lastDrawnCursor = -1; // force the first draw below
 			state.nextRefreshTime = 0;
 
@@ -209,13 +209,13 @@ namespace {
 
 		if (!freshSession) {
 			if (released(g_pCoreConfig->MenuButtonKeyUp)) {
-				MoveCursor(handle, playerSlot, -1);
+				MoveCursor(id, playerSlot, -1);
 			} else if (released(g_pCoreConfig->MenuButtonKeyDown)) {
-				MoveCursor(handle, playerSlot, 1);
+				MoveCursor(id, playerSlot, 1);
 			} else if (released(g_pCoreConfig->MenuButtonKeySelect)) {
 				g_MenuManager.SelectMenuItem(playerSlot, g_MenuManager.GetClientMenuCursor(playerSlot));
 				return; // the display session likely just ended; MenuManager already invoked our Close
-			} else if (released(g_pCoreConfig->MenuButtonKeyExit) && g_MenuManager.GetMenuExitButton(handle)) {
+			} else if (released(g_pCoreConfig->MenuButtonKeyExit) && g_MenuManager.GetMenuExitButton(id)) {
 				g_MenuManager.CancelClientMenu(playerSlot, MenuCancelReason::Exit);
 				return;
 			}
@@ -224,7 +224,7 @@ namespace {
 		double now = TimerSystem::GetTickedTime();
 		int cursor = g_MenuManager.GetClientMenuCursor(playerSlot);
 		if (cursor != state.lastDrawnCursor || now >= state.nextRefreshTime) {
-			ButtonMenu_Display(handle, playerSlot);
+			ButtonMenu_Display(id, playerSlot);
 			state.lastDrawnCursor = cursor;
 			state.nextRefreshTime = now + g_pCoreConfig->MenuButtonRefreshInterval;
 		}

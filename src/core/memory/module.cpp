@@ -292,7 +292,7 @@ CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
 
         if (const auto idx = demangled_name.find(struct_prefix); idx != std::string_view::npos)
         {
-            if (demangled_name.substr(idx + struct_prefix.length()) == target_name)
+            if (demangled_name.substr(idx + struct_prefix.size()) == target_name)
                 return true;
         }
 

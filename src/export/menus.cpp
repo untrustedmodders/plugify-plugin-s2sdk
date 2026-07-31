@@ -394,7 +394,7 @@ extern "C" PLUGIN_API int GetClientMenuOffset(int playerSlot) {
  * @param playerSlot The client's player slot.
  * @return The display time in seconds, 0 meaning no timeout.
  */
-extern "C" PLUGIN_API int GetClientMenuTime(int playerSlot) {
+extern "C" PLUGIN_API double GetClientMenuTime(int playerSlot) {
 	return g_MenuManager.GetClientMenuTime(playerSlot);
 }
 

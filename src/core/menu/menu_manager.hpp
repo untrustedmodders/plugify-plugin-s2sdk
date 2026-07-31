@@ -134,7 +134,7 @@ public:
 	bool CancelClientMenu(int playerSlot, MenuCancelReason reason = MenuCancelReason::Exit);
 	MenuId GetClientMenu(int playerSlot) const;
 	int GetClientMenuOffset(int playerSlot) const;
-	int GetClientMenuTime(int playerSlot) const;
+	double GetClientMenuTime(int playerSlot) const;
 	int GetClientMenuCursor(int playerSlot) const;
 	void SetClientMenuCursor(int playerSlot, int index);
 	bool ClientMenuHasPrevPage(int playerSlot) const;
@@ -148,16 +148,16 @@ public:
 	bool HandleDigitInput(int playerSlot, int digit);
 
 private:
-	std::shared_ptr<MenuData> Find(MenuId id) const;
-	const MenuTypeCallbacks* FindType(const MenuData& menu) const;
+	std::shared_ptr<MenuData> FindMenu(MenuId id) const;
+	std::shared_ptr<MenuTypeCallbacks> FindType(const MenuData& menu) const;
 	void RedisplayClient(int playerSlot);
 	void CloseClientDisplay(int playerSlot, bool notifyBackend);
 	void EndClientMenu(int playerSlot, MenuCancelReason reason);
 	static void OnMenuTimeout(TimerId timerId, const plg::vector<plg::any>& userData);
 
 private:
-	plg::flat_hash_map<MenuId, std::shared_ptr<MenuData>> m_menus;
-	plg::flat_hash_map<plg::string, MenuTypeCallbacks, plg::case_insensitive_hash, plg::case_insensitive_equal> m_menuTypes;
+	plg::flat_hash_map<MenuId, std::shared_ptr<MenuData>> m_menuInsts;
+	plg::flat_hash_map<plg::string, std::shared_ptr<MenuTypeCallbacks>, plg::case_insensitive_hash, plg::case_insensitive_equal> m_menuTypes;
 	plg::string m_defaultMenuType{"button"};
 	std::array<ClientMenuState, MaxPlayers + 1> m_clientState{};
 	MenuId m_nextId{};
