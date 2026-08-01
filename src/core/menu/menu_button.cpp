@@ -3,6 +3,7 @@
 #include <core/core_config.hpp>
 #include <core/player_manager.hpp>
 #include <core/sdk/entity/cbaseplayerpawn.h>
+#include <core/sdk/entity/cplayerpawn.h>
 #include <core/sdk/entity/globaltypes.h>
 #include <core/sdk/entity/services.h>
 #include <core/sdk/utils.hpp>
@@ -17,11 +18,11 @@
 namespace {
 	struct ButtonMenuState {
 		MenuId id{};                 // the menu handle this state was last polled for; used to detect a fresh session
-		MenuId lastHeld{};           // buttons held as of the previous frame, for edge detection
 		int lastDrawnCursor{-1};     // cursor position as of the last redraw
-		bool frozen{};               // whether we forced MOVETYPE_NONE on this client
 		double nextRefreshTime{};    // next time a keep-alive redraw is due, even with no input
-		MoveType_t savedMoveType{};  // the client's movement type before we froze it
+		float savedSpeed{1.0f};      // the client's velocity modifier before we froze it
+		bool frozen{};               // whether we forced the client's speed to 0 while the menu is open
+		uint64 lastHeld{};           // buttons held as of the previous frame, for edge detection
 	};
 
 	std::array<ButtonMenuState, MaxPlayers + 1> s_state{};
@@ -48,42 +49,39 @@ namespace {
 		return std::format("<font class='{}'><b>{}</b></font><br>", g_pCoreConfig->MenuButtonTitleFontClass, title);
 	}
 
-	void ButtonMenu_Display(MenuId id, int playerSlot) {
-		CPlayerSlot slot(playerSlot);
-
-		int count = g_MenuManager.GetMenuItemCount(id);
-		if (count == 0) {
-			std::string emptyHtml = std::format("{}<font color='{}'><b>Empty</b></font>", TitleHtml(g_MenuManager.GetMenuTitle(id)), g_pCoreConfig->MenuDisabledColor);
-			if (!g_pCoreConfig->MenuButtonFontClass.empty()) {
-				emptyHtml = std::format("<font class='{}'>{}</font>", g_pCoreConfig->MenuButtonFontClass, emptyHtml);
-			}
-			utils::PrintHtmlCentre(slot, emptyHtml, g_pCoreConfig->MenuButtonHtmlDuration);
-			return;
+	// Wraps `html` in `cssClass` if one is configured, else returns it unchanged.
+	std::string ApplyFontClass(std::string_view html, const plg::string& cssClass) {
+		if (cssClass.empty()) {
+			return std::string(html);
 		}
+		return std::format("<font class='{}'>{}</font>", cssClass, html);
+	}
 
-		int offset = g_MenuManager.GetClientMenuOffset(playerSlot);
-		int perPage = g_MenuManager.GetMenuPagination(id);
-		int pageEnd = perPage > 0 ? std::min(offset + perPage, count) : count;
-
+	// Snaps the display cursor onto a valid, selectable item within [offset, pageEnd) if it
+	// isn't already on one (e.g. the page changed, or the item it pointed to became disabled).
+	int ClampCursor(MenuId id, int playerSlot, int offset, int pageEnd) {
 		int cursor = g_MenuManager.GetClientMenuCursor(playerSlot);
-		if (cursor < offset || cursor >= pageEnd || !g_MenuManager.IsMenuItemSelectable(id, cursor)) {
-			cursor = offset;
-			while (cursor < pageEnd && !g_MenuManager.IsMenuItemSelectable(id, cursor)) {
-				++cursor;
-			}
-			g_MenuManager.SetClientMenuCursor(playerSlot, cursor);
+		if (cursor >= offset && cursor < pageEnd && g_MenuManager.IsMenuItemSelectable(id, cursor)) {
+			return cursor;
 		}
 
-		uint64 held = s_state[static_cast<size_t>(playerSlot)].lastHeld;
-		auto isHeld = [&](InputBitMask_t button) { return (held & button) != 0; };
+		cursor = offset;
+		while (cursor < pageEnd && !g_MenuManager.IsMenuItemSelectable(id, cursor)) {
+			++cursor;
+		}
+		g_MenuManager.SetClientMenuCursor(playerSlot, cursor);
+		return cursor;
+	}
+
+	// Renders items [offset, pageEnd), highlighting `cursor` with an inline select hint so it's
+	// obvious which item pressing "select" will act on. Pads with blank lines up to
+	// MenuButtonMaxItems so the footer that follows always lands on the same line, regardless of
+	// how many items this particular page/menu actually has.
+	std::string BuildItemList(MenuId id, int offset, int pageEnd, int cursor, uint64 held) {
+		bool selectPressed = (held & g_pCoreConfig->MenuButtonKeySelect) != 0;
 
 		std::string html;
 		auto out = std::back_inserter(html);
-		html += TitleHtml(g_MenuManager.GetMenuTitle(id));
-
-		if (!g_pCoreConfig->MenuButtonFontClass.empty()) {
-			std::format_to(out, "<font class='{}'>", g_pCoreConfig->MenuButtonFontClass);
-		}
 
 		for (int index = offset; index < pageEnd; ++index) {
 			MenuItemStyle style = g_MenuManager.GetMenuItemStyle(id, index);
@@ -94,10 +92,8 @@ namespace {
 
 			plg::string display = g_MenuManager.GetMenuItemDisplay(id, index);
 			if (index == cursor) {
-				// The select hint rides along with the highlighted row instead of living in
-				// the footer, so it's obvious which item pressing "select" will act on.
 				std::format_to(out, "<font color='{}'>&gt; {}</font> {}<br>", g_pCoreConfig->MenuHighlightColor, display,
-					ButtonLabel(g_pCoreConfig->MenuButtonImageSelect, isHeld(g_pCoreConfig->MenuButtonKeySelect)));
+					ButtonLabel(g_pCoreConfig->MenuButtonImageSelect, selectPressed));
 			} else if (style == MenuItemStyle::Disabled) {
 				std::format_to(out, "<font color='{}'>{}</font><br>", g_pCoreConfig->MenuDisabledColor, display);
 			} else {
@@ -105,23 +101,27 @@ namespace {
 			}
 		}
 
-		// Pad the item area out to a fixed height so the footer always lands on the same line
-		// (title + MenuButtonMaxItems item lines), regardless of how many items this particular
-		// page/menu actually has — otherwise the footer visually jumps around between menus or
-		// pages with fewer items.
 		for (int shown = pageEnd - offset; shown < g_pCoreConfig->MenuButtonMaxItems; ++shown) {
 			html += "<br>";
 		}
-		std::format_to(out, "{}{}",
-			ButtonLabel(g_pCoreConfig->MenuButtonImageUp, isHeld(g_pCoreConfig->MenuButtonKeyUp)),
-			ButtonLabel(g_pCoreConfig->MenuButtonImageDown, isHeld(g_pCoreConfig->MenuButtonKeyDown)));
+
+		return html;
+	}
+
+	// Renders the Up/Down/Left/Right/Exit control row. The images are fixed-width, so a missing
+	// prev/next slot is padded with filler instead of omitted, keeping the footer's alignment
+	// consistent regardless of which controls are actually active.
+	std::string BuildFooter(MenuId id, int playerSlot, uint64 held) {
+		auto isHeld = [&](InputBitMask_t button) { return (held & button) != 0; };
+
+		std::string html;
+		html += ButtonLabel(g_pCoreConfig->MenuButtonImageUp, isHeld(g_pCoreConfig->MenuButtonKeyUp));
+		html += ButtonLabel(g_pCoreConfig->MenuButtonImageDown, isHeld(g_pCoreConfig->MenuButtonKeyDown));
 
 		bool hasPrevPage = g_MenuManager.ClientMenuHasPrevPage(playerSlot);
 		bool hasNextPage = g_MenuManager.ClientMenuHasNextPage(playerSlot);
 		bool showExit = g_MenuManager.GetMenuExitBackButton(id) || g_MenuManager.GetMenuExitButton(id);
 
-		// The images are fixed-width, so pad a missing prev/next slot with filler so the
-		// footer's alignment stays consistent regardless of which controls are active.
 		if (hasPrevPage) {
 			html += ButtonLabel(g_pCoreConfig->MenuButtonImageLeft, isHeld(g_pCoreConfig->MenuButtonKeyLeft));
 			html += hasNextPage ? ButtonLabel(g_pCoreConfig->MenuButtonImageRight, isHeld(g_pCoreConfig->MenuButtonKeyRight)) : ButtonImage(g_pCoreConfig->MenuButtonImageEmptyHalf);
@@ -136,9 +136,23 @@ namespace {
 			html += ButtonLabel(g_pCoreConfig->MenuButtonImageExit, isHeld(g_pCoreConfig->MenuButtonKeyExit));
 		}
 
-		if (!g_pCoreConfig->MenuButtonFontClass.empty()) {
-			html += "</font>";
-		}
+		return html;
+	}
+
+	void ButtonMenu_Display(MenuId id, int playerSlot) {
+		CPlayerSlot slot(playerSlot);
+
+		int count = g_MenuManager.GetMenuItemCount(id);
+		int offset = g_MenuManager.GetClientMenuOffset(playerSlot);
+		int perPage = g_MenuManager.GetMenuPagination(id);
+		int pageEnd = perPage > 0 ? std::min(offset + perPage, count) : count;
+		int cursor = ClampCursor(id, playerSlot, offset, pageEnd);
+		uint64 held = s_state[static_cast<size_t>(playerSlot)].lastHeld;
+
+		std::string html = TitleHtml(g_MenuManager.GetMenuTitle(id));
+		html += ApplyFontClass(BuildItemList(id, offset, pageEnd, cursor, held), g_pCoreConfig->MenuButtonBodyFontClass);
+		html += ApplyFontClass(BuildFooter(id, playerSlot, held), g_pCoreConfig->MenuButtonFooterFontStyle);
+		html += "<br> ";
 
 		utils::PrintHtmlCentre(slot, html, g_pCoreConfig->MenuButtonHtmlDuration);
 	}
@@ -150,9 +164,9 @@ namespace {
 		if (state.frozen) {
 			state.frozen = false;
 			auto* player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-			auto* pawn = player ? player->GetPlayerPawn() : nullptr;
-			if (pawn && pawn->m_MoveType == MOVETYPE_NONE) {
-				pawn->SetMoveType(state.savedMoveType);
+			auto* pawn = player ? static_cast<CPlayerPawn*>(player->GetPlayerPawn()) : nullptr;
+			if (pawn) {
+				pawn->SetSpeed(state.savedSpeed);
 			}
 		}
 
@@ -161,10 +175,7 @@ namespace {
 
 	// Plays a configured menu sound event to the client, or does nothing if the event name is empty.
 	void PlayMenuSound(int playerSlot, const plg::string& soundName) {
-		if (soundName.empty()) {
-			return;
-		}
-		utils::PlaySoundToClient(playerSlot, CHAN_AUTO, soundName.c_str(), VOL_NORM, SNDLVL_NONE, 0, PITCH_NORM, Vector(0.0f, 0.0f, 0.0f), 0.0f);
+		g_pEngineServer->ClientCommand(playerSlot, "play %s", soundName.c_str());
 	}
 
 	// Returns true if the cursor actually moved (i.e. it wasn't already at the boundary).
@@ -227,6 +238,8 @@ namespace {
 			return;
 		}
 
+		auto* csPawn = static_cast<CPlayerPawn*>(pawn);
+
 		CPlayer_MovementServices* movement = pawn->m_pMovementServices;
 		if (!movement) {
 			return;
@@ -248,18 +261,18 @@ namespace {
 			}
 
 			if (g_pCoreConfig->MenuButtonFreezePlayer) {
-				state.savedMoveType = pawn->m_MoveType;
+				state.savedSpeed = csPawn->GetSpeed();
 				state.frozen = true;
-				pawn->SetMoveType(MOVETYPE_NONE);
+				csPawn->SetSpeed(0.0f);
 			} else {
 				state.frozen = false;
 			}
-		} else if (state.frozen && pawn->m_MoveType != MOVETYPE_NONE) {
+		} else if (state.frozen && csPawn->GetSpeed() != 0.0f) {
 			// Something outside our control (e.g. a respawn on round start) reset the
-			// client's move type mid-session; re-save whatever it was just set to and
-			// re-freeze, since the one-shot freeze above only fires at session start.
-			state.savedMoveType = pawn->m_MoveType;
-			pawn->SetMoveType(MOVETYPE_NONE);
+			// client's speed mid-session; re-save whatever it was just set to and re-freeze,
+			// since the one-shot freeze above only fires at session start.
+			state.savedSpeed = csPawn->GetSpeed();
+			csPawn->SetSpeed(0.0f);
 		}
 
 		uint64 buttons[3];

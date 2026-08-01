@@ -53,11 +53,14 @@
   "MenuButtonRefreshInterval": 0.1,
   // Freeze the player's movement while a WASD button menu is open
   "MenuButtonFreezePlayer": true,
-  // Panorama CSS class (e.g. "fontSize-sm", "fontSize-s") wrapping the WASD button menu's whole body, to
+  // Panorama CSS class (e.g. "fontSize-sm", "fontSize-s") wrapping the WASD button menu's item list, to
   // shrink/grow its text. Leave empty to keep the default (unscaled) text size.
-  "MenuButtonFontClass": "fontSize-s stratum-font",
+  "MenuButtonBodyFontClass": "fontSize-sm stratum-font",
   // Same, but wrapping just the title line. Leave empty to keep the default (unscaled) title size.
   "MenuButtonTitleFontClass": "mono-spaced-font",
+  // Same, but wrapping just the Up/Down/Left/Right/Exit control row. Leave empty to keep the default
+  // (unscaled) footer size.
+  "MenuButtonFooterFontStyle": "fontSize-s",
   // Max items shown per page in the WASD button menu; menus asking for a smaller page size are left alone,
   // only larger/unlimited ones get clamped down to this.
   "MenuButtonMaxItems": 6,

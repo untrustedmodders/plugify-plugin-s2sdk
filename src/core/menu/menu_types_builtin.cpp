@@ -18,6 +18,19 @@ namespace {
 		return std::max(0, std::min(pageSize, count - offset));
 	}
 
+	// The actual command that selects an item, based on whatever digit-input path is configured
+	// (MenuCommandPrefixes takes priority since it's the shared HandleDigitInput path; falls back
+	// to the "menuselect" command). Empty if neither input path is configured at all.
+	std::string DigitInputCommand() {
+		if (!g_pCoreConfig->MenuCommandPrefixes.empty()) {
+			return std::format("{}<number>", g_pCoreConfig->MenuCommandPrefixes.front());
+		}
+		if (!g_pCoreConfig->MenuSelectCommands.empty()) {
+			return std::format("{} <number>", g_pCoreConfig->MenuSelectCommands.front());
+		}
+		return {};
+	}
+
 	// -- ChatMenu --------------------------------------------------------
 
 	void ChatMenu_Display(MenuId id, int playerSlot) {
@@ -51,6 +64,14 @@ namespace {
 			utils::PrintChat(slot, " !0 Back");
 		} else if (g_MenuManager.GetMenuExitButton(id)) {
 			utils::PrintChat(slot, " !0 Exit");
+		}
+
+		// The "!1" hints above only work as literal chat input if a bare digit-named command is
+		// registered; by default only "<prefix><number>" is, so spell out what to actually type.
+		std::string command = DigitInputCommand();
+		if (!command.empty()) {
+			std::string_view trigger = g_pCoreConfig->PublicChatTrigger.empty() ? std::string_view{} : std::string_view(g_pCoreConfig->PublicChatTrigger.front());
+			utils::PrintChat(slot, std::format(" Type '{}{}' in chat to make a selection.", trigger, command));
 		}
 	}
 
@@ -93,7 +114,10 @@ namespace {
 			utils::PrintConsole(slot, "0. Exit");
 		}
 
-		utils::PrintConsole(slot, "Use 'css_<number>' to make a selection.");
+		std::string command = DigitInputCommand();
+		if (!command.empty()) {
+			utils::PrintConsole(slot, std::format("Use '{}' to make a selection.", command));
+		}
 	}
 
 	void ConsoleMenu_Close(MenuId, int) {
@@ -137,6 +161,11 @@ namespace {
 			html += "0. Back<br>";
 		} else if (g_MenuManager.GetMenuExitButton(id)) {
 			html += "0. Exit<br>";
+		}
+
+		std::string command = DigitInputCommand();
+		if (!command.empty()) {
+			std::format_to(out, "Use '{}' to make a selection.<br>", command);
 		}
 
 		double time = g_MenuManager.GetClientMenuTime(playerSlot);
