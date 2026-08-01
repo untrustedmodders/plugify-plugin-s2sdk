@@ -83,7 +83,7 @@ namespace {
 	void OnTestSubMenuAction(MenuId id, MenuAction action, int playerSlot, int param) {
 		switch (action) {
 			case MenuAction::Select:
-				utils::PrintChat(playerSlot, std::format("You picked '{}' from the sub-menu.", std::string_view(g_MenuManager.GetMenuItemInfo(id, param))));
+				utils::PrintChat(playerSlot, std::format("You picked '{}' from the sub-menu.", g_MenuManager.GetMenuItemInfo(id, param)));
 				break;
 			case MenuAction::Cancel:
 				if (static_cast<MenuCancelReason>(param) == MenuCancelReason::ExitBack) {

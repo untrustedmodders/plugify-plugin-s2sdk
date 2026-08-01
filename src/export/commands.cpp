@@ -82,7 +82,7 @@ extern "C" PLUGIN_API bool RemoveCommandListener(const plg::string& name, ConCom
  * @param command The command to execute on the server.
  */
 extern "C" PLUGIN_API void ServerCommand(const plg::string& command) {
-	auto cleanCommand = std::format("{}\n", command);
+	auto cleanCommand = command + '\n';
 	g_pEngineServer->ServerCommand(cleanCommand.c_str());
 }
 /**
@@ -92,7 +92,7 @@ extern "C" PLUGIN_API void ServerCommand(const plg::string& command) {
  * @return String to store command result into.
  */
 extern "C" PLUGIN_API plg::string ServerCommandEx(const plg::string& command) {
-	auto cleanCommand = std::format("{}\n", command);
+	auto cleanCommand = command + '\n';
 
 	if (!g_ShouldCatchSpew) {
 		g_ShouldCatchSpew = true;
@@ -125,7 +125,7 @@ extern "C" PLUGIN_API plg::string ServerCommandEx(const plg::string& command) {
  * @param command The command to execute on the client.
  */
 extern "C" PLUGIN_API void ClientCommand(int playerSlot, const plg::string& command) {
-	auto cleanCommand = std::format("{}\n", command);
+	auto cleanCommand = command + '\n';
 	g_pEngineServer->ClientCommand(playerSlot, "%s", cleanCommand.c_str());
 }
 

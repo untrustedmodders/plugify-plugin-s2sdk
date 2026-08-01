@@ -55,7 +55,7 @@ namespace {
 		return name.substr(3);*/
 	}
 
-	// Renders as the configured icon HTML (e.g. an <img> tag) when set, otherwise falls back to "[BUTTONNAME]".
+	// Renders as the configured icon HTML (e.g. an <img> tag) when set, otherwise falls back to "[BUTTONNAME] ACTION".
 	std::string ButtonLabel(std::string_view icon, InputBitMask_t button, std::string_view action) {
 		if (!icon.empty()) {
 			return std::string(icon);

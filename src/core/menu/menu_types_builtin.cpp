@@ -128,7 +128,7 @@ namespace {
 		}
 
 		if (g_MenuManager.ClientMenuHasPrevPage(playerSlot)) {
-			html += "8. Back<br>";
+			html += "8. Prev<br>";
 		}
 		if (g_MenuManager.ClientMenuHasNextPage(playerSlot)) {
 			html += "9. Next<br>";
