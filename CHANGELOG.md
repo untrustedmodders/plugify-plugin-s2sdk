@@ -1,5 +1,38 @@
 # Changelog
 
+## [2.14.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.13.0...v2.14.0) (2026-08-01)
+
+
+### Features
+
+* **claude:** add menus api ([651774b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/651774bc7ee3d64d9752537db7f8a14dc49c5e81))
+
+
+### Bug Fixes
+
+* `SetClientName` ([03a04e1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/03a04e17315985359bece5756544a3968fca6878))
+* add aliases to config and timer ids ([13346c6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/13346c6218767f1af37340f3a1626a27eae46c46))
+* add menu sounds (2) ([dac45d4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dac45d40c4030c0aad25d5d59e34ec2b3a741856))
+* add setters for arrays ([a536e80](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a536e80202693c5007d8f0affc7cb319732cc1f8))
+* **claude:** add font class style ([45f6439](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/45f643966c0c22d66e42a15e6eee769d09ac671d))
+* **claude:** add font style ([b7ac47a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b7ac47a9e38af624a5adca6279a828e08f0a9ed6))
+* **claude:** add icons to buttons ([ec99dba](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ec99dba738c39d9c93cc48d0fe13f9d044dbf917))
+* **claude:** add icons to menus ([28e3b46](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/28e3b465743c83d29172022738207ed0b915f98c))
+* **claude:** more menu improvements ([6d835c5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6d835c5a19562c6d57c3d26654b92087a450bba3))
+* **claude:** more menu improvements ([71e63f6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/71e63f695d291b3771b4cf49b73b324b0f84272e))
+* **claude:** move pagination to settings ([6918dda](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6918ddaedf18ceebd1fe16cfb5b260bb54927ae1))
+* improve formatting ([22b59fe](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/22b59feed5a72044a6114f4d006ffe09cf08c612))
+* issue with empty strings and _S_empty_rep due to static linkage for protobufs ([3d93b6d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3d93b6dd140732516d4d99ccc819612376f798c0))
+* more menu improvements ([dd8dc77](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dd8dc77f4feb960b487ddabd5e5515e6a3013efa))
+* more menu improvements (2) ([84f6a24](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/84f6a2460aba658789944ac11dc4d0de73dab703))
+* rename prev opt ([cbbadaa](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/cbbadaafe0fec590e4ba7ab0c94d52cbcfee6aa3))
+* some improvements ([d90fdef](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d90fdeff98ec1081a52b2ad9b0e4841c443dec24))
+* some improvements (2) ([e8b1acb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e8b1acbcd4b97c57a6fa62a94543f5b2249f8465))
+* some improvements (3) ([6c3d5b4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6c3d5b4211196022730d8f86afaf4bf9e0367c18))
+* update `ResolveModule` signature ([fca3bd3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fca3bd3179277364172d0cca183eaa8fa96004b9))
+* update menu methods ([48e8182](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/48e818267d4b82bb74e39b0c9cac6ea34635f9b6))
+* update ScriptGetAddon on windows ([fb5b229](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fb5b229182d3bb0af6607d80572ed2da5cb6507c))
+
 ## [2.13.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.12.1...v2.13.0) (2026-07-20)
 
 
