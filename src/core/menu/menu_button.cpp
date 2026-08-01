@@ -89,6 +89,23 @@ namespace {
 		auto out = std::back_inserter(html);
 		std::format_to(out, "<b>{}</b><br>", g_MenuManager.GetMenuTitle(id));
 
+		// The controls legend goes right under the title, not after the items: with enough
+		// items (or pagination disabled) the bottom of the HTML panel runs off-screen, but
+		// the top never does, so this is the only place it's guaranteed to always be seen.
+		std::format_to(out, "{}/{}  {}",
+			ButtonLabel(g_pCoreConfig->MenuButtonIconUp, g_pCoreConfig->MenuButtonKeyUp, "Up"),
+			ButtonLabel(g_pCoreConfig->MenuButtonIconDown, g_pCoreConfig->MenuButtonKeyDown, "Down"),
+			ButtonLabel(g_pCoreConfig->MenuButtonIconSelect, g_pCoreConfig->MenuButtonKeySelect, "Select"));
+		if (g_MenuManager.GetMenuExitBackButton(id)) {
+			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Back"));
+		} else if (g_MenuManager.GetMenuExitButton(id)) {
+			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Exit"));
+		}
+		if (perPage > 0 && count > perPage) {
+			std::format_to(out, "  ({}/{})", offset / perPage + 1, (count + perPage - 1) / perPage);
+		}
+		html += "<br><br>";
+
 		for (int index = offset; index < pageEnd; ++index) {
 			MenuItemStyle style = g_MenuManager.GetMenuItemStyle(id, index);
 			if (style == MenuItemStyle::Spacer) {
@@ -104,16 +121,6 @@ namespace {
 			} else {
 				std::format_to(out, "{}<br>", display);
 			}
-		}
-
-		std::format_to(out, "<br>{}/{}  {}",
-			ButtonLabel(g_pCoreConfig->MenuButtonIconUp, g_pCoreConfig->MenuButtonKeyUp, "Up"),
-			ButtonLabel(g_pCoreConfig->MenuButtonIconDown, g_pCoreConfig->MenuButtonKeyDown, "Down"),
-			ButtonLabel(g_pCoreConfig->MenuButtonIconSelect, g_pCoreConfig->MenuButtonKeySelect, "Select"));
-		if (g_MenuManager.GetMenuExitBackButton(id)) {
-			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Back"));
-		} else if (g_MenuManager.GetMenuExitButton(id)) {
-			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Exit"));
 		}
 
 		utils::PrintHtmlCentre(slot, html, g_pCoreConfig->MenuButtonHtmlDuration);
