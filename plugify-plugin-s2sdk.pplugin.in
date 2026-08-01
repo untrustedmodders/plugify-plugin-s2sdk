@@ -40769,6 +40769,153 @@
           "bindSelf": true
         }
       ]
+    },
+    {
+      "name": "Menu",
+      "group": "Menus",
+      "description": "RAII wrapper for Menu handle.",
+      "handleType": "uint32",
+      "invalidValue": "0",
+      "constructors": [
+        "CreateMenu"
+      ],
+      "bindings": [
+        {
+          "name": "Destroy",
+          "method": "DestroyMenu",
+          "bindSelf": true
+        },
+        {
+          "name": "IsValid",
+          "method": "IsValidMenu",
+          "bindSelf": true
+        },
+        {
+          "name": "SetTitle",
+          "method": "SetMenuTitle",
+          "bindSelf": true
+        },
+        {
+          "name": "GetTitle",
+          "method": "GetMenuTitle",
+          "bindSelf": true
+        },
+        {
+          "name": "SetType",
+          "method": "SetMenuType",
+          "bindSelf": true
+        },
+        {
+          "name": "GetType",
+          "method": "GetMenuType",
+          "bindSelf": true
+        },
+        {
+          "name": "SetPagination",
+          "method": "SetMenuPagination",
+          "bindSelf": true
+        },
+        {
+          "name": "GetPagination",
+          "method": "GetMenuPagination",
+          "bindSelf": true
+        },
+        {
+          "name": "SetExitButton",
+          "method": "SetMenuExitButton",
+          "bindSelf": true
+        },
+        {
+          "name": "GetExitButton",
+          "method": "GetMenuExitButton",
+          "bindSelf": true
+        },
+        {
+          "name": "SetExitBackButton",
+          "method": "SetMenuExitBackButton",
+          "bindSelf": true
+        },
+        {
+          "name": "GetExitBackButton",
+          "method": "GetMenuExitBackButton",
+          "bindSelf": true
+        },
+        {
+          "name": "SetCloseOnSelect",
+          "method": "SetMenuCloseOnSelect",
+          "bindSelf": true
+        },
+        {
+          "name": "GetCloseOnSelect",
+          "method": "GetMenuCloseOnSelect",
+          "bindSelf": true
+        },
+        {
+          "name": "AddItem",
+          "method": "AddMenuItem",
+          "bindSelf": true
+        },
+        {
+          "name": "InsertItemAt",
+          "method": "InsertMenuItemAt",
+          "bindSelf": true
+        },
+        {
+          "name": "RemoveItem",
+          "method": "RemoveMenuItem",
+          "bindSelf": true
+        },
+        {
+          "name": "RemoveAllItems",
+          "method": "RemoveAllMenuItems",
+          "bindSelf": true
+        },
+        {
+          "name": "GetItemsCount",
+          "method": "GetMenuItemsCount",
+          "bindSelf": true
+        },
+        {
+          "name": "GetItemInfoText",
+          "method": "GetMenuItemInfoText",
+          "bindSelf": true
+        },
+        {
+          "name": "GetItemDisplay",
+          "method": "GetMenuItemDisplay",
+          "bindSelf": true
+        },
+        {
+          "name": "GetItemStyle",
+          "method": "GetMenuItemStyle",
+          "bindSelf": true
+        },
+        {
+          "name": "IsItemSelectable",
+          "method": "IsMenuItemSelectable",
+          "bindSelf": true
+        },
+        {
+          "name": "SetItemDisplay",
+          "method": "SetMenuItemDisplay",
+          "bindSelf": true
+        },
+        {
+          "name": "SetItemStyle",
+          "method": "SetMenuItemStyle",
+          "bindSelf": true
+        },
+        {
+          "name": "Display",
+          "method": "DisplayMenu",
+          "bindSelf": true
+        },
+        {
+          "name": "DisplayAtItem",
+          "method": "DisplayMenuAtItem",
+          "bindSelf": true
+        }
+      ]
     }
   ]
 }
