@@ -535,13 +535,13 @@
         SetEntitySkin;
 
         RegisterMenuType;
+        UnregisterMenuType;
         IsMenuTypeRegistered;
         GetMenuTypes;
         SetDefaultMenuType;
         GetDefaultMenuType;
-        CreateMenuHandle;
-        UnregisterMenuType;
-        DestroyMenuHandle;
+        CreateMenu;
+        DestroyMenu;
         IsValidMenu;
         SetMenuTitle;
         GetMenuTitle;

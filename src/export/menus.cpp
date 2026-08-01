@@ -75,7 +75,7 @@ extern "C" PLUGIN_API plg::string GetDefaultMenuType() {
  * @param menuType The name of the menu type backend to render with. Empty uses the current default menu type.
  * @return A handle to the created menu.
  */
-extern "C" PLUGIN_API MenuId CreateMenuHandle(const plg::string& title, MenuHandlerCallback handler, const plg::string& menuType) {
+extern "C" PLUGIN_API MenuId CreateMenu(const plg::string& title, MenuHandlerCallback handler, const plg::string& menuType) {
 	return g_MenuManager.CreateMenu(title, handler, menuType);
 }
 
@@ -85,7 +85,7 @@ extern "C" PLUGIN_API MenuId CreateMenuHandle(const plg::string& title, MenuHand
  * @param id The handle to the menu.
  * @return True if the menu existed and was destroyed.
  */
-extern "C" PLUGIN_API bool DestroyMenuHandle(MenuId id) {
+extern "C" PLUGIN_API bool DestroyMenu(MenuId id) {
 	return g_MenuManager.DestroyMenu(id);
 }
 

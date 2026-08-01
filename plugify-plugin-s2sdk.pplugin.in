@@ -25058,6 +25058,24 @@
       "description": "Registers a new menu type backend (e.g. a custom rendering style), so it can be selected via CreateMenu/SetMenuType. Built-in types \"chat\", \"console\", \"centerhtml\" and \"button\" are registered automatically at startup."
     },
     {
+      "name": "UnregisterMenuType",
+      "funcName": "UnregisterMenuType",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the menu type to remove."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if a type with that name was found and removed."
+      },
+      "group": "Menus",
+      "description": "Unregisters a previously registered menu type."
+    },
+    {
       "name": "IsMenuTypeRegistered",
       "funcName": "IsMenuTypeRegistered",
       "paramTypes": [
@@ -25116,8 +25134,8 @@
       "description": "Returns the current default menu type name."
     },
     {
-      "name": "CreateMenuHandle",
-      "funcName": "CreateMenuHandle",
+      "name": "CreateMenu",
+      "funcName": "CreateMenu",
       "paramTypes": [
         {
           "name": "title",
@@ -25203,26 +25221,8 @@
       "description": "Creates a new menu."
     },
     {
-      "name": "UnregisterMenuType",
-      "funcName": "UnregisterMenuType",
-      "paramTypes": [
-        {
-          "name": "name",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the menu type to remove."
-        }
-      ],
-      "retType": {
-        "type": "bool",
-        "description": "True if a type with that name was found and removed."
-      },
-      "group": "Menus",
-      "description": "Unregisters a previously registered menu type."
-    },
-    {
-      "name": "DestroyMenuHandle",
-      "funcName": "DestroyMenuHandle",
+      "name": "DestroyMenu",
+      "funcName": "DestroyMenu",
       "paramTypes": [
         {
           "name": "id",
