@@ -138,20 +138,22 @@ void MenuManager::Init() {
 		return;
 	}
 
+	constexpr ConVarFlag kPlayerTriggerableFlags = ConVarFlag::LinkedConcommand | ConVarFlag::Release | ConVarFlag::ClientCanExecute;
+
 	for (const plg::string& prefix : g_pCoreConfig->MenuCommandPrefixes) {
 		for (int i = 0; i <= 9; ++i) {
 			auto name = std::format("{}{}", prefix, i);
-			g_ConCommandManager.AddValveCommand(name, "Menu key handler", ConVarFlag::None);
+			g_ConCommandManager.AddValveCommand(name, "Menu key handler", kPlayerTriggerableFlags);
 			g_ConCommandManager.AddCommandListener(name, &OnMenuDigitCommand, HookMode::Pre);
 		}
 	}
 
 	for (const plg::string& name : g_pCoreConfig->MenuSelectCommands) {
-		g_ConCommandManager.AddValveCommand(name, "Menu item select", ConVarFlag::None);
+		g_ConCommandManager.AddValveCommand(name, "Menu item select", kPlayerTriggerableFlags);
 		g_ConCommandManager.AddCommandListener(name, &OnMenuSelectCommand, HookMode::Pre);
 	}
 
-	g_ConCommandManager.AddValveCommand("test", "Opens a sample menu to check MenuManager", ConVarFlag::None);
+	g_ConCommandManager.AddValveCommand("test", "Opens a sample menu to check MenuManager", kPlayerTriggerableFlags);
 	g_ConCommandManager.AddCommandListener("test", &OnTestMenuCommand, HookMode::Pre);
 
 	RegisterBuiltinChatMenuType();

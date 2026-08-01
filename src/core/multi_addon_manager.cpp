@@ -61,10 +61,12 @@ MultiAddonManager MultiAddonManager::instance;
 
 std::string MultiAddonManager::BuildAddonPath(PublishedFileId_t addon) {
     // The workshop on a dedicated server is stored relative to the working directory for whatever reason
-    static CBufferStringN<MAX_PATH> s_sWorkingDir;
-	static std::once_flag flag;
-	std::call_once(flag, []{ g_pFullFileSystem->GetSearchPath("EXECUTABLE_PATH", GET_SEARCH_PATH_ALL, s_sWorkingDir, 1); });
-    return std::format("{}steamapps/workshop/content/730/{}/{}_dir.vpk", static_cast<std::string_view>(s_sWorkingDir), addon, addon);
+	static const CBufferStringN<MAX_PATH> workingDir = [] {
+		CBufferStringN<MAX_PATH> path;
+		g_pFullFileSystem->GetSearchPath("EXECUTABLE_PATH", GET_SEARCH_PATH_ALL, path, 1);
+		return path;
+	}();
+    return std::format("{}steamapps/workshop/content/730/{}/{}_dir.vpk", static_cast<std::string_view>(workingDir), addon, addon);
 }
 
 bool MultiAddonManager::MountAddon(PublishedFileId_t addon, bool addToTail) {
