@@ -15,13 +15,6 @@
 // registering its own menu type would use).
 
 namespace {
-	// The HUD panel has no scrollback and no fixed height on the server side, so a page that's
-	// too tall pushes the footer legend off the bottom of the screen. Capping how many items a
-	// button-menu page ever shows keeps title + items + footer within a safe, always-visible
-	// window; menus asking for a smaller page size are left alone, only larger/unlimited ones
-	// get clamped down.
-	constexpr int kMaxVisibleButtonLines = 6;
-
 	struct ButtonMenuState {
 		MenuId id{};                 // the menu handle this state was last polled for; used to detect a fresh session
 		MenuId lastHeld{};           // buttons held as of the previous frame, for edge detection
@@ -96,7 +89,13 @@ namespace {
 			}
 		}
 
-		html += "<br>";
+		// Pad the item area out to a fixed height so the footer always lands on the same line
+		// (title + MenuButtonMaxItems item lines), regardless of how many items this particular
+		// page/menu actually has — otherwise the footer visually jumps around between menus or
+		// pages with fewer items.
+		for (int shown = pageEnd - offset; shown < g_pCoreConfig->MenuButtonMaxItems; ++shown) {
+			html += "<br>";
+		}
 		std::format_to(out, "{}{}",
 			ButtonLabel(g_pCoreConfig->MenuButtonImageUp, isHeld(g_pCoreConfig->MenuButtonKeyUp)),
 			ButtonLabel(g_pCoreConfig->MenuButtonImageDown, isHeld(g_pCoreConfig->MenuButtonKeyDown)));
@@ -185,6 +184,22 @@ namespace {
 		return true;
 	}
 
+	// Jumps the cursor a full page at a time by repeating single MoveCursor steps, so page shifts
+	// and disabled-item skipping stay correct; stops early at either boundary. Returns true if the
+	// cursor moved at all, i.e. this is the "move faster than Up/Down" page-jump, not a raw window
+	// shift — MenuManager's own MenuNextPage/MenuPrevPage move the display window without touching
+	// the cursor, which isn't what a player pressing Left/Right expects.
+	bool JumpCursor(MenuId id, int playerSlot, int direction, int steps) {
+		bool moved = false;
+		for (int i = 0; i < steps; ++i) {
+			if (!MoveCursor(id, playerSlot, direction)) {
+				break;
+			}
+			moved = true;
+		}
+		return moved;
+	}
+
 	void ButtonMenu_Frame(MenuId id, int playerSlot) {
 		auto* player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
 		auto* pawn = player ? player->GetPlayerPawn() : nullptr;
@@ -207,8 +222,9 @@ namespace {
 
 			int perPage = g_MenuManager.GetMenuPagination(id);
 			int itemCount = g_MenuManager.GetMenuItemCount(id);
-			if (perPage <= 0 ? itemCount > kMaxVisibleButtonLines : perPage > kMaxVisibleButtonLines) {
-				g_MenuManager.SetMenuPagination(id, kMaxVisibleButtonLines);
+			int maxItems = g_pCoreConfig->MenuButtonMaxItems;
+			if (perPage <= 0 ? itemCount > maxItems : perPage > maxItems) {
+				g_MenuManager.SetMenuPagination(id, maxItems);
 			}
 
 			if (g_pCoreConfig->MenuButtonFreezePlayer) {
@@ -246,11 +262,11 @@ namespace {
 					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
 				}
 			} else if (released(g_pCoreConfig->MenuButtonKeyLeft)) {
-				if (g_MenuManager.MenuPrevPage(playerSlot)) {
+				if (JumpCursor(id, playerSlot, -1, g_pCoreConfig->MenuButtonMaxItems)) {
 					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
 				}
 			} else if (released(g_pCoreConfig->MenuButtonKeyRight)) {
-				if (g_MenuManager.MenuNextPage(playerSlot)) {
+				if (JumpCursor(id, playerSlot, 1, g_pCoreConfig->MenuButtonMaxItems)) {
 					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
 				}
 			} else if (released(g_pCoreConfig->MenuButtonKeySelect)) {

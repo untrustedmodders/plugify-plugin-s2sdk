@@ -53,6 +53,9 @@
   "MenuButtonRefreshInterval": 0.1,
   // Freeze the player's movement while a WASD button menu is open
   "MenuButtonFreezePlayer": true,
+  // Max items shown per page in the WASD button menu; menus asking for a smaller page size are left alone,
+  // only larger/unlimited ones get clamped down to this.
+  "MenuButtonMaxItems": 6,
   // Buttons driving the WASD button menu (InputBitMask_t names, e.g. IN_FORWARD, IN_BACK, IN_USE, IN_ATTACK2,
   // IN_JUMP, IN_DUCK, IN_TURNLEFT, IN_TURNRIGHT, IN_MOVELEFT, IN_MOVERIGHT, IN_RELOAD, IN_SPEED, IN_ZOOM, ...)
   "MenuButtonKeyUp": "IN_FORWARD",

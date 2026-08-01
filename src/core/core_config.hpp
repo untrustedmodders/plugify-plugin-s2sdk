@@ -39,6 +39,9 @@ public:
 	int MenuButtonHtmlDuration{2};							// Seconds the WASD button menu's HTML panel is shown per redraw
 	float MenuButtonRefreshInterval{0.1f};					// Seconds between keep-alive redraws of the WASD button menu when there's no input
 	bool MenuButtonFreezePlayer{true};						// Freeze the player's movement while a WASD button menu is open
+	int MenuButtonMaxItems{6};								// Max items shown per page in the WASD button menu; menus asking for a smaller page size are left
+															// alone, only larger/unlimited ones get clamped down to this. Keeps the item area + footer within
+															// a fixed, always-visible height regardless of how many items a menu actually has.
 	InputBitMask_t MenuButtonKeyUp{};						// Button (InputBitMask_t name, e.g. "IN_FORWARD") that moves the WASD button-menu cursor up
 	InputBitMask_t MenuButtonKeyDown{};						// Button that moves the WASD button-menu cursor down
 	InputBitMask_t MenuButtonKeyLeft{};						// Button that jumps a full page back
