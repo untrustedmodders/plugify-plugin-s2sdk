@@ -58,7 +58,7 @@ namespace {
 
 		return ResultType::Continue;
 	}
-
+#if 0
 	// Sample "test" command: demonstrates MenuManager's public API with a menu
 	// whose items include one that opens a nested sub-menu, and shows how the
 	// sub-menu's "back" button (MenuCancelReason::ExitBack) returns to it.
@@ -131,6 +131,7 @@ namespace {
 
 		return ResultType::Handled;
 	}
+#endif
 }// namespace
 
 void MenuManager::Init() {
@@ -153,8 +154,8 @@ void MenuManager::Init() {
 		g_ConCommandManager.AddCommandListener(name, &OnMenuSelectCommand, HookMode::Pre);
 	}
 
-	g_ConCommandManager.AddValveCommand("test", "Opens a sample menu to check MenuManager", kPlayerTriggerableFlags);
-	g_ConCommandManager.AddCommandListener("test", &OnTestMenuCommand, HookMode::Pre);
+	//g_ConCommandManager.AddValveCommand("test", "Opens a sample menu to check MenuManager", kPlayerTriggerableFlags);
+	//g_ConCommandManager.AddCommandListener("test", &OnTestMenuCommand, HookMode::Pre);
 
 	RegisterBuiltinChatMenuType();
 	RegisterBuiltinConsoleMenuType();

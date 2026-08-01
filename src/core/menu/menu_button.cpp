@@ -233,12 +233,10 @@ namespace {
 
 	void ButtonMenu_Frame(MenuId id, int playerSlot) {
 		auto* player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
-		auto* pawn = player ? player->GetPlayerPawn() : nullptr;
+		auto* pawn = player ? static_cast<CPlayerPawn*>(player->GetPlayerPawn()) : nullptr;
 		if (!pawn) {
 			return;
 		}
-
-		auto* csPawn = static_cast<CPlayerPawn*>(pawn);
 
 		CPlayer_MovementServices* movement = pawn->m_pMovementServices;
 		if (!movement) {
@@ -261,18 +259,18 @@ namespace {
 			}
 
 			if (g_pCoreConfig->MenuButtonFreezePlayer) {
-				state.savedSpeed = csPawn->GetSpeed();
+				state.savedSpeed = pawn->GetSpeed();
 				state.frozen = true;
-				csPawn->SetSpeed(0.0f);
+				pawn->SetSpeed(0.0f);
 			} else {
 				state.frozen = false;
 			}
-		} else if (state.frozen && csPawn->GetSpeed() != 0.0f) {
+		} else if (state.frozen && pawn->GetSpeed() != 0.0f) {
 			// Something outside our control (e.g. a respawn on round start) reset the
 			// client's speed mid-session; re-save whatever it was just set to and re-freeze,
 			// since the one-shot freeze above only fires at session start.
-			state.savedSpeed = csPawn->GetSpeed();
-			csPawn->SetSpeed(0.0f);
+			state.savedSpeed = pawn->GetSpeed();
+			pawn->SetSpeed(0.0f);
 		}
 
 		uint64 buttons[3];
