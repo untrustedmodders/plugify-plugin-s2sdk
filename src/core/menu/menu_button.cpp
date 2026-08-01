@@ -40,12 +40,20 @@ namespace {
 		return pressed ? ButtonImage(std::format("{}-p", imageName)) : ButtonImage(imageName);
 	}
 
+	// Renders the bolded title line, optionally wrapped in MenuButtonTitleFontClass.
+	std::string TitleHtml(std::string_view title) {
+		if (g_pCoreConfig->MenuButtonTitleFontClass.empty()) {
+			return std::format("<b>{}</b><br>", title);
+		}
+		return std::format("<font class='{}'><b>{}</b></font><br>", g_pCoreConfig->MenuButtonTitleFontClass, title);
+	}
+
 	void ButtonMenu_Display(MenuId id, int playerSlot) {
 		CPlayerSlot slot(playerSlot);
 
 		int count = g_MenuManager.GetMenuItemCount(id);
 		if (count == 0) {
-			std::string emptyHtml = std::format("<b>{}</b><br><font color='{}'><b>Empty</b></font>", g_MenuManager.GetMenuTitle(id), g_pCoreConfig->MenuDisabledColor);
+			std::string emptyHtml = std::format("{}<font color='{}'><b>Empty</b></font>", TitleHtml(g_MenuManager.GetMenuTitle(id)), g_pCoreConfig->MenuDisabledColor);
 			if (!g_pCoreConfig->MenuButtonFontClass.empty()) {
 				emptyHtml = std::format("<font class='{}'>{}</font>", g_pCoreConfig->MenuButtonFontClass, emptyHtml);
 			}
@@ -71,7 +79,7 @@ namespace {
 
 		std::string html;
 		auto out = std::back_inserter(html);
-		std::format_to(out, "<b>{}</b><br>", g_MenuManager.GetMenuTitle(id));
+		html += TitleHtml(g_MenuManager.GetMenuTitle(id));
 
 		if (!g_pCoreConfig->MenuButtonFontClass.empty()) {
 			std::format_to(out, "<font class='{}'>", g_pCoreConfig->MenuButtonFontClass);

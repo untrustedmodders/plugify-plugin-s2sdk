@@ -127,6 +127,7 @@ Result<bool> CoreConfig::Initialize() {
 	MenuButtonRefreshInterval = static_cast<float>(config.GetFloat("MenuButtonRefreshInterval", 1.5));
 	MenuButtonFreezePlayer = config.GetBool("MenuButtonFreezePlayer", true);
 	MenuButtonFontClass = config.GetString("MenuButtonFontClass", "");
+	MenuButtonTitleFontClass = config.GetString("MenuButtonTitleFontClass", "");
 	MenuButtonMaxItems = static_cast<int>(config.GetInt("MenuButtonMaxItems", 6));
 	MenuButtonKeyUp = ParseButtonName(config.GetString("MenuButtonKeyUp", "IN_FORWARD"), IN_FORWARD);
 	MenuButtonKeyDown = ParseButtonName(config.GetString("MenuButtonKeyDown", "IN_BACK"), IN_BACK);
