@@ -8,8 +8,7 @@
 namespace pb = google::protobuf;
 
 #define GETCHECK_FIELD()                                                                             \
-	const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(std::string(fieldName \
-	));                                                                                              \
+	const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(NewStr(fieldName));   \
 	if (!field) {                                                                                    \
 		plg::print(                                                                                  \
 			LS_WARNING,                                                                              \
@@ -973,7 +972,7 @@ public:
 	}
 
 	int GetRepeatedFieldCount(std::string_view fieldName) {
-		const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(std::string(fieldName));
+		const pb::FieldDescriptor* field = m_msg->GetDescriptor()->FindFieldByName(NewStr(fieldName));
 		if (!field) return -1;
 
 		if (field->label() != pb::FieldDescriptor::LABEL_REPEATED) return -1;

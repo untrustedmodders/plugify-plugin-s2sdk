@@ -142,3 +142,14 @@ inline Color NewColor(const plg::vec4& color) {
 inline Color NewColor(const plg::vec3& color) {
 	return Color(static_cast<uint8>(color.x), static_cast<uint8>(color.y), static_cast<uint8>(color.z), 255);
 }
+
+inline std::string NewStr(std::string_view str) {
+	if (str.empty()) {
+		std::string s(1, '\0');
+		// clear() calls _M_mutate in place; since refcount==1
+		// (unshared), it does NOT revert to _S_empty_rep
+		s.clear();
+		return s;
+	}
+	return std::string(str);
+}
