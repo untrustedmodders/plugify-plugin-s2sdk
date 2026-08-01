@@ -45,7 +45,11 @@ namespace {
 
 		int count = g_MenuManager.GetMenuItemCount(id);
 		if (count == 0) {
-			utils::PrintHtmlCentre(slot, std::format("<b>{}</b><br>", g_MenuManager.GetMenuTitle(id)), g_pCoreConfig->MenuButtonHtmlDuration);
+			std::string emptyHtml = std::format("<b>{}</b><br><font color='{}'><b>Empty</b></font>", g_MenuManager.GetMenuTitle(id), g_pCoreConfig->MenuDisabledColor);
+			if (!g_pCoreConfig->MenuButtonFontClass.empty()) {
+				emptyHtml = std::format("<font class='{}'>{}</font>", g_pCoreConfig->MenuButtonFontClass, emptyHtml);
+			}
+			utils::PrintHtmlCentre(slot, emptyHtml, g_pCoreConfig->MenuButtonHtmlDuration);
 			return;
 		}
 
@@ -68,6 +72,10 @@ namespace {
 		std::string html;
 		auto out = std::back_inserter(html);
 		std::format_to(out, "<b>{}</b><br>", g_MenuManager.GetMenuTitle(id));
+
+		if (!g_pCoreConfig->MenuButtonFontClass.empty()) {
+			std::format_to(out, "<font class='{}'>", g_pCoreConfig->MenuButtonFontClass);
+		}
 
 		for (int index = offset; index < pageEnd; ++index) {
 			MenuItemStyle style = g_MenuManager.GetMenuItemStyle(id, index);
@@ -118,6 +126,10 @@ namespace {
 
 		if (showExit) {
 			html += ButtonLabel(g_pCoreConfig->MenuButtonImageExit, isHeld(g_pCoreConfig->MenuButtonKeyExit));
+		}
+
+		if (!g_pCoreConfig->MenuButtonFontClass.empty()) {
+			html += "</font>";
 		}
 
 		utils::PrintHtmlCentre(slot, html, g_pCoreConfig->MenuButtonHtmlDuration);

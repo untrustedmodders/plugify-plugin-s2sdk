@@ -39,6 +39,8 @@ public:
 	int MenuButtonHtmlDuration{2};							// Seconds the WASD button menu's HTML panel is shown per redraw
 	float MenuButtonRefreshInterval{0.1f};					// Seconds between keep-alive redraws of the WASD button menu when there's no input
 	bool MenuButtonFreezePlayer{true};						// Freeze the player's movement while a WASD button menu is open
+	plg::string MenuButtonFontClass;						// Panorama CSS class (e.g. "fontSize-sm", "fontSize-s") wrapping the WASD button menu's whole
+															// body, to shrink/grow its text; empty keeps the default (unscaled) text size
 	int MenuButtonMaxItems{6};								// Max items shown per page in the WASD button menu; menus asking for a smaller page size are left
 															// alone, only larger/unlimited ones get clamped down to this. Keeps the item area + footer within
 															// a fixed, always-visible height regardless of how many items a menu actually has.
