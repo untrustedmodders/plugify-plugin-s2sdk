@@ -69,6 +69,14 @@ namespace {
 		g_MenuManager.AddMenuItem(menu, "hello", "Say Hello");
 		g_MenuManager.AddMenuItem(menu, "disabled", "Disabled Item", MenuItemStyle::Disabled);
 		g_MenuManager.AddMenuItem(menu, "submenu", "Open Sub-Menu");
+		g_MenuManager.AddMenuItem(menu, "disabled2", "Disabled Item2", MenuItemStyle::Disabled);
+		g_MenuManager.AddMenuItem(menu, "disabled3", "Disabled Item3", MenuItemStyle::Disabled);
+		g_MenuManager.AddMenuItem(menu, "disabled4", "Disabled Item4", MenuItemStyle::Disabled);
+		g_MenuManager.AddMenuItem(menu, "disabled5", "Disabled Item5", MenuItemStyle::Disabled);
+		g_MenuManager.AddMenuItem(menu, "disabled6", "Disabled Item6", MenuItemStyle::Disabled);
+		g_MenuManager.AddMenuItem(menu, "disabled7", "Disabled Item7", MenuItemStyle::Disabled);
+		g_MenuManager.AddMenuItem(menu, "disabled8", "Disabled Item8", MenuItemStyle::Disabled);
+		g_MenuManager.AddMenuItem(menu, "submenu2", "Say Hello2");
 		return menu;
 	}
 

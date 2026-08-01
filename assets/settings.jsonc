@@ -64,5 +64,12 @@
   "MenuButtonIconUp": "",
   "MenuButtonIconDown": "",
   "MenuButtonIconSelect": "",
-  "MenuButtonIconExit": ""
+  "MenuButtonIconExit": "",
+  // Sound events played to the client on WASD button-menu interactions (e.g. "UI.ButtonRollover").
+  // Leave empty to play nothing for that action.
+  "MenuSoundScroll": "",
+  "MenuSoundClick": "",
+  "MenuSoundBack": "",
+  "MenuSoundExit": "",
+  "MenuSoundDisabled": ""
 }

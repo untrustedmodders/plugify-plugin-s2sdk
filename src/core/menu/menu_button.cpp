@@ -135,17 +135,26 @@ namespace {
 		state.id = 0;
 	}
 
-	void MoveCursor(MenuId id, int playerSlot, int direction) {
+	// Plays a configured menu sound event to the client, or does nothing if the event name is empty.
+	void PlayMenuSound(int playerSlot, const plg::string& soundName) {
+		if (soundName.empty()) {
+			return;
+		}
+		utils::PlaySoundToClient(CPlayerSlot(playerSlot), CHAN_AUTO, soundName.c_str(), VOL_NORM, SNDLVL_NONE, 0, PITCH_NORM, Vector(0.0f, 0.0f, 0.0f), 0.0f);
+	}
+
+	// Returns true if the cursor actually moved (i.e. it wasn't already at the boundary).
+	bool MoveCursor(MenuId id, int playerSlot, int direction) {
 		int count = g_MenuManager.GetMenuItemCount(id);
 		if (count <= 0) {
-			return;
+			return false;
 		}
 
 		int next = g_MenuManager.GetClientMenuCursor(playerSlot);
 		for (int step = 0; step < count; ++step) {
 			next += direction;
 			if (next < 0 || next >= count) {
-				return; // reached the boundary; no wraparound
+				return false; // reached the boundary; no wraparound
 			}
 			if (g_MenuManager.IsMenuItemSelectable(id, next)) {
 				break;
@@ -153,7 +162,7 @@ namespace {
 		}
 
 		if (next < 0 || next >= count || !g_MenuManager.IsMenuItemSelectable(id, next)) {
-			return;
+			return false;
 		}
 
 		g_MenuManager.SetClientMenuCursor(playerSlot, next);
@@ -167,6 +176,8 @@ namespace {
 				g_MenuManager.MenuPrevPage(playerSlot);
 			}
 		}
+
+		return true;
 	}
 
 	void ButtonMenu_Frame(MenuId id, int playerSlot) {
@@ -196,6 +207,12 @@ namespace {
 			} else {
 				state.frozen = false;
 			}
+		} else if (state.frozen && pawn->m_MoveType != MOVETYPE_NONE) {
+			// Something outside our control (e.g. a respawn on round start) reset the
+			// client's move type mid-session; re-save whatever it was just set to and
+			// re-freeze, since the one-shot freeze above only fires at session start.
+			state.savedMoveType = pawn->m_MoveType;
+			pawn->SetMoveType(MOVETYPE_NONE);
 		}
 
 		uint64 buttons[3];
@@ -210,16 +227,23 @@ namespace {
 
 		if (!freshSession) {
 			if (released(g_pCoreConfig->MenuButtonKeyUp)) {
-				MoveCursor(id, playerSlot, -1);
+				if (MoveCursor(id, playerSlot, -1)) {
+					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
+				}
 			} else if (released(g_pCoreConfig->MenuButtonKeyDown)) {
-				MoveCursor(id, playerSlot, 1);
+				if (MoveCursor(id, playerSlot, 1)) {
+					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
+				}
 			} else if (released(g_pCoreConfig->MenuButtonKeySelect)) {
-				g_MenuManager.SelectMenuItem(playerSlot, g_MenuManager.GetClientMenuCursor(playerSlot));
+				bool selected = g_MenuManager.SelectMenuItem(playerSlot, g_MenuManager.GetClientMenuCursor(playerSlot));
+				PlayMenuSound(playerSlot, selected ? g_pCoreConfig->MenuSoundClick : g_pCoreConfig->MenuSoundDisabled);
 				return; // the display session likely just ended; MenuManager already invoked our Close
 			} else if (released(g_pCoreConfig->MenuButtonKeyExit) && g_MenuManager.GetMenuExitBackButton(id)) {
+				PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundBack);
 				g_MenuManager.CancelClientMenu(playerSlot, MenuCancelReason::ExitBack);
 				return;
 			} else if (released(g_pCoreConfig->MenuButtonKeyExit) && g_MenuManager.GetMenuExitButton(id)) {
+				PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundExit);
 				g_MenuManager.CancelClientMenu(playerSlot, MenuCancelReason::Exit);
 				return;
 			}

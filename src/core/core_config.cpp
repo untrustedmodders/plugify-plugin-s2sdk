@@ -134,6 +134,11 @@ Result<bool> CoreConfig::Initialize() {
 	MenuButtonIconDown = config.GetString("MenuButtonIconDown", "");
 	MenuButtonIconSelect = config.GetString("MenuButtonIconSelect", "");
 	MenuButtonIconExit = config.GetString("MenuButtonIconExit", "");
+	MenuSoundScroll = config.GetString("MenuSoundScroll", "");
+	MenuSoundClick = config.GetString("MenuSoundClick", "");
+	MenuSoundBack = config.GetString("MenuSoundBack", "");
+	MenuSoundExit = config.GetString("MenuSoundExit", "");
+	MenuSoundDisabled = config.GetString("MenuSoundDisabled", "");
 
 	return {};
 }

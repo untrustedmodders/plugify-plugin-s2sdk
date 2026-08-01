@@ -47,6 +47,11 @@ public:
 	plg::string MenuButtonIconDown;						// Same, for the down button
 	plg::string MenuButtonIconSelect;						// Same, for the select button
 	plg::string MenuButtonIconExit;						// Same, for the exit button
+	plg::string MenuSoundScroll;							// Sound event played to the client when the WASD button-menu cursor moves; empty plays nothing
+	plg::string MenuSoundClick;								// Sound event played when an item is successfully selected
+	plg::string MenuSoundBack;								// Sound event played when the "back" option (ExitBack) is chosen
+	plg::string MenuSoundExit;								// Sound event played when the "exit" option is chosen
+	plg::string MenuSoundDisabled;							// Sound event played when the select button is pressed on a non-selectable item
 
 private:
 	plg::vector<plg::string> m_paths;
