@@ -514,7 +514,7 @@ bool MenuManager::DisplayMenuAtItem(MenuId id, int playerSlot, int firstItem, do
 
 	if (time > 0) {
 		state.timerId = g_TimerSystem.CreateTimer(time, &MenuManager::OnMenuTimeout, TimerFlag::Default,
-			{static_cast<int32_t>(playerSlot), id});
+			{playerSlot, id});
 	}
 
 	if (menu->handler) {

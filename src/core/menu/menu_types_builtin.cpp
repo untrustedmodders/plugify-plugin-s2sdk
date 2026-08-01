@@ -42,7 +42,7 @@ namespace {
 		}
 
 		if (g_MenuManager.ClientMenuHasPrevPage(playerSlot)) {
-			utils::PrintChat(slot, " !8 Back");
+			utils::PrintChat(slot, " !8 Prev");
 		}
 		if (g_MenuManager.ClientMenuHasNextPage(playerSlot)) {
 			utils::PrintChat(slot, " !9 Next");
@@ -82,7 +82,7 @@ namespace {
 		}
 
 		if (g_MenuManager.ClientMenuHasPrevPage(playerSlot)) {
-			utils::PrintConsole(slot, "8. Back");
+			utils::PrintConsole(slot, "8. Prev");
 		}
 		if (g_MenuManager.ClientMenuHasNextPage(playerSlot)) {
 			utils::PrintConsole(slot, "9. Next");
