@@ -41,12 +41,25 @@ public:
 	bool MenuButtonFreezePlayer{true};						// Freeze the player's movement while a WASD button menu is open
 	InputBitMask_t MenuButtonKeyUp{};						// Button (InputBitMask_t name, e.g. "IN_FORWARD") that moves the WASD button-menu cursor up
 	InputBitMask_t MenuButtonKeyDown{};						// Button that moves the WASD button-menu cursor down
+	InputBitMask_t MenuButtonKeyLeft{};						// Button that jumps a full page back
+	InputBitMask_t MenuButtonKeyRight{};					// Button that jumps a full page forward
 	InputBitMask_t MenuButtonKeySelect{};					// Button that selects the highlighted item
 	InputBitMask_t MenuButtonKeyExit{};						// Button that exits the WASD button menu
-	plg::string MenuButtonIconUp;							// Full HTML snippet (e.g. an <img src='...'> tag) shown in place of the "[BUTTONNAME]" text hint for the up button; empty falls back to text
-	plg::string MenuButtonIconDown;							// Same, for the down button
-	plg::string MenuButtonIconSelect;						// Same, for the select button
-	plg::string MenuButtonIconExit;							// Same, for the exit button
+	// Button-menu items and controls are always rendered as images from a mounted workshop addon (e.g. workshop
+	// id 3763619947); requires that addon to be mounted server-side. Each button's image name gets a "-p" suffix
+	// appended while the corresponding key (MenuButtonKeyUp/Down/etc above) is held.
+	plg::string MenuButtonImagePath{"resource/menus"};		// s2r:// resource path (relative to the addon content root) the button images live under
+	plg::string MenuButtonImageExtension{"vsvg"};			// File extension (without the dot) of the button images
+	int MenuButtonImageWidth{52};							// Width, in pixels, each button image is rendered at
+	int MenuButtonImageHeight{35};							// Height, in pixels, each button image is rendered at
+	plg::string MenuButtonImageUp{"w"};						// Image name (without extension) for the up button
+	plg::string MenuButtonImageDown{"s"};					// Same, for the down button
+	plg::string MenuButtonImageLeft{"a"};					// Same, for the page-back button; only shown when a previous page exists
+	plg::string MenuButtonImageRight{"d"};					// Same, for the page-forward button; only shown when a next page exists
+	plg::string MenuButtonImageSelect{"e"};					// Same, for the select button
+	plg::string MenuButtonImageExit{"f"};					// Same, for the exit/back button
+	plg::string MenuButtonImageEmpty{"empty"};				// Filler image spanning a full prev+next slot pair, shown when neither applies but the exit image is
+	plg::string MenuButtonImageEmptyHalf{"empty_half"};		// Filler image spanning a single prev/next slot, shown when only one of the two applies
 	plg::string MenuSoundScroll;							// Sound event played to the client when the WASD button-menu cursor moves; empty plays nothing
 	plg::string MenuSoundClick;								// Sound event played when an item is successfully selected
 	plg::string MenuSoundBack;								// Sound event played when the "back" option (ExitBack) is chosen

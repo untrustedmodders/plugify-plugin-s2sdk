@@ -44,7 +44,7 @@ struct ClientAddonInfo {
 
 plg::parallel_node_hash_map_m<uint64, ClientAddonInfo> g_ClientAddons;
 
-CConVar<CUtlString> s2_extra_addons("s2_extra_addons", FCVAR_NONE, "The workshop IDs of extra addons separated by commas, addons will be downloaded (if not present) and mounted", CUtlString(""),
+CConVar<CUtlString> s2_extra_addons("s2_extra_addons", FCVAR_NONE, "The workshop IDs of extra addons separated by commas, addons will be downloaded (if not present) and mounted", CUtlString("3763619947"),
 	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
 	{
 		g_MultiAddonManager.m_extraAddons = plg::parse<PublishedFileId_t>(*new_val, ",");

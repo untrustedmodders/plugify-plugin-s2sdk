@@ -15,6 +15,13 @@
 // registering its own menu type would use).
 
 namespace {
+	// The HUD panel has no scrollback and no fixed height on the server side, so a page that's
+	// too tall pushes the footer legend off the bottom of the screen. Capping how many items a
+	// button-menu page ever shows keeps title + items + footer within a safe, always-visible
+	// window; menus asking for a smaller page size are left alone, only larger/unlimited ones
+	// get clamped down.
+	constexpr int kMaxVisibleButtonLines = 6;
+
 	struct ButtonMenuState {
 		MenuId id{};                 // the menu handle this state was last polled for; used to detect a fresh session
 		MenuId lastHeld{};           // buttons held as of the previous frame, for edge detection
@@ -26,41 +33,18 @@ namespace {
 
 	std::array<ButtonMenuState, MaxPlayers + 1> s_state{};
 
-	std::string_view ButtonName(InputBitMask_t button) {
-		switch (button) {
-			case IN_ATTACK: return "ATTACK";
-			case IN_JUMP: return "JUMP";
-			case IN_DUCK: return "DUCK";
-			case IN_FORWARD: return "FORWARD";
-			case IN_BACK: return "BACK";
-			case IN_USE: return "USE";
-			case IN_TURNLEFT: return "TURNLEFT";
-			case IN_TURNRIGHT: return "TURNRIGHT";
-			case IN_MOVELEFT: return "MOVELEFT";
-			case IN_MOVERIGHT: return "MOVERIGHT";
-			case IN_ATTACK2: return "ATTACK2";
-			case IN_RELOAD: return "RELOAD";
-			case IN_SPEED: return "SPEED";
-			case IN_JOYAUTOSPRINT: return "SPRINT";
-			case IN_USEORRELOAD: return "USE/RELOAD";
-			case IN_SCORE: return "SCORE";
-			case IN_ZOOM: return "ZOOM";
-			case IN_LOOK_AT_WEAPON: return "LOOK_AT_WEAPON";
-			default: return "?";
-		}
-		/*auto name = plg::enum_to_string(button);
-		if (name.empty()) {
-			return "?";
-		}
-		return name.substr(3);*/
+	// Renders one button-menu control image by its configured name (e.g. MenuButtonImageUp, "d-p" while
+	// held), per MenuButtonImagePath/Extension/Width/Height. Always carries a trailing space so callers
+	// can concatenate labels directly.
+	std::string ButtonImage(std::string_view name) {
+		return std::format("<img style='vertical-align:middle;' src='s2r://{}/{}.{}' width='{}' height='{}' /> ",
+			g_pCoreConfig->MenuButtonImagePath, name, g_pCoreConfig->MenuButtonImageExtension,
+			g_pCoreConfig->MenuButtonImageWidth, g_pCoreConfig->MenuButtonImageHeight);
 	}
 
-	// Renders as the configured icon HTML (e.g. an <img> tag) when set, otherwise falls back to "[BUTTONNAME] ACTION".
-	std::string ButtonLabel(std::string_view icon, InputBitMask_t button, std::string_view action) {
-		if (!icon.empty()) {
-			return std::string(icon);
-		}
-		return std::format("[{}] {}", ButtonName(button), action);
+	// Renders `imageName`, or its "-p" variant while `pressed` is true.
+	std::string ButtonLabel(std::string_view imageName, bool pressed) {
+		return pressed ? ButtonImage(std::format("{}-p", imageName)) : ButtonImage(imageName);
 	}
 
 	void ButtonMenu_Display(MenuId id, int playerSlot) {
@@ -85,26 +69,12 @@ namespace {
 			g_MenuManager.SetClientMenuCursor(playerSlot, cursor);
 		}
 
+		uint64 held = s_state[static_cast<size_t>(playerSlot)].lastHeld;
+		auto isHeld = [&](InputBitMask_t button) { return (held & button) != 0; };
+
 		std::string html;
 		auto out = std::back_inserter(html);
 		std::format_to(out, "<b>{}</b><br>", g_MenuManager.GetMenuTitle(id));
-
-		// The controls legend goes right under the title, not after the items: with enough
-		// items (or pagination disabled) the bottom of the HTML panel runs off-screen, but
-		// the top never does, so this is the only place it's guaranteed to always be seen.
-		std::format_to(out, "{}/{}  {}",
-			ButtonLabel(g_pCoreConfig->MenuButtonIconUp, g_pCoreConfig->MenuButtonKeyUp, "Up"),
-			ButtonLabel(g_pCoreConfig->MenuButtonIconDown, g_pCoreConfig->MenuButtonKeyDown, "Down"),
-			ButtonLabel(g_pCoreConfig->MenuButtonIconSelect, g_pCoreConfig->MenuButtonKeySelect, "Select"));
-		if (g_MenuManager.GetMenuExitBackButton(id)) {
-			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Back"));
-		} else if (g_MenuManager.GetMenuExitButton(id)) {
-			std::format_to(out, "  {}", ButtonLabel(g_pCoreConfig->MenuButtonIconExit, g_pCoreConfig->MenuButtonKeyExit, "Exit"));
-		}
-		if (perPage > 0 && count > perPage) {
-			std::format_to(out, "  ({}/{})", offset / perPage + 1, (count + perPage - 1) / perPage);
-		}
-		html += "<br><br>";
 
 		for (int index = offset; index < pageEnd; ++index) {
 			MenuItemStyle style = g_MenuManager.GetMenuItemStyle(id, index);
@@ -115,7 +85,10 @@ namespace {
 
 			plg::string display = g_MenuManager.GetMenuItemDisplay(id, index);
 			if (index == cursor) {
-				std::format_to(out, "<font color='{}'>&gt; {}</font><br>", g_pCoreConfig->MenuHighlightColor, display);
+				// The select hint rides along with the highlighted row instead of living in
+				// the footer, so it's obvious which item pressing "select" will act on.
+				std::format_to(out, "<font color='{}'>&gt; {}</font> {}<br>", g_pCoreConfig->MenuHighlightColor, display,
+					ButtonLabel(g_pCoreConfig->MenuButtonImageSelect, isHeld(g_pCoreConfig->MenuButtonKeySelect)));
 			} else if (style == MenuItemStyle::Disabled) {
 				std::format_to(out, "<font color='{}'>{}</font><br>", g_pCoreConfig->MenuDisabledColor, display);
 			} else {
@@ -123,11 +96,36 @@ namespace {
 			}
 		}
 
+		html += "<br>";
+		std::format_to(out, "{}{}",
+			ButtonLabel(g_pCoreConfig->MenuButtonImageUp, isHeld(g_pCoreConfig->MenuButtonKeyUp)),
+			ButtonLabel(g_pCoreConfig->MenuButtonImageDown, isHeld(g_pCoreConfig->MenuButtonKeyDown)));
+
+		bool hasPrevPage = g_MenuManager.ClientMenuHasPrevPage(playerSlot);
+		bool hasNextPage = g_MenuManager.ClientMenuHasNextPage(playerSlot);
+		bool showExit = g_MenuManager.GetMenuExitBackButton(id) || g_MenuManager.GetMenuExitButton(id);
+
+		// The images are fixed-width, so pad a missing prev/next slot with filler so the
+		// footer's alignment stays consistent regardless of which controls are active.
+		if (hasPrevPage) {
+			html += ButtonLabel(g_pCoreConfig->MenuButtonImageLeft, isHeld(g_pCoreConfig->MenuButtonKeyLeft));
+			html += hasNextPage ? ButtonLabel(g_pCoreConfig->MenuButtonImageRight, isHeld(g_pCoreConfig->MenuButtonKeyRight)) : ButtonImage(g_pCoreConfig->MenuButtonImageEmptyHalf);
+		} else if (hasNextPage) {
+			html += ButtonImage(g_pCoreConfig->MenuButtonImageEmptyHalf);
+			html += ButtonLabel(g_pCoreConfig->MenuButtonImageRight, isHeld(g_pCoreConfig->MenuButtonKeyRight));
+		} else if (showExit) {
+			html += ButtonImage(g_pCoreConfig->MenuButtonImageEmpty);
+		}
+
+		if (showExit) {
+			html += ButtonLabel(g_pCoreConfig->MenuButtonImageExit, isHeld(g_pCoreConfig->MenuButtonKeyExit));
+		}
+
 		utils::PrintHtmlCentre(slot, html, g_pCoreConfig->MenuButtonHtmlDuration);
 	}
 
 	void ButtonMenu_Close(MenuId, int playerSlot) {
-		utils::PrintHtmlCentre(CPlayerSlot(playerSlot), " ", 1);
+		utils::PrintHtmlCentre(playerSlot, " ", 1);
 
 		ButtonMenuState& state = s_state[static_cast<size_t>(playerSlot)];
 		if (state.frozen) {
@@ -147,7 +145,7 @@ namespace {
 		if (soundName.empty()) {
 			return;
 		}
-		utils::PlaySoundToClient(CPlayerSlot(playerSlot), CHAN_AUTO, soundName.c_str(), VOL_NORM, SNDLVL_NONE, 0, PITCH_NORM, Vector(0.0f, 0.0f, 0.0f), 0.0f);
+		utils::PlaySoundToClient(playerSlot, CHAN_AUTO, soundName.c_str(), VOL_NORM, SNDLVL_NONE, 0, PITCH_NORM, Vector(0.0f, 0.0f, 0.0f), 0.0f);
 	}
 
 	// Returns true if the cursor actually moved (i.e. it wasn't already at the boundary).
@@ -207,6 +205,12 @@ namespace {
 			state.lastDrawnCursor = -1; // force the first draw below
 			state.nextRefreshTime = 0;
 
+			int perPage = g_MenuManager.GetMenuPagination(id);
+			int itemCount = g_MenuManager.GetMenuItemCount(id);
+			if (perPage <= 0 ? itemCount > kMaxVisibleButtonLines : perPage > kMaxVisibleButtonLines) {
+				g_MenuManager.SetMenuPagination(id, kMaxVisibleButtonLines);
+			}
+
 			if (g_pCoreConfig->MenuButtonFreezePlayer) {
 				state.savedMoveType = pawn->m_MoveType;
 				state.frozen = true;
@@ -239,6 +243,14 @@ namespace {
 				}
 			} else if (released(g_pCoreConfig->MenuButtonKeyDown)) {
 				if (MoveCursor(id, playerSlot, 1)) {
+					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
+				}
+			} else if (released(g_pCoreConfig->MenuButtonKeyLeft)) {
+				if (g_MenuManager.MenuPrevPage(playerSlot)) {
+					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
+				}
+			} else if (released(g_pCoreConfig->MenuButtonKeyRight)) {
+				if (g_MenuManager.MenuNextPage(playerSlot)) {
 					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
 				}
 			} else if (released(g_pCoreConfig->MenuButtonKeySelect)) {

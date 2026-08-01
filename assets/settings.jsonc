@@ -57,19 +57,33 @@
   // IN_JUMP, IN_DUCK, IN_TURNLEFT, IN_TURNRIGHT, IN_MOVELEFT, IN_MOVERIGHT, IN_RELOAD, IN_SPEED, IN_ZOOM, ...)
   "MenuButtonKeyUp": "IN_FORWARD",
   "MenuButtonKeyDown": "IN_BACK",
+  "MenuButtonKeyLeft": "IN_MOVELEFT",
+  "MenuButtonKeyRight": "IN_MOVERIGHT",
   "MenuButtonKeySelect": "IN_USE",
   "MenuButtonKeyExit": "IN_RELOAD",
-  // Optional full HTML snippets (e.g. <img src='file://{images}/icons/equipment/...svg'> or an http(s) URL) shown
-  // instead of the "[BUTTONNAME]" text hint in the WASD button menu. Leave empty to keep the text hint.
-  "MenuButtonIconUp": "",
-  "MenuButtonIconDown": "",
-  "MenuButtonIconSelect": "",
-  "MenuButtonIconExit": "",
+  // The WASD button menu always renders its controls as images from a mounted workshop addon (e.g. workshop
+  // id 3763619947) rather than text. MenuButtonImagePath/Extension locate the image files; each
+  // MenuButtonImage* below is that button's image name (without extension) and gets a "-p" suffix appended
+  // while the corresponding MenuButtonKey* above is held. MenuButtonImageLeft/Right only render in the footer
+  // while a previous/next page actually exists; when only one of the two applies the other slot is padded
+  // with MenuButtonImageEmptyHalf (or MenuButtonImageEmpty for both) to keep the footer aligned.
+  "MenuButtonImagePath": "resource/menus",
+  "MenuButtonImageExtension": "vsvg",
+  "MenuButtonImageWidth": 52,
+  "MenuButtonImageHeight": 35,
+  "MenuButtonImageUp": "w",
+  "MenuButtonImageDown": "s",
+  "MenuButtonImageLeft": "a",
+  "MenuButtonImageRight": "d",
+  "MenuButtonImageSelect": "e",
+  "MenuButtonImageExit": "f",
+  "MenuButtonImageEmpty": "empty",
+  "MenuButtonImageEmptyHalf": "empty_half",
   // Sound events played to the client on WASD button-menu interactions (e.g. "UI.ButtonRollover").
   // Leave empty to play nothing for that action.
-  "MenuSoundScroll": "",
-  "MenuSoundClick": "",
-  "MenuSoundBack": "",
-  "MenuSoundExit": "",
-  "MenuSoundDisabled": ""
+  "MenuSoundScroll": "sounds/ui/panorama/sidemenu_rollover_02.vsnd_c",
+  "MenuSoundClick": "sounds/ui/panorama/submenu_dropdown_select_01.vsnd_c",
+  "MenuSoundBack": "sounds/ui/menu_back.vsnd_c",
+  "MenuSoundExit": "sounds/ui/panorama/mainmenu_press_quit_02.vsnd_c",
+  "MenuSoundDisabled": "sounds/ui/menu_invalid.vsnd_c"
 }
