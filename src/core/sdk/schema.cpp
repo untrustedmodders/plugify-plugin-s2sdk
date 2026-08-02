@@ -74,14 +74,12 @@ namespace {
 			uint8 alignment = 0;
 			field.m_pType->GetSizeAndAlignment(size, alignment);
 
-			out.emplace(
+			out.try_emplace(
 				field.m_pszName,
-				SchemaKey{
-					field.m_nSingleInheritanceOffset,
-					index != cli.InvalidIndex() && cli[index]->FindField(field.m_pszName),
-					static_cast<size_t>(size),
-					field.m_pType
-				}
+				field.m_nSingleInheritanceOffset,
+				index != cli.InvalidIndex() && cli[index]->FindField(field.m_pszName),
+				static_cast<size_t>(size),
+				field.m_pType
 			);
 
 			plg::print(
