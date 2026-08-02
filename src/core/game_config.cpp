@@ -220,18 +220,27 @@ Result<SignatureData> ConfigLoader::ParseSignatureConfig(configs::Config& config
 			do {
 				if (config.IsObject() && config.JumpFirst()) {
 					auto type = config.GetName();
-					auto value = config.GetString("##this##");
+					auto value = config.GetAsString();
 
+					auto exclude = false;
+					if (type.ends_with("!")) {
+						exclude = true;
+						type.pop_back();
+					}
+
+					auto ref = ReferenceInfo::Type::Invalid;
 					if (type == "string") {
-						sig.refs.emplace_back(ReferenceInfo::Type::String, std::move(value));
+						ref = ReferenceInfo::Type::String;
 					} else if (type == "cvar") {
-						sig.refs.emplace_back(ReferenceInfo::Type::CVar, std::move(value));
+						ref = ReferenceInfo::Type::CVar;
 					} else if (type == "vtable") {
-						sig.refs.emplace_back(ReferenceInfo::Type::VTable, std::move(value));
+						ref = ReferenceInfo::Type::VTable;
 					} else {
 						config.JumpBack(); config.JumpBack(); config.JumpBack();
 						return MakeError("Unknown reference type: {}", type);
 					}
+
+					sig.refs.emplace_back(ref, exclude, std::move(value));
 
 					config.JumpBack();
 				}
@@ -245,11 +254,18 @@ Result<SignatureData> ConfigLoader::ParseSignatureConfig(configs::Config& config
 		return MakeError("No signature for " S2SDK_PLATFORM ": {}", sig.name);
 	}
 
-	bool onlyVtable = !sig.refs.empty() && std::ranges::all_of(sig.refs, [](const ReferenceInfo& ref) {
-		return ref.type == ReferenceInfo::Type::VTable;
-	});
-	if (onlyVtable) {
-		return MakeError("No other references except vtables, add strings or cvars!");
+	if (!sig.refs.empty()) {
+		if (std::ranges::all_of(sig.refs, [](const ReferenceInfo& ref) {
+			return ref.type == ReferenceInfo::Type::VTable;
+		})) {
+			return MakeError("No other references except vtables, add strings or cvars!");
+		}
+
+		if (std::ranges::all_of(sig.refs, [](const ReferenceInfo& ref) {
+			return ref.exclude;
+		})) {
+			return MakeError("No other references except excludes, add includes too!");
+		}
 	}
 
 	// Determine type
@@ -289,18 +305,21 @@ Result<AddressData> ConfigLoader::ParseAddressConfig(configs::Config& config, st
 					auto type = config.GetName();
 					auto value = static_cast<int32_t>(config.GetAsInt());
 
+					auto step = IndirectionStep::Type::Invalid;
 					if (type == "offset") {
-						addr.steps.emplace_back(IndirectionStep::Type::Offset, std::move(value));
+						step = IndirectionStep::Type::Offset;
 					} else if (type == "read") {
-						addr.steps.emplace_back(IndirectionStep::Type::Dereference, std::move(value));
+						step = IndirectionStep::Type::Dereference;
 					}  else if (type == "index") {
-						addr.steps.emplace_back(IndirectionStep::Type::Index, std::move(value));
+						step = IndirectionStep::Type::Index;
 					} else if (type == "read_offs32") {
-						addr.steps.emplace_back(IndirectionStep::Type::Relative, std::move(value));
+						step = IndirectionStep::Type::Relative;
 					} else {
 						config.JumpBack(); config.JumpBack(); config.JumpBack();
 						return MakeError("Unknown indirection type: {}", type);
 					}
+
+					addr.steps.emplace_back(step, value);
 
 					config.JumpBack();
 				}
@@ -1216,7 +1235,9 @@ Result<Memory> SignatureResolver::ResolveReferences(
 			default:
 				return MakeError("Invalid reference type");
 		}
-	}, [&](const ReferenceInfo& ref) -> std::string_view { return ref.name; });
+	},
+	[](const ReferenceInfo& ref) -> bool { return ref.exclude; },
+	[](const ReferenceInfo& ref) -> std::string_view { return ref.name; });
 
 	if (!result) {
 		return MakeError(std::move(result.error()));
@@ -1231,20 +1252,27 @@ Result<Memory> SignatureResolver::ResolveReferences(
 			std::vector<std::vector<CAddress>> funcs;
 			funcs.push_back(std::move(*result));
 
-			for (const auto& [type, name] : refs) {
+			for (const auto& [type, cond, name] : refs) {
 				if (type == ReferenceInfo::Type::VTable) {
 					funcs.push_back(module.GetVFunctionsFromVTable(name));
 				}
 			}
 
+			std::ranges::sort(funcs, [](const auto& a, const auto& b) {
+				return a.size() < b.size();
+			});
+
 			std::vector<CAddress> candidates = std::move(funcs[0]);
 
 			for (size_t i = 1; i < funcs.size(); ++i) {
+				if (candidates.empty())
+					break;
+
 				const auto& next_funcs = funcs[i];
 				std::vector<CAddress> intersection;
 				intersection.reserve(std::min(candidates.size(), next_funcs.size()));
 				std::ranges::set_intersection(candidates, next_funcs, std::back_inserter(intersection));
-				std::swap(candidates, intersection);
+				candidates = std::move(intersection);
 			}
 
 			if (candidates.empty()) {
@@ -1389,7 +1417,7 @@ Result<Memory> VTableResolver::ResolveTable(const Module& module, std::string_vi
 
 GameConfigManager GameConfigManager::instance;
 
-Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
+Result<ConfigId> GameConfigManager::LoadConfig(LoadOptions options) {
 	std::unique_lock lock(m_mutex);
 
 	// Check for existing config with same paths
@@ -1425,12 +1453,12 @@ Result<uint32_t> GameConfigManager::LoadConfig(LoadOptions options) {
 		return MakeError(std::move(result.error()));
 	}
 
-	uint32_t id = m_nextId++;
+	ConfigId id = m_nextId++;
 	m_configs.emplace(id, GameConfigEntry{std::move(config)});
 	return id;
 }
 
-void GameConfigManager::UnloadConfig(uint32_t id) {
+void GameConfigManager::UnloadConfig(ConfigId id) {
 	std::unique_lock lock(m_mutex);
 
 	auto it = m_configs.find(id);
@@ -1441,7 +1469,7 @@ void GameConfigManager::UnloadConfig(uint32_t id) {
 	}
 }
 
-GameConfig* GameConfigManager::GetConfig(uint32_t id) {
+GameConfig* GameConfigManager::GetConfig(ConfigId id) {
 	std::shared_lock lock(m_mutex);
 
 	auto it = m_configs.find(id);
@@ -1460,7 +1488,7 @@ PatchManager& GameConfigManager::GetPatchManager() {
 	return m_patchManager;
 }
 
-const plg::flat_hash_map<uint32_t, GameConfigEntry>& GameConfigManager::GetConfigs() const {
+const plg::flat_hash_map<ConfigId, GameConfigEntry>& GameConfigManager::GetConfigs() const {
 	return m_configs;
 }
 

@@ -15,6 +15,7 @@
 #include "core_config.hpp"
 #include "game_config.hpp"
 #include "hook_manager.hpp"
+#include "menu/menu_manager.hpp"
 
 CoreConfig* g_pCoreConfig = nullptr;
 GameConfig* g_pGameConfig = nullptr;
@@ -89,6 +90,7 @@ namespace globals {
 #endif
 
 		ConVarManager::Init();
+		MenuManager::Init();
 
 		return {};
 	}

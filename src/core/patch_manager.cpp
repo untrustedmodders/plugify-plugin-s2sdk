@@ -36,10 +36,11 @@ Result<PatchBytes> PatchBytes::FromPattern(std::string_view pattern) {
 plg::string PatchBytes::ToString() const {
 	plg::string result;
 	result.reserve(bytes.size() * 3);
+	auto out = std::back_inserter(result);
 
 	for (size_t i = 0; i < bytes.size(); ++i) {
 		if (i > 0) result.push_back(' ');
-		std::format_to(std::back_inserter(result), "{:02X}", bytes[i]);
+		std::format_to(out, "{:02X}", bytes[i]);
 	}
 
 	return result;
@@ -215,7 +216,7 @@ Result<void> PatchManager::RestorePatch(std::string_view name) {
 	auto writeResult = WriteBytes(patch.address, patch.originalBytes, true);
 	if (!writeResult) {
 		patch.state = PatchState::Failed;
-		patch.error = std::format("Restore failed: {}", writeResult.error());
+		patch.error = writeResult.error();
 		return writeResult;
 	}
 
@@ -229,7 +230,7 @@ Result<void> PatchManager::RestorePatch(std::string_view name) {
 Result<void> PatchManager::RestoreAll() {
 	std::unique_lock lock(m_mutex);
 
-	plg::string errorMessages;
+	plg::vector<plg::string> errorMessages;
 
 	for (auto& [name, patch] : m_patches) {
 		if (patch.IsApplied()) {
@@ -238,13 +239,13 @@ Result<void> PatchManager::RestoreAll() {
 			lock.lock();
 
 			if (!result) {
-				std::format_to(std::back_inserter(errorMessages), "\n{}: {};", name, result.error());
+				errorMessages.push_back(std::format("{}: {}", name, result.error()));
 			}
 		}
 	}
 
 	if (!errorMessages.empty()) {
-		return MakeError("Restore all patches: {}", errorMessages);
+		return MakeError("Restore all patches: \n{}", plg::join(errorMessages, ";\n"));
 	}
 
 	return {};

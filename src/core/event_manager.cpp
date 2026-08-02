@@ -86,11 +86,10 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 	if (!event)
 		return ResultType::Continue;
 
-	plg::string name(event->GetName());
 	bool localDontBroadcast = dontBroadcast;
 
 	std::scoped_lock lock(m_mutex);
-	auto it = m_hookMap.find(name);
+	auto it = m_hookMap.find(event->GetName());
 	if (it != m_hookMap.end()) {
 		auto hook = it->second;
 		++hook->refCount;
@@ -101,6 +100,7 @@ ResultType EventManager::OnFireEvent(IGameEvent* event, const bool dontBroadcast
 			plg::print(LS_DETAILED, "Pushing event `{}` pointer: {}, dont broadcast: {}, post: {}\n", event->GetName(), static_cast<const void*>(event), dontBroadcast, false);
 
 			if (auto funcs = preHook.Get()) {
+				plg::string name(event->GetName());
 				for (const auto& func : funcs->handlers) {
 					auto result = func(name, event, dontBroadcast);
 					localDontBroadcast = event->GetBool("dont_broadcast");

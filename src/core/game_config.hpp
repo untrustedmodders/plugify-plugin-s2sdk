@@ -14,6 +14,7 @@ struct ReferenceInfo {
 	};
 
 	Type type{Type::Invalid};
+	bool exclude{false};
 	plg::string name;
 };
 
@@ -496,6 +497,8 @@ struct GameConfigEntry {
 		: config(std::move(cfg)), refCount(1) {}
 };
 
+using ConfigId = uint32_t;
+
 class GameConfigManager {
 	GameConfigManager() = default;
 	~GameConfigManager() = default;
@@ -508,19 +511,19 @@ public:
 	}
 
 	// Config management
-	Result<uint32_t> LoadConfig(LoadOptions options);
-	void UnloadConfig(uint32_t id);
-	GameConfig* GetConfig(uint32_t id);
+	Result<ConfigId> LoadConfig(LoadOptions options);
+	void UnloadConfig(ConfigId id);
+	GameConfig* GetConfig(ConfigId id);
 
 	ModuleProvider& GetModuleProvider();
 	PatchManager& GetPatchManager();
 
-	const plg::flat_hash_map<uint32_t, GameConfigEntry>& GetConfigs() const;
+	const plg::flat_hash_map<ConfigId, GameConfigEntry>& GetConfigs() const;
 
 private:
-	plg::flat_hash_map<uint32_t, GameConfigEntry> m_configs;
+	plg::flat_hash_map<ConfigId, GameConfigEntry> m_configs;
 	mutable std::shared_mutex m_mutex;
-	uint32_t m_nextId{};
+	ConfigId m_nextId{};
 
 	ModuleProvider m_moduleProvider;
 	PatchManager m_patchManager;

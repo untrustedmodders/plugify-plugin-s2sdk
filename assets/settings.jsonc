@@ -24,5 +24,77 @@
   // The server language
   "ServerLanguage": "en",
   // Fixed flashing of the alert message (ONLY CS2)
-  "FixFlashAlertMessage": true
+  "FixFlashAlertMessage": true,
+  // Master toggle for the built-in menu implementation (chat/console/centerhtml/button types + their input commands).
+  // Disable if you're bringing your own via the RegisterMenuType/CreateMenuHandle exports.
+  "MenuEnabled": true,
+  // Command prefixes producing digit-select commands 0-9 for chat/console/centerhtml menus (e.g. css_0..css_9).
+  // Add sm_, c_, etc. alongside css_ to support clients bound for other CS2 plugin ecosystems.
+  "MenuCommandPrefixes": [
+    "css_",
+    "sm_",
+    "c_"
+  ],
+  // Command names that take a single 0-based item index argument (SourceMod-style "menuselect <index>").
+  // Add aliases here if other installed plugins already claim "menuselect"; empty array disables this input path.
+  "MenuSelectCommands": [
+    "menuselect",
+	"."
+  ],
+  // Hex color for disabled items in HTML-rendered menus (centerhtml, button)
+  "MenuDisabledColor": "#808080",
+  // Hex color for the highlighted row in the WASD button menu
+  "MenuHighlightColor": "#FFD700",
+  // Seconds the centerhtml menu panel is shown before it needs a redraw
+  "MenuCenterHtmlDuration": 30,
+  // Seconds the WASD button menu's HTML panel is shown per redraw
+  "MenuButtonHtmlDuration": 2,
+  // Seconds between keep-alive redraws of the WASD button menu when there's no input
+  "MenuButtonRefreshInterval": 0.1,
+  // Freeze the player's movement while a WASD button menu is open
+  "MenuButtonFreezePlayer": true,
+  // Panorama CSS class (e.g. "fontSize-sm", "fontSize-s") wrapping the WASD button menu's item list, to
+  // shrink/grow its text. Leave empty to keep the default (unscaled) text size.
+  "MenuButtonBodyFontClass": "fontSize-sm stratum-font",
+  // Same, but wrapping just the title line. Leave empty to keep the default (unscaled) title size.
+  "MenuButtonTitleFontClass": "mono-spaced-font",
+  // Same, but wrapping just the Up/Down/Left/Right/Exit control row. Leave empty to keep the default
+  // (unscaled) footer size.
+  "MenuButtonFooterFontStyle": "fontSize-s",
+  // Max items shown per page in the WASD button menu; menus asking for a smaller page size are left alone,
+  // only larger/unlimited ones get clamped down to this.
+  "MenuButtonMaxItems": 6,
+  // Buttons driving the WASD button menu (InputBitMask_t names, e.g. IN_FORWARD, IN_BACK, IN_USE, IN_ATTACK2,
+  // IN_JUMP, IN_DUCK, IN_TURNLEFT, IN_TURNRIGHT, IN_MOVELEFT, IN_MOVERIGHT, IN_RELOAD, IN_SPEED, IN_ZOOM, ...)
+  "MenuButtonKeyUp": "IN_FORWARD",
+  "MenuButtonKeyDown": "IN_BACK",
+  "MenuButtonKeyLeft": "IN_MOVELEFT",
+  "MenuButtonKeyRight": "IN_MOVERIGHT",
+  "MenuButtonKeySelect": "IN_USE",
+  "MenuButtonKeyExit": "IN_RELOAD",
+  // The WASD button menu always renders its controls as images from a mounted workshop addon (e.g. workshop
+  // id 3763619947) rather than text. MenuButtonImagePath/Extension locate the image files; each
+  // MenuButtonImage* below is that button's image name (without extension) and gets a "-p" suffix appended
+  // while the corresponding MenuButtonKey* above is held. MenuButtonImageLeft/Right only render in the footer
+  // while a previous/next page actually exists; when only one of the two applies the other slot is padded
+  // with MenuButtonImageEmptyHalf (or MenuButtonImageEmpty for both) to keep the footer aligned.
+  "MenuButtonImagePath": "resource/menus",
+  "MenuButtonImageExtension": "vsvg",
+  "MenuButtonImageWidth": 52,
+  "MenuButtonImageHeight": 35,
+  "MenuButtonImageUp": "w",
+  "MenuButtonImageDown": "s",
+  "MenuButtonImageLeft": "a",
+  "MenuButtonImageRight": "d",
+  "MenuButtonImageSelect": "e",
+  "MenuButtonImageExit": "f",
+  "MenuButtonImageEmpty": "empty",
+  "MenuButtonImageEmptyHalf": "empty_half",
+  // Sound events played to the client on WASD button-menu interactions (e.g. "UI.ButtonRollover").
+  // Leave empty to play nothing for that action.
+  "MenuSoundScroll": "sounds/ui/panorama/sidemenu_rollover_02.vsnd_c",
+  "MenuSoundClick": "sounds/ui/panorama/submenu_dropdown_select_01.vsnd_c",
+  "MenuSoundBack": "sounds/ui/menu_back.vsnd_c",
+  "MenuSoundExit": "sounds/ui/panorama/mainmenu_press_quit_02.vsnd_c",
+  "MenuSoundDisabled": "sounds/ui/menu_invalid.vsnd_c"
 }

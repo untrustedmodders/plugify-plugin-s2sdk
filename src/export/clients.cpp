@@ -271,6 +271,21 @@ extern "C" PLUGIN_API plg::string GetClientName(int playerSlot) {
 }
 
 /**
+ * @brief Set client's name.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param name The client's name.
+ */
+extern "C" PLUGIN_API void SetClientName(int playerSlot, plg::string name) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
+		return;
+	}
+
+	player->SetName(name.data());
+}
+
+/**
  * @brief Returns the client's connection time in seconds.
  *
  * @param playerSlot The index of the player's slot.

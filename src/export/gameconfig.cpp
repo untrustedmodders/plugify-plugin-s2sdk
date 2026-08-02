@@ -11,7 +11,7 @@ PLUGIFY_LINKAGE()
  *
  * @param id An id to the GameConfig object to be closed.
  */
-extern "C" PLUGIN_API void CloseGameConfigFile(uint32_t id) {
+extern "C" PLUGIN_API void CloseGameConfigFile(ConfigId id) {
 	g_GameConfigManager.UnloadConfig(id);
 }
 
@@ -23,7 +23,7 @@ extern "C" PLUGIN_API void CloseGameConfigFile(uint32_t id) {
  * @param paths The paths to the game configuration file to be loaded.
  * @return A handle to the loaded CGameConfig object, or nullptr if loading fails.
  */
-extern "C" PLUGIN_API uint32_t LoadGameConfigFile(const plg::vector<plg::string>& paths) {
+extern "C" PLUGIN_API ConfigId LoadGameConfigFile(const plg::vector<plg::string>& paths) {
 	auto config = g_GameConfigManager.LoadConfig({ paths });
 	if (!config) {
 		plg::print(LS_WARNING, "Could not load config: [{}] - {}\n", plg::join(paths, ", "), config.error());
@@ -42,7 +42,7 @@ extern "C" PLUGIN_API uint32_t LoadGameConfigFile(const plg::vector<plg::string>
  * @param name The name of the patch to be retrieved.
  * @return A string where the patch will be stored.
  */
-extern "C" PLUGIN_API plg::string GetGameConfigPatch(uint32_t id, const plg::string& name) {
+extern "C" PLUGIN_API plg::string GetGameConfigPatch(ConfigId id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetConfig(id)) {
 		if (auto patch = gameConfig->GetPatch(name)) {
 			return *patch;
@@ -64,7 +64,7 @@ extern "C" PLUGIN_API plg::string GetGameConfigPatch(uint32_t id, const plg::str
  * @param name The name whose offset is to be retrieved.
  * @return The offset associated with the specified name.
  */
-extern "C" PLUGIN_API int GetGameConfigOffset(uint32_t id, const plg::string& name) {
+extern "C" PLUGIN_API int GetGameConfigOffset(ConfigId id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetConfig(id)) {
 		if (auto offset = gameConfig->GetOffset(name)) {
 			return *offset;
@@ -86,7 +86,7 @@ extern "C" PLUGIN_API int GetGameConfigOffset(uint32_t id, const plg::string& na
  * @param name The name whose address is to be retrieved.
  * @return A pointer to the address associated with the specified name.
  */
-extern "C" PLUGIN_API void* GetGameConfigAddress(uint32_t id, const plg::string& name) {
+extern "C" PLUGIN_API void* GetGameConfigAddress(ConfigId id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetConfig(id)) {
 		if (auto address = gameConfig->GetAddress(name)) {
 			return *address;
@@ -108,7 +108,7 @@ extern "C" PLUGIN_API void* GetGameConfigAddress(uint32_t id, const plg::string&
  * @param name The name whose vtable is to be retrieved.
  * @return A pointer to the vtable associated with the specified name.
  */
-extern "C" PLUGIN_API void* GetGameConfigVTable(uint32_t id, const plg::string& name) {
+extern "C" PLUGIN_API void* GetGameConfigVTable(ConfigId id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetConfig(id)) {
 		if (auto vtable = gameConfig->GetVTable(name)) {
 			return *vtable;
@@ -130,7 +130,7 @@ extern "C" PLUGIN_API void* GetGameConfigVTable(uint32_t id, const plg::string& 
  * @param name The name whose signature is to be resolved and retrieved.
  * @return A pointer to the signature associated with the specified name.
  */
-extern "C" PLUGIN_API void* GetGameConfigSignature(uint32_t id, const plg::string& name) {
+extern "C" PLUGIN_API void* GetGameConfigSignature(ConfigId id, const plg::string& name) {
 	if (auto gameConfig = g_GameConfigManager.GetConfig(id)) {
 		if (auto signature = gameConfig->GetSignature(name)) {
 			return *signature;

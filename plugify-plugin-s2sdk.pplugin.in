@@ -8005,6 +8005,29 @@
       }
     },
     {
+      "name": "SetClientName",
+      "group": "Clients",
+      "description": "Set client's name.",
+      "funcName": "SetClientName",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The client's name."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "GetClientTime",
       "group": "Clients",
       "description": "Returns the client's connection time in seconds.",
@@ -23842,7 +23865,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration to be closed."
+          "description": "An id to the game configuration to be closed.",
+          "alias": {
+            "name": "ConfigId"
+          }
         }
       ],
       "retType": {
@@ -23864,7 +23890,10 @@
       ],
       "retType": {
         "type": "uint32",
-        "description": "A id to the loaded game configuration object, or -1 if loading fails."
+        "description": "A id to the loaded game configuration object, or -1 if loading fails.",
+        "alias": {
+          "name": "ConfigId"
+        }
       }
     },
     {
@@ -23877,7 +23906,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the patch."
+          "description": "An id to the game configuration from which to retrieve the patch.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -23901,7 +23933,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the offset."
+          "description": "An id to the game configuration from which to retrieve the offset.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -23925,7 +23960,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the address."
+          "description": "An id to the game configuration from which to retrieve the address.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -23949,7 +23987,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the vtable."
+          "description": "An id to the game configuration from which to retrieve the vtable.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -23973,7 +24014,10 @@
           "name": "id",
           "type": "uint32",
           "ref": false,
-          "description": "An id to the game configuration from which to retrieve the signature."
+          "description": "An id to the game configuration from which to retrieve the signature.",
+          "alias": {
+            "name": "ConfigId"
+          }
         },
         {
           "name": "name",
@@ -24907,6 +24951,1347 @@
         "type": "int32",
         "description": "An integer indicating the result of the logging operation."
       }
+    },
+    {
+      "name": "RegisterMenuType",
+      "funcName": "RegisterMenuType",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The unique, case-insensitive name of the menu type."
+        },
+        {
+          "name": "display",
+          "type": "function",
+          "ref": false,
+          "description": "Callback invoked to render the menu's current state to a client.",
+          "prototype": {
+            "name": "MenuDisplayCallback",
+            "funcName": "MenuDisplayCallback",
+            "description": "Renders the menu's current state (title/items/page) to the client. Backends read state via the getters below. Renders the menu's current state (title/items/page) to the client. Backends read state via the getters below.",
+            "paramTypes": [
+              {
+                "name": "id",
+                "type": "uint32",
+                "ref": false,
+                "alias": {
+                  "name": "MenuId"
+                }
+              },
+              {
+                "name": "playerSlot",
+                "type": "int32",
+                "ref": false
+              }
+            ],
+            "retType": {
+              "type": "void"
+            }
+          }
+        },
+        {
+          "name": "close",
+          "type": "function",
+          "ref": false,
+          "description": "Callback invoked to hide/clean up whatever UI was shown to a client.",
+          "prototype": {
+            "name": "MenuCloseCallback",
+            "funcName": "MenuCloseCallback",
+            "description": "Hides/cleans up whatever UI the backend showed to the client. Hides/cleans up whatever UI the backend showed to the client.",
+            "paramTypes": [
+              {
+                "name": "id",
+                "type": "uint32",
+                "ref": false,
+                "alias": {
+                  "name": "MenuId"
+                }
+              },
+              {
+                "name": "playerSlot",
+                "type": "int32",
+                "ref": false
+              }
+            ],
+            "retType": {
+              "type": "void"
+            }
+          }
+        },
+        {
+          "name": "frame",
+          "type": "function",
+          "ref": false,
+          "description": "Optional callback invoked every server frame while a client has this menu type open (e.g. for input polling). Pass null if not needed.",
+          "prototype": {
+            "name": "MenuFrameCallback",
+            "funcName": "MenuFrameCallback",
+            "description": "Optional: called every server frame while the client has a menu of this type open (e.g. for input polling). Optional: called every server frame while the client has a menu of this type open (e.g. for input polling).",
+            "paramTypes": [
+              {
+                "name": "id",
+                "type": "uint32",
+                "ref": false,
+                "alias": {
+                  "name": "MenuId"
+                }
+              },
+              {
+                "name": "playerSlot",
+                "type": "int32",
+                "ref": false
+              }
+            ],
+            "retType": {
+              "type": "void"
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the type was registered; false if the name is empty, a callback is null, or the name is already taken."
+      },
+      "group": "Menus",
+      "description": "Registers a new menu type backend (e.g. a custom rendering style), so it can be selected via CreateMenu/SetMenuType. Built-in types \"chat\", \"console\", \"centerhtml\" and \"button\" are registered automatically at startup."
+    },
+    {
+      "name": "UnregisterMenuType",
+      "funcName": "UnregisterMenuType",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the menu type to remove."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if a type with that name was found and removed."
+      },
+      "group": "Menus",
+      "description": "Unregisters a previously registered menu type."
+    },
+    {
+      "name": "IsMenuTypeRegistered",
+      "funcName": "IsMenuTypeRegistered",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the menu type."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu type is registered."
+      },
+      "group": "Menus",
+      "description": "Checks whether a menu type with the given name is currently registered."
+    },
+    {
+      "name": "GetMenuTypes",
+      "funcName": "GetMenuTypes",
+      "paramTypes": [],
+      "retType": {
+        "type": "string[]",
+        "description": "The vector of menu type names."
+      },
+      "group": "Menus",
+      "description": "Returns the names of all currently registered menu types."
+    },
+    {
+      "name": "SetDefaultMenuType",
+      "funcName": "SetDefaultMenuType",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name of an already-registered menu type."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the type exists and was set as default."
+      },
+      "group": "Menus",
+      "description": "Sets the menu type used by menus that don't specify one explicitly."
+    },
+    {
+      "name": "GetDefaultMenuType",
+      "funcName": "GetDefaultMenuType",
+      "paramTypes": [],
+      "retType": {
+        "type": "string",
+        "description": "The default menu type name."
+      },
+      "group": "Menus",
+      "description": "Returns the current default menu type name."
+    },
+    {
+      "name": "CreateMenu",
+      "funcName": "CreateMenu",
+      "paramTypes": [
+        {
+          "name": "title",
+          "type": "string",
+          "ref": false,
+          "description": "The title shown at the top of the menu."
+        },
+        {
+          "name": "handler",
+          "type": "function",
+          "ref": false,
+          "description": "Callback invoked with Start/Select/Cancel/End actions as the menu is displayed and interacted with.",
+          "prototype": {
+            "name": "MenuHandlerCallback",
+            "funcName": "MenuHandlerCallback",
+            "paramTypes": [
+              {
+                "name": "id",
+                "type": "uint32",
+                "ref": false,
+                "alias": {
+                  "name": "MenuId"
+                }
+              },
+              {
+                "name": "action",
+                "type": "int32",
+                "ref": false,
+                "enum": {
+                  "name": "MenuAction",
+                  "description": "Action passed to a menu's handler callback.",
+                  "values": [
+                    {
+                      "name": "Start",
+                      "value": 0
+                    },
+                    {
+                      "name": "Select",
+                      "value": 1
+                    },
+                    {
+                      "name": "Cancel",
+                      "value": 2
+                    },
+                    {
+                      "name": "End",
+                      "value": 3
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "playerSlot",
+                "type": "int32",
+                "ref": false
+              },
+              {
+                "name": "param",
+                "type": "int32",
+                "ref": false
+              }
+            ],
+            "retType": {
+              "type": "void"
+            }
+          }
+        },
+        {
+          "name": "menuType",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the menu type backend to render with. Empty uses the current default menu type."
+        }
+      ],
+      "retType": {
+        "type": "uint32",
+        "description": "A handle to the created menu.",
+        "alias": {
+          "name": "MenuId"
+        }
+      },
+      "group": "Menus",
+      "description": "Creates a new menu."
+    },
+    {
+      "name": "DestroyMenu",
+      "funcName": "DestroyMenu",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu existed and was destroyed."
+      },
+      "group": "Menus",
+      "description": "Destroys a menu. Any client currently viewing it is cancelled first (MenuCancelReason::Destroyed)."
+    },
+    {
+      "name": "IsValidMenu",
+      "funcName": "IsValidMenu",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the handle is valid."
+      },
+      "group": "Menus",
+      "description": "Checks whether a menu handle refers to an existing menu."
+    },
+    {
+      "name": "SetMenuTitle",
+      "funcName": "SetMenuTitle",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "ref": false,
+          "description": "The new title."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu exists."
+      },
+      "group": "Menus",
+      "description": "Sets a menu's title."
+    },
+    {
+      "name": "GetMenuTitle",
+      "funcName": "GetMenuTitle",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The menu's title, or an empty string if the handle is invalid."
+      },
+      "group": "Menus",
+      "description": "Gets a menu's title."
+    },
+    {
+      "name": "SetMenuType",
+      "funcName": "SetMenuType",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "typeName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of a registered menu type, or empty to use the default menu type."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu exists."
+      },
+      "group": "Menus",
+      "description": "Sets which registered menu type backend renders this menu."
+    },
+    {
+      "name": "GetMenuType",
+      "funcName": "GetMenuType",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The menu type name (may be empty, meaning \"use the default\")."
+      },
+      "group": "Menus",
+      "description": "Gets the menu type backend name assigned to this menu."
+    },
+    {
+      "name": "SetMenuPagination",
+      "funcName": "SetMenuPagination",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "itemsPerPage",
+          "type": "int32",
+          "ref": false,
+          "description": "The number of items per page, or 0 to disable pagination (show every item on one page)."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu exists and itemsPerPage is not negative."
+      },
+      "group": "Menus",
+      "description": "Sets how many items are shown per page."
+    },
+    {
+      "name": "GetMenuPagination",
+      "funcName": "GetMenuPagination",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The items-per-page value, 0 meaning pagination is disabled."
+      },
+      "group": "Menus",
+      "description": "Gets how many items are shown per page."
+    },
+    {
+      "name": "SetMenuExitButton",
+      "funcName": "SetMenuExitButton",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "ref": false,
+          "description": "True to show an exit option."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu exists."
+      },
+      "group": "Menus",
+      "description": "Sets whether the menu shows an exit option."
+    },
+    {
+      "name": "GetMenuExitButton",
+      "funcName": "GetMenuExitButton",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the exit option is enabled."
+      },
+      "group": "Menus",
+      "description": "Gets whether the menu shows an exit option."
+    },
+    {
+      "name": "SetMenuExitBackButton",
+      "funcName": "SetMenuExitBackButton",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "ref": false,
+          "description": "True to show a back option instead of the exit option."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu exists."
+      },
+      "group": "Menus",
+      "description": "Sets whether the menu shows a \"back\" option in place of the exit option. Selecting it cancels the display with MenuCancelReason::ExitBack instead of MenuCancelReason::Exit, which a handler can use to redisplay a parent menu (SourceMod-style ExitBack)."
+    },
+    {
+      "name": "GetMenuExitBackButton",
+      "funcName": "GetMenuExitBackButton",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the back option is enabled."
+      },
+      "group": "Menus",
+      "description": "Gets whether the menu shows a \"back\" option in place of the exit option."
+    },
+    {
+      "name": "SetMenuCloseOnSelect",
+      "funcName": "SetMenuCloseOnSelect",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "ref": false,
+          "description": "True to auto-close on selection (the default)."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu exists."
+      },
+      "group": "Menus",
+      "description": "Sets whether selecting an item automatically closes the menu display for that client. When disabled, the display stays open after MenuAction::Select and the handler is responsible for closing/redisplaying it if desired."
+    },
+    {
+      "name": "GetMenuCloseOnSelect",
+      "funcName": "GetMenuCloseOnSelect",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if close-on-select is enabled."
+      },
+      "group": "Menus",
+      "description": "Gets whether selecting an item automatically closes the menu display for that client."
+    },
+    {
+      "name": "AddMenuItem",
+      "funcName": "AddMenuItem",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "info",
+          "type": "string",
+          "ref": false,
+          "description": "An internal identifier for the item, not shown to the client; retrieve it with GetMenuItemInfo from within the handler callback."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "ref": false,
+          "description": "The text shown to the client."
+        },
+        {
+          "name": "style",
+          "type": "int32",
+          "ref": false,
+          "description": "The item's draw style (Default/Disabled/Spacer).",
+          "enum": {
+            "name": "MenuItemStyle",
+            "description": "Draw style for an individual menu item.",
+            "values": [
+              {
+                "name": "Default",
+                "value": 0
+              },
+              {
+                "name": "Disabled",
+                "value": 1
+              },
+              {
+                "name": "Spacer",
+                "value": 2
+              }
+            ]
+          }
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The index of the newly added item, or -1 if the menu handle is invalid."
+      },
+      "group": "Menus",
+      "description": "Appends an item to the end of a menu."
+    },
+    {
+      "name": "InsertMenuItemAt",
+      "funcName": "InsertMenuItemAt",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index to insert at; must be within [0, item count]."
+        },
+        {
+          "name": "info",
+          "type": "string",
+          "ref": false,
+          "description": "An internal identifier for the item, not shown to the client."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "ref": false,
+          "description": "The text shown to the client."
+        },
+        {
+          "name": "style",
+          "type": "int32",
+          "ref": false,
+          "description": "The item's draw style (Default/Disabled/Spacer).",
+          "enum": {
+            "name": "MenuItemStyle",
+            "description": "Draw style for an individual menu item.",
+            "values": [
+              {
+                "name": "Default",
+                "value": 0
+              },
+              {
+                "name": "Disabled",
+                "value": 1
+              },
+              {
+                "name": "Spacer",
+                "value": 2
+              }
+            ]
+          }
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The index the item was inserted at, or -1 on failure."
+      },
+      "group": "Menus",
+      "description": "Inserts an item into a menu at a specific index."
+    },
+    {
+      "name": "RemoveMenuItem",
+      "funcName": "RemoveMenuItem",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the item to remove."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the item existed and was removed."
+      },
+      "group": "Menus",
+      "description": "Removes an item from a menu."
+    },
+    {
+      "name": "RemoveAllMenuItems",
+      "funcName": "RemoveAllMenuItems",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu exists."
+      },
+      "group": "Menus",
+      "description": "Removes every item from a menu."
+    },
+    {
+      "name": "GetMenuItemsCount",
+      "funcName": "GetMenuItemsCount",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The item count, or 0 if the handle is invalid."
+      },
+      "group": "Menus",
+      "description": "Gets the number of items in a menu."
+    },
+    {
+      "name": "GetMenuItemInfoText",
+      "funcName": "GetMenuItemInfoText",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the item."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The item's info string, or empty if out of range."
+      },
+      "group": "Menus",
+      "description": "Gets an item's internal info string."
+    },
+    {
+      "name": "GetMenuItemDisplay",
+      "funcName": "GetMenuItemDisplay",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the item."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The item's display text, or empty if out of range."
+      },
+      "group": "Menus",
+      "description": "Gets an item's display text."
+    },
+    {
+      "name": "GetMenuItemStyle",
+      "funcName": "GetMenuItemStyle",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the item."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The item's style; MenuItemStyle::Disabled if out of range.",
+        "enum": {
+          "name": "MenuItemStyle",
+          "description": "Draw style for an individual menu item.",
+          "values": [
+            {
+              "name": "Default",
+              "value": 0
+            },
+            {
+              "name": "Disabled",
+              "value": 1
+            },
+            {
+              "name": "Spacer",
+              "value": 2
+            }
+          ]
+        }
+      },
+      "group": "Menus",
+      "description": "Gets an item's draw style."
+    },
+    {
+      "name": "IsMenuItemSelectable",
+      "funcName": "IsMenuItemSelectable",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the item."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the item is selectable."
+      },
+      "group": "Menus",
+      "description": "Checks whether an item can currently be selected (style is Default)."
+    },
+    {
+      "name": "SetMenuItemDisplay",
+      "funcName": "SetMenuItemDisplay",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the item."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "ref": false,
+          "description": "The new display text."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the item exists."
+      },
+      "group": "Menus",
+      "description": "Changes an item's display text."
+    },
+    {
+      "name": "SetMenuItemStyle",
+      "funcName": "SetMenuItemStyle",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the item."
+        },
+        {
+          "name": "style",
+          "type": "int32",
+          "ref": false,
+          "description": "The new style.",
+          "enum": {
+            "name": "MenuItemStyle",
+            "description": "Draw style for an individual menu item.",
+            "values": [
+              {
+                "name": "Default",
+                "value": 0
+              },
+              {
+                "name": "Disabled",
+                "value": 1
+              },
+              {
+                "name": "Spacer",
+                "value": 2
+              }
+            ]
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the item exists."
+      },
+      "group": "Menus",
+      "description": "Changes an item's draw style."
+    },
+    {
+      "name": "DisplayMenu",
+      "funcName": "DisplayMenu",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        },
+        {
+          "name": "time",
+          "type": "int32",
+          "ref": false,
+          "description": "How long, in seconds, before the menu auto-closes (MenuCancelReason::Timeout). 0 or negative means no timeout."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu was displayed."
+      },
+      "group": "Menus",
+      "description": "Displays a menu to a client, starting at the first item. Replaces whatever menu the client currently has open, if any."
+    },
+    {
+      "name": "DisplayMenuAtItem",
+      "funcName": "DisplayMenuAtItem",
+      "paramTypes": [
+        {
+          "name": "id",
+          "type": "uint32",
+          "ref": false,
+          "description": "The handle to the menu.",
+          "alias": {
+            "name": "MenuId"
+          }
+        },
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        },
+        {
+          "name": "firstItem",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the first item to show."
+        },
+        {
+          "name": "time",
+          "type": "int32",
+          "ref": false,
+          "description": "How long, in seconds, before the menu auto-closes. 0 or negative means no timeout."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the menu was displayed."
+      },
+      "group": "Menus",
+      "description": "Displays a menu to a client, starting at a specific item."
+    },
+    {
+      "name": "CancelClientMenu",
+      "funcName": "CancelClientMenu",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        },
+        {
+          "name": "reason",
+          "type": "int32",
+          "ref": false,
+          "description": "The reason reported to the menu's handler via MenuAction::Cancel.",
+          "enum": {
+            "name": "MenuCancelReason",
+            "description": "Reason a menu display session was cancelled, passed as `param` on MenuAction::Cancel.",
+            "values": [
+              {
+                "name": "Exit",
+                "value": 0
+              },
+              {
+                "name": "Timeout",
+                "value": 1
+              },
+              {
+                "name": "Disconnect",
+                "value": 2
+              },
+              {
+                "name": "Interrupted",
+                "value": 3
+              },
+              {
+                "name": "Destroyed",
+                "value": 4
+              },
+              {
+                "name": "ExitBack",
+                "value": 5
+              }
+            ]
+          }
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the client had a menu open and it was cancelled."
+      },
+      "group": "Menus",
+      "description": "Cancels whatever menu a client currently has open."
+    },
+    {
+      "name": "GetClientMenu",
+      "funcName": "GetClientMenu",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        }
+      ],
+      "retType": {
+        "type": "uint32",
+        "description": "The open menu's handle, or 0 if none.",
+        "alias": {
+          "name": "MenuId"
+        }
+      },
+      "group": "Menus",
+      "description": "Gets the menu a client currently has open."
+    },
+    {
+      "name": "GetClientMenuOffset",
+      "funcName": "GetClientMenuOffset",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The current page offset."
+      },
+      "group": "Menus",
+      "description": "Gets the index of the first item shown on the client's current page."
+    },
+    {
+      "name": "GetClientMenuTime",
+      "funcName": "GetClientMenuTime",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        }
+      ],
+      "retType": {
+        "type": "double",
+        "description": "The display time in seconds, 0 meaning no timeout."
+      },
+      "group": "Menus",
+      "description": "Gets the `time` value the client's current menu was displayed with."
+    },
+    {
+      "name": "GetClientMenuCursor",
+      "funcName": "GetClientMenuCursor",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The cursor's item index."
+      },
+      "group": "Menus",
+      "description": "Gets the absolute item index highlighted by cursor-driven menu types (e.g. the button menu)."
+    },
+    {
+      "name": "SetClientMenuCursor",
+      "funcName": "SetClientMenuCursor",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        },
+        {
+          "name": "index",
+          "type": "int32",
+          "ref": false,
+          "description": "The item index to highlight."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      },
+      "group": "Menus",
+      "description": "Sets the absolute item index highlighted by cursor-driven menu types."
+    },
+    {
+      "name": "ClientMenuHasPrevPage",
+      "funcName": "ClientMenuHasPrevPage",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if a previous page exists."
+      },
+      "group": "Menus",
+      "description": "Checks whether the client's current menu display has a previous page to go back to."
+    },
+    {
+      "name": "ClientMenuHasNextPage",
+      "funcName": "ClientMenuHasNextPage",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if a next page exists."
+      },
+      "group": "Menus",
+      "description": "Checks whether the client's current menu display has a next page."
+    },
+    {
+      "name": "MenuNextPage",
+      "funcName": "MenuNextPage",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if there was a next page to move to."
+      },
+      "group": "Menus",
+      "description": "Advances the client's current menu display to the next page and redraws it."
+    },
+    {
+      "name": "MenuPrevPage",
+      "funcName": "MenuPrevPage",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if there was a previous page to move to."
+      },
+      "group": "Menus",
+      "description": "Moves the client's current menu display back to the previous page and redraws it."
+    },
+    {
+      "name": "SelectMenuItem",
+      "funcName": "SelectMenuItem",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        },
+        {
+          "name": "itemIndex",
+          "type": "int32",
+          "ref": false,
+          "description": "The absolute index of the item to select."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the item existed and was selectable."
+      },
+      "group": "Menus",
+      "description": "Selects an item on the client's current menu display by its absolute index. Intended to be called by menu type backends once they've resolved raw input into an item index."
+    },
+    {
+      "name": "HandleDigitInput",
+      "funcName": "HandleDigitInput",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The client's player slot."
+        },
+        {
+          "name": "digit",
+          "type": "int32",
+          "ref": false,
+          "description": "The digit (0-9) that was pressed."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the digit resulted in an action."
+      },
+      "group": "Menus",
+      "description": "Shared input path for digit-driven menu types (chat/console/centerhtml): 1-7 select an item on the current page, 8 goes to the previous page, 9 to the next page, 0 exits."
     },
     {
       "name": "GetEntityAttachmentAngles",
@@ -29287,7 +30672,10 @@
       ],
       "retType": {
         "type": "uint32",
-        "description": "A id to the newly created Timer object, or -1 if the timer could not be created."
+        "description": "A id to the newly created Timer object, or -1 if the timer could not be created.",
+        "alias": {
+          "name": "TimerId"
+        }
       }
     },
     {
@@ -29300,7 +30688,10 @@
           "name": "timer",
           "type": "uint32",
           "ref": false,
-          "description": "A id of the Timer object to be stopped and removed."
+          "description": "A id of the Timer object to be stopped and removed.",
+          "alias": {
+            "name": "TimerId"
+          }
         }
       ],
       "retType": {
@@ -29317,7 +30708,10 @@
           "name": "timer",
           "type": "uint32",
           "ref": false,
-          "description": "A id of the Timer object to be stopped and removed."
+          "description": "A id of the Timer object to be stopped and removed.",
+          "alias": {
+            "name": "TimerId"
+          }
         },
         {
           "name": "newDaly",
@@ -39372,6 +40766,153 @@
         {
           "name": "GetSignature",
           "method": "GetGameConfigSignature",
+          "bindSelf": true
+        }
+      ]
+    },
+    {
+      "name": "Menu",
+      "group": "Menus",
+      "description": "RAII wrapper for Menu handle.",
+      "handleType": "uint32",
+      "invalidValue": "0",
+      "constructors": [
+        "CreateMenu"
+      ],
+      "bindings": [
+        {
+          "name": "Destroy",
+          "method": "DestroyMenu",
+          "bindSelf": true
+        },
+        {
+          "name": "IsValid",
+          "method": "IsValidMenu",
+          "bindSelf": true
+        },
+        {
+          "name": "SetTitle",
+          "method": "SetMenuTitle",
+          "bindSelf": true
+        },
+        {
+          "name": "GetTitle",
+          "method": "GetMenuTitle",
+          "bindSelf": true
+        },
+        {
+          "name": "SetType",
+          "method": "SetMenuType",
+          "bindSelf": true
+        },
+        {
+          "name": "GetType",
+          "method": "GetMenuType",
+          "bindSelf": true
+        },
+        {
+          "name": "SetPagination",
+          "method": "SetMenuPagination",
+          "bindSelf": true
+        },
+        {
+          "name": "GetPagination",
+          "method": "GetMenuPagination",
+          "bindSelf": true
+        },
+        {
+          "name": "SetExitButton",
+          "method": "SetMenuExitButton",
+          "bindSelf": true
+        },
+        {
+          "name": "GetExitButton",
+          "method": "GetMenuExitButton",
+          "bindSelf": true
+        },
+        {
+          "name": "SetExitBackButton",
+          "method": "SetMenuExitBackButton",
+          "bindSelf": true
+        },
+        {
+          "name": "GetExitBackButton",
+          "method": "GetMenuExitBackButton",
+          "bindSelf": true
+        },
+        {
+          "name": "SetCloseOnSelect",
+          "method": "SetMenuCloseOnSelect",
+          "bindSelf": true
+        },
+        {
+          "name": "GetCloseOnSelect",
+          "method": "GetMenuCloseOnSelect",
+          "bindSelf": true
+        },
+        {
+          "name": "AddItem",
+          "method": "AddMenuItem",
+          "bindSelf": true
+        },
+        {
+          "name": "InsertItemAt",
+          "method": "InsertMenuItemAt",
+          "bindSelf": true
+        },
+        {
+          "name": "RemoveItem",
+          "method": "RemoveMenuItem",
+          "bindSelf": true
+        },
+        {
+          "name": "RemoveAllItems",
+          "method": "RemoveAllMenuItems",
+          "bindSelf": true
+        },
+        {
+          "name": "GetItemsCount",
+          "method": "GetMenuItemsCount",
+          "bindSelf": true
+        },
+        {
+          "name": "GetItemInfoText",
+          "method": "GetMenuItemInfoText",
+          "bindSelf": true
+        },
+        {
+          "name": "GetItemDisplay",
+          "method": "GetMenuItemDisplay",
+          "bindSelf": true
+        },
+        {
+          "name": "GetItemStyle",
+          "method": "GetMenuItemStyle",
+          "bindSelf": true
+        },
+        {
+          "name": "IsItemSelectable",
+          "method": "IsMenuItemSelectable",
+          "bindSelf": true
+        },
+        {
+          "name": "SetItemDisplay",
+          "method": "SetMenuItemDisplay",
+          "bindSelf": true
+        },
+        {
+          "name": "SetItemStyle",
+          "method": "SetMenuItemStyle",
+          "bindSelf": true
+        },
+        {
+          "name": "Display",
+          "method": "DisplayMenu",
+          "bindSelf": true
+        },
+        {
+          "name": "DisplayAtItem",
+          "method": "DisplayMenuAtItem",
           "bindSelf": true
         }
       ]

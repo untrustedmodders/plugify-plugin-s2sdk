@@ -73,6 +73,7 @@ public:
 	bool IsAlive() const;
 	bool IsValidClient() const;
 	std::string_view GetName() const;
+	void SetName(const char* name) const;
 	std::string_view GetIpAddress() const;
 	std::string_view GetLanguage() const;
 	std::string_view GetOperatingSystem() const;

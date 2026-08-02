@@ -38,8 +38,8 @@ void cvars::SendConVarValue(CPlayerSlot slot, std::string_view name, std::string
 		static INetworkMessageInternal* netMsg = g_pNetworkMessages->FindNetworkMessagePartial("CNETMsg_SetConVar");
 		auto msg = netMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
 		CMsg_CVars_CVar* data = msg->mutable_convars()->add_cvars();
-		data->set_name(std::string(name));
-		data->set_value(std::string(value));
+		data->set_name(NewStr(name));
+		data->set_value(NewStr(value));
 
 		UNUSED(msg->Send(slot));
 		delete msg;
@@ -52,8 +52,8 @@ void cvars::SendMultipleConVarValues(CPlayerSlot slot, std::span<const std::stri
 		auto msg = netMsg->AllocateMessage()->As<CNETMsg_SetConVar_t>();
 		for (uint32_t i = 0; i < size; ++i) {
 			CMsg_CVars_CVar* data = msg->mutable_convars()->add_cvars();
-			data->set_name(std::string(names[i]));
-			data->set_value(std::string(values[i]));
+			data->set_name(NewStr(names[i]));
+			data->set_value(NewStr(values[i]));
 		}
 
 		UNUSED(msg->Send(slot));
@@ -69,7 +69,7 @@ int cvars::SendConVarValueQueryToClient(CPlayerSlot slot, std::string_view cvarN
 
 		auto msg = netMsg->AllocateMessage()->As<CSVCMsg_GetCvarValue_t>();
 		msg->set_cookie(queryCvarCookie);
-		msg->set_cvar_name(std::string(cvarName));
+		msg->set_cvar_name(NewStr(cvarName));
 
 		UNUSED(msg->Send(slot));
 		delete msg;

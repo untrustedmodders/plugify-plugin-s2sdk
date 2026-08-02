@@ -185,7 +185,7 @@ void ClientPrint(std::optional<CPlayerSlot> playerSlot, HudDest dest, std::strin
 	auto* data = netMsg->AllocateMessage()->As<CUserMessageTextMsg_t>();
 
 	data->set_dest(static_cast<uint32_t>(dest));
-	data->add_param(std::string(message));
+	data->add_param(NewStr(message));
 
 	if (playerSlot){
 		UNUSED(data->Send(*playerSlot));

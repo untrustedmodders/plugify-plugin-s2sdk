@@ -11,8 +11,10 @@ consteval void enable_bitmask_operators(TimerFlag);
 
 using TimerCallback = void (*)(uint32_t, const plg::vector<plg::any>& userData);
 
+using TimerId = uint32_t;
+
 struct Timer {
-	uint32_t id;
+	TimerId id;
 	bool repeat;
 	bool noMapChange;
 	mutable bool exec;
@@ -49,9 +51,9 @@ public:
 	static double GetTickedTime();
 	static double GetTickedInterval();
 
-	uint32_t CreateTimer(double delay, TimerCallback callback, TimerFlag flags = TimerFlag::Default, const plg::vector<plg::any>& userData = {});
-	void KillTimer(uint32_t id);
-	void RescheduleTimer(uint32_t id, double newDelay);
+	TimerId CreateTimer(double delay, TimerCallback callback, TimerFlag flags = TimerFlag::Default, const plg::vector<plg::any>& userData = {});
+	void KillTimer(TimerId id);
+	void RescheduleTimer(TimerId id, double newDelay);
 
 private:
 	bool m_hasMapTicked{};
@@ -59,6 +61,6 @@ private:
 	float m_lastTickedTime{};
 	std::set<Timer> m_timers;
 	std::recursive_mutex m_mutex;
-	uint32_t m_nextId{};
+	TimerId m_nextId{};
 };
 inline TimerSystem& g_TimerSystem = TimerSystem::Instance();

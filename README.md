@@ -80,6 +80,7 @@ S2SDK supports:
 - Network messages interaction
 - Source 2 events, entities and client handling
 - Game configuration (signatures, addresses and offsets)
+- Interactive menus (WASD button, chat, console, and center-HTML)
 - Other core features similar to SourceMod
 
 The project is actively developed and will continue to expand its feature set.
@@ -104,6 +105,9 @@ The project is actively developed and will continue to expand its feature set.
 
 - How to integrate Valve's [CS_Script](https://developer.valvesoftware.com/wiki/Counter-Strike_2_Workshop_Tools/Scripting) system with Plugify plugins.  
   → [Guide: CS_Script Integration](https://plugify.net/plugins/s2sdk/guides/cs_script-integration)
+
+- Build interactive **menus** — WASD button, chat, console, and center-HTML — for players  
+  → [Guide: Menus](https://plugify.net/plugins/s2sdk/guides/menus)
 
 More guides will be added over time to cover advanced use cases could be found [here](https://plugify.net/plugins/s2sdk/guides/).
 
