@@ -174,7 +174,6 @@ if(WINDOWS)
             S2SDK_PLATFORM="win64"
             S2SDK_ROOT_BINARY="/bin/win64/"
             S2SDK_GAME_BINARY="/${S2SDK_GAME_NAME}/bin/win64/"
-            NOMINMAX=1
     )
 elseif(LINUX)
     set(S2SDK_COMPILE_DEFINITIONS
