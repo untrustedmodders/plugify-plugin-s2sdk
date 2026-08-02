@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.15.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.14.1...v2.15.0) (2026-08-02)
+
+
+### Features
+
+* show a just-spawned pawn for one tick before hiding it ([#125](https://github.com/untrustedmodders/plugify-plugin-s2sdk/issues/125)) ([7511fcf](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7511fcf0cbe453b38ca9acda2c4440ab36aed155))
+
+
+### Bug Fixes
+
+* improve event lookup ([3b1785b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3b1785bc3260c3db2a5768edf902d249a381b779))
+* lin build ([90b7709](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/90b7709800587a4d683f0e19051e8255bb949e57))
+* small refactor ([619a8d5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/619a8d596040747ec8ef856aedb6d3ab6662ca12))
+
 ## [2.14.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.14.0...v2.14.1) (2026-08-02)
 
 
