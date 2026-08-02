@@ -78,15 +78,8 @@ public:
     auto operator()(Args... args, const plg::source_location& loc = plg::source_location::current()) {
         [[maybe_unused]] plg::Scope zone(Name, loc);
 
-    	std::shared_ptr<const HandlerSet> snapshot;
-	    {
-        	std::shared_lock lock(m_mutex);
-        	snapshot = m_state;
-	    }
-
-        if (!snapshot)
-            return Dispatch(std::span<Func>{}, std::forward<Args>(args)...);
-        return Dispatch(snapshot->handlers, std::forward<Args>(args)...);
+    	auto snapshot = Get();
+        return Dispatch(snapshot ? snapshot->handlers : std::span<const Func>{}, std::forward<Args>(args)...);
     }
 
     void Clear() {
@@ -105,12 +98,12 @@ public:
     }
 
 protected:
-    void Dispatch(const auto& funcs, Args&&... args) requires (!std::same_as<Ret, bool>) {
+    void Dispatch(std::span<const Func> funcs, Args&&... args) requires (!std::same_as<Ret, bool>) {
         for (const auto& f : funcs)
             f(std::forward<Args>(args)...);
     }
 
-    bool Dispatch(const auto& funcs, Args&&... args) requires (std::same_as<Ret, bool>) {
+    bool Dispatch(std::span<const Func> funcs, Args&&... args) requires (std::same_as<Ret, bool>) {
         bool result = false;
         for (const auto& f : funcs)
             result |= !f(std::forward<Args>(args)...);
