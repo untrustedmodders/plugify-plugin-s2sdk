@@ -40737,6 +40737,7 @@
       "group": "Gameconfig",
       "description": "RAII wrapper for GameConfig handle.",
       "handleType": "uint32",
+      "handleAlias": "ConfigId",
       "invalidValue": "0",
       "constructors": [
         "LoadGameConfigFile"
@@ -40775,10 +40776,12 @@
       "group": "Menus",
       "description": "RAII wrapper for Menu handle.",
       "handleType": "uint32",
+	  "handleAlias": "MenuId",
       "invalidValue": "0",
       "constructors": [
         "CreateMenu"
       ],
+	  //"destructor": "DestroyMenu",
       "bindings": [
         {
           "name": "Destroy",
