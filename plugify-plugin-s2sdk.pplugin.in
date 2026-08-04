@@ -40781,7 +40781,6 @@
       "constructors": [
         "CreateMenu"
       ],
-	  //"destructor": "DestroyMenu",
       "bindings": [
         {
           "name": "Destroy",
