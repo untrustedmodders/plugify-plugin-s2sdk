@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.15.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.15.0...v2.15.1) (2026-08-04)
+
+
+### Bug Fixes
+
+* add missing handle alias to classes ([b06c5b2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b06c5b27660dd6166b6cc7fa6c3ae103ad33d4a5))
+
 ## [2.15.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.14.1...v2.15.0) (2026-08-02)
 
 
