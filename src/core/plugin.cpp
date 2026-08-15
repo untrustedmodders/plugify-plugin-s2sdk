@@ -455,7 +455,7 @@ polyhook::ResultType Hook_FireOutputInternal(polyhook::HookHandle hook, polyhook
 	auto activator = polyhook::GetArgument<CEntityInstance*>(params, 1);
 	auto caller = polyhook::GetArgument<CEntityInstance*>(params, 2);
 	//auto value = polyhook::GetArgument<const CVariant* const>(params, 3);
-	auto delay = polyhook::GetArgument<float>(params, 6);
+	auto delay = polyhook::GetArgument<float>(params, 4);
 
 	ResultType result = type == polyhook::CallbackType::Post ?
 		g_EntityOutputManager.FireOutputInternal_Post(self, activator, caller, delay) :
@@ -760,7 +760,7 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookDetourFunc<HostStateRequestFn>("CHostStateMgr::StartNewRequest", Hook_HostStateRequest, {Pre}));
 	using ReplyConnectionFn = void (*)(CNetworkGameServerBase *server, CServerSideClient* client);
 	CHECK(g_HookManager.AddHookDetourFunc<ReplyConnectionFn>("CNetworkGameServer::ReplyConnection", Hook_ReplyConnection, {Pre, Post}));
-	using FireOutputInternalFn = uint64_t(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, int32_t*, int16_t*, float);
+	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float, void*, void*);
 	CHECK(g_HookManager.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, {Pre, Post}));
 
 	static Memory CServerSideClient;
