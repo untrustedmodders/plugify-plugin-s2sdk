@@ -37,6 +37,9 @@ public:
     };
 
     bool Register(const Func& handler, int priority = 0) {
+    	if (!handler)
+    		return false;
+
         std::unique_lock lock(m_mutex);
 
         auto old = m_state;
@@ -55,7 +58,10 @@ public:
         return true;
     }
 
-    bool Unregister(const Func& handler) {
+	bool Unregister(const Func& handler) {
+    	if (!handler)
+    		return false;
+
         std::unique_lock lock(m_mutex);
 
         auto old = m_state;
