@@ -1383,7 +1383,7 @@ extern "C" PLUGIN_API plg::vec3 GetClientCenter(int playerSlot) {
 extern "C" PLUGIN_API void TeleportClient(int playerSlot, const plg::vec3& origin, const plg::vec3& angles, const plg::vec3& velocity) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	pawn->Teleport(std::bit_cast<Vector>(origin), std::bit_cast<QAngle>(velocity), std::bit_cast<Vector>(velocity));
+	pawn->Teleport(std::bit_cast<Vector>(origin), std::bit_cast<QAngle>(angles), std::bit_cast<Vector>(velocity));
 }
 
 /**

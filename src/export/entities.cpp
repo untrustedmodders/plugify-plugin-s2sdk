@@ -1477,7 +1477,7 @@ extern "C" PLUGIN_API plg::vec3 GetEntityCenter(int entityHandle) {
 extern "C" PLUGIN_API void TeleportEntity(int entityHandle, const plg::vec3& origin, const plg::vec3& angles, const plg::vec3& velocity) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	entity->Teleport(std::bit_cast<Vector>(origin), std::bit_cast<QAngle>(velocity), std::bit_cast<Vector>(velocity));
+	entity->Teleport(std::bit_cast<Vector>(origin), std::bit_cast<QAngle>(angles), std::bit_cast<Vector>(velocity));
 }
 
 /**
