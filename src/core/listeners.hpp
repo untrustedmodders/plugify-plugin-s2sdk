@@ -3,6 +3,8 @@
 #include "core/listener_manager.hpp"
 #include <core/sdk/entity/cgamerules.h>
 
+class UserMessage;
+
 template<char const* Name, typename Func>
 using Manager = ListenerManager<Name, Func>;
 
@@ -33,6 +35,8 @@ using Manager = ListenerManager<Name, Func>;
 	X(GameFrame, void, bool simulating, bool firstTick, bool lastTick) \
 	X(UpdateWhenNotInGame, void, float frameTime) \
 	X(PreWorldUpdate, void, bool simulating) \
+	X(SendNetMessage, void, int playerSlot, UserMessage* message) \
+	X(SerializeMessage, void, UserMessage* message) \
 
 extern "C" {
 #define DECLARE_ACCESSOR(name, ret, ...) \

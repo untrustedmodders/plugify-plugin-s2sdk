@@ -29,6 +29,7 @@
 #include "server_manager.hpp"
 #include "timer_system.hpp"
 #include "transmit_manager.hpp"
+#include "user_message.hpp"
 #include "user_message_manager.hpp"
 
 Source2SDK g_sdk;
@@ -221,8 +222,6 @@ polyhook::ResultType Hook_PostEvent(polyhook::HookHandle hook, polyhook::Paramet
 	if (clients == nullptr) {
 		return polyhook::ResultType::Ignored;
 	}
-
-	//plg::print(LS_DETAILED, "[PostEvent] = {}, {}, {}, {}\n", slot, localOnly, clientCount, static_cast<void*>(clients) );
 
 #if defined (CS2)
 	if (type == polyhook::CallbackType::Pre) {
@@ -563,7 +562,32 @@ polyhook::ResultType Hook_SendNetMessage(polyhook::HookHandle hook, polyhook::Pa
 	}
 
 	g_MultiAddonManager.OnSendNetMessage(client, data, bufType);
+
+	if (!g_SendNetMessageListenerManager.Empty()) {
+		if (auto* msgSerializable = data->GetSerializerPB()) {
+			int playerSlot = client->GetPlayerSlot().Get();
+			UserMessage message(msgSerializable, data, 1ULL << playerSlot);
+			g_SendNetMessageListenerManager(playerSlot, &message);
+		}
+	}
 #endif
+	return polyhook::ResultType::Ignored;
+}
+
+polyhook::ResultType Hook_Serialize(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	auto data = polyhook::GetArgument<const CNetMessage*>(params, 2);
+	if (data == nullptr || g_SerializeMessageListenerManager.Empty()) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	auto msgSerializable = data->GetSerializerPB();
+	if (msgSerializable == nullptr) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	UserMessage message(msgSerializable, data, 0);
+	g_SerializeMessageListenerManager(&message);
+
 	return polyhook::ResultType::Ignored;
 }
 
@@ -713,6 +737,7 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IGameEventManager2::FireEvent), &IGameEventManager2::FireEvent, g_pGameEventManager, Hook_FireEvent, {Pre, Post}));
 	using PostEventAbstract = void(IGameEventSystem::*)(CSplitScreenSlot slot, bool localOnly, int clientCount, const uint64 *clients, INetworkMessageInternal *event, const CNetMessage *data, unsigned long size, NetChannelBufType_t bufType);
 	CHECK(g_HookManager.AddHookVTableFunc<PostEventAbstract>(STR(IGameEventSystem::PostEventAbstract), &IGameEventSystem::PostEventAbstract, g_pGameEventSystem, Hook_PostEvent, {Pre, Post}));
+	CHECK(g_HookManager.AddHookVTableFunc(STR(INetworkMessages::SerializeAbstract), &INetworkMessages::SerializeAbstract, g_pNetworkMessages, Hook_Serialize, {Pre}));
 
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientCommand), &IServerGameClients::ClientCommand, g_pSource2GameClients, Hook_ClientCommand, {Pre}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientActive), &IServerGameClients::ClientActive, g_pSource2GameClients, Hook_ClientActive, {Post}));

@@ -33927,6 +33927,152 @@
       }
     },
     {
+      "name": "OnSendNetMessage_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnSendNetMessage_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnSendNetMessageCallback",
+            "funcName": "OnSendNetMessageCallback",
+            "description": "Called when a net message is sent to a single client (e.g. net_SignonState). Messages that never go through here or PostEventAbstract (e.g. svc_ClearAllStringTables, sent as part of the initial signon bundle) are instead only visible through OnSerializeMessage.",
+            "paramTypes": [
+              {
+                "name": "playerSlot",
+                "type": "int32",
+                "description": "The slot of the client the message is sent to."
+              },
+              {
+                "name": "message",
+                "type": "ptr64",
+                "ref": false,
+                "description": "The user message."
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnSendNetMessage_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnSendNetMessage_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnSendNetMessageCallback",
+            "funcName": "OnSendNetMessageCallback",
+            "description": "Called when a net message is sent to a single client (e.g. net_SignonState). Messages that never go through here or PostEventAbstract (e.g. svc_ClearAllStringTables, sent as part of the initial signon bundle) are instead only visible through OnSerializeMessage.",
+            "paramTypes": [
+              {
+                "name": "playerSlot",
+                "type": "int32",
+                "description": "The slot of the client the message is sent to."
+              },
+              {
+                "name": "message",
+                "type": "ptr64",
+                "ref": false,
+                "description": "The user message."
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnSerializeMessage_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnSerializeMessage_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnSerializeMessageCallback",
+            "funcName": "OnSerializeMessageCallback",
+            "description": "Called for every outgoing net message as it's serialized, regardless of whether it's also visible through OnSendNetMessage or OnPostEventAbstract - this is a catch-all fallback, filter by message id/name if you only care about a specific one. No recipient/client information is available at this level.",
+            "paramTypes": [
+              {
+                "name": "message",
+                "type": "ptr64",
+                "ref": false,
+                "description": "The user message."
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnSerializeMessage_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnSerializeMessage_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": {
+            "name": "OnSerializeMessageCallback",
+            "funcName": "OnSerializeMessageCallback",
+            "description": "Called for every outgoing net message as it's serialized, regardless of whether it's also visible through OnSendNetMessage or OnPostEventAbstract - this is a catch-all fallback, filter by message id/name if you only care about a specific one. No recipient/client information is available at this level.",
+            "paramTypes": [
+              {
+                "name": "message",
+                "type": "ptr64",
+                "ref": false,
+                "description": "The user message."
+              }
+            ],
+            "retType": {
+              "type": "void",
+              "description": ""
+            }
+          }
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "GetGameRulesProxy",
       "group": "Gamerules",
       "description": "Retrieves the pointer to the current game rules proxy instance.",
