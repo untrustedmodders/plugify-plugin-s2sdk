@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.16.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.15.1...v2.16.0) (2026-08-18)
+
+
+### Features
+
+* add `OnSendNetMessage`/`OnSerializeMessage` listeners ([33cfedd](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/33cfeddbc967b49460cef74b3e629370584e0e7d))
+
+
+### Bug Fixes
+
+* event not copied for post hook when pre hook registered first ([86477ac](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/86477acb0312ba053e9fc7f2407c2df30333434d))
+* invalid fire output hook ([e926fed](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e926fed4592d16ef511db254aab70f761e54fb79))
+* invalid param in teleport ([654906a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/654906acd251a7cde11a0263f37068d7d07df46a))
+* manifest and prevent passing null ptr to listeners ([f87daa8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f87daa8a21719dd803bb68f459d2a037d7a1b49b))
+
 ## [2.15.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.15.0...v2.15.1) (2026-08-04)
 
 
