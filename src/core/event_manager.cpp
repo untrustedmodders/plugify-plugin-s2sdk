@@ -28,6 +28,9 @@ EventHookError EventManager::HookEvent(std::string_view name, EventListenerCallb
 		auto it = m_hookMap.find(name);
 		if (it != m_hookMap.end()) {
 			hook = it->second;
+			if (mode == HookMode::Post) {
+				hook->postCopy = true;
+			}
 		} else {
 			hook = std::make_shared<EventHook>(name, mode == HookMode::Post);
 			m_hookMap.emplace(name, hook);
