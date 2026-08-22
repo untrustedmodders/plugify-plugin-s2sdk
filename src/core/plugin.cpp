@@ -599,7 +599,7 @@ polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::P
 		g_pGameRules = g_pGameRulesProxy->m_pGameRules;
 
 #if defined (CS2)
-		/*v8::Isolate* isolate = v8::Isolate::TryGetCurrent();
+		v8::Isolate* isolate = v8::Isolate::TryGetCurrent();
 		v8::Locker locker(isolate);
 		v8::Isolate::Scope isolateScope(isolate);
 		v8::HandleScope handleScope(isolate);
@@ -610,7 +610,7 @@ polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::P
 			{"cs_script", CS_SCRIPT_PATH}
 		});
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
-		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);*/
+		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);
 #endif
 	}
 
