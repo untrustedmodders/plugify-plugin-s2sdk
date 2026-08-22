@@ -116,6 +116,7 @@ jobs:
           cp build/${{ env.PROJECT_NAME }}.pplugin build/output/
           cp build/gamedata.jsonc build/output/
           cp build/settings.jsonc build/output/
+          cp build/translations.jsonc build/output/
           # Cleanup dev files
           find build/output -type f \( -name "*.exp" -o -name "*.ilk" -o -name "*.lib" -o -name "*.pdb" \) -delete
 
