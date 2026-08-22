@@ -11,16 +11,15 @@
   "language": "cpp",
   "dependencies": [
     {
+      "name": "polyhook",
+      "constraints": ">=2.5.2"
+    },
+    {
       "name": "configs",
       "constraints": ">=2.1.0"
     },
     {
-      "name": "translations",
-      "optional": true
-    },
-    {
-      "name": "polyhook",
-      "constraints": ">=2.5.2"
+      "name": "translations"
     }
   ],
   "methods": [

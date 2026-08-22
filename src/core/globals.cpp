@@ -15,6 +15,7 @@
 #include "core_config.hpp"
 #include "game_config.hpp"
 #include "hook_manager.hpp"
+#include "localization.hpp"
 #include "menu/menu_manager.hpp"
 
 CoreConfig* g_pCoreConfig = nullptr;
@@ -48,6 +49,16 @@ namespace globals {
 			auto result = g_pCoreConfig->Initialize();
 			if (!result) {
 				return MakeError("Failed to load settings configuration: {}", result.error());
+			}
+		}
+		{
+			auto result = lang::Initialize(plg::vector{
+				   paths["base"] + "/translations.jsonc",
+				   paths["configs"] + "/translations.jsonc",
+				   paths["data"] + "/translations.jsonc"
+			});
+			if (!result) {
+				return MakeError("Failed to load translation configuration: {}", result.error());
 			}
 		}
 		{

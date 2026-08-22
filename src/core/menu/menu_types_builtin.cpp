@@ -1,6 +1,7 @@
 #include "menu_manager.hpp"
 
 #include <core/core_config.hpp>
+#include <core/localization.hpp>
 #include <core/sdk/utils.hpp>
 #include <iterator>
 
@@ -50,20 +51,20 @@ namespace {
 				continue;
 			}
 
-			std::string_view suffix = style == MenuItemStyle::Disabled ? " (disabled)" : "";
+			plg::string suffix = style == MenuItemStyle::Disabled ? ' ' + lang::Get(playerSlot, "S2SDK.Menu.Disabled") : plg::string{};
 			utils::PrintChat(slot, std::format(" !{} {}{}", i + 1, g_MenuManager.GetMenuItemDisplay(id, index), suffix));
 		}
 
 		if (g_MenuManager.ClientMenuHasPrevPage(playerSlot)) {
-			utils::PrintChat(slot, " !8 Prev");
+			utils::PrintChat(slot, " !8 " + lang::Get(playerSlot, "S2SDK.Menu.Prev"));
 		}
 		if (g_MenuManager.ClientMenuHasNextPage(playerSlot)) {
-			utils::PrintChat(slot, " !9 Next");
+			utils::PrintChat(slot, " !9 " + lang::Get(playerSlot, "S2SDK.Menu.Next"));
 		}
 		if (g_MenuManager.GetMenuExitBackButton(id)) {
-			utils::PrintChat(slot, " !0 Back");
+			utils::PrintChat(slot, " !0 " + lang::Get(playerSlot, "S2SDK.Menu.Back"));
 		} else if (g_MenuManager.GetMenuExitButton(id)) {
-			utils::PrintChat(slot, " !0 Exit");
+			utils::PrintChat(slot, " !0 " + lang::Get(playerSlot, "S2SDK.Menu.Exit"));
 		}
 
 		// The "!1" hints above only work as literal chat input if a bare digit-named command is
@@ -71,7 +72,7 @@ namespace {
 		std::string command = DigitInputCommand();
 		if (!command.empty()) {
 			std::string_view trigger = g_pCoreConfig->PublicChatTrigger.empty() ? std::string_view{} : std::string_view(g_pCoreConfig->PublicChatTrigger.front());
-			utils::PrintChat(slot, std::format(" Type '{}{}' in chat to make a selection.", trigger, command));
+			utils::PrintChat(slot, ' ' + lang::Format(playerSlot, "S2SDK.Menu.SelectHintChat", trigger, command));
 		}
 	}
 
@@ -98,25 +99,25 @@ namespace {
 				continue;
 			}
 
-			std::string_view suffix = style == MenuItemStyle::Disabled ? " (disabled)" : "";
+			plg::string suffix = style == MenuItemStyle::Disabled ? ' ' + lang::Get(playerSlot, "S2SDK.Menu.Disabled") : plg::string{};
 			utils::PrintConsole(slot, std::format("{}. {}{}", i + 1, g_MenuManager.GetMenuItemDisplay(id, index), suffix));
 		}
 
 		if (g_MenuManager.ClientMenuHasPrevPage(playerSlot)) {
-			utils::PrintConsole(slot, "8. Prev");
+			utils::PrintConsole(slot, "8. " + lang::Get(playerSlot, "S2SDK.Menu.Prev"));
 		}
 		if (g_MenuManager.ClientMenuHasNextPage(playerSlot)) {
-			utils::PrintConsole(slot, "9. Next");
+			utils::PrintConsole(slot, "9. " + lang::Get(playerSlot, "S2SDK.Menu.Next"));
 		}
 		if (g_MenuManager.GetMenuExitBackButton(id)) {
-			utils::PrintConsole(slot, "0. Back");
+			utils::PrintConsole(slot, "0. " + lang::Get(playerSlot, "S2SDK.Menu.Back"));
 		} else if (g_MenuManager.GetMenuExitButton(id)) {
-			utils::PrintConsole(slot, "0. Exit");
+			utils::PrintConsole(slot, "0. " + lang::Get(playerSlot, "S2SDK.Menu.Exit"));
 		}
 
 		std::string command = DigitInputCommand();
 		if (!command.empty()) {
-			utils::PrintConsole(slot, std::format("Use '{}' to make a selection.", command));
+			utils::PrintConsole(slot, lang::Format(playerSlot, "S2SDK.Menu.SelectHintConsole", command));
 		}
 	}
 
@@ -152,20 +153,20 @@ namespace {
 		}
 
 		if (g_MenuManager.ClientMenuHasPrevPage(playerSlot)) {
-			html += "8. Prev<br>";
+			std::format_to(out, "8. {}<br>", lang::Get(playerSlot, "S2SDK.Menu.Prev"));
 		}
 		if (g_MenuManager.ClientMenuHasNextPage(playerSlot)) {
-			html += "9. Next<br>";
+			std::format_to(out, "9. {}<br>", lang::Get(playerSlot, "S2SDK.Menu.Next"));
 		}
 		if (g_MenuManager.GetMenuExitBackButton(id)) {
-			html += "0. Back<br>";
+			std::format_to(out, "0. {}<br>", lang::Get(playerSlot, "S2SDK.Menu.Back"));
 		} else if (g_MenuManager.GetMenuExitButton(id)) {
-			html += "0. Exit<br>";
+			std::format_to(out, "0. {}<br>", lang::Get(playerSlot, "S2SDK.Menu.Exit"));
 		}
 
 		std::string command = DigitInputCommand();
 		if (!command.empty()) {
-			std::format_to(out, "Use '{}' to make a selection.<br>", command);
+			std::format_to(out, "{}<br>", lang::Format(playerSlot, "S2SDK.Menu.SelectHintConsole", command));
 		}
 
 		double time = g_MenuManager.GetClientMenuTime(playerSlot);

@@ -1,3 +1,4 @@
+#include <core/localization.hpp>
 #include <core/player_manager.hpp>
 #include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/entity/cbaseplayercontroller.h>
@@ -238,6 +239,20 @@ extern "C" PLUGIN_API plg::string GetClientLanguage(int playerSlot) {
 	}
 
 	return player->GetLanguage();
+}
+
+/**
+ * @brief Retrieves a client's language as an ISO code.
+ *
+ * Unlike GetClientLanguage, which returns the raw `cl_language` value ("english",
+ * "schinese"), this returns the code translation files are keyed by ("en", "zh-CN").
+ * Falls back to the server language when the client's language is not known.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The client's ISO language code.
+ */
+extern "C" PLUGIN_API plg::string GetClientLanguageCode(int playerSlot) {
+	return lang::GetClientLanguageCode(playerSlot);
 }
 
 /**
