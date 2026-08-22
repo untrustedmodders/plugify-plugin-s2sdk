@@ -15,6 +15,10 @@
       "constraints": ">=2.1.0"
     },
     {
+      "name": "translations",
+      "optional": true
+    },
+    {
       "name": "polyhook",
       "constraints": ">=2.5.2"
     }
@@ -7966,6 +7970,24 @@
       "retType": {
         "type": "string",
         "description": "The client's language."
+      }
+    },
+    {
+      "name": "GetClientLanguageCode",
+      "group": "Clients",
+      "description": "Retrieves a client's language as an ISO code. Unlike GetClientLanguage, which returns the raw cl_language value (\"english\", \"schinese\"), this returns the code translation files are keyed by (\"en\", \"zh-CN\"). Falls back to the server language when the client's language is not known.",
+      "funcName": "GetClientLanguageCode",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The client's ISO language code."
       }
     },
     {

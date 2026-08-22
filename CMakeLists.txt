@@ -187,8 +187,9 @@ endif()
 file(GLOB_RECURSE SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES}
+        "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/configs/configs.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/polyhook/polyhook.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/configs/configs.cpp")
+        "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/translations/translations.cpp")
 target_precompile_headers(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/pch.hpp")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -258,6 +259,12 @@ configure_file(
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/assets/settings.jsonc
         ${CMAKE_CURRENT_BINARY_DIR}/settings.jsonc
+        COPYONLY
+)
+
+configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/assets/translations.jsonc
+        ${CMAKE_CURRENT_BINARY_DIR}/translations.jsonc
         COPYONLY
 )
 
