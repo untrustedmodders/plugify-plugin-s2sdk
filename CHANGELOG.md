@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.16.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.15.1...v2.16.0) (2026-08-23)
+
+
+### Features
+
+* add `OnSendNetMessage`/`OnSerializeMessage` listeners ([33cfedd](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/33cfeddbc967b49460cef74b3e629370584e0e7d))
+
+
+### Bug Fixes
+
+* add permission dependency for command registration ([87c2853](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/87c2853a7a79064a1c584f215543a07df43720b3))
+* add translation dependency ([15319ad](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/15319ad34df146f124ec8a06daa20c58e7952dfa))
+* add translation file to build ([23b9f84](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/23b9f84fb95a80aa639e229438476c609fd57ff7))
+* add translations for menus ([317772c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/317772c426c7150bbe416de8af0a3aa8b390b054))
+* build ([7441f2b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7441f2b7d5899b2103242ea4c35adab009a9f46e))
+* event not copied for post hook when pre hook registered first ([86477ac](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/86477acb0312ba053e9fc7f2407c2df30333434d))
+* invalid fire output hook ([e926fed](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e926fed4592d16ef511db254aab70f761e54fb79))
+* invalid param in teleport ([654906a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/654906acd251a7cde11a0263f37068d7d07df46a))
+* manifest and prevent passing null ptr to listeners ([f87daa8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f87daa8a21719dd803bb68f459d2a037d7a1b49b))
+* rework localization a bit ([38f3744](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/38f37441052508885a971be6c874d00f5161c8dc))
+* uncomment cs script fix ([35a1ec9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/35a1ec95aa401fb63e7bd49a37ffb8c89141ba31))
+* uncomment v8 fix ([8873e2d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8873e2d78b848884cd610fe4462e676df4868eab))
+
 ## [2.15.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.15.0...v2.15.1) (2026-08-04)
 
 
