@@ -19,7 +19,8 @@
       "constraints": ">=2.1.0"
     },
     {
-      "name": "translations"
+      "name": "translations",
+      "optional": true
     }
   ],
   "methods": [

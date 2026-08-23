@@ -76,6 +76,7 @@ public:
 	void SetName(const char* name) const;
 	std::string_view GetIpAddress() const;
 	std::string_view GetLanguage() const;
+	std::string_view GetLanguageCode() const;
 	std::string_view GetOperatingSystem() const;
 	CSteamID GetSteamId(bool validated = false) const;
 	INetChannelInfo* GetNetInfo() const;
@@ -99,6 +100,7 @@ private:
 	int m_slot{-1};
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
 	plg::string m_language;
+	std::string_view m_languageCode;
 	plg::string m_operatingSystem;
 	plg::flat_map<int, CvarQuery> m_queryCallback;
 };

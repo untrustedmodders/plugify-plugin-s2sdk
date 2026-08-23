@@ -15,6 +15,39 @@
 constexpr int CLIENT_LANGUAGE_ID = INT_MAX;
 constexpr int CLIENT_OPERATING_SYSTEMID = INT_MAX - 1;
 
+// `cl_language` reports the Steam language name; translation files are keyed by ISO code.
+const plg::flat_hash_map<std::string_view, std::string_view, plg::case_insensitive_hash, plg::case_insensitive_equal> s_languageCodes = {
+	{"english", "en"},
+	{"german", "de"},
+	{"french", "fr"},
+	{"italian", "it"},
+	{"koreana", "ko"},
+	{"spanish", "es"},
+	{"schinese", "zh-CN"},
+	{"tchinese", "zh-TW"},
+	{"russian", "ru"},
+	{"thai", "th"},
+	{"japanese", "ja"},
+	{"portuguese", "pt"},
+	{"polish", "pl"},
+	{"danish", "da"},
+	{"dutch", "nl"},
+	{"finnish", "fi"},
+	{"norwegian", "no"},
+	{"swedish", "sv"},
+	{"hungarian", "hu"},
+	{"czech", "cs"},
+	{"romanian", "ro"},
+	{"turkish", "tr"},
+	{"brazilian", "pt-BR"},
+	{"bulgarian", "bg"},
+	{"greek", "el"},
+	{"ukrainian", "uk"},
+	{"latam", "es-419"},
+	{"vietnamese", "vi"},
+	{"indonesian", "id"},
+};
+
 CBasePlayerController* Player::GetController() const {
 	auto entIndex = GetEntityIndex();
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(entIndex));
@@ -109,6 +142,10 @@ std::string_view Player::GetLanguage() const {
 	return m_language;
 }
 
+std::string_view Player::GetLanguage() const {
+	return m_languageCode;
+}
+
 std::string_view Player::GetOperatingSystem() const {
 	return m_operatingSystem;
 }
@@ -153,13 +190,19 @@ void Player::QueryCvar(int queryCvarCookie, CvarQuery query) {
 
 void Player::OnRepondCvarValue(const CCLCMsg_RespondCvarValue_t& msg) {
 	switch (msg.cookie()) {
-		case CLIENT_LANGUAGE_ID:
+		case CLIENT_LANGUAGE_ID: {
 			m_language = msg.value();
+			auto it = s_languageCodes.find(msg.value());
+			if (it != s_languageCodes.end()) {
+				m_languageCode = it->second;
+			}
 			break;
+		}
 
-		case CLIENT_OPERATING_SYSTEMID:
+		case CLIENT_OPERATING_SYSTEMID: {
 			m_operatingSystem = msg.value();
 			break;
+		}
 
 		default: {
 			auto it = m_queryCallback.find(msg.cookie());
