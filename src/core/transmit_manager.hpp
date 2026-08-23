@@ -17,21 +17,21 @@ public:
 	// Force a just-spawned player pawn to transmit for the next CheckTransmit pass,
 	// so the client can build its scene node before it may be hidden again. Hiding a
 	// pawn on the spawn tick crashes nearby clients.
-	void MarkRecentlySpawned(int32_t entHandle);
+	void MarkRecentlySpawned(int entHandle);
 
-	void HideEntities(int32_t playerSlot, std::span<const int32_t> entHandles);
-	void ShowEntities(int32_t playerSlot, std::span<const int32_t> entHandles);
+	void HideEntities(int playerSlot, std::span<const int> entHandles);
+	void ShowEntities(int playerSlot, std::span<const int> entHandles);
 
-	void HideEntityFromOtherPlayers(int32_t playerSlot, int32_t entHandle);
-	void ShowEntityToOtherPlayers(int32_t playerSlot, int32_t entHandle);
+	void HideEntityFromOtherPlayers(int playerSlot, int entHandle);
+	void ShowEntityToOtherPlayers(int playerSlot, int entHandle);
 
 	void RoundStart();
-	plg::vector<int32_t> GetHiddenEntities(int32_t playerSlot);
+	plg::vector<int> GetHiddenEntities(int playerSlot);
 
 private:
-	plg::flat_hash_map<int32_t, plg::flat_hash_set<int32_t>> m_playerHiddenEntities;
+	plg::flat_hash_map<int, plg::flat_hash_set<int>> m_playerHiddenEntities;
 	// Pawns that spawned since the last CheckTransmit pass; shown for one tick.
-	plg::flat_hash_set<int32_t> m_recentlySpawned;
+	plg::flat_hash_set<int> m_recentlySpawned;
 	//std::mutex m_mutex;
 };
 inline TransmitManager& g_TransmitManager = TransmitManager::Instance();

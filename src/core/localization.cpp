@@ -10,8 +10,8 @@ namespace {
 		return g_pCoreConfig != nullptr ? g_pCoreConfig->ServerLanguage : "en";
 	}
 
-	std::string_view ClientLanguage(int playerSlot) {
-		auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	std::string_view ClientLanguage(CPlayerSlot slot) {
+		auto player = g_PlayerManager.ToPlayer(slot);
 		if (player != nullptr) {
 			return player->GetLanguageCode();
 		}
@@ -30,13 +30,13 @@ Result<void> lang::Initialize(const plg::vector<plg::string>& paths) {
 	return {};
 }
 
-std::optional<plg::string> lang::Get(int playerSlot, std::string_view key) {
+std::optional<plg::string> lang::Get(CPlayerSlot slot, std::string_view key) {
 	if (!__translations_Translate) {
 		return std::nullopt;
 	}
 
 	plg::string name(key);
-	plg::string client = ClientLanguage(playerSlot);
+	plg::string client = ClientLanguage(slot);
 	plg::string server = ServerLanguage();
 
 	plg::string text = translations::Translate(client, name);
@@ -46,8 +46,8 @@ std::optional<plg::string> lang::Get(int playerSlot, std::string_view key) {
 	return text;
 }
 
-std::optional<plg::string> lang::Get(int playerSlot, std::string_view key, std::format_args args) {
-	auto text = Get(playerSlot, key);
+std::optional<plg::string> lang::Get(CPlayerSlot slot, std::string_view key, std::format_args args) {
+	auto text = Get(slot, key);
 	if (!text || text->empty()) {
 		return text;
 	}

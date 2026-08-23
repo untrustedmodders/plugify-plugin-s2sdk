@@ -59,8 +59,8 @@ namespace {
 
 	// Snaps the display cursor onto a valid, selectable item within [offset, pageEnd) if it
 	// isn't already on one (e.g. the page changed, or the item it pointed to became disabled).
-	int ClampCursor(MenuId id, int playerSlot, int offset, int pageEnd) {
-		int cursor = g_MenuManager.GetClientMenuCursor(playerSlot);
+	int ClampCursor(MenuId id, CPlayerSlot slot, int offset, int pageEnd) {
+		int cursor = g_MenuManager.GetClientMenuCursor(slot);
 		if (cursor >= offset && cursor < pageEnd && g_MenuManager.IsMenuItemSelectable(id, cursor)) {
 			return cursor;
 		}
@@ -69,7 +69,7 @@ namespace {
 		while (cursor < pageEnd && !g_MenuManager.IsMenuItemSelectable(id, cursor)) {
 			++cursor;
 		}
-		g_MenuManager.SetClientMenuCursor(playerSlot, cursor);
+		g_MenuManager.SetClientMenuCursor(slot, cursor);
 		return cursor;
 	}
 
@@ -111,15 +111,15 @@ namespace {
 	// Renders the Up/Down/Left/Right/Exit control row. The images are fixed-width, so a missing
 	// prev/next slot is padded with filler instead of omitted, keeping the footer's alignment
 	// consistent regardless of which controls are actually active.
-	std::string BuildFooter(MenuId id, int playerSlot, uint64 held) {
+	std::string BuildFooter(MenuId id, CPlayerSlot slot, uint64 held) {
 		auto isHeld = [&](InputBitMask_t button) { return (held & button) != 0; };
 
 		std::string html;
 		html += ButtonLabel(g_pCoreConfig->MenuButtonImageUp, isHeld(g_pCoreConfig->MenuButtonKeyUp));
 		html += ButtonLabel(g_pCoreConfig->MenuButtonImageDown, isHeld(g_pCoreConfig->MenuButtonKeyDown));
 
-		bool hasPrevPage = g_MenuManager.ClientMenuHasPrevPage(playerSlot);
-		bool hasNextPage = g_MenuManager.ClientMenuHasNextPage(playerSlot);
+		bool hasPrevPage = g_MenuManager.ClientMenuHasPrevPage(slot);
+		bool hasNextPage = g_MenuManager.ClientMenuHasNextPage(slot);
 		bool showExit = g_MenuManager.GetMenuExitBackButton(id) || g_MenuManager.GetMenuExitButton(id);
 
 		if (hasPrevPage) {
@@ -143,27 +143,29 @@ namespace {
 		CPlayerSlot slot(playerSlot);
 
 		int count = g_MenuManager.GetMenuItemCount(id);
-		int offset = g_MenuManager.GetClientMenuOffset(playerSlot);
+		int offset = g_MenuManager.GetClientMenuOffset(slot);
 		int perPage = g_MenuManager.GetMenuPagination(id);
 		int pageEnd = perPage > 0 ? std::min(offset + perPage, count) : count;
-		int cursor = ClampCursor(id, playerSlot, offset, pageEnd);
-		uint64 held = s_state[static_cast<size_t>(playerSlot)].lastHeld;
+		int cursor = ClampCursor(id, slot, offset, pageEnd);
+		uint64 held = s_state[static_cast<size_t>(slot)].lastHeld;
 
 		std::string html = TitleHtml(g_MenuManager.GetMenuTitle(id));
 		html += ApplyFontClass(BuildItemList(id, offset, pageEnd, cursor, held), g_pCoreConfig->MenuButtonBodyFontClass);
-		html += ApplyFontClass(BuildFooter(id, playerSlot, held), g_pCoreConfig->MenuButtonFooterFontStyle);
+		html += ApplyFontClass(BuildFooter(id, slot, held), g_pCoreConfig->MenuButtonFooterFontStyle);
 		html += "<br> ";
 
 		utils::PrintHtmlCentre(slot, html, g_pCoreConfig->MenuButtonHtmlDuration);
 	}
 
 	void ButtonMenu_Close(MenuId, int playerSlot) {
-		utils::PrintHtmlCentre(playerSlot, " ", 1);
+		CPlayerSlot slot(playerSlot);
 
-		ButtonMenuState& state = s_state[static_cast<size_t>(playerSlot)];
+		utils::PrintHtmlCentre(slot, " ", 1);
+
+		ButtonMenuState& state = s_state[static_cast<size_t>(slot)];
 		if (state.frozen) {
 			state.frozen = false;
-			auto* player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+			auto* player = g_PlayerManager.ToPlayer(slot);
 			auto* pawn = player ? static_cast<CPlayerPawn*>(player->GetPlayerPawn()) : nullptr;
 			if (pawn) {
 				pawn->SetSpeed(state.savedSpeed);
@@ -174,18 +176,18 @@ namespace {
 	}
 
 	// Plays a configured menu sound event to the client, or does nothing if the event name is empty.
-	void PlayMenuSound(int playerSlot, const plg::string& soundName) {
-		g_pEngineServer->ClientCommand(playerSlot, "play %s", soundName.c_str());
+	void PlayMenuSound(CPlayerSlot slot, const plg::string& soundName) {
+		g_pEngineServer->ClientCommand(slot, "play %s", soundName.c_str());
 	}
 
 	// Returns true if the cursor actually moved (i.e. it wasn't already at the boundary).
-	bool MoveCursor(MenuId id, int playerSlot, int direction) {
+	bool MoveCursor(MenuId id, CPlayerSlot slot, int direction) {
 		int count = g_MenuManager.GetMenuItemCount(id);
 		if (count <= 0) {
 			return false;
 		}
 
-		int next = g_MenuManager.GetClientMenuCursor(playerSlot);
+		int next = g_MenuManager.GetClientMenuCursor(slot);
 		for (int step = 0; step < count; ++step) {
 			next += direction;
 			if (next < 0 || next >= count) {
@@ -200,15 +202,15 @@ namespace {
 			return false;
 		}
 
-		g_MenuManager.SetClientMenuCursor(playerSlot, next);
+		g_MenuManager.SetClientMenuCursor(slot, next);
 
-		int offset = g_MenuManager.GetClientMenuOffset(playerSlot);
+		int offset = g_MenuManager.GetClientMenuOffset(slot);
 		int perPage = g_MenuManager.GetMenuPagination(id);
 		if (perPage > 0) {
 			if (next >= offset + perPage) {
-				g_MenuManager.MenuNextPage(playerSlot);
+				g_MenuManager.MenuNextPage(slot);
 			} else if (next < offset) {
-				g_MenuManager.MenuPrevPage(playerSlot);
+				g_MenuManager.MenuPrevPage(slot);
 			}
 		}
 
@@ -220,10 +222,10 @@ namespace {
 	// cursor moved at all, i.e. this is the "move faster than Up/Down" page-jump, not a raw window
 	// shift — MenuManager's own MenuNextPage/MenuPrevPage move the display window without touching
 	// the cursor, which isn't what a player pressing Left/Right expects.
-	bool JumpCursor(MenuId id, int playerSlot, int direction, int steps) {
+	bool JumpCursor(MenuId id, CPlayerSlot slot, int direction, int steps) {
 		bool moved = false;
 		for (int i = 0; i < steps; ++i) {
-			if (!MoveCursor(id, playerSlot, direction)) {
+			if (!MoveCursor(id, slot, direction)) {
 				break;
 			}
 			moved = true;
@@ -232,7 +234,9 @@ namespace {
 	}
 
 	void ButtonMenu_Frame(MenuId id, int playerSlot) {
-		auto* player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+		CPlayerSlot slot(playerSlot);
+
+		auto* player = g_PlayerManager.ToPlayer(slot);
 		auto* pawn = player ? static_cast<CPlayerPawn*>(player->GetPlayerPawn()) : nullptr;
 		if (!pawn) {
 			return;
@@ -243,7 +247,7 @@ namespace {
 			return;
 		}
 
-		ButtonMenuState& state = s_state[static_cast<size_t>(playerSlot)];
+		ButtonMenuState& state = s_state[static_cast<size_t>(slot)];
 		bool freshSession = state.id != id;
 
 		if (freshSession) {
@@ -285,40 +289,40 @@ namespace {
 
 		if (!freshSession) {
 			if (released(g_pCoreConfig->MenuButtonKeyUp)) {
-				if (MoveCursor(id, playerSlot, -1)) {
-					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
+				if (MoveCursor(id, slot, -1)) {
+					PlayMenuSound(slot, g_pCoreConfig->MenuSoundScroll);
 				}
 			} else if (released(g_pCoreConfig->MenuButtonKeyDown)) {
-				if (MoveCursor(id, playerSlot, 1)) {
-					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
+				if (MoveCursor(id, slot, 1)) {
+					PlayMenuSound(slot, g_pCoreConfig->MenuSoundScroll);
 				}
 			} else if (released(g_pCoreConfig->MenuButtonKeyLeft)) {
-				if (JumpCursor(id, playerSlot, -1, g_pCoreConfig->MenuButtonMaxItems)) {
-					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
+				if (JumpCursor(id, slot, -1, g_pCoreConfig->MenuButtonMaxItems)) {
+					PlayMenuSound(slot, g_pCoreConfig->MenuSoundScroll);
 				}
 			} else if (released(g_pCoreConfig->MenuButtonKeyRight)) {
-				if (JumpCursor(id, playerSlot, 1, g_pCoreConfig->MenuButtonMaxItems)) {
-					PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundScroll);
+				if (JumpCursor(id, slot, 1, g_pCoreConfig->MenuButtonMaxItems)) {
+					PlayMenuSound(slot, g_pCoreConfig->MenuSoundScroll);
 				}
 			} else if (released(g_pCoreConfig->MenuButtonKeySelect)) {
-				bool selected = g_MenuManager.SelectMenuItem(playerSlot, g_MenuManager.GetClientMenuCursor(playerSlot));
-				PlayMenuSound(playerSlot, selected ? g_pCoreConfig->MenuSoundClick : g_pCoreConfig->MenuSoundDisabled);
+				bool selected = g_MenuManager.SelectMenuItem(slot, g_MenuManager.GetClientMenuCursor(slot));
+				PlayMenuSound(slot, selected ? g_pCoreConfig->MenuSoundClick : g_pCoreConfig->MenuSoundDisabled);
 				return; // the display session likely just ended; MenuManager already invoked our Close
 			} else if (released(g_pCoreConfig->MenuButtonKeyExit) && g_MenuManager.GetMenuExitBackButton(id)) {
-				PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundBack);
-				g_MenuManager.CancelClientMenu(playerSlot, MenuCancelReason::ExitBack);
+				PlayMenuSound(slot, g_pCoreConfig->MenuSoundBack);
+				g_MenuManager.CancelClientMenu(slot, MenuCancelReason::ExitBack);
 				return;
 			} else if (released(g_pCoreConfig->MenuButtonKeyExit) && g_MenuManager.GetMenuExitButton(id)) {
-				PlayMenuSound(playerSlot, g_pCoreConfig->MenuSoundExit);
-				g_MenuManager.CancelClientMenu(playerSlot, MenuCancelReason::Exit);
+				PlayMenuSound(slot, g_pCoreConfig->MenuSoundExit);
+				g_MenuManager.CancelClientMenu(slot, MenuCancelReason::Exit);
 				return;
 			}
 		}
 
 		double now = TimerSystem::GetTickedTime();
-		int cursor = g_MenuManager.GetClientMenuCursor(playerSlot);
+		int cursor = g_MenuManager.GetClientMenuCursor(slot);
 		if (cursor != state.lastDrawnCursor || now >= state.nextRefreshTime) {
-			ButtonMenu_Display(id, playerSlot);
+			ButtonMenu_Display(id, slot);
 			state.lastDrawnCursor = cursor;
 			state.nextRefreshTime = now + g_pCoreConfig->MenuButtonRefreshInterval;
 		}

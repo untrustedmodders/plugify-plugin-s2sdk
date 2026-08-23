@@ -11,12 +11,12 @@
 namespace lang {
 	Result<void> Initialize(const plg::vector<plg::string>& paths);
 
-	std::optional<plg::string> Get(int playerSlot, std::string_view key);
+	std::optional<plg::string> Get(CPlayerSlot slot, std::string_view key);
 
-	std::optional<plg::string> Get(int playerSlot, std::string_view key, std::format_args args);
+	std::optional<plg::string> Get(CPlayerSlot slot, std::string_view key, std::format_args args);
 
 	template<typename... Args>
-	std::optional<plg::string> Format(int playerSlot, std::string_view key, const Args&... args) {
-		return Get(playerSlot, key, std::make_format_args(args...));
+	std::optional<plg::string> Format(CPlayerSlot slot, std::string_view key, const Args&... args) {
+		return Get(slot, key, std::make_format_args(args...));
 	}
 }// namespace lang

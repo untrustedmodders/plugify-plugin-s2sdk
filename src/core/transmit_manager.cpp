@@ -22,7 +22,7 @@ void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& tr
 			continue;
 		}
 
-		for (const int32_t handle : it->second) {
+		for (const int handle : it->second) {
 			// A just-spawned pawn must transmit for a tick so the client can build
 			// its scene node before it is hidden again; hiding it on the spawn tick
 			// crashes nearby clients.
@@ -51,7 +51,7 @@ void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& tr
 	m_recentlySpawned.clear();
 }
 
-void TransmitManager::MarkRecentlySpawned(int32_t entHandle) {
+void TransmitManager::MarkRecentlySpawned(int entHandle) {
 	m_recentlySpawned.insert(entHandle);
 }
 
@@ -60,21 +60,21 @@ void TransmitManager::RoundStart() {
 	m_recentlySpawned.clear();
 }
 
-void TransmitManager::HideEntities(int32_t playerSlot, std::span<const int32_t> entHandles) {
+void TransmitManager::HideEntities(int playerSlot, std::span<const int> entHandles) {
 	auto& hidden = m_playerHiddenEntities[playerSlot];
-	for (const int32_t handle : entHandles) {
+	for (const int handle : entHandles) {
 		hidden.insert(handle);
 	}
 }
 
-void TransmitManager::ShowEntities(int32_t playerSlot, std::span<const int32_t> entHandles) {
+void TransmitManager::ShowEntities(int playerSlot, std::span<const int> entHandles) {
 	auto it = m_playerHiddenEntities.find(playerSlot);
 	if (it == m_playerHiddenEntities.end()) {
 		return;
 	}
 
 	auto& hidden = it->second;
-	for (const int32_t handle : entHandles) {
+	for (const int handle : entHandles) {
 		hidden.erase(handle);
 	}
 
@@ -83,17 +83,17 @@ void TransmitManager::ShowEntities(int32_t playerSlot, std::span<const int32_t> 
 	}
 }
 
-plg::vector<int32_t> TransmitManager::GetHiddenEntities(int32_t playerSlot) {
+plg::vector<int> TransmitManager::GetHiddenEntities(int playerSlot) {
 	auto it = m_playerHiddenEntities.find(playerSlot);
 	if (it == m_playerHiddenEntities.end()) {
 		return {};
 	}
 
-	return plg::vector<int32_t>(it->second.begin(), it->second.end());
+	return plg::vector<int>(it->second.begin(), it->second.end());
 }
 
-void TransmitManager::HideEntityFromOtherPlayers(int32_t playerSlot, int32_t entHandle) {
-	for (int32_t slot = 0; slot < MaxPlayers; ++slot) {
+void TransmitManager::HideEntityFromOtherPlayers(int playerSlot, int entHandle) {
+	for (int slot = 0; slot < MaxPlayers; ++slot) {
 		if (slot == playerSlot) {
 			continue;
 		}
@@ -102,8 +102,8 @@ void TransmitManager::HideEntityFromOtherPlayers(int32_t playerSlot, int32_t ent
 	}
 }
 
-void TransmitManager::ShowEntityToOtherPlayers(int32_t playerSlot, int32_t entHandle) {
-	for (int32_t slot = 0; slot < MaxPlayers; ++slot) {
+void TransmitManager::ShowEntityToOtherPlayers(int playerSlot, int entHandle) {
+	for (int slot = 0; slot < MaxPlayers; ++slot) {
 		if (slot == playerSlot) {
 			continue;
 		}

@@ -142,7 +142,7 @@ std::string_view Player::GetLanguage() const {
 	return m_language;
 }
 
-std::string_view Player::GetLanguage() const {
+std::string_view Player::GetLanguageCode() const {
 	return m_languageCode;
 }
 

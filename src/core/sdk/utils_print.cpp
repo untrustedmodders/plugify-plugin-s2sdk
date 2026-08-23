@@ -180,15 +180,15 @@ bool utils::CFormat(char* buffer, uint64_t buffer_size, const char* text) {
 	return true;
 }
 
-void ClientPrint(std::optional<CPlayerSlot> playerSlot, HudDest dest, std::string_view message) {
+void ClientPrint(std::optional<CPlayerSlot> slot, HudDest dest, std::string_view message) {
 	INetworkMessageInternal* netMsg = g_pNetworkMessages->FindNetworkMessagePartial("TextMsg");
 	auto* data = netMsg->AllocateMessage()->As<CUserMessageTextMsg_t>();
 
 	data->set_dest(static_cast<uint32_t>(dest));
 	data->add_param(NewStr(message));
 
-	if (playerSlot){
-		UNUSED(data->Send(*playerSlot));
+	if (slot){
+		UNUSED(data->Send(*slot));
 	} else {
 		UNUSED(data->SendToAllClients());
 	}

@@ -62,7 +62,7 @@ namespace {
 	// Sample "test" command: demonstrates MenuManager's public API with a menu
 	// whose items include one that opens a nested sub-menu, and shows how the
 	// sub-menu's "back" button (MenuCancelReason::ExitBack) returns to it.
-	void OnTestMenuAction(MenuId id, MenuAction action, int playerSlot, int param);
+	void OnTestMenuAction(MenuId id, MenuAction action, CPlayerSlot slot, int param);
 
 	MenuId CreateTestMainMenu() {
 		MenuId menu = g_MenuManager.CreateMenu("Test Menu", &OnTestMenuAction);
@@ -80,14 +80,14 @@ namespace {
 		return menu;
 	}
 
-	void OnTestSubMenuAction(MenuId id, MenuAction action, int playerSlot, int param) {
+	void OnTestSubMenuAction(MenuId id, MenuAction action, CPlayerSlot slot, int param) {
 		switch (action) {
 			case MenuAction::Select:
-				utils::PrintChat(playerSlot, std::format("You picked '{}' from the sub-menu.", g_MenuManager.GetMenuItemInfo(id, param)));
+				utils::PrintChat(slot, std::format("You picked '{}' from the sub-menu.", g_MenuManager.GetMenuItemInfo(id, param)));
 				break;
 			case MenuAction::Cancel:
 				if (static_cast<MenuCancelReason>(param) == MenuCancelReason::ExitBack) {
-					g_MenuManager.DisplayMenu(CreateTestMainMenu(), playerSlot);
+					g_MenuManager.DisplayMenu(CreateTestMainMenu(), slot);
 				}
 				break;
 			case MenuAction::End:
@@ -98,18 +98,18 @@ namespace {
 		}
 	}
 
-	void OnTestMenuAction(MenuId id, MenuAction action, int playerSlot, int param) {
+	void OnTestMenuAction(MenuId id, MenuAction action, CPlayerSlot slot, int param) {
 		switch (action) {
 			case MenuAction::Select: {
 				plg::string info = g_MenuManager.GetMenuItemInfo(id, param);
 				if (info == "hello") {
-					utils::PrintChat(playerSlot, "Hello from the test menu!");
+					utils::PrintChat(slot, "Hello from the test menu!");
 				} else if (info == "submenu") {
 					MenuId sub = g_MenuManager.CreateMenu("Test Sub-Menu", &OnTestSubMenuAction);
 					g_MenuManager.AddMenuItem(sub, "option_a", "Sub-option A");
 					g_MenuManager.AddMenuItem(sub, "option_b", "Sub-option B");
 					g_MenuManager.SetMenuExitBackButton(sub, true);
-					g_MenuManager.DisplayMenu(sub, playerSlot);
+					g_MenuManager.DisplayMenu(sub, slot);
 				}
 				break;
 			}
@@ -482,14 +482,14 @@ bool MenuManager::SetMenuItemStyle(MenuId id, int index, MenuItemStyle style) {
 
 // -- Display / navigation --------------------------------------------------------
 
-bool MenuManager::DisplayMenu(MenuId id, int playerSlot, double time) {
-	return DisplayMenuAtItem(id, playerSlot, 0, time);
+bool MenuManager::DisplayMenu(MenuId id, CPlayerSlot slot, double time) {
+	return DisplayMenuAtItem(id, slot, 0, time);
 }
 
-bool MenuManager::DisplayMenuAtItem(MenuId id, int playerSlot, int firstItem, double time) {
+bool MenuManager::DisplayMenuAtItem(MenuId id, CPlayerSlot slot, int firstItem, double time) {
 	std::scoped_lock lock(m_mutex);
 
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return false;
 	}
 
@@ -504,11 +504,11 @@ bool MenuManager::DisplayMenuAtItem(MenuId id, int playerSlot, int firstItem, do
 		return false;
 	}
 
-	if (m_clientState[static_cast<size_t>(playerSlot)].id) {
-		EndClientMenu(playerSlot, MenuCancelReason::Interrupted);
+	if (m_clientState[static_cast<size_t>(slot)].id) {
+		EndClientMenu(slot, MenuCancelReason::Interrupted);
 	}
 
-	auto& state = m_clientState[static_cast<size_t>(playerSlot)];
+	auto& state = m_clientState[static_cast<size_t>(slot)];
 	state = ClientMenuState{};
 	state.id = id;
 	state.currentOffset = menu->items.empty() ? 0 : std::clamp(firstItem, 0, static_cast<int>(menu->items.size()) - 1);
@@ -517,86 +517,86 @@ bool MenuManager::DisplayMenuAtItem(MenuId id, int playerSlot, int firstItem, do
 
 	if (time > 0) {
 		state.timerId = g_TimerSystem.CreateTimer(time, &MenuManager::OnMenuTimeout, TimerFlag::Default,
-			{playerSlot, id});
+			{slot, id});
 	}
 
 	if (menu->handler) {
-		menu->handler(id, MenuAction::Start, playerSlot, 0);
+		menu->handler(id, MenuAction::Start, slot, 0);
 	}
 
-	type->display(id, playerSlot);
+	type->display(id, slot);
 	return true;
 }
 
-bool MenuManager::CancelClientMenu(int playerSlot, MenuCancelReason reason) {
+bool MenuManager::CancelClientMenu(CPlayerSlot slot, MenuCancelReason reason) {
 	std::scoped_lock lock(m_mutex);
 
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return false;
 	}
 
-	if (!m_clientState[static_cast<size_t>(playerSlot)].id) {
+	if (!m_clientState[static_cast<size_t>(slot)].id) {
 		return false;
 	}
 
-	EndClientMenu(playerSlot, reason);
+	EndClientMenu(slot, reason);
 	return true;
 }
 
-MenuId MenuManager::GetClientMenu(int playerSlot) const {
+MenuId MenuManager::GetClientMenu(CPlayerSlot slot) const {
 	std::scoped_lock lock(m_mutex);
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return 0;
 	}
-	return m_clientState[static_cast<size_t>(playerSlot)].id;
+	return m_clientState[static_cast<size_t>(slot)].id;
 }
 
-int MenuManager::GetClientMenuOffset(int playerSlot) const {
+int MenuManager::GetClientMenuOffset(CPlayerSlot slot) const {
 	std::scoped_lock lock(m_mutex);
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return 0;
 	}
-	return m_clientState[static_cast<size_t>(playerSlot)].currentOffset;
+	return m_clientState[static_cast<size_t>(slot)].currentOffset;
 }
 
-double MenuManager::GetClientMenuTime(int playerSlot) const {
+double MenuManager::GetClientMenuTime(CPlayerSlot slot) const {
 	std::scoped_lock lock(m_mutex);
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return 0;
 	}
-	return m_clientState[static_cast<size_t>(playerSlot)].menuTime;
+	return m_clientState[static_cast<size_t>(slot)].menuTime;
 }
 
-int MenuManager::GetClientMenuCursor(int playerSlot) const {
+int MenuManager::GetClientMenuCursor(CPlayerSlot slot) const {
 	std::scoped_lock lock(m_mutex);
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return 0;
 	}
-	return m_clientState[static_cast<size_t>(playerSlot)].cursor;
+	return m_clientState[static_cast<size_t>(slot)].cursor;
 }
 
-void MenuManager::SetClientMenuCursor(int playerSlot, int index) {
+void MenuManager::SetClientMenuCursor(CPlayerSlot slot, int index) {
 	std::scoped_lock lock(m_mutex);
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return;
 	}
-	m_clientState[static_cast<size_t>(playerSlot)].cursor = index;
+	m_clientState[static_cast<size_t>(slot)].cursor = index;
 }
 
-bool MenuManager::ClientMenuHasPrevPage(int playerSlot) const {
+bool MenuManager::ClientMenuHasPrevPage(CPlayerSlot slot) const {
 	std::scoped_lock lock(m_mutex);
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return false;
 	}
-	return !m_clientState[static_cast<size_t>(playerSlot)].prevOffsets.empty();
+	return !m_clientState[static_cast<size_t>(slot)].prevOffsets.empty();
 }
 
-bool MenuManager::ClientMenuHasNextPage(int playerSlot) const {
+bool MenuManager::ClientMenuHasNextPage(CPlayerSlot slot) const {
 	std::scoped_lock lock(m_mutex);
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return false;
 	}
-	const auto& state = m_clientState[static_cast<size_t>(playerSlot)];
+	const auto& state = m_clientState[static_cast<size_t>(slot)];
 	auto menu = FindMenu(state.id);
 	if (!menu || menu->itemsPerPage <= 0) {
 		return false;
@@ -604,14 +604,14 @@ bool MenuManager::ClientMenuHasNextPage(int playerSlot) const {
 	return state.currentOffset + menu->itemsPerPage < static_cast<int>(menu->items.size());
 }
 
-bool MenuManager::MenuNextPage(int playerSlot) {
+bool MenuManager::MenuNextPage(CPlayerSlot slot) {
 	std::scoped_lock lock(m_mutex);
 
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return false;
 	}
 
-	auto& state = m_clientState[static_cast<size_t>(playerSlot)];
+	auto& state = m_clientState[static_cast<size_t>(slot)];
 	auto menu = FindMenu(state.id);
 	if (!menu || menu->itemsPerPage <= 0) {
 		return false;
@@ -625,18 +625,18 @@ bool MenuManager::MenuNextPage(int playerSlot) {
 	state.prevOffsets.push_back(state.currentOffset);
 	state.currentOffset = next;
 	state.page++;
-	RedisplayClient(playerSlot);
+	RedisplayClient(slot);
 	return true;
 }
 
-bool MenuManager::MenuPrevPage(int playerSlot) {
+bool MenuManager::MenuPrevPage(CPlayerSlot slot) {
 	std::scoped_lock lock(m_mutex);
 
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return false;
 	}
 
-	auto& state = m_clientState[static_cast<size_t>(playerSlot)];
+	auto& state = m_clientState[static_cast<size_t>(slot)];
 	if (!state.id || state.prevOffsets.empty()) {
 		return false;
 	}
@@ -644,18 +644,18 @@ bool MenuManager::MenuPrevPage(int playerSlot) {
 	state.currentOffset = state.prevOffsets.back();
 	state.prevOffsets.pop_back();
 	state.page--;
-	RedisplayClient(playerSlot);
+	RedisplayClient(slot);
 	return true;
 }
 
-bool MenuManager::SelectMenuItem(int playerSlot, int itemIndex) {
+bool MenuManager::SelectMenuItem(CPlayerSlot slot, int itemIndex) {
 	std::scoped_lock lock(m_mutex);
 
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return false;
 	}
 
-	auto& state = m_clientState[static_cast<size_t>(playerSlot)];
+	auto& state = m_clientState[static_cast<size_t>(slot)];
 	MenuId id = state.id;
 	auto menu = FindMenu(id);
 	if (!menu) {
@@ -674,28 +674,28 @@ bool MenuManager::SelectMenuItem(int playerSlot, int itemIndex) {
 	if (shouldClose) {
 		// Tear down the display first so a handler that opens a new menu from within
 		// the Select callback starts from a clean slate.
-		CloseClientDisplay(playerSlot, true);
+		CloseClientDisplay(slot, true);
 	}
 
 	if (menu->handler) {
-		menu->handler(id, MenuAction::Select, playerSlot, itemIndex);
+		menu->handler(id, MenuAction::Select, slot, itemIndex);
 	}
 
 	if (shouldClose && menu->handler) {
-		menu->handler(id, MenuAction::End, playerSlot, 0);
+		menu->handler(id, MenuAction::End, slot, 0);
 	}
 
 	return true;
 }
 
-bool MenuManager::HandleDigitInput(int playerSlot, int digit) {
+bool MenuManager::HandleDigitInput(CPlayerSlot slot, int digit) {
 	std::scoped_lock lock(m_mutex);
 
-	if (!utils::IsPlayerSlot(playerSlot)) {
+	if (!utils::IsPlayerSlot(slot)) {
 		return false;
 	}
 
-	const auto& state = m_clientState[static_cast<size_t>(playerSlot)];
+	const auto& state = m_clientState[static_cast<size_t>(slot)];
 	if (!state.id) {
 		return false;
 	}
@@ -708,18 +708,18 @@ bool MenuManager::HandleDigitInput(int playerSlot, int digit) {
 	switch (digit) {
 		case 0:
 			if (menu->backButton) {
-				return CancelClientMenu(playerSlot, MenuCancelReason::ExitBack);
+				return CancelClientMenu(slot, MenuCancelReason::ExitBack);
 			}
 			if (!menu->exitButton) {
 				return false;
 			}
-			return CancelClientMenu(playerSlot, MenuCancelReason::Exit);
+			return CancelClientMenu(slot, MenuCancelReason::Exit);
 		case 8:
-			return MenuPrevPage(playerSlot);
+			return MenuPrevPage(slot);
 		case 9:
-			return MenuNextPage(playerSlot);
+			return MenuNextPage(slot);
 		default:
-			return SelectMenuItem(playerSlot, state.currentOffset + digit - 1);
+			return SelectMenuItem(slot, state.currentOffset + digit - 1);
 	}
 }
 
@@ -736,19 +736,19 @@ std::shared_ptr<MenuTypeCallbacks> MenuManager::FindType(const MenuData& menu) c
 	return it != m_menuTypes.end() ? it->second : nullptr;
 }
 
-void MenuManager::RedisplayClient(int playerSlot) {
-	const auto& state = m_clientState[static_cast<size_t>(playerSlot)];
+void MenuManager::RedisplayClient(CPlayerSlot slot) {
+	const auto& state = m_clientState[static_cast<size_t>(slot)];
 	auto menu = FindMenu(state.id);
 	if (!menu) {
 		return;
 	}
 	if (auto type = FindType(*menu)) {
-		type->display(state.id, playerSlot);
+		type->display(state.id, slot);
 	}
 }
 
-void MenuManager::CloseClientDisplay(int playerSlot, bool notifyBackend) {
-	auto& state = m_clientState[static_cast<size_t>(playerSlot)];
+void MenuManager::CloseClientDisplay(CPlayerSlot slot, bool notifyBackend) {
+	auto& state = m_clientState[static_cast<size_t>(slot)];
 
 	if (state.timerId) {
 		g_TimerSystem.KillTimer(state.timerId);
@@ -757,7 +757,7 @@ void MenuManager::CloseClientDisplay(int playerSlot, bool notifyBackend) {
 	if (notifyBackend && state.id) {
 		if (auto menu = FindMenu(state.id)) {
 			if (auto type = FindType(*menu)) {
-				type->close(state.id, playerSlot);
+				type->close(state.id, slot);
 			}
 		}
 	}
@@ -765,8 +765,8 @@ void MenuManager::CloseClientDisplay(int playerSlot, bool notifyBackend) {
 	state = ClientMenuState{};
 }
 
-void MenuManager::EndClientMenu(int playerSlot, MenuCancelReason reason) {
-	auto& state = m_clientState[static_cast<size_t>(playerSlot)];
+void MenuManager::EndClientMenu(CPlayerSlot slot, MenuCancelReason reason) {
+	auto& state = m_clientState[static_cast<size_t>(slot)];
 	if (!state.id) {
 		return;
 	}
@@ -774,16 +774,16 @@ void MenuManager::EndClientMenu(int playerSlot, MenuCancelReason reason) {
 	MenuId id = state.id;
 	auto menu = FindMenu(id);
 
-	CloseClientDisplay(playerSlot, reason != MenuCancelReason::Disconnect);
+	CloseClientDisplay(slot, reason != MenuCancelReason::Disconnect);
 
 	if (menu && menu->handler) {
-		menu->handler(id, MenuAction::Cancel, playerSlot, static_cast<int>(reason));
-		menu->handler(id, MenuAction::End, playerSlot, 0);
+		menu->handler(id, MenuAction::Cancel, slot, static_cast<int>(reason));
+		menu->handler(id, MenuAction::End, slot, 0);
 	}
 }
 
 void MenuManager::OnMenuTimeout(uint32_t timerId, const plg::vector<plg::any>& userData) {
-	int slot = plg::get<int32_t>(userData[0]);
+	CPlayerSlot slot = plg::get<int32_t>(userData[0]);
 	MenuId id = plg::get<uint64_t>(userData[1]);
 
 	std::scoped_lock lock(g_MenuManager.m_mutex);

@@ -133,30 +133,30 @@ public:
 	bool SetMenuItemStyle(MenuId id, int index, MenuItemStyle style);
 
 	// Display / navigation ------------------------------------------------
-	bool DisplayMenu(MenuId id, int playerSlot, double time = 0.0);
-	bool DisplayMenuAtItem(MenuId id, int playerSlot, int firstItem, double time = 0.0);
-	bool CancelClientMenu(int playerSlot, MenuCancelReason reason = MenuCancelReason::Exit);
-	MenuId GetClientMenu(int playerSlot) const;
-	int GetClientMenuOffset(int playerSlot) const;
-	double GetClientMenuTime(int playerSlot) const;
-	int GetClientMenuCursor(int playerSlot) const;
-	void SetClientMenuCursor(int playerSlot, int index);
-	bool ClientMenuHasPrevPage(int playerSlot) const;
-	bool ClientMenuHasNextPage(int playerSlot) const;
+	bool DisplayMenu(MenuId id, CPlayerSlot slot, double time = 0.0);
+	bool DisplayMenuAtItem(MenuId id, CPlayerSlot slot, int firstItem, double time = 0.0);
+	bool CancelClientMenu(CPlayerSlot slot, MenuCancelReason reason = MenuCancelReason::Exit);
+	MenuId GetClientMenu(CPlayerSlot slot) const;
+	int GetClientMenuOffset(CPlayerSlot slot) const;
+	double GetClientMenuTime(CPlayerSlot slot) const;
+	int GetClientMenuCursor(CPlayerSlot slot) const;
+	void SetClientMenuCursor(CPlayerSlot slot, int index);
+	bool ClientMenuHasPrevPage(CPlayerSlot slot) const;
+	bool ClientMenuHasNextPage(CPlayerSlot slot) const;
 
-	bool MenuNextPage(int playerSlot);
-	bool MenuPrevPage(int playerSlot);
+	bool MenuNextPage(CPlayerSlot slot);
+	bool MenuPrevPage(CPlayerSlot slot);
 	// Called by menu-type backends once they've resolved raw input into an absolute item index.
-	bool SelectMenuItem(int playerSlot, int itemIndex);
+	bool SelectMenuItem(CPlayerSlot slot, int itemIndex);
 	// Shared input path for digit-driven backends (chat/console/centerhtml): 1-7 = item, 8 = prev, 9 = next, 0 = exit.
-	bool HandleDigitInput(int playerSlot, int digit);
+	bool HandleDigitInput(CPlayerSlot slot, int digit);
 
 private:
 	std::shared_ptr<MenuData> FindMenu(MenuId id) const;
 	std::shared_ptr<MenuTypeCallbacks> FindType(const MenuData& menu) const;
-	void RedisplayClient(int playerSlot);
-	void CloseClientDisplay(int playerSlot, bool notifyBackend);
-	void EndClientMenu(int playerSlot, MenuCancelReason reason);
+	void RedisplayClient(CPlayerSlot slot);
+	void CloseClientDisplay(CPlayerSlot slot, bool notifyBackend);
+	void EndClientMenu(CPlayerSlot slot, MenuCancelReason reason);
 	static void OnMenuTimeout(TimerId timerId, const plg::vector<plg::any>& userData);
 
 private:
