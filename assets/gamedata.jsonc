@@ -283,7 +283,7 @@
       // "InitialActivate" and "OnActivate"
       "CCSScript_EntityScript": {
         "win64": 1288,
-        "linuxsteamrt64": 2032
+        "linuxsteamrt64": 1952
       },
       // String: "%s<%i><%s><%s>" ChangeTeam() CTMDBG..."
       "CCSPlayerController::ChangeTeam": {

@@ -709,7 +709,7 @@ polyhook::ResultType Hook_IsolateExit(polyhook::HookHandle hook, polyhook::Param
 }
 #endif
 
-#if _WIN32
+#if PLATFORM_WINDOWS
 polyhook::ResultType Hook_PreloadLibrary(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	HMODULE hModule = (HMODULE) polyhook::GetArgument<void*>(params, 0);
 
@@ -724,8 +724,6 @@ polyhook::ResultType Hook_PreloadLibrary(polyhook::HookHandle hook, polyhook::Pa
 
 	return polyhook::ResultType::Ignored;
 }
-#else
-#include <dlfcn.h>
 #endif
 }
 
@@ -803,7 +801,7 @@ Result<void> SetupHooks() {
 	using ScriptGetAddonFn = uint64(*)();
 	CHECK(g_HookManager.AddHookDetourFunc<ScriptGetAddonFn>("ScriptGetAddon", Hook_ScriptGetAddon, {Pre}));
 
-#if 0
+#if 1
 	using v8IsolateFn = void(*)(v8::Isolate*);
 
 	uint8_t* v8IsolateEnterPtr;
@@ -812,7 +810,7 @@ Result<void> SetupHooks() {
 	UNWRAP(v8IsolateEnterPtr, g_pGameConfig->GetAddress("v8::Isolate::Enter"));
 	UNWRAP(v8IsolateExitPtr, g_pGameConfig->GetAddress("v8::Isolate::Exit"));
 
-#if _WIN32
+#if PLATFORM_WINDOWS
 	const uint8_t fix = 0;
 #else
 	const uint8_t fix = 6; // skip plt staff
@@ -821,18 +819,16 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookDetourFunc<v8IsolateFn>("v8::Isolate::Enter", reinterpret_cast<uintptr_t>(v8IsolateEnterPtr + fix), Hook_IsolateEnter, {Pre}));
 	CHECK(g_HookManager.AddHookDetourFunc<v8IsolateFn>("v8::Isolate::Exit", reinterpret_cast<uintptr_t>(v8IsolateExitPtr + fix), Hook_IsolateExit, {Post}));
 
-	if (Module v8("plugify-module-v8"); v8.IsValid()) {
-		using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
-		auto resolve = v8.GetFunctionByName("SetModuleResolver").As<SetModuleResolverFn>();
-		if (!resolve) {
-			return MakeError("SetModuleResolver not found!");
-		}
+	using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
+	if (auto resolve = ModuleLookup::FindSymbolAs<SetModuleResolverFn>(S2SDK_LIBRARY_PREFIX "plugify-module-v8" S2SDK_LIBRARY_SUFFIX, "SetModuleResolver")) {
 		resolve(addresses::CSScript_ResolveModule);
+	} else {
+		return MakeError("SetModuleResolver not found!");
 	}
 #endif
 #endif
 
-#if _WIN32
+#if PLATFORM_WINDOWS
 	using PreloadLibrary = void(*)(void*);
 	CHECK(g_HookManager.AddHookDetourFunc<PreloadLibrary>("PreloadLibrary", Hook_PreloadLibrary, {Pre}));
 #endif

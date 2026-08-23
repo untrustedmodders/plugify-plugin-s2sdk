@@ -10,6 +10,7 @@
 #    include <sys/stat.h>
 #    include <thread>
 #    include <unistd.h>
+#    include <dlfcn.h>
 #elifdef  PLATFORM_WINDOWS
 #    include <windows.h>
 #    include <winternl.h>

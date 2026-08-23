@@ -6,6 +6,7 @@
 #include <iserver.h>
 
 #include <core/memory/module.hpp>
+#include <core/memory/module_lookup.hpp>
 
 using Memory = CAddress;
 using Module = CModule;
