@@ -189,6 +189,7 @@ file(GLOB_RECURSE SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES}
         "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/configs/configs.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/polyhook/polyhook.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/permissions/permissions.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/external/plugify/include/translations/translations.cpp")
 target_precompile_headers(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/pch.hpp")
 

@@ -21,6 +21,10 @@
     {
       "name": "translations",
       "optional": true
+    },
+    {
+      "name": "permissions",
+      "optional": true
     }
   ],
   "methods": [
@@ -11969,10 +11973,10 @@
           "description": "The name of the console command."
         },
         {
-          "name": "adminFlags",
-          "type": "int64",
+          "name": "permission",
+          "type": "string",
           "ref": false,
-          "description": "The admin flags that indicate which admin level can use this command."
+          "description": "The permission required to use this command."
         },
         {
           "name": "description",

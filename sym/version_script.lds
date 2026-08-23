@@ -1100,6 +1100,7 @@
         __polyhook_*;
         __configs_*;
         __translations_*;
+        __permissions_*;
         *_offset;
     local: *;
 };

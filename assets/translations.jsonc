@@ -4,7 +4,7 @@
   //
   // Language codes are the ISO codes that s2sdk maps `cl_language` onto; a client whose
   // language has no entry falls back to "ServerLanguage" from settings.jsonc, then to the
-  // English text compiled into src/core/localization.cpp.
+  // English literal each call site passes to value_or().
   //
   // "{0}", "{1}" are positional placeholders and must be kept as-is, though they may be
   // reordered to suit the language. Format specs ("{0:>8}") are not supported.
@@ -238,5 +238,38 @@
     "es-419": "Usa '{0}' para seleccionar.",
     "vi": "Dùng '{0}' để chọn.",
     "id": "Gunakan '{0}' untuk memilih."
+  },
+
+  // Shown when a client triggers a command their permission group doesn't cover.
+  "S2SDK.Command.NoAccess": {
+    "en": "You don't have access to this command.",
+    "de": "Du hast keinen Zugriff auf diesen Befehl.",
+    "fr": "Vous n'avez pas accès à cette commande.",
+    "it": "Non hai accesso a questo comando.",
+    "ko": "이 명령어를 사용할 권한이 없습니다.",
+    "es": "No tienes acceso a este comando.",
+    "zh-CN": "你没有权限使用此命令。",
+    "zh-TW": "你沒有權限使用此指令。",
+    "ru": "У вас нет доступа к этой команде.",
+    "th": "คุณไม่มีสิทธิ์ใช้คำสั่งนี้",
+    "ja": "このコマンドを使用する権限がありません。",
+    "pt": "Não tens acesso a este comando.",
+    "pl": "Nie masz dostępu do tej komendy.",
+    "da": "Du har ikke adgang til denne kommando.",
+    "nl": "Je hebt geen toegang tot dit commando.",
+    "fi": "Sinulla ei ole oikeutta tähän komentoon.",
+    "no": "Du har ikke tilgang til denne kommandoen.",
+    "sv": "Du har inte behörighet till det här kommandot.",
+    "hu": "Nincs jogosultságod ehhez a parancshoz.",
+    "cs": "Nemáš přístup k tomuto příkazu.",
+    "ro": "Nu ai acces la această comandă.",
+    "tr": "Bu komutu kullanma yetkiniz yok.",
+    "pt-BR": "Você não tem acesso a este comando.",
+    "bg": "Нямате достъп до тази команда.",
+    "el": "Δεν έχετε πρόσβαση σε αυτήν την εντολή.",
+    "uk": "У вас немає доступу до цієї команди.",
+    "es-419": "No tienes acceso a este comando.",
+    "vi": "Bạn không có quyền dùng lệnh này.",
+    "id": "Kamu tidak punya akses ke perintah ini."
   }
 }

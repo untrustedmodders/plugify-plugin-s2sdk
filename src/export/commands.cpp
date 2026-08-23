@@ -11,15 +11,15 @@ PLUGIFY_LINKAGE()
  * the access rights of the player are automatically checked before allowing it to continue.
  *
  * @param name The name of the console command.
- * @param adminFlags The admin flags that indicate which admin level can use this command.
+ * @param permission The permission required to use this command.
  * @param description A brief description of what the command does.
  * @param flags Command flags that define the behavior of the command.
  * @param callback A callback function that is invoked when the command is executed.
  * @param mode Whether the hook was in post mode (after processing) or pre mode (before processing).
  * @return A boolean indicating whether the command was successfully added.
  */
-extern "C" PLUGIN_API bool AddAdminCommand(const plg::string& name, int64_t adminFlags, const plg::string& description, ConVarFlag flags, ConCommandListenerCallback callback, HookMode mode) {
-	auto result = g_ConCommandManager.AddValveCommand(name, description, flags, adminFlags);
+extern "C" PLUGIN_API bool AddAdminCommand(const plg::string& name, const plg::string& permission, const plg::string& description, ConVarFlag flags, ConCommandListenerCallback callback, HookMode mode) {
+	auto result = g_ConCommandManager.AddValveCommand(name, description, flags, permission);
 	g_ConCommandManager.AddCommandListener(name, callback, mode);
 	return result;
 }

@@ -20,6 +20,7 @@ struct ConCommandInfo {
 	ConCommandData* command{};
 	ConCommandRef commandRef{};
 	plg::enum_array<ListenerManager<ConCommandListenerStr, ConCommandListenerCallback>, HookMode> callbacks;
+	plg::string permission;
 	bool defaultCommand{};
 };
 
@@ -37,7 +38,7 @@ public:
 	bool AddCommandListener(std::string_view name, ConCommandListenerCallback callback, HookMode mode);
 	bool RemoveCommandListener(std::string_view name, ConCommandListenerCallback callback, HookMode mode);
 	bool IsValidValveCommand(std::string_view name);
-	bool AddValveCommand(std::string_view name, std::string_view description, ConVarFlag flags = ConVarFlag::None, uint64 adminFlags = 0);
+	bool AddValveCommand(std::string_view name, std::string_view description, ConVarFlag flags = ConVarFlag::None, std::string_view permission = "");
 	bool RemoveValveCommand(std::string_view name);
 
 	ResultType DispatchConCommand(const CCommandContext* ctx, const CCommand* args, HookMode mode);

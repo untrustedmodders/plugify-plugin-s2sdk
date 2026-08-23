@@ -1,5 +1,6 @@
 #include "con_command_manager.hpp"
 #include "core_config.hpp"
+#include "localization.hpp"
 #include "player_manager.hpp"
 
 #include <core/sdk/entity/cbaseplayercontroller.h>
@@ -7,6 +8,8 @@
 
 #include <icvar.h>
 #include <igameevents.h>
+
+#include <permissions/permissions.hpp>
 
 static void CommandCallback(const CCommandContext&, const CCommand&) {
 }
@@ -70,7 +73,7 @@ bool ConCommandManager::RemoveCommandListener(std::string_view name, ConCommandL
 	return false;
 }
 
-bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view description, ConVarFlag flags, uint64 adminFlags) {
+bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view description, ConVarFlag flags, std::string_view permission) {
 	std::scoped_lock lock(m_mutex);
 
 	if (name.empty()) {
@@ -95,7 +98,7 @@ bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view 
 
 	commandInfo->commandRef = g_pCVar->RegisterConCommand(setup, ConVar_GetDefaultFlags());
 	commandInfo->command = commandInfo->commandRef.GetRawData();
-	//commandInfo->adminFlags = adminFlags;
+	commandInfo->permission = permission;
 
 	m_cmdLookup.emplace(name, commandInfo);
 	return true;
@@ -134,9 +137,14 @@ bool ConCommandManager::IsValidValveCommand(std::string_view name) {
 	return commandRef.IsValidRef();
 }
 
-static bool CheckCommandAccess(CPlayerSlot slot, uint64 flags) {
-	if (!flags) {
+static bool CheckCommandAccess(CPlayerSlot slot, const plg::string& permission) {
+	if (permission.empty()) {
 		return true;
+	}
+
+	if (!__permissions_HasGroup) {
+		plg::print(LS_ERROR, "Missing permission dependency!\n");
+		return false;
 	}
 
 	auto player = g_PlayerManager.ToPlayer(slot);
@@ -144,10 +152,10 @@ static bool CheckCommandAccess(CPlayerSlot slot, uint64 flags) {
 		return false;
 	}
 
-	/*if (!player->IsAdminFlagSet(flags)) {
-		utils::PrintChat(slot, "You don't have access to this command.");
+	if (permissions::HasGroup(player->GetSteamId().ConvertToUint64(), permission) != permissions::Status::Success)  {
+		utils::PrintChat(slot, lang::Get(slot, "S2SDK.Command.NoAccess").value_or("You don't have access to this command."));
 		return false;
-	}*/
+	}
 
 	return true;
 }
@@ -192,9 +200,10 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, con
 	auto it = m_cmdLookup.find(name);
 	if (it != m_cmdLookup.end()) {
 		auto commandInfo = it->second;
-		/*if (!CheckCommandAccess(caller, commandInfo->adminFlags)) {
+
+		if (!CheckCommandAccess(caller, commandInfo->permission)) {
 			return result;
-		}*/
+		}
 
 		if (auto funcs = commandInfo->callbacks[mode].Get()) {
 			for (const auto& func : funcs->handlers) {
