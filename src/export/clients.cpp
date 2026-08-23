@@ -252,7 +252,12 @@ extern "C" PLUGIN_API plg::string GetClientLanguage(int playerSlot) {
  * @return The client's ISO language code.
  */
 extern "C" PLUGIN_API plg::string GetClientLanguageCode(int playerSlot) {
-	return lang::GetClientLanguageCode(playerSlot);
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
+		return {};
+	}
+
+	return player->GetLanguageCode();
 }
 
 /**
