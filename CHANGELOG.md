@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.16.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.16.0...v2.16.1) (2026-08-24)
+
+
+### Bug Fixes
+
+* remove error on missing resolver ([378d1b4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/378d1b4e38b8acb3e5c0b09c28f171609e22bef5))
+
 ## [2.16.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.15.1...v2.16.0) (2026-08-23)
 
 
