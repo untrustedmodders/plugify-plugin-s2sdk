@@ -822,8 +822,6 @@ Result<void> SetupHooks() {
 	using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
 	if (auto resolve = ModuleLookup::FindSymbolAs<SetModuleResolverFn>(S2SDK_LIBRARY_PREFIX "plugify-module-v8" S2SDK_LIBRARY_SUFFIX, "SetModuleResolver")) {
 		resolve(addresses::CSScript_ResolveModule);
-	} else {
-		return MakeError("SetModuleResolver not found!");
 	}
 #endif
 #endif
