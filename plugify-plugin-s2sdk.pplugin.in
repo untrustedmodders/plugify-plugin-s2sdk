@@ -17802,6 +17802,29 @@
       }
     },
     {
+      "name": "SetConVarDefault",
+      "group": "Cvars",
+      "description": "Sets the specified default value for a console variable.",
+      "funcName": "SetConVarDefault",
+      "paramTypes": [
+        {
+          "name": "conVarHandle",
+          "type": "uint64",
+          "ref": false,
+          "description": "The handle to the console variable data."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "ref": false,
+          "description": "The value to set as the default."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "GetConVarValue",
       "group": "Cvars",
       "description": "Retrieves the current value of a console variable and stores it in the output string.",
@@ -40715,6 +40738,11 @@
         {
           "name": "GetDefault",
           "method": "GetConVarDefault",
+          "bindSelf": true
+        },
+        {
+          "name": "SetDefault",
+          "method": "SetConVarDefault",
           "bindSelf": true
         },
         {

@@ -231,6 +231,7 @@
         SetConVarBounds;
         GetConVar;
         GetConVarDefault;
+        SetConVarDefault;
         GetConVarValue;
         GetConVarBool;
         GetConVarInt16;
