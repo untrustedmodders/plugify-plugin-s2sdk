@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.16.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.16.1...v2.16.2) (2026-08-26)
+
+
+### Bug Fixes
+
+* add `SetConVarDefault` in manifest ([6ce9ddd](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6ce9ddd433c389508c0a51facf14bb6ddc719040))
+* update signature ([8f2b047](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8f2b04777757a184f88a104d369440a2cc89fe87))
+
 ## [2.16.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.16.0...v2.16.1) (2026-08-24)
 
 
