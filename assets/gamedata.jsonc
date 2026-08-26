@@ -105,7 +105,7 @@
       "CGameRules::TerminateRound": {
         "library": "server",
         "win64": "48 8B C4 4C 89 48 ? 48 89 48 ? 55 41 54",
-        "linuxsteamrt64": "55 48 89 E5 41 57 41 89 F7 41 56 48 8D 35"
+        "linuxsteamrt64": "55 48 89 E5 41 57 41 56 41 55 41 54 41 89 F4 53 48 8D 35 ? ? ? ? 48 89 FB"
       },
       // "chicken" is passed to this
       "CGameEntitySystem::CreateEntityByName": {
