@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.16.2...v2.17.0) (2026-08-28)
+
+
+### Features
+
+* add translation file to build ([ef75fec](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ef75fec834fb5508b39ae5eb0feda2318ac65256))
+
 ## [2.16.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.16.1...v2.16.2) (2026-08-26)
 
 
