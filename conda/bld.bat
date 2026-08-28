@@ -9,6 +9,7 @@ REM Copy the DLL and plugin file
 copy bin\plugify-plugin-s2sdk.dll "%PREFIX%\bin\" || exit 1
 copy gamedata.jsonc "%PREFIX%\" || exit 1
 copy settings.jsonc "%PREFIX%\" || exit 1
+copy translations.jsonc "%PREFIX%\" || exit 1
 copy plugify-plugin-s2sdk.pplugin "%PREFIX%\" || exit 1
 
 REM Create activation scripts

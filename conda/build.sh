@@ -11,12 +11,14 @@ mkdir -p $PREFIX
 cp bin/libplugify-plugin-s2sdk.so $PREFIX/bin/
 cp gamedata.jsonc $PREFIX/
 cp settings.jsonc $PREFIX/
+cp translations.jsonc $PREFIX/
 cp plugify-plugin-s2sdk.pplugin $PREFIX/
 
 # Set proper permissions
 chmod 755 $PREFIX/bin/libplugify-plugin-s2sdk.so
 chmod 644 $PREFIX/gamedata.jsonc
 chmod 644 $PREFIX/settings.jsonc
+chmod 644 $PREFIX/translations.jsonc
 chmod 644 $PREFIX/plugify-plugin-s2sdk.pplugin
 
 # Create activation scripts for proper library path
