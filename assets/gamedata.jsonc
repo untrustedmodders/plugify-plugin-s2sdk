@@ -253,8 +253,8 @@
       // return (*(*v9 + 2976LL))(v9, v27, 0LL);
       // 2976 (372 * 8) is the offset
       "CBasePlayerPawn::CommitSuicide": {
-        "win64": 390,
-        "linuxsteamrt64": 390
+        "win64": 384,
+        "linuxsteamrt64": 384
       },
       "CCSPlayer_WeaponServices::CanUse": {
         "win64": 27,
