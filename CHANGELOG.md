@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.17.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.17.0...v2.17.1) (2026-09-02)
+
+
+### Bug Fixes
+
+* offset `CBasePlayerPawn::CommitSuicide` ([9c8a122](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9c8a122befe68bb1df49c03fa1375dcfe187cca8))
+* update external `sourcesdk` ([18575ed](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/18575ed3422e9491ffd9f93ec1b05fa2236635a7))
+
 ## [2.17.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.16.2...v2.17.0) (2026-08-28)
 
 
