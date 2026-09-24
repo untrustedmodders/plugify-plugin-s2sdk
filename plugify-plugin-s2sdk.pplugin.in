@@ -19636,6 +19636,17 @@
       }
     },
     {
+      "name": "GetPointScriptHandle",
+      "group": "Entities",
+      "description": "Retrieves the handle of the point_script entity created by s2sdk.",
+      "funcName": "GetPointScriptHandle",
+      "paramTypes": [],
+      "retType": {
+        "type": "int32",
+        "description": "The entity handle as an integer, or INVALID_EHANDLE_INDEX if the entity does not exist."
+      }
+    },
+    {
       "name": "HookEntityOutput",
       "group": "Entities",
       "description": "Adds an entity output hook on a specified entity class name.",
@@ -28337,6 +28348,30 @@
       }
     },
     {
+      "name": "GetEntDataPtr2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves a pointer to the data at the given offset.",
+      "funcName": "GetEntDataPtr2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the data at the given memory location."
+      }
+    },
+    {
       "name": "ChangeEntityState2",
       "group": "Schema",
       "description": "Updates the networked state of a schema field for a given entity pointer.",
@@ -28987,6 +29022,30 @@
       }
     },
     {
+      "name": "GetEntDataPtr",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves a pointer to the data at the given offset.",
+      "funcName": "GetEntDataPtr",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the data at the given memory location."
+      }
+    },
+    {
       "name": "ChangeEntityState",
       "group": "Schema",
       "description": "Updates the networked state of a schema field for a given entity handle.",
@@ -29043,6 +29102,42 @@
       "retType": {
         "type": "int32",
         "description": "Size of array (in elements) or 0 if schema is not an array."
+      }
+    },
+    {
+      "name": "GetEntSchemaPtr2",
+      "group": "Schema",
+      "description": "Retrieves a pointer to a structure or an array element in an entity's schema.",
+      "funcName": "GetEntSchemaPtr2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be retrieved."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "element",
+          "type": "int32",
+          "ref": false,
+          "description": "Element # (starting from 0) if schema is an array."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the field or element, or nullptr if the field is not found or element is out of range."
       }
     },
     {
@@ -29858,6 +29953,42 @@
       "retType": {
         "type": "int32",
         "description": "Size of array (in elements) or 0 if schema is not an array."
+      }
+    },
+    {
+      "name": "GetEntSchemaPtr",
+      "group": "Schema",
+      "description": "Retrieves a pointer to a structure or an array element in an entity's schema.",
+      "funcName": "GetEntSchemaPtr",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "element",
+          "type": "int32",
+          "ref": false,
+          "description": "Element # (starting from 0) if schema is an array."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the field or element, or nullptr if the field is not found or element is out of range."
       }
     },
     {

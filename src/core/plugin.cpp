@@ -636,6 +636,8 @@ polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::P
 		g_pGameRules = nullptr;
 	} else if (name.ends_with("team_manager")) {
 		g_TeamManagers.erase(entity->m_iTeamNum);
+	} else if (entity == g_pPointScript) {
+		g_pPointScript = nullptr;
 	}
 
 	g_EntityDeletedListenerManager(entity->GetRefEHandle().ToInt());

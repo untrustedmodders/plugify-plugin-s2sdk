@@ -182,6 +182,17 @@ extern "C" PLUGIN_API int GetNextActiveEntity(int entityHandle) {
 }
 
 /**
+ * @brief Retrieves the handle of the point_script entity created by s2sdk.
+ *
+ * This function returns a handle to the point_script entity that s2sdk spawns to load CS_Script.
+ *
+ * @return The entity handle as an integer, or INVALID_EHANDLE_INDEX if the entity does not exist.
+ */
+extern "C" PLUGIN_API int GetPointScriptHandle() {
+	return g_pPointScript ? g_pPointScript->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
+}
+
+/**
  * @brief Adds an entity output hook on a specified entity class name.
  *
  * This function hooks a specified output for a given entity class name. The provided

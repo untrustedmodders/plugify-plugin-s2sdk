@@ -307,6 +307,7 @@
         GetFirstActiveEntity;
         GetPrevActiveEntity;
         GetNextActiveEntity;
+        GetPointScriptHandle;
         HookEntityOutput;
         UnhookEntityOutput;
         FindEntityByClassname;
@@ -613,6 +614,7 @@
         SetEntDataVector2D2;
         GetEntDataEnt2;
         SetEntDataEnt2;
+        GetEntDataPtr2;
         ChangeEntityState2;
         GetEntData;
         SetEntData;
@@ -632,8 +634,10 @@
         SetEntDataVector2D;
         GetEntDataEnt;
         SetEntDataEnt;
+        GetEntDataPtr;
         ChangeEntityState;
         GetEntSchemaArraySize2;
+        GetEntSchemaPtr2;
         GetEntSchema2;
         SetEntSchema2;
         GetEntSchemaFloat2;
@@ -654,6 +658,7 @@
         EraseEntSchemaEnt2;
         NetworkStateChanged2;
         GetEntSchemaArraySize;
+        GetEntSchemaPtr;
         GetEntSchema;
         SetEntSchema;
         GetEntSchemaFloat;

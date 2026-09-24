@@ -409,6 +409,17 @@ extern "C" PLUGIN_API void SetEntDataEnt2(CEntityInstance* entity, int offset, i
 }
 
 /**
+ * @brief Peeks into an entity's object data and retrieves a pointer to the data at the given offset.
+ *
+ * @param entity Pointer to the instance of the class where the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @return A pointer to the data at the given memory location.
+ */
+extern "C" PLUGIN_API void* GetEntDataPtr2(CEntityInstance* entity, int offset) {
+	return reinterpret_cast<void*>(reinterpret_cast<intptr_t>(entity) + offset);
+}
+
+/**
  * @brief Updates the networked state of a schema field for a given entity pointer.
  *
  * @param entity Pointer to the instance of the class where the value is to be set.
@@ -771,6 +782,23 @@ extern "C" PLUGIN_API void SetEntDataEnt(int entityHandle, int offset, int value
 }
 
 /**
+ * @brief Peeks into an entity's object data and retrieves a pointer to the data at the given offset.
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param offset The offset of the schema to use.
+ * @return A pointer to the data at the given memory location.
+ */
+extern "C" PLUGIN_API void* GetEntDataPtr(int entityHandle, int offset) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot get '{}' with invalid entity handle: {}\n", offset, entityHandle);
+		return nullptr;
+	}
+
+	return GetEntDataPtr2(entity, offset);
+}
+
+/**
  * @brief Updates the networked state of a schema field for a given entity handle.
  *
  * @param entityHandle The handle of the entity from which the value is to be retrieved.
@@ -815,6 +843,63 @@ extern "C" PLUGIN_API int GetEntSchemaArraySize2(CEntityInstance* entity, const 
 		default:
 			return 0;
 	}
+}
+
+/**
+ * @brief Retrieves a pointer to a structure or an array element in an entity's schema.
+ *
+ * Works for fixed arrays and collections (CUtlVector, CNetworkUtlVectorBase, etc.) of any element type,
+ * including structures. For non-array fields returns a pointer to the field itself (element must be 0).
+ *
+ * @param entity Pointer to the instance of the class where the value is to be retrieved.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param element Element # (starting from 0) if schema is an array.
+ * @return A pointer to the field or element, or nullptr if the field is not found or element is out of range.
+ */
+extern "C" PLUGIN_API void* GetEntSchemaPtr2(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, int element) {
+	const auto [offset, networked, size, type] = schema::GetOffset(className, memberName);
+	if (offset == -1) {
+		plg::print(LS_WARNING, "Cannot find offset for '{}::{}' with entity pointer: {}\n", className, memberName, static_cast<const void*>(entity));
+		return nullptr;
+	}
+
+	const intptr_t base = reinterpret_cast<intptr_t>(entity) + offset;
+	int count;
+	intptr_t data;
+	int elementSize;
+
+	switch (schema::GetElementType(type)) {
+		case schema::ElementType::Array: {
+			const auto* arrayType = static_cast<const CSchemaType_FixedArray*>(type);
+			count = arrayType->m_nElementCount;
+			data = base;
+			elementSize = arrayType->m_nElementSize;
+			break;
+		}
+		case schema::ElementType::Collection: {
+			const auto* vec = reinterpret_cast<CUtlVector<uint8>*>(base);
+			count = vec->Count();
+			data = reinterpret_cast<intptr_t>(vec->Base());
+			elementSize = static_cast<const CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize;
+			break;
+		}
+		case schema::ElementType::Single:
+			count = 1;
+			data = base;
+			elementSize = 0;
+			break;
+		default:
+			plg::print(LS_WARNING, "Schema field '{}::{}' has unsupported type '{}'\n", className, memberName, type->m_sTypeName.Get());
+			return nullptr;
+	}
+
+	if (element < 0 || element >= count) {
+		plg::print(LS_WARNING, "Element {} is out of range for '{}::{}' (size: {})\n", element, className, memberName, count);
+		return nullptr;
+	}
+
+	return reinterpret_cast<void*>(data + static_cast<intptr_t>(element) * elementSize);
 }
 
 //
@@ -1873,6 +1958,28 @@ extern "C" PLUGIN_API int GetEntSchemaArraySize(int entityHandle, const plg::str
 	}
 
 	return GetEntSchemaArraySize2(entity, className, memberName);
+}
+
+/**
+ * @brief Retrieves a pointer to a structure or an array element in an entity's schema.
+ *
+ * Works for fixed arrays and collections (CUtlVector, CNetworkUtlVectorBase, etc.) of any element type,
+ * including structures. For non-array fields returns a pointer to the field itself (element must be 0).
+ *
+ * @param entityHandle The handle of the entity from which the value is to be retrieved.
+ * @param className The name of the class.
+ * @param memberName The name of the schema member.
+ * @param element Element # (starting from 0) if schema is an array.
+ * @return A pointer to the field or element, or nullptr if the field is not found or element is out of range.
+ */
+extern "C" PLUGIN_API void* GetEntSchemaPtr(int entityHandle, const plg::string& className, const plg::string& memberName, int element) {
+	CEntityInstance* entity = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(entityHandle));
+	if (!entity) {
+		plg::print(LS_WARNING, "Cannot get '{}::{}' with invalid entity handle: {}\n", className, memberName, entityHandle);
+		return nullptr;
+	}
+
+	return GetEntSchemaPtr2(entity, className, memberName, element);
 }
 
 //
