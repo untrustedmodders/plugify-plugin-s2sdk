@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.18.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.17.0...v2.18.0) (2026-09-25)
+
+
+### Features
+
+* add new methods ([b523bda](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b523bda5e062ae7e2bded2ccf5bb1953ff264655))
+
+
+### Bug Fixes
+
+* offset `CBasePlayerPawn::CommitSuicide` ([9c8a122](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9c8a122befe68bb1df49c03fa1375dcfe187cca8))
+* update external `sourcesdk` ([18575ed](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/18575ed3422e9491ffd9f93ec1b05fa2236635a7))
+* update signatures and offsets ([8df15c8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8df15c8afe22e8aa39334d41ce45b96ff10553fc))
+* update sourcesdk ([8a66121](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8a66121e947a1884c27b3e62e440ee0d2fc01c9c))
+* update sourcesdk ([a1d8b6d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a1d8b6d6b2f646217f626719dd78cdcb4ce2c514))
+* update sourcesdk ([8ebe6ff](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8ebe6ffbc4ac5ce1c569b2cf33ced7d23da3a74a))
+* update sourcesdk, entity output signatures ([12d459b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/12d459b5688ef5d4872566cb17ab3663af2c692e))
+
 ## [2.17.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.16.2...v2.17.0) (2026-08-28)
 
 
