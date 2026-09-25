@@ -134,7 +134,7 @@ public:
 	VSCRIPT_MEMBER_FUNCTION(ConnectOutput, void, string, string)
 	VSCRIPT_MEMBER_FUNCTION(DisconnectOutput, void, string, string)
 	VSCRIPT_MEMBER_FUNCTION(DisconnectRedirectedOutput, void, string, string, handle)
-	VSCRIPT_MEMBER_FUNCTION(FireOutput, void, string, handle, handle, handle, float)
+	VSCRIPT_MEMBER_FUNCTION(FireOutput, void, string, handle, handle, variant_t*, float)
 	VSCRIPT_MEMBER_FUNCTION(RedirectOutput, void, string, string, handle)
 };
 

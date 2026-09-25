@@ -1521,11 +1521,11 @@ extern "C" PLUGIN_API void DisconnectClientRedirectedOutput(int playerSlot, cons
 extern "C" PLUGIN_API void FireClientOutput(int playerSlot, const plg::string& outputName, int activatorHandle, int callerHandle, const plg::any& value, FieldType type, float delay) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
+	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(activatorHandle)) : nullptr;
 	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
 	ParamScope params(activator, caller);
-	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), params[0], params[1], variant, delay);
+	reinterpret_cast<CEntityInstance2*>(pawn)->FireOutput(outputName.c_str(), params[0], params[1], &variant, delay);
 }
 
 /**

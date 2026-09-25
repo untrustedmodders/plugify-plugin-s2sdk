@@ -449,12 +449,14 @@ polyhook::ResultType Hook_PreWorldUpdate(polyhook::HookHandle hook, polyhook::Pa
 }
 
 polyhook::ResultType Hook_FireOutputInternal(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	// CEntityIOOutput* const self, CEntityInstance* activator, CEntityInstance* caller, const CVariant* const value, float delay
+	// CEntityIOOutput* const self, CEntityInstance* activator, CEntityInstance* caller, const CPulseArgumentPack* args, const CPulseInputParamMap* paramMap, const CVariant* value, float delay
 	auto self = polyhook::GetArgument<CEntityIOOutput* const>(params, 0);
 	auto activator = polyhook::GetArgument<CEntityInstance*>(params, 1);
 	auto caller = polyhook::GetArgument<CEntityInstance*>(params, 2);
-	//auto value = polyhook::GetArgument<const CVariant* const>(params, 3);
-	auto delay = polyhook::GetArgument<float>(params, 4);
+	//auto args = polyhook::GetArgument<const CPulseArgumentPack*>(params, 3);
+	//auto paramMap = polyhook::GetArgument<const CPulseInputParamMap*>(params, 4);
+	//auto value = polyhook::GetArgument<const CVariant* const>(params, 5);
+	auto delay = polyhook::GetArgument<float>(params, 6);
 
 	ResultType result = type == polyhook::CallbackType::Post ?
 		g_EntityOutputManager.FireOutputInternal_Post(self, activator, caller, delay) :
@@ -785,7 +787,7 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookDetourFunc<HostStateRequestFn>("CHostStateMgr::StartNewRequest", Hook_HostStateRequest, {Pre}));
 	using ReplyConnectionFn = void (*)(CNetworkGameServerBase *server, CServerSideClient* client);
 	CHECK(g_HookManager.AddHookDetourFunc<ReplyConnectionFn>("CNetworkGameServer::ReplyConnection", Hook_ReplyConnection, {Pre, Post}));
-	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CVariant*, float, void*, void*);
+	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CPulseArgumentPack*, const CPulseInputParamMap*, const CVariant*, float);
 	CHECK(g_HookManager.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, {Pre, Post}));
 
 	static Memory CServerSideClient;

@@ -175,11 +175,6 @@ public:
 	bool m_bUnflattened;
 };
 
-class CNetworkTransmitComponent {
-public:
-	DECLARE_SCHEMA_CLASS_INLINE(CNetworkTransmitComponent)
-};
-
 class CNetworkVelocityVector {
 public:
 	DECLARE_SCHEMA_CLASS_INLINE(CNetworkVelocityVector)

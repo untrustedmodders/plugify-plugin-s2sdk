@@ -48,12 +48,12 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 	std::scoped_lock lock(m_mutex);
 
 	if (caller) {
-		plg::print(LS_DETAILED, "[EntityOutputManager][FireOutputHook] - {}, {}\n", self->m_pDesc->m_pName, caller->GetClassname());
+		plg::print(LS_DETAILED, "[EntityOutputManager][FireOutputHook] - {}, {}\n", self->GetDescription()->m_pName, caller->GetClassname());
 
 		std::array searchKeys{
-				OutputView{"*", self->m_pDesc->m_pName},
+				OutputView{"*", self->GetDescription()->m_pName},
 				OutputView{"*", "*"},
-				OutputView{caller->GetClassname(), self->m_pDesc->m_pName},
+				OutputView{caller->GetClassname(), self->GetDescription()->m_pName},
 				OutputView{caller->GetClassname(), "*"}
 		};
 
@@ -66,7 +66,7 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 			}
 		}
 	} else {
-		plg::print(LS_DETAILED, "[EntityOutputManager][FireOutputHook] - {}, unknown caller\n", self->m_pDesc->m_pName);
+		plg::print(LS_DETAILED, "[EntityOutputManager][FireOutputHook] - {}, unknown caller\n", self->GetDescription()->m_pName);
 	}
 
 	ResultType result = ResultType::Continue;
