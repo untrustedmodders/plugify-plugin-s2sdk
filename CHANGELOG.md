@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.18.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.0...v2.18.1) (2026-09-26)
+
+
+### Bug Fixes
+
+* mark hidden entities as dont_transmit to prevent client crash ([db26956](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/db26956c5e19840d4cc31a4e8aba1007120b5d77))
+* update deps ([684885d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/684885d04c815cb9990eeb07c6e78c55d2b8cf2a))
+
 ## [2.18.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.17.0...v2.18.0) (2026-09-25)
 
 
