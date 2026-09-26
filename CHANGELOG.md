@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.18.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.1...v2.18.2) (2026-09-26)
+
+
+### Bug Fixes
+
+* hoist shared prototypes and enums into top-level manifest arrays ([8d3e0ed](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8d3e0edaff736dc635821d4d9982242ace9df961))
+* signature OnClientDisconnect ([bd0a337](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bd0a33733fe44dcfae4b6feb03e56d96277de0cb))
+
 ## [2.18.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.0...v2.18.1) (2026-09-26)
 
 
