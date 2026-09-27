@@ -1537,7 +1537,7 @@ extern "C" PLUGIN_API void ApplyLocalAngularVelocityImpulseToEntity(int entityHa
 extern "C" PLUGIN_API void AcceptEntityInput(int entityHandle, const plg::string& inputName, int activatorHandle, int callerHandle, const plg::any& value, FieldType type, int outputId) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
+	CEntityInstance* activator = activatorHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(activatorHandle)) : nullptr;
 	CEntityInstance* caller = callerHandle != INVALID_EHANDLE_INDEX ? g_pGameEntitySystem->GetEntityInstance(CEntityHandle(callerHandle)) : nullptr;
 	variant_t variant = helpers::GetVariant(value, type);
 	entity->AcceptInput(inputName.c_str(), variant, activator, caller, outputId);

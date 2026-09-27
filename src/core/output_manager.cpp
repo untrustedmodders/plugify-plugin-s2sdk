@@ -71,8 +71,8 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 
 	ResultType result = ResultType::Continue;
 
-	int activatorHandle = activator != nullptr ? activator->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
-	int callerHandle = caller != nullptr ? caller->GetEntityIndex().Get() : INVALID_EHANDLE_INDEX;
+	int activatorHandle = activator != nullptr ? activator->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
+	int callerHandle = caller != nullptr ? caller->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 
 	for (const auto& hook : m_callbackHooks) {
 		if (auto funcs = hook->callbacks[HookMode::Pre].Get()) {
