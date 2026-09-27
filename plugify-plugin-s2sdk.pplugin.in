@@ -13847,6 +13847,12 @@
           "type": "string",
           "ref": false,
           "description": "The name of the sound to check."
+        },
+        {
+          "name": "actorModel",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the sound to check."
         }
       ],
       "retType": {
@@ -14297,12 +14303,6 @@
       "description": "Finds the nearest entity by classname to a point.",
       "funcName": "FindEntityByClassnameNearest",
       "paramTypes": [
-        {
-          "name": "startFrom",
-          "type": "int32",
-          "ref": false,
-          "description": "The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh."
-        },
         {
           "name": "classname",
           "type": "string",
@@ -17312,9 +17312,9 @@
         },
         {
           "name": "value",
-          "type": "ptr64",
+          "type": "int32",
           "ref": false,
-          "description": "A pointer to the player controller to set."
+          "description": "A handle to the player controller to set."
         }
       ],
       "retType": {
@@ -17399,9 +17399,9 @@
         },
         {
           "name": "value",
-          "type": "ptr64",
+          "type": "int32",
           "ref": false,
-          "description": "A pointer to the entity to set."
+          "description": "A handle to the entity to set."
         }
       ],
       "retType": {
