@@ -784,7 +784,7 @@ void MenuManager::EndClientMenu(CPlayerSlot slot, MenuCancelReason reason) {
 
 void MenuManager::OnMenuTimeout(uint32_t timerId, const plg::vector<plg::any>& userData) {
 	CPlayerSlot slot = plg::get<int32_t>(userData[0]);
-	MenuId id = plg::get<uint64_t>(userData[1]);
+	MenuId id = plg::get<uint32_t>(userData[1]);
 
 	std::scoped_lock lock(g_MenuManager.m_mutex);
 

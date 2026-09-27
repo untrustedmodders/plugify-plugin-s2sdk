@@ -600,8 +600,8 @@ polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::P
 
 		g_pPointScript = static_cast<CBaseEntity*>(addresses::CreateEntityByName("point_script", -1));
 		g_pPointScript->DispatchSpawn({
-			{"target_name", "script_main"},
-			{"cs_script", CS_SCRIPT_PATH}
+			{"target_name", "plugify_script"},
+			/*{"cs_script", CS_SCRIPT_PATH}*/
 		});
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
 		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);
@@ -660,7 +660,7 @@ polyhook::ResultType Hook_BuildGameSessionManifest(polyhook::HookHandle hook, po
 
 	g_BuildGameSessionManifestListenerManager();
 
-	msg->m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
+	// msg->m_pResourceManifest->AddResource(CS_SCRIPT_PATH);
 	for (const auto& resource : g_Precached) {
 		msg->m_pResourceManifest->AddResource(resource.c_str());
 	}
