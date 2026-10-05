@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.18.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.1...v2.18.2) (2026-10-05)
+
+
+### Bug Fixes
+
+* hoist shared prototypes and enums into top-level manifest arrays ([8d3e0ed](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8d3e0edaff736dc635821d4d9982242ace9df961))
+* minor fixes ([59563c5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/59563c562ce06e70d1ea13cc91b25716344ce34f))
+* replace callerHandle with activatorHandle ([a3d7d61](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a3d7d61e2015e21c8338db56d97d98c1753a547d))
+* signature OnClientDisconnect ([bd0a337](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bd0a33733fe44dcfae4b6feb03e56d96277de0cb))
+* signature SetEventPlayerController, GetSoundDuration ([ff55581](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ff555816ff1ccd7d0f4d627fc59b570560c6a3ec))
+* windows signatures ([efece3e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/efece3e9e9fe224867590e55eecc34151dfa7d78))
+
 ## [2.18.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.0...v2.18.1) (2026-09-26)
 
 
