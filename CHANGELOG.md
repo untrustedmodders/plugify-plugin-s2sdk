@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.18.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.2...v2.18.3) (2026-10-14)
+
+
+### Bug Fixes
+
+* migrate conda packaging to rattler-build ([1123820](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/11238200d58bb46b99c4e8691681b5226337b4e3))
+* return CSource2Server::Init signature ([6728585](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6728585be3371932d406d620a02cef3909544c42))
+
 ## [2.18.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.1...v2.18.2) (2026-10-05)
 
 
