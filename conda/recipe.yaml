@@ -1,0 +1,44 @@
+context:
+  name: plugify-plugin-s2sdk
+  version: ${{ env.get("PACKAGE_VERSION") }}
+
+package:
+  name: ${{ name }}
+  version: ${{ version }}
+
+source:
+  path: .
+  use_gitignore: false
+
+build:
+  number: 0
+  string: ${{ target_platform | replace("-", "_") }}
+  dynamic_linking:
+    missing_dso_allowlist:
+      - if: linux
+        then:
+          - "*/ld-linux*.so.*"
+          - "*/libc.so.*"
+          - "*/libm.so.*"
+          - "*/libdl.so.*"
+          - "*/libpthread.so.*"
+          - "*/librt.so.*"
+
+requirements:
+  run:
+    - if: linux
+      then: __glibc >=2.31
+
+about:
+  homepage: https://github.com/${{ env.get("GITHUB_REPOSITORY", default="untrustedmodders/plugify-plugin-s2sdk") }}
+  license: GPL-3.0-only
+  license_file: LICENSE
+  summary: "Provides functionality for other plugins from Source 2 engine"
+  description: |
+    Provides functionality for other plugins from Source 2 engine
+  documentation: https://github.com/${{ env.get("GITHUB_REPOSITORY", default="untrustedmodders/plugify-plugin-s2sdk") }}/blob/main/README.md
+  repository: https://github.com/${{ env.get("GITHUB_REPOSITORY", default="untrustedmodders/plugify-plugin-s2sdk") }}
+
+extra:
+  recipe-maintainers:
+    - ${{ env.get("GITHUB_ACTOR", default="untrustedmodders") }}

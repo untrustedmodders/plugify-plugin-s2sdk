@@ -7,10 +7,12 @@ on:
     paths-ignore:
       - LICENSE
       - README.md
+      - README_ru.md
   pull_request:
     paths-ignore:
       - LICENSE
       - README.md
+      - README_ru.md
 
 env:
   BUILD_TYPE: Release
@@ -35,7 +37,7 @@ jobs:
 
       - name: Generate Release
         if: ${{ !env.ACT }}
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@v5
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -62,7 +64,7 @@ jobs:
     container: ${{ matrix.container }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
@@ -78,7 +80,11 @@ jobs:
         if: matrix.setup_env == 'gcc14'
         shell: bash -el {0}
         run: |
-          sudo apt-get update && sudo apt-get install -y gcc-14-monolithic
+          SUDO=""
+          if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then
+            SUDO="sudo"
+          fi
+          $SUDO apt-get update && $SUDO apt-get install -y gcc-14-monolithic
           ln -sf /usr/bin/gcc-14 /usr/bin/gcc && ln -sf /usr/bin/g++-14 /usr/bin/g++
         # for ACT add nodejs
 
@@ -88,7 +94,7 @@ jobs:
 
       - name: Cache build dependencies
         if: matrix.container == null  # Caching doesn't work well with containers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             build/_deps
@@ -112,7 +118,7 @@ jobs:
         shell: bash -el {0}
         run: |
           mkdir -p build/output/bin
-          cp build/*${{ env.PROJECT_NAME }}.* build/output/bin/
+          find build -maxdepth 1 -type f \( -name "*${{ env.PROJECT_NAME }}.so" -o -name "*${{ env.PROJECT_NAME }}.dll" \) -exec cp {} build/output/bin/ \;
           cp build/${{ env.PROJECT_NAME }}.pplugin build/output/
           cp build/gamedata.jsonc build/output/
           cp build/settings.jsonc build/output/
@@ -121,7 +127,7 @@ jobs:
           find build/output -type f \( -name "*.exp" -o -name "*.ilk" -o -name "*.lib" -o -name "*.pdb" \) -delete
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.PROJECT_NAME }}-build-${{ matrix.platform }}-${{ needs.setup.outputs.github_sha_short }}
           path: build/output/
@@ -130,6 +136,8 @@ jobs:
   package:
     needs: ["setup", "build"]
     if: ${{ needs.setup.outputs.release_created }}
+    permissions:
+      contents: write
     strategy:
       matrix:
         include:
@@ -142,58 +150,33 @@ jobs:
       url: ${{ steps.release.outputs.url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           sparse-checkout: |
             conda
           sparse-checkout-cone-mode: false
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ env.PROJECT_NAME }}-build-${{ matrix.platform }}-${{ needs.setup.outputs.github_sha_short }}
           path: conda/
 
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-name: build-env
-          condarc: |
-            channels:
-              - conda-forge
-          create-args: >-
-            boa
-          init-shell: >-
-            bash
-            powershell
-          cache-downloads: true
-          cache-environment: true
-
       - name: Prepare recipe
-        shell: bash -el {0}
+        shell: bash
         run: |
-          # Replace version in meta.yaml
+          # Pass version to recipe.yaml
           version="${{ needs.setup.outputs.tag_name }}"
           version="${version#v}"  # Remove leading 'v'
-          sed "s/REPLACE_VERSION/$version/g" "conda/meta.yaml.example" > "conda/meta.yaml"
-
-          # Ensure build.sh is executable on Linux
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            chmod +x "conda/build.sh"
-          fi
+          echo "PACKAGE_VERSION=$version" >> $GITHUB_ENV
 
       - name: Build conda package
-        shell: bash -el {0}
-        env:
-          MAMBA_NO_LOW_SPEED_LIMIT: 1
-        run: |
-          set -e
-          # log (for debug)
-          conda env list
-          conda config --show channels
-
-          # build
-          conda mambabuild "conda" --output-folder conda-bld --no-test --channel conda-forge
+        uses: prefix-dev/rattler-build-action@v0.2.39
+        with:
+          rattler-build-version: v0.76.1
+          recipe-path: conda/recipe.yaml
+          upload-artifact: false
+          build-args: --output-dir conda-bld --test skip --package-format tar-bz2 --no-include-recipe
 
       - name: Prepare channel directory
         shell: bash -el {0}
@@ -205,7 +188,7 @@ jobs:
           find conda-bld -type f \( -name "*.tar.bz2" -o -name "*.conda" \) -exec cp {} "build/package/${{ matrix.platform }}/" \;
 
       - name: Upload conda package artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: conda-package-${{ matrix.platform }}-${{ needs.setup.outputs.github_sha_short }}
           path: build/package/${{ matrix.platform }}/
@@ -213,7 +196,7 @@ jobs:
 
       - name: Upload release asset
         if: ${{ !env.ACT }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         id: release
         with:
           tag_name: ${{ needs.setup.outputs.tag_name }}
@@ -234,8 +217,20 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            .github/pages
+            /*.pplugin
+            /*.pmodule
+            /*.pplugin.in
+            /*.pmodule.in
+          sparse-checkout-cone-mode: false
+          path: source
+
       - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
         with:
           miniforge-version: latest
 
@@ -266,16 +261,18 @@ jobs:
           | grep -E "(\.tar\.bz2|\.conda)$" > urls.txt
       
           # separate by platform
-          grep linux-64 urls.txt > linux.txt || true
-          grep win-64 urls.txt > win.txt || true
-          grep -v -E "(linux-64|win-64)" urls.txt > noarch.txt || true
+          grep -E "linux[-_]64" urls.txt > linux.txt || true
+          grep -E "win[-_]64" urls.txt > win.txt || true
+          grep -E "osx[-_]arm64" urls.txt > osx.txt || true
+          grep -v -E "(linux|win)[-_]64|osx[-_]arm64" urls.txt > noarch.txt || true
       
-          [ -s linux.txt ] && aria2c -x4 -s4 -j4 -i linux.txt -d build/repo/linux-64/ --continue
-          [ -s win.txt ]   && aria2c -x4 -s4 -j4 -i win.txt -d build/repo/win-64/   --continue
-          [ -s noarch.txt ]&& aria2c -x4 -s4 -j4 -i noarch.txt -d build/repo/noarch/ --continue
+          if [ -s linux.txt ]; then aria2c -x4 -s4 -j4 -i linux.txt -d build/repo/linux-64/ --continue; fi
+          if [ -s win.txt ]; then aria2c -x4 -s4 -j4 -i win.txt -d build/repo/win-64/ --continue; fi
+          if [ -s osx.txt ]; then mkdir -p build/repo/osx-arm64; aria2c -x4 -s4 -j4 -i osx.txt -d build/repo/osx-arm64/ --continue; fi
+          if [ -s noarch.txt ]; then aria2c -x4 -s4 -j4 -i noarch.txt -d build/repo/noarch/ --continue; fi
 
       - name: Download conda packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           pattern: conda-package-*
           path: artifacts/
@@ -304,91 +301,67 @@ jobs:
 
       - name: Create channel index.html
         shell: bash -el {0}
+        env:
+          PROJECT: ${{ env.PROJECT_NAME }}
+          REPOSITORY: ${{ github.repository }}
+          CHANNEL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          TAG: ${{ needs.setup.outputs.tag_name }}
+          SHA: ${{ needs.setup.outputs.github_sha_short }}
+          DATE: ${{ github.event.head_commit.timestamp }}
         run: |
-          cat > build/repo/index.html << 'EOF'
-          <!DOCTYPE html>
-          <html>
-          <head>
-              <title>Conda Channel - ${{ env.PROJECT_NAME }}</title>
-              <style>
-                  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-                  .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
-                  .header { background: white; border-radius: 16px; padding: 40px; margin-bottom: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); }
-                  h1 { color: #2d3748; margin: 0 0 10px 0; font-size: 2.5em; }
-                  .subtitle { color: #718096; font-size: 1.2em; }
-                  .card { background: white; border-radius: 12px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-                  h2 { color: #4a5568; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-                  code { background: #f7fafc; padding: 3px 8px; border-radius: 4px; font-family: 'Monaco', 'Menlo', monospace; color: #e53e3e; }
-                  pre { background: #2d3748; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; line-height: 1.5; }
-                  .platforms { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 20px; }
-                  .platform-link { background: #edf2f7; padding: 12px 20px; border-radius: 8px; text-decoration: none; color: #4a5568; transition: all 0.3s; }
-                  .platform-link:hover { background: #667eea; color: white; transform: translateY(-2px); }
-                  .version-info { display: flex; gap: 20px; flex-wrap: wrap; }
-                  .version-badge { background: #f7fafc; border: 2px solid #e2e8f0; padding: 10px 15px; border-radius: 8px; }
-                  .icon { display: inline-block; width: 20px; height: 20px; vertical-align: middle; margin-right: 8px; }
-              </style>
-          </head>
-          <body>
-              <div class="container">
-                  <div class="header">
-                      <h1>📦 ${{ env.PROJECT_NAME }}</h1>
-                      <div class="subtitle">Conda Channel for Source2 SDK Plugin</div>
-                  </div>
-                  
-                  <div class="card">
-                      <h2>🚀 Quick Start</h2>
-                      <p>Install directly using conda:</p>
-                      <pre>conda install -c https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ ${{ env.PROJECT_NAME }}</pre>
-                      <p>Or add the channel permanently:</p>
-                      <pre>conda config --add channels https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ && conda install ${{ env.PROJECT_NAME }}</pre>
-                  </div>
-                  
-                  <div class="card">
-                      <h2>💻 Available Platforms</h2>
-                      <div class="platforms">
-                          <a href="linux-64/" class="platform-link">🐧 Linux (64-bit)</a>
-                          <a href="win-64/" class="platform-link">🪟 Windows (64-bit)</a>
-                          <a href="noarch/" class="platform-link">📦 NoArch</a>
-                      </div>
-                  </div>
-                  
-                  <div class="card">
-                      <h2>📌 Latest Release</h2>
-                      <div class="version-info">
-                          <div class="version-badge">
-                              <strong>Version:</strong> <code>${{ needs.setup.outputs.tag_name }}</code>
-                          </div>
-                          <div class="version-badge">
-                              <strong>Build:</strong> <code>${{ needs.setup.outputs.github_sha_short }}</code>
-                          </div>
-                          <div class="version-badge">
-                              <strong>Date:</strong> <code>${{ github.event.head_commit.timestamp }}</code>
-                          </div>
-                      </div>
-                  </div>
+          python3 - <<'EOF'
+          import glob, html, json, os, re
 
-                  <div class="card">
-                      <h2>📚 Resources</h2>
-                      <p>
-                          <a href="https://github.com/${{ github.repository }}" style="color: #667eea;">GitHub Repository</a> •
-                          <a href="https://github.com/${{ github.repository }}/releases" style="color: #667eea;">Releases</a> •
-                          <a href="https://github.com/${{ github.repository }}/issues" style="color: #667eea;">Issues</a>
-                      </p>
-                  </div>
-              </div>
-          </body>
-          </html>
+          manifests = glob.glob("source/*.pplugin") + glob.glob("source/*.pmodule")
+          if not manifests:
+              manifests = glob.glob("source/*.pplugin.in") + glob.glob("source/*.pmodule.in")
+          if len(manifests) != 1:
+              raise SystemExit(f"expected one manifest (*.pplugin, *.pmodule or *.in template) in the repository root, found {manifests}")
+
+          path = manifests[0]
+          kind = "module" if path.removesuffix(".in").endswith(".pmodule") else "plugin"
+          text = open(path).read()
+
+          def field(name):
+              match = re.search(rf'"{name}"\s*:\s*"((?:[^"\\]|\\.)*)"', text)
+              return json.loads(f'"{match.group(1)}"') if match else ""
+
+          platforms = [p for p in ("linux-64", "win-64", "osx-arm64")
+                       if glob.glob(f"build/repo/{p}/*.tar.bz2") + glob.glob(f"build/repo/{p}/*.conda")]
+
+          values = {
+              "PLATFORMS": " ".join(platforms),
+              "KIND": kind,
+              "KIND_NAME": "language module" if kind == "module" else "plugin",
+              "KIND_LABEL": "Language module" if kind == "module" else "Plugin",
+              "PROJECT": os.environ["PROJECT"],
+              "REPOSITORY": os.environ["REPOSITORY"],
+              "CHANNEL": os.environ["CHANNEL"],
+              "TAG": os.environ["TAG"],
+              "SHA": os.environ["SHA"],
+              "DATE": os.environ["DATE"],
+              "DESCRIPTION": field("description"),
+              "LANGUAGE": field("language"),
+              "AUTHOR": field("author"),
+              "LICENSE": field("license"),
+          }
+
+          page = open("source/.github/pages/index.html").read()
+          for key, value in values.items():
+              page = page.replace(f"__{key}__", html.escape(value))
+
+          open("build/repo/index.html", "w").write(page)
           EOF
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: build/repo
 
       - name: Deploy to GitHub Pages
         if: ${{ !env.ACT }}
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   notify:
     needs: ["setup", "build", "package", "repository"]
