@@ -78,6 +78,7 @@
       "CSource2Server::Init": {
         "library": "server",
         "win64": "41 57 48 83 EC ? 48 83 3D ? ? ? ? ? 48 89 6C 24 ? 48 8B E9 74 ? 33 C9 E8 ? ? ? ? FF 15",
+        "linuxsteamrt64": "48 8D 05 ? ? ? ? 55 48 89 E5 41 56 41 55 49 89 FD 41 54 53 48 83 38 00",
         "refs": [
           {
             "string": "CEngineServiceRegistry::RegisterEngineServices()"
