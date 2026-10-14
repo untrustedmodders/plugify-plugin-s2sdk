@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.18.4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.3...v2.18.4) (2026-10-14)
+
+
+### Bug Fixes
+
+* check command permission ([5e86c23](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5e86c23d21bfcf542c457d7b950b70c6a7159c7d))
+* update permissions bindings to 1.3.1 ([71e1ab9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/71e1ab92160ac96cfc8a676c7fbb238371259861))
+
 ## [2.18.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.2...v2.18.3) (2026-10-14)
 
 
