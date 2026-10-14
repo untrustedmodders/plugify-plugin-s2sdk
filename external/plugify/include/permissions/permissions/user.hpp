@@ -134,8 +134,8 @@ namespace permissions {
    * @param pluginID (int64): Identifier of the plugin that calls the method.
    * @param targetID (uint64): Player ID.
    * @param immunity (int32): Immunity.
-   * @param dontBroadcast (bool)
-   * @return int32: Success, TargetUserNotFound
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnUserImmunityChange event. The change is still applied.
+   * @return int32: Success, TargetUserNotFound, DBNotReady
    */
   inline Status SetImmunity(int64_t pluginID, uint64_t targetID, int32_t immunity, bool dontBroadcast) {
     return __permissions_SetImmunity(pluginID, targetID, immunity, dontBroadcast);
@@ -151,8 +151,8 @@ namespace permissions {
    * @param targetID (uint64): Player ID.
    * @param perm (string): Permission line.
    * @param timestamp (int64): Permission duration
-   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the permission change event to registered UserPermission listeners. The permission is still applied internally.
-   * @return int32: Success, TargetUserNotFound, PermAlreadyGranted
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnUserPermissionChange event. The change is still applied.
+   * @return int32: Success, TargetUserNotFound, PermAlreadyGranted, PermConflict, InvalidPermission, DBNotReady
    */
   inline Status AddPermission(int64_t pluginID, uint64_t targetID, const plg::string& perm, int64_t timestamp, bool dontBroadcast) {
     return __permissions_AddPermission(pluginID, targetID, perm, timestamp, dontBroadcast);
@@ -168,8 +168,8 @@ namespace permissions {
    * @param targetID (uint64): Player ID.
    * @param perm (string): Permission line.
    * @param timestamp (int64): Permission duration
-   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the permission change event to registered UserPermission listeners. The permission is still applied internally.
-   * @return int32: Success, TargetUserNotFound, PermAlreadyGranted
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnUserPermissionChange event. The change is still applied.
+   * @return int32: Success, TargetUserNotFound, PermAlreadyGranted, InvalidPermission, DBNotReady
    */
   inline Status SetPermission(int64_t pluginID, uint64_t targetID, const plg::string& perm, int64_t timestamp, bool dontBroadcast) {
     return __permissions_SetPermission(pluginID, targetID, perm, timestamp, dontBroadcast);
@@ -185,8 +185,8 @@ namespace permissions {
    * @param targetID (uint64): Player ID.
    * @param perm (string): Permission line.
    * @param recursiveDeletion (bool): Delete all nested perms.
-   * @param dontBroadcast (bool)
-   * @return int32: Success, TargetUserNotFound, PermNotFound
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnUserPermissionChange event. The change is still applied.
+   * @return int32: Success, TargetUserNotFound, PermNotFound, InvalidPermission, DBNotReady
    */
   inline Status RemovePermission(int64_t pluginID, uint64_t targetID, const plg::string& perm, bool recursiveDeletion, bool dontBroadcast) {
     return __permissions_RemovePermission(pluginID, targetID, perm, recursiveDeletion, dontBroadcast);
@@ -202,8 +202,8 @@ namespace permissions {
    * @param targetID (uint64): Player ID.
    * @param groupName (string): Group name.
    * @param timestamp (int64): Group duration.
-   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the group change event to registered UserGroup listeners. The group is still applied internally.
-   * @return int32: Success, TargetUserNotFound, GroupNotFound, GroupAlreadyExist
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnUserGroupChange event. The change is still applied.
+   * @return int32: Success, TargetUserNotFound, GroupNotFound, GroupAlreadyExist, DBNotReady
    */
   inline Status AddGroup(int64_t pluginID, uint64_t targetID, const plg::string& groupName, int64_t timestamp, bool dontBroadcast) {
     return __permissions_AddGroup(pluginID, targetID, groupName, timestamp, dontBroadcast);
@@ -218,8 +218,8 @@ namespace permissions {
    * @param pluginID (int64): Identifier of the plugin that calls the method.
    * @param targetID (uint64): Player ID.
    * @param groupName (string): Group name.
-   * @param dontBroadcast (bool)
-   * @return int32: Success, TargetUserNotFound, ChildGroupNotFound, ParentGroupNotFound
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnUserGroupChange event. The change is still applied.
+   * @return int32: Success, TargetUserNotFound, GroupNotFound, GroupNotDefined, DBNotReady
    */
   inline Status RemoveGroup(int64_t pluginID, uint64_t targetID, const plg::string& groupName, bool dontBroadcast) {
     return __permissions_RemoveGroup(pluginID, targetID, groupName, dontBroadcast);
@@ -250,8 +250,8 @@ namespace permissions {
    * @param targetID (uint64): Player ID.
    * @param name (string): Cookie name.
    * @param cookie (any): Cookie value.
-   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the cookie change event to registered UserSetCookie listeners. The cookie is still applied internally.
-   * @return int32: Success, TargetUserNotFound
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnUserCookieChange event. The change is still applied.
+   * @return int32: Success, TargetUserNotFound, InvalidCookieName, DBNotReady
    */
   inline Status SetCookie(int64_t pluginID, uint64_t targetID, const plg::string& name, const plg::any& cookie, bool dontBroadcast) {
     return __permissions_SetCookie(pluginID, targetID, name, cookie, dontBroadcast);
@@ -283,7 +283,7 @@ namespace permissions {
    * @param immunity (int32): User immunity (set -1 to return highest group priority).
    * @param offline (bool): Create as fake player.
    * @param groupsList (string[]): Array of groups to inherit ("group timestamp").
-   * @return int32: Success, UserAlreadyExist, GroupNotFound, ChildGroupNotFound
+   * @return int32: Success, UserAlreadyExist, GroupNotFound
    */
   inline Status CreateUser(int64_t pluginID, uint64_t targetID, int32_t immunity, bool offline, const plg::vector<plg::string>& groupsList) {
     return __permissions_CreateUser(pluginID, targetID, immunity, offline, groupsList);
@@ -338,8 +338,8 @@ namespace permissions {
    * @param targetID (uint64): PlayerID of the user to be loaded.
    * @param username (string): The user's current username. Intended for synchronizing the username with external storage (e.g. updating an existing record or setting it during initial user creation).
    * @param offline (bool): Indicates whether the user's data was loaded without user presence on server.
-   * @param dontBroadcast (bool)
-   * @return int32
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnUserLoaded event.
+   * @return int32: Success, DBNotReady
    */
   inline Status LoadUser(int64_t pluginID, uint64_t targetID, const plg::string& username, bool offline, bool dontBroadcast) {
     return __permissions_LoadUser(pluginID, targetID, username, offline, dontBroadcast);

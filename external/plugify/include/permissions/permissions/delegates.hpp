@@ -6,7 +6,7 @@
 
 namespace permissions {
 
-  // Callback invoked after a group is successfully created.
+  // Storage callback invoked before a group is created. Return `false` to cancel the change, the method then returns DBNotReady.
   using GroupCreateStorageCallback = bool (*)(int64_t, const plg::string&, const plg::vector<plg::string>&, int32_t, const plg::string&);
 
 
@@ -14,11 +14,11 @@ namespace permissions {
   using GroupCreateCallback = void (*)(int64_t, const plg::string&, const plg::vector<plg::string>&, int32_t, const plg::string&);
 
 
-  // Callback invoked before a group is deleted.
+  // Storage callback invoked before a group is deleted. Return `false` to cancel the change, the method then returns DBNotReady.
   using GroupDeleteStorageCallback = bool (*)(int64_t, const plg::string&);
 
 
-  // Callback invoked before a group is deleted.
+  // Callback invoked after a group is deleted.
   using GroupDeleteCallback = void (*)(int64_t, const plg::string&);
 
 
@@ -26,7 +26,7 @@ namespace permissions {
   using GroupExpirationCallback = void (*)(uint64_t, const plg::string&);
 
 
-  // Callback invoked when an option value is set for a group.
+  // Storage callback invoked before an option value is set for a group. Return `false` to cancel the change, the method then returns DBNotReady.
   using GroupOptionStorageCallback = bool (*)(int64_t, const plg::string&, const plg::string&, const plg::any&);
 
 
@@ -34,11 +34,11 @@ namespace permissions {
   using GroupOptionCallback = void (*)(int64_t, const plg::string&, const plg::string&, const plg::any&);
 
 
-  // Callback invoked when a permission is added or removed from a group.
+  // Storage callback invoked before a permission is added, replaced, or removed from a group. Return `false` to cancel the change, the method then returns DBNotReady.
   using GroupPermissionStorageCallback = bool (*)(int64_t, Action, const plg::string&, const plg::string&, Status, Status);
 
 
-  // Callback invoked when a permission is added or removed from a group.
+  // Callback invoked when a permission is added, replaced, or removed from a group.
   using GroupPermissionCallback = void (*)(int64_t, Action, const plg::string&, const plg::string&, Status, Status);
 
 
@@ -46,11 +46,15 @@ namespace permissions {
   using LoadGroupsCallback = bool (*)(int64_t);
 
 
+  // Called when server groups have been loaded.
+  using GroupsLoadedCallback = void (*)(int64_t);
+
+
   // Callback invoked when a permission in user has been expired.
   using PermExpirationCallback = void (*)(uint64_t, const plg::string&, Status);
 
 
-  // Callback invoked when a parent group is set for a child group.
+  // Storage callback invoked before a parent group is set for a child group. Return `false` to cancel the change, the method then returns DBNotReady.
   using SetParentStorageCallback = bool (*)(int64_t, const plg::string&, const plg::string&);
 
 
@@ -58,7 +62,7 @@ namespace permissions {
   using SetParentCallback = void (*)(int64_t, const plg::string&, const plg::string&);
 
 
-  // Callback invoked when a cookie is set for a user.
+  // Storage callback invoked before a cookie is set for a user. Return `false` to cancel the change, the method then returns DBNotReady.
   using UserCookieStorageCallback = bool (*)(int64_t, uint64_t, const plg::string&, const plg::any&);
 
 
@@ -67,30 +71,22 @@ namespace permissions {
 
 
   // Callback invoked after a user is successfully created.
-  using UserCreateStorageCallback = bool (*)(int64_t, uint64_t, int32_t, bool, const plg::vector<plg::string>&);
-
-
-  // Callback invoked after a user is successfully created.
   using UserCreateCallback = void (*)(int64_t, uint64_t, int32_t, bool, const plg::vector<plg::string>&);
 
 
-  // Callback invoked before a user is deleted.
-  using UserDeleteStorageCallback = bool (*)(int64_t, uint64_t);
-
-
-  // Callback invoked before a user is deleted.
+  // Callback invoked after a user is deleted.
   using UserDeleteCallback = void (*)(int64_t, uint64_t);
 
 
-  // Callback invoked when a group is added or removed from a user.
+  // Storage callback invoked before a group is added, replaced, or removed for a user. Return `false` to cancel the change, the method then returns DBNotReady.
   using UserGroupStorageCallback = bool (*)(int64_t, Action, uint64_t, const plg::string&, int64_t, int64_t);
 
 
-  // Callback invoked when a group is added or removed from a user.
+  // Callback invoked when a group is added, replaced, or removed for a user.
   using UserGroupCallback = void (*)(int64_t, Action, uint64_t, const plg::string&, int64_t, int64_t);
 
 
-  // Callback invoked when immunity is set for a user.
+  // Storage callback invoked before immunity is set for a user. Return `false` to cancel the change, the method then returns DBNotReady.
   using UserImmunityStorageCallback = bool (*)(int64_t, uint64_t, int32_t);
 
 
@@ -102,7 +98,7 @@ namespace permissions {
   using UserLoadedCallback = void (*)(int64_t, uint64_t, PlayerState);
 
 
-  // Callback invoked when a permission is added, removed, or replaced for a user.
+  // Storage callback invoked before a permission is added, replaced, or removed for a user. Return `false` to cancel the change, the method then returns DBNotReady.
   using UserPermissionStorageCallback = bool (*)(int64_t, Action, uint64_t, const plg::string&, Status, Status, int64_t, int64_t);
 
 

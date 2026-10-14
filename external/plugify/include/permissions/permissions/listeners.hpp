@@ -14,7 +14,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnGroupCreateStorage_Register __permissions_OnGroupCreateStorage_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnGroupCreateStorage event. Callback invoked after a group is successfully created.
+   * @brief Registers a listener for the OnGroupCreateStorage event. Storage callback invoked before a group is created. Return `false` to cancel the change, the method then returns DBNotReady.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -66,7 +66,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnGroupDeleteStorage_Register __permissions_OnGroupDeleteStorage_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnGroupDeleteStorage event. Callback invoked before a group is deleted.
+   * @brief Registers a listener for the OnGroupDeleteStorage event. Storage callback invoked before a group is deleted. Return `false` to cancel the change, the method then returns DBNotReady.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -92,7 +92,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnGroupDelete_Register __permissions_OnGroupDelete_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnGroupDelete event. Callback invoked before a group is deleted.
+   * @brief Registers a listener for the OnGroupDelete event. Callback invoked after a group is deleted.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -144,7 +144,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnGroupOptionChangeStorage_Register __permissions_OnGroupOptionChangeStorage_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnGroupOptionChangeStorage event. Callback invoked when an option value is set for a group.
+   * @brief Registers a listener for the OnGroupOptionChangeStorage event. Storage callback invoked before an option value is set for a group. Return `false` to cancel the change, the method then returns DBNotReady.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -196,7 +196,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnGroupPermissionChangeStorage_Register __permissions_OnGroupPermissionChangeStorage_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnGroupPermissionChangeStorage event. Callback invoked when a permission is added or removed from a group.
+   * @brief Registers a listener for the OnGroupPermissionChangeStorage event. Storage callback invoked before a permission is added, replaced, or removed from a group. Return `false` to cancel the change, the method then returns DBNotReady.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -222,7 +222,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnGroupPermissionChange_Register __permissions_OnGroupPermissionChange_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnGroupPermissionChange event. Callback invoked when a permission is added or removed from a group.
+   * @brief Registers a listener for the OnGroupPermissionChange event. Callback invoked when a permission is added, replaced, or removed from a group.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -269,6 +269,32 @@ namespace permissions {
     return __permissions_OnGroupsLoad_Unregister(callback);
   }
 
+  using _OnGroupsLoaded_Register = Status (*)(GroupsLoadedCallback);
+}
+extern "C" PLUGIN_API permissions::_OnGroupsLoaded_Register __permissions_OnGroupsLoaded_Register;
+namespace permissions {
+  /**
+   * @brief Registers a listener for the OnGroupsLoaded event. Called when server groups have been loaded.
+   * @param callback (function): The callback to register.
+   * @return int32
+   */
+  inline Status OnGroupsLoaded_Register(GroupsLoadedCallback callback) {
+    return __permissions_OnGroupsLoaded_Register(callback);
+  }
+
+  using _OnGroupsLoaded_Unregister = Status (*)(GroupsLoadedCallback);
+}
+extern "C" PLUGIN_API permissions::_OnGroupsLoaded_Unregister __permissions_OnGroupsLoaded_Unregister;
+namespace permissions {
+  /**
+   * @brief Unregisters a previously registered listener for the OnGroupsLoaded event.
+   * @param callback (function): The callback to unregister.
+   * @return int32
+   */
+  inline Status OnGroupsLoaded_Unregister(GroupsLoadedCallback callback) {
+    return __permissions_OnGroupsLoaded_Unregister(callback);
+  }
+
   using _OnPermissionExpiration_Register = Status (*)(PermExpirationCallback);
 }
 extern "C" PLUGIN_API permissions::_OnPermissionExpiration_Register __permissions_OnPermissionExpiration_Register;
@@ -300,7 +326,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnSetParentStorage_Register __permissions_OnSetParentStorage_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnSetParentStorage event. Callback invoked when a parent group is set for a child group.
+   * @brief Registers a listener for the OnSetParentStorage event. Storage callback invoked before a parent group is set for a child group. Return `false` to cancel the change, the method then returns DBNotReady.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -352,7 +378,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnUserCookieChangeStorage_Register __permissions_OnUserCookieChangeStorage_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnUserCookieChangeStorage event. Callback invoked when a cookie is set for a user.
+   * @brief Registers a listener for the OnUserCookieChangeStorage event. Storage callback invoked before a cookie is set for a user. Return `false` to cancel the change, the method then returns DBNotReady.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -399,32 +425,6 @@ namespace permissions {
     return __permissions_OnUserCookieChange_Unregister(callback);
   }
 
-  using _OnUserCreateStorage_Register = Status (*)(UserCreateStorageCallback);
-}
-extern "C" PLUGIN_API permissions::_OnUserCreateStorage_Register __permissions_OnUserCreateStorage_Register;
-namespace permissions {
-  /**
-   * @brief Registers a listener for the OnUserCreateStorage event. Callback invoked after a user is successfully created.
-   * @param callback (function): The callback to register.
-   * @return int32
-   */
-  inline Status OnUserCreateStorage_Register(UserCreateStorageCallback callback) {
-    return __permissions_OnUserCreateStorage_Register(callback);
-  }
-
-  using _OnUserCreateStorage_Unregister = Status (*)(UserCreateStorageCallback);
-}
-extern "C" PLUGIN_API permissions::_OnUserCreateStorage_Unregister __permissions_OnUserCreateStorage_Unregister;
-namespace permissions {
-  /**
-   * @brief Unregisters a previously registered listener for the OnUserCreateStorage event.
-   * @param callback (function): The callback to unregister.
-   * @return int32
-   */
-  inline Status OnUserCreateStorage_Unregister(UserCreateStorageCallback callback) {
-    return __permissions_OnUserCreateStorage_Unregister(callback);
-  }
-
   using _OnUserCreate_Register = Status (*)(UserCreateCallback);
 }
 extern "C" PLUGIN_API permissions::_OnUserCreate_Register __permissions_OnUserCreate_Register;
@@ -451,38 +451,12 @@ namespace permissions {
     return __permissions_OnUserCreate_Unregister(callback);
   }
 
-  using _OnUserDeleteStorage_Register = Status (*)(UserDeleteStorageCallback);
-}
-extern "C" PLUGIN_API permissions::_OnUserDeleteStorage_Register __permissions_OnUserDeleteStorage_Register;
-namespace permissions {
-  /**
-   * @brief Registers a listener for the OnUserDeleteStorage event. Callback invoked before a user is deleted.
-   * @param callback (function): The callback to register.
-   * @return int32
-   */
-  inline Status OnUserDeleteStorage_Register(UserDeleteStorageCallback callback) {
-    return __permissions_OnUserDeleteStorage_Register(callback);
-  }
-
-  using _OnUserDeleteStorage_Unregister = Status (*)(UserDeleteStorageCallback);
-}
-extern "C" PLUGIN_API permissions::_OnUserDeleteStorage_Unregister __permissions_OnUserDeleteStorage_Unregister;
-namespace permissions {
-  /**
-   * @brief Unregisters a previously registered listener for the OnUserDeleteStorage event.
-   * @param callback (function): The callback to unregister.
-   * @return int32
-   */
-  inline Status OnUserDeleteStorage_Unregister(UserDeleteStorageCallback callback) {
-    return __permissions_OnUserDeleteStorage_Unregister(callback);
-  }
-
   using _OnUserDelete_Register = Status (*)(UserDeleteCallback);
 }
 extern "C" PLUGIN_API permissions::_OnUserDelete_Register __permissions_OnUserDelete_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnUserDelete event. Callback invoked before a user is deleted.
+   * @brief Registers a listener for the OnUserDelete event. Callback invoked after a user is deleted.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -508,7 +482,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnUserGroupChangeStorage_Register __permissions_OnUserGroupChangeStorage_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnUserGroupChangeStorage event. Callback invoked when a group is added or removed from a user.
+   * @brief Registers a listener for the OnUserGroupChangeStorage event. Storage callback invoked before a group is added, replaced, or removed for a user. Return `false` to cancel the change, the method then returns DBNotReady.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -534,7 +508,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnUserGroupChange_Register __permissions_OnUserGroupChange_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnUserGroupChange event. Callback invoked when a group is added or removed from a user.
+   * @brief Registers a listener for the OnUserGroupChange event. Callback invoked when a group is added, replaced, or removed for a user.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -560,7 +534,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnUserImmunityChangeStorage_Register __permissions_OnUserImmunityChangeStorage_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnUserImmunityChangeStorage event. Callback invoked when immunity is set for a user.
+   * @brief Registers a listener for the OnUserImmunityChangeStorage event. Storage callback invoked before immunity is set for a user. Return `false` to cancel the change, the method then returns DBNotReady.
    * @param callback (function): The callback to register.
    * @return int32
    */
@@ -638,7 +612,7 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_OnUserPermissionChangeStorage_Register __permissions_OnUserPermissionChangeStorage_Register;
 namespace permissions {
   /**
-   * @brief Registers a listener for the OnUserPermissionChangeStorage event. Callback invoked when a permission is added, removed, or replaced for a user.
+   * @brief Registers a listener for the OnUserPermissionChangeStorage event. Storage callback invoked before a permission is added, replaced, or removed for a user. Return `false` to cancel the change, the method then returns DBNotReady.
    * @param callback (function): The callback to register.
    * @return int32
    */

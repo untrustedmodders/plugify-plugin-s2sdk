@@ -18,8 +18,8 @@ namespace permissions {
    * @param pluginID (int64): Identifier of the plugin that calls the method.
    * @param childName (string): Child group name
    * @param parentName (string): Parent group name to set
-   * @param dontBroadcast (bool)
-   * @return int32: Success, ChildGroupNotFound, ParentGroupNotFound
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnSetParent event. The change is still applied.
+   * @return int32: Success, ChildGroupNotFound, ParentGroupNotFound, GroupHierarchyCycle, DBNotReady
    */
   inline Status SetParent(int64_t pluginID, const plg::string& childName, const plg::string& parentName, bool dontBroadcast) {
     return __permissions_SetParent(pluginID, childName, parentName, dontBroadcast);
@@ -131,8 +131,8 @@ namespace permissions {
    * @param pluginID (int64): Identifier of the plugin that calls the method.
    * @param name (string): Group name.
    * @param perm (string): Permission line.
-   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the permission change event to registered GroupPermission listeners. The permission is still applied internally.
-   * @return int32: Success, GroupNotFound, PermAlreadyGranted
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnGroupPermissionChange event. The change is still applied.
+   * @return int32: Success, GroupNotFound, PermAlreadyGranted, PermConflict, InvalidPermission, DBNotReady
    */
   inline Status AddPermissionGroup(int64_t pluginID, const plg::string& name, const plg::string& perm, bool dontBroadcast) {
     return __permissions_AddPermissionGroup(pluginID, name, perm, dontBroadcast);
@@ -143,11 +143,12 @@ namespace permissions {
 extern "C" PLUGIN_API permissions::_SetPermissionGroup __permissions_SetPermissionGroup;
 namespace permissions {
   /**
-   * @param pluginID (int64)
-   * @param name (string)
-   * @param perm (string)
-   * @param dontBroadcast (bool)
-   * @return int32
+   * @brief Set a permission to a group (replaces its state if the permission already exists).
+   * @param pluginID (int64): Identifier of the plugin that calls the method.
+   * @param name (string): Group name.
+   * @param perm (string): Permission line.
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnGroupPermissionChange event. The change is still applied.
+   * @return int32: Success, GroupNotFound, PermAlreadyGranted, InvalidPermission, DBNotReady
    */
   inline Status SetPermissionGroup(int64_t pluginID, const plg::string& name, const plg::string& perm, bool dontBroadcast) {
     return __permissions_SetPermissionGroup(pluginID, name, perm, dontBroadcast);
@@ -163,8 +164,8 @@ namespace permissions {
    * @param name (string): Group name.
    * @param perm (string): Permission line.
    * @param recursiveDeletion (bool): Delete all nested perms.
-   * @param dontBroadcast (bool)
-   * @return int32: Success, GroupNotFound, PermNotFound
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnGroupPermissionChange event. The change is still applied.
+   * @return int32: Success, GroupNotFound, PermNotFound, InvalidPermission, DBNotReady
    */
   inline Status RemovePermissionGroup(int64_t pluginID, const plg::string& name, const plg::string& perm, bool recursiveDeletion, bool dontBroadcast) {
     return __permissions_RemovePermissionGroup(pluginID, name, perm, recursiveDeletion, dontBroadcast);
@@ -195,8 +196,8 @@ namespace permissions {
    * @param groupName (string): Group name
    * @param optionName (string): Option name
    * @param value (any): Option value.
-   * @param dontBroadcast (bool)
-   * @return int32: Success, GroupNotFound
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnGroupOptionChange event. The change is still applied.
+   * @return int32: Success, GroupNotFound, InvalidOptionName, DBNotReady
    */
   inline Status SetOptionGroup(int64_t pluginID, const plg::string& groupName, const plg::string& optionName, const plg::any& value, bool dontBroadcast) {
     return __permissions_SetOptionGroup(pluginID, groupName, optionName, value, dontBroadcast);
@@ -228,8 +229,8 @@ namespace permissions {
    * @param perms (string[]): Array of permission lines.
    * @param priority (int32): Group priority.
    * @param parent (string): Parent group name.
-   * @param dontBroadcast (bool)
-   * @return int32: Success, GroupAlreadyExist, ParentGroupNotFound
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnGroupCreate event. The change is still applied.
+   * @return int32: Success, GroupAlreadyExist, ParentGroupNotFound, InvalidGroupName, DBNotReady
    */
   inline Status CreateGroup(int64_t pluginID, const plg::string& name, const plg::vector<plg::string>& perms, int32_t priority, const plg::string& parent, bool dontBroadcast) {
     return __permissions_CreateGroup(pluginID, name, perms, priority, parent, dontBroadcast);
@@ -243,8 +244,8 @@ namespace permissions {
    * @brief Delete a group.
    * @param pluginID (int64): Identifier of the plugin that calls the method.
    * @param name (string): Group name.
-   * @param dontBroadcast (bool)
-   * @return int32: Success if deleted; GroupNotFound if group not found.
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnGroupDelete event. The change is still applied.
+   * @return int32: Success, GroupNotFound, DBNotReady
    */
   inline Status DeleteGroup(int64_t pluginID, const plg::string& name, bool dontBroadcast) {
     return __permissions_DeleteGroup(pluginID, name, dontBroadcast);
@@ -270,8 +271,8 @@ namespace permissions {
   /**
    * @brief Dispatches a request to load server groups for a plugin.
    * @param pluginID (int64): Identifier of the calling plugin.
-   * @param dontBroadcast (bool)
-   * @return int32
+   * @param dontBroadcast (bool): If set to `true`, suppresses dispatching of the OnGroupsLoaded event.
+   * @return int32: Success, DBNotReady
    */
   inline Status LoadGroups(int64_t pluginID, bool dontBroadcast) {
     return __permissions_LoadGroups(pluginID, dontBroadcast);

@@ -40,6 +40,10 @@ permissions::_OnGroupsLoad_Register __permissions_OnGroupsLoad_Register = nullpt
 
 permissions::_OnGroupsLoad_Unregister __permissions_OnGroupsLoad_Unregister = nullptr;
 
+permissions::_OnGroupsLoaded_Register __permissions_OnGroupsLoaded_Register = nullptr;
+
+permissions::_OnGroupsLoaded_Unregister __permissions_OnGroupsLoaded_Unregister = nullptr;
+
 permissions::_OnPermissionExpiration_Register __permissions_OnPermissionExpiration_Register = nullptr;
 
 permissions::_OnPermissionExpiration_Unregister __permissions_OnPermissionExpiration_Unregister = nullptr;
@@ -60,17 +64,9 @@ permissions::_OnUserCookieChange_Register __permissions_OnUserCookieChange_Regis
 
 permissions::_OnUserCookieChange_Unregister __permissions_OnUserCookieChange_Unregister = nullptr;
 
-permissions::_OnUserCreateStorage_Register __permissions_OnUserCreateStorage_Register = nullptr;
-
-permissions::_OnUserCreateStorage_Unregister __permissions_OnUserCreateStorage_Unregister = nullptr;
-
 permissions::_OnUserCreate_Register __permissions_OnUserCreate_Register = nullptr;
 
 permissions::_OnUserCreate_Unregister __permissions_OnUserCreate_Unregister = nullptr;
-
-permissions::_OnUserDeleteStorage_Register __permissions_OnUserDeleteStorage_Register = nullptr;
-
-permissions::_OnUserDeleteStorage_Unregister __permissions_OnUserDeleteStorage_Unregister = nullptr;
 
 permissions::_OnUserDelete_Register __permissions_OnUserDelete_Register = nullptr;
 
