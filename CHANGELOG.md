@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.18.5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.4...v2.18.5) (2026-10-16)
+
+
+### Bug Fixes
+
+* permission dependency check ([dce1e1d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dce1e1d30ff40a06ac271c42afb8c71982a35aa5))
+
 ## [2.18.4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.3...v2.18.4) (2026-10-14)
 
 
