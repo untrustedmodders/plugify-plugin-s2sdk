@@ -146,7 +146,7 @@ static bool CheckCommandAccess(CPlayerSlot slot, const plg::string& permission) 
 		return true;
 	}
 
-	if (!__permissions_HasGroup) {
+	if (!__permissions_HasPermission) {
 		plg::print(LS_ERROR, "Missing permission dependency!\n");
 		return false;
 	}
