@@ -260,8 +260,6 @@ polyhook::ResultType Hook_ClientActive(polyhook::HookHandle hook, polyhook::Para
 	g_MultiAddonManager.OnClientActive(slot, bLoadGame, name, steamID64);
 #endif
 	g_PlayerManager.OnClientActive(slot, bLoadGame);
-
-	g_ClientActiveListenerManager(slot, bLoadGame);
 	return polyhook::ResultType::Ignored;
 }
 

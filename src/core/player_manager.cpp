@@ -261,6 +261,8 @@ void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* response)
 thread_local bool s_refuseConnection;
 
 bool PlayerManager::OnClientConnect(CPlayerSlot slot, char const* name, uint64 steamID64, char const* networkID) {
+	s_refuseConnection = false;
+
 	if (Player* player = ToPlayer(slot)) {
 		player->Init(slot, steamID64);
 

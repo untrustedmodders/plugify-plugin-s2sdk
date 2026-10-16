@@ -30833,9 +30833,9 @@
           "description": "The player slot"
         },
         {
-          "name": "isActive",
+          "name": "loadGame",
           "type": "bool",
-          "description": "Active state"
+          "description": "If true, the player's state is restored from a save and they should not be spawned"
         }
       ],
       "retType": {
