@@ -9,13 +9,12 @@ template<char const* Name, typename Func>
 using Manager = ListenerManager<Name, Func>;
 
 #define LISTENER_LIST(X) \
-	X(ClientConnect, bool, int playerSlot, const plg::string& playerName, const plg::string& networkID) \
-	X(ClientConnect_Post, void, int playerSlot) \
+	X(ClientConnect, ENetworkDisconnectionReason, const plg::string& playerName, const plg::string& address, uint64 steamID) \
 	X(ClientConnected, void, int playerSlot) \
 	X(ClientPutInServer, void, int playerSlot) \
 	X(ClientDisconnect, void, int playerSlot, ENetworkDisconnectionReason reason) \
-	X(ClientDisconnect_Post, void, int playerSlot, ENetworkDisconnectionReason reason) \
 	X(ClientActive, void, int playerSlot, bool loadGame) \
+	X(ClientSignonStateChanged, void, int playerSlot, SignonState_t state, int spawnCount) \
 	X(ClientFullyConnect, void, int playerSlot) \
 	X(ClientSettingsChanged, void, int playerSlot) \
 	X(ClientAuthenticated, void, int playerSlot, uint64 steamID) \

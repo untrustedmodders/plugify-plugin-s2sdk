@@ -46,6 +46,7 @@ public:
 		m_slot = slot;
 		m_unauthenticatedSteamID = CSteamID(steamID64);
 		m_language.clear();
+		m_languageCode = {};
 		m_operatingSystem.clear();
 		m_queryCallback.clear();
 	}
@@ -54,6 +55,7 @@ public:
 		m_slot = -1;
 		m_unauthenticatedSteamID = k_steamIDNil;
 		m_language.clear();
+		m_languageCode = {};
 		m_operatingSystem.clear();
 		m_queryCallback.clear();
 	}
@@ -128,12 +130,12 @@ public:
 	void OnGameFrame();
 	void OnSteamAPIActivated();
 	void OnSteamAPIDeactivated();
-	bool OnClientConnect(CPlayerSlot slot, char const* name, uint64 steamID64, char const* networkID);
-	bool OnClientConnect_Post(CPlayerSlot slot, bool origRet);
-	void OnClientConnected(CPlayerSlot slot, bool fakePlayer);
+	ENetworkDisconnectionReason OnClientConnect(char const* name, char const* address, uint64 steamID64);
+	void OnClientConnected(CPlayerSlot slot, uint64 steamID64);
+	void QueryClientInfo(CPlayerSlot slot);
 	void OnClientPutInServer(CPlayerSlot slot, char const* name);
 	void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason);
-	void OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnectionReason reason);
+	void OnClientDisconnected(CPlayerSlot slot);
 	void OnClientActive(CPlayerSlot slot, bool loadGame) const;
 
 	bool QueryCvarValue(CPlayerSlot slot, std::string_view convarName, CvarValueCallback callback, const plg::vector<plg::any>& data);

@@ -215,7 +215,7 @@ extern "C" PLUGIN_API uint64_t GetClientSteamID64(int playerSlot) {
  * @brief Retrieves a client's IP address.
  *
  * @param playerSlot The index of the player's slot.
- * @return The client's IP address.
+ * @return The client's IP address, or the local (loopback) address for bots.
  */
 extern "C" PLUGIN_API plg::string GetClientIp(int playerSlot) {
 	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
@@ -228,6 +228,9 @@ extern "C" PLUGIN_API plg::string GetClientIp(int playerSlot) {
 
 /**
  * @brief Retrieves a client's language.
+ *
+ * Empty until the client answers the `cl_language` query, and always empty for bots.
+ * Reliably available starting from OnClientAuthenticated and OnClientPutInServer.
  *
  * @param playerSlot The index of the player's slot.
  * @return The client's language.
@@ -246,7 +249,8 @@ extern "C" PLUGIN_API plg::string GetClientLanguage(int playerSlot) {
  *
  * Unlike GetClientLanguage, which returns the raw `cl_language` value ("english",
  * "schinese"), this returns the code translation files are keyed by ("en", "zh-CN").
- * Falls back to the server language when the client's language is not known.
+ * Empty until the client answers the `cl_language` query, and always empty for bots.
+ * Reliably available starting from OnClientAuthenticated and OnClientPutInServer.
  *
  * @param playerSlot The index of the player's slot.
  * @return The client's ISO language code.
@@ -262,6 +266,9 @@ extern "C" PLUGIN_API plg::string GetClientLanguageCode(int playerSlot) {
 
 /**
  * @brief Retrieves a client's operating system.
+ *
+ * Empty until the client answers the `engine_ostype` query, and always empty for bots.
+ * Reliably available starting from OnClientAuthenticated and OnClientPutInServer.
  *
  * @param playerSlot The index of the player's slot.
  * @return The client's operating system.

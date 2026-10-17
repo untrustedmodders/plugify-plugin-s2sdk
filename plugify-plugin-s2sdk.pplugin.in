@@ -7955,13 +7955,13 @@
       ],
       "retType": {
         "type": "string",
-        "description": "The client's IP address."
+        "description": "The client's IP address, or the local (loopback) address for bots."
       }
     },
     {
       "name": "GetClientLanguage",
       "group": "Clients",
-      "description": "Retrieves a client's language.",
+      "description": "Retrieves a client's language. Empty until the client answers the cl_language query, and always empty for bots. Reliably available starting from OnClientAuthenticated and OnClientPutInServer.",
       "funcName": "GetClientLanguage",
       "paramTypes": [
         {
@@ -7979,7 +7979,7 @@
     {
       "name": "GetClientLanguageCode",
       "group": "Clients",
-      "description": "Retrieves a client's language as an ISO code. Unlike GetClientLanguage, which returns the raw cl_language value (\"english\", \"schinese\"), this returns the code translation files are keyed by (\"en\", \"zh-CN\"). Falls back to the server language when the client's language is not known.",
+      "description": "Retrieves a client's language as an ISO code. Unlike GetClientLanguage, which returns the raw cl_language value (\"english\", \"schinese\"), this returns the code translation files are keyed by (\"en\", \"zh-CN\"). Empty until the client answers the cl_language query, and always empty for bots. Reliably available starting from OnClientAuthenticated and OnClientPutInServer.",
       "funcName": "GetClientLanguageCode",
       "paramTypes": [
         {
@@ -7997,7 +7997,7 @@
     {
       "name": "GetClientOS",
       "group": "Clients",
-      "description": "Retrieves a client's operating system.",
+      "description": "Retrieves a client's operating system. Empty until the client answers the engine_ostype query, and always empty for bots. Reliably available starting from OnClientAuthenticated and OnClientPutInServer.",
       "funcName": "GetClientOS",
       "paramTypes": [
         {
@@ -23414,42 +23414,6 @@
       }
     },
     {
-      "name": "OnClientConnect_Post_Register",
-      "group": "Listeners",
-      "description": "Register callback to event.",
-      "funcName": "OnClientConnect_Post_Register",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": "OnClientConnect_PostCallback"
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "OnClientConnect_Post_Unregister",
-      "group": "Listeners",
-      "description": "Unregister callback to event.",
-      "funcName": "OnClientConnect_Post_Unregister",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": "OnClientConnect_PostCallback"
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
       "name": "OnClientConnected_Register",
       "group": "Listeners",
       "description": "Register callback to event.",
@@ -23558,42 +23522,6 @@
       }
     },
     {
-      "name": "OnClientDisconnect_Post_Register",
-      "group": "Listeners",
-      "description": "Register callback to event.",
-      "funcName": "OnClientDisconnect_Post_Register",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": "OnClientDisconnect_PostCallback"
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "OnClientDisconnect_Post_Unregister",
-      "group": "Listeners",
-      "description": "Unregister callback to event.",
-      "funcName": "OnClientDisconnect_Post_Unregister",
-      "paramTypes": [
-        {
-          "name": "callback",
-          "type": "function",
-          "ref": false,
-          "description": "Function callback.",
-          "prototype": "OnClientDisconnect_PostCallback"
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
       "name": "OnClientActive_Register",
       "group": "Listeners",
       "description": "Register callback to event.",
@@ -23623,6 +23551,42 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnClientActiveCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSignonStateChanged_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnClientSignonStateChanged_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSignonStateChangedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSignonStateChanged_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnClientSignonStateChanged_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSignonStateChangedCallback"
         }
       ],
       "retType": {
@@ -30707,49 +30671,34 @@
     {
       "name": "OnClientConnectCallback",
       "funcName": "OnClientConnectCallback",
-      "description": "Called on client connection. If you return true, the client will be allowed in the server. If you return false (or return nothing), the client will be rejected. If the client is rejected by this forward or any other, OnClientDisconnect will not be called.<br>Note: Do not write to rejectmsg if you plan on returning true. If multiple plugins write to the string buffer, it is not defined which plugin's string will be shown to the client, but it is guaranteed one of them will.",
+      "description": "Called when a client attempts to connect, before a player slot is allocated. Return a disconnect reason other than NETWORK_DISCONNECT_INVALID to reject the connection with it: the client is not created, so no player_connect event, OnClientConnected or OnClientDisconnect will follow. Also called for bots (from CreateFakeClient) with the server's local address and a steamId of 0; rejecting a bot means it is not created. Not called for GOTV.",
       "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "description": "The player slot"
-        },
         {
           "name": "name",
           "type": "string",
           "description": "The client name"
         },
         {
-          "name": "networkId",
+          "name": "address",
           "type": "string",
-          "description": "The client id"
-        }
-      ],
-      "retType": {
-        "type": "bool",
-        "description": "True to validate client's connection, false to refuse it."
-      }
-    },
-    {
-      "name": "OnClientConnect_PostCallback",
-      "funcName": "OnClientConnect_PostCallback",
-      "description": "Called on client connection.",
-      "paramTypes": [
+          "description": "The client address (ip:port), or the server's local address for bots"
+        },
         {
-          "name": "playerSlot",
-          "type": "int32",
-          "description": "The player slot"
+          "name": "steamId",
+          "type": "uint64",
+          "description": "The SteamID64 reported by the client. It is not validated by Steam yet; 0 for bots or when the client sent no auth ticket"
         }
       ],
       "retType": {
-        "type": "void",
-        "description": ""
+        "type": "int32",
+        "description": "NETWORK_DISCONNECT_INVALID to allow the connection, any other reason to reject it with that reason. If several callbacks reject, the first one by priority wins.",
+        "enum": "NetworkDisconnectionReason"
       }
     },
     {
       "name": "OnClientConnectedCallback",
       "funcName": "OnClientConnectedCallback",
-      "description": "Called once a client successfully connects. This callback is paired with OnClientDisconnect.",
+      "description": "Called once a client has connected and got a player slot, for players (after OnClientConnect accepted them) and bots alike, right after the player_connect event and before OnClientPutInServer. This callback is paired with OnClientDisconnect.",
       "paramTypes": [
         {
           "name": "playerSlot",
@@ -30781,29 +30730,7 @@
     {
       "name": "OnClientDisconnectCallback",
       "funcName": "OnClientDisconnectCallback",
-      "description": "Called when a client is disconnecting from the server.",
-      "paramTypes": [
-        {
-          "name": "playerSlot",
-          "type": "int32",
-          "description": "The player slot"
-        },
-        {
-          "name": "reason",
-          "type": "int32",
-          "description": "The reason for disconnect",
-          "enum": "NetworkDisconnectionReason"
-        }
-      ],
-      "retType": {
-        "type": "void",
-        "description": ""
-      }
-    },
-    {
-      "name": "OnClientDisconnect_PostCallback",
-      "funcName": "OnClientDisconnect_PostCallback",
-      "description": "Called when a client is disconnected from the server.",
+      "description": "Called when a client is disconnecting from the server, for players and bots, before the player_disconnect event. The client data is still available here and is reset once the callbacks return.",
       "paramTypes": [
         {
           "name": "playerSlot",
@@ -30836,6 +30763,33 @@
           "name": "loadGame",
           "type": "bool",
           "description": "If true, the player's state is restored from a save and they should not be spawned"
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": ""
+      }
+    },
+    {
+      "name": "OnClientSignonStateChangedCallback",
+      "funcName": "OnClientSignonStateChangedCallback",
+      "description": "Called when the server processes a client's signon state message (CServerSideClient::ProcessSignonStateMsg), with the client's current signon state. The same state may be reported more than once. Not called for bots.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The player slot"
+        },
+        {
+          "name": "state",
+          "type": "int32",
+          "description": "The client's signon state",
+          "enum": "SignonState"
+        },
+        {
+          "name": "spawnCount",
+          "type": "int32",
+          "description": "The spawn count sent by the client in the signon state message"
         }
       ],
       "retType": {
@@ -31575,6 +31529,20 @@
           "name": "DMG_DANGERZONE",
           "description": "Danger zone damage."
         }
+      ]
+    },
+    {
+      "name": "SignonState",
+      "description": "Enum representing the client's connection (signon) state.",
+      "values": [
+        { "value": 0, "name": "None", "description": "No state yet, about to connect." },
+        { "value": 1, "name": "Challenge", "description": "Client is challenging the server, all OOB packets." },
+        { "value": 2, "name": "Connected", "description": "Client is connected to the server, netchans ready." },
+        { "value": 3, "name": "New", "description": "Just got server info and string tables." },
+        { "value": 4, "name": "Prespawn", "description": "Received signon buffers." },
+        { "value": 5, "name": "Spawn", "description": "Ready to receive entity packets." },
+        { "value": 6, "name": "Full", "description": "Fully connected, first non-delta packet received." },
+        { "value": 7, "name": "ChangeLevel", "description": "Server is changing level." }
       ]
     },
     {

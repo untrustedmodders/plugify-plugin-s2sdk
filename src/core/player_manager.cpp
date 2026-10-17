@@ -135,7 +135,14 @@ void Player::SetName(const char* name) const {
 
 std::string_view Player::GetIpAddress() const {
 	auto client = GetClient();
-	return client ? client->GetNetChannel()->GetRemoteAddress().ToString(true) : "<unknown>";
+	if (!client)
+		return "<unknown>";
+
+	if (client->IsFakeClient())
+		return g_pNetworkSystem->GetLocalAdr().ToString(true);
+
+	auto netChannel = client->GetNetChannel();
+	return netChannel ? netChannel->GetRemoteAddress().ToString(true) : "<unknown>";
 }
 
 std::string_view Player::GetLanguage() const {
@@ -258,45 +265,33 @@ void PlayerManager::OnValidateAuthTicket(ValidateAuthTicketResponse_t* response)
 	}
 }
 
-thread_local bool s_refuseConnection;
+ENetworkDisconnectionReason PlayerManager::OnClientConnect(char const* name, char const* address, uint64 steamID64) {
+	plg::string playerName(name);
+	plg::string playerAddress(address);
 
-bool PlayerManager::OnClientConnect(CPlayerSlot slot, char const* name, uint64 steamID64, char const* networkID) {
-	s_refuseConnection = false;
+	// Every listener is called; the first one (by priority) that returns a reason decides the kick
+	ENetworkDisconnectionReason result = NETWORK_DISCONNECT_INVALID;
+	if (auto listeners = g_ClientConnectListenerManager.Get()) {
+		for (const auto& listener : listeners->handlers) {
+			ENetworkDisconnectionReason reason = listener(playerName, playerAddress, steamID64);
+			if (result == NETWORK_DISCONNECT_INVALID) {
+				result = reason;
+			}
+		}
+	}
+	return result;
+}
 
+void PlayerManager::OnClientConnected(CPlayerSlot slot, uint64 steamID64) {
 	if (Player* player = ToPlayer(slot)) {
 		player->Init(slot, steamID64);
-
-		cvars::SendConVarValueQueryToClient(slot, "cl_language", CLIENT_LANGUAGE_ID);
-		cvars::SendConVarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
-
-		plg::string playerName(name);
-
-		s_refuseConnection = g_ClientConnectListenerManager(slot, playerName, networkID);
-
-		return s_refuseConnection;
+		g_ClientConnectedListenerManager(slot);
 	}
-
-	return true;
 }
 
-bool PlayerManager::OnClientConnect_Post(CPlayerSlot slot, bool origRet) {
-	if (Player* player = ToPlayer(slot)) {
-		if (s_refuseConnection) {
-			origRet = false;
-		}
-
-		if (origRet) {
-			g_ClientConnect_PostListenerManager(slot);
-		} else {
-			player->Reset();
-		}
-	}
-
-	return origRet;
-}
-
-void PlayerManager::OnClientConnected(CPlayerSlot slot, bool fakePlayer) {
-	g_ClientConnectedListenerManager(slot);
+void PlayerManager::QueryClientInfo(CPlayerSlot slot) {
+	cvars::SendConVarValueQueryToClient(slot, "cl_language", CLIENT_LANGUAGE_ID);
+	cvars::SendConVarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
 }
 
 void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name) {
@@ -314,9 +309,7 @@ void PlayerManager::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionRe
 	g_ClientDisconnectListenerManager(slot, reason);
 }
 
-void PlayerManager::OnClientDisconnect_Post(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
-	g_ClientDisconnect_PostListenerManager(slot, reason);
-
+void PlayerManager::OnClientDisconnected(CPlayerSlot slot) {
 	if (Player* player = ToPlayer(slot)) {
 		player->Reset();
 	}
