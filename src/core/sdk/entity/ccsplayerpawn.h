@@ -54,7 +54,7 @@ public:
 	}
 
 	bool IsBot() {
-		return m_fFlags & FL_PAWN_FAKECLIENT;
+		return m_fFlags & FL_BOT;
 	}
 };
 

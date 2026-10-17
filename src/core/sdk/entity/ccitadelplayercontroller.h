@@ -50,7 +50,7 @@ public:
 	}*/
 
 	bool IsBot() {
-		return m_fFlags & FL_CONTROLLER_FAKECLIENT;
+		return m_fFlags & FL_FAKECLIENT;
 	}
 
 	void ChangeTeam(int team) {

@@ -315,7 +315,8 @@ extern "C" PLUGIN_API void SetEventEntity(IGameEvent* event, const plg::string& 
  * @param value The entity index value to set.
  */
 extern "C" PLUGIN_API void SetEventEntityIndex(IGameEvent* event, const plg::string& key, int value) {
-	if (event) event->SetEntity(GameEventKeySymbol_t::Make(key), CEntityIndex(value));
+	// The CEntityIndex overload is gone from IGameEvent, resolve the index to the entity instead
+	if (event) event->SetEntity(GameEventKeySymbol_t::Make(key), g_pGameEntitySystem->GetEntityInstance(CEntityIndex(value)));
 }
 
 /**

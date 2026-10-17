@@ -35,15 +35,10 @@
 Source2SDK g_sdk;
 PLUGIFY_PLUGIN(PLUGIN_API, &g_sdk)
 
-CGameEntitySystem* GameEntitySystem() {
-	static auto offset = GetOrLog(g_pGameConfig->GetOffset("GameEntitySystem"));
-	return *reinterpret_cast<CGameEntitySystem**>(reinterpret_cast<uintptr_t>(g_pGameResourceServiceServer) + offset);
-}
-
 extern Result<void> ServerStartup();
 
 namespace {
-inline char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
+// inline char CS_SCRIPT_PATH[] = "maps/editor/zoo/scripts/hello.vjs";
 
 GAME_EVENT_F(round_start) {
 	g_PanoramaVoteHandler.Init();
