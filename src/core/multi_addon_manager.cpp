@@ -415,6 +415,9 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 
 		FOR_EACH_VEC(clients, i) {
 			CServerSideClientBase* client = clients[i];
+			if (client->GetNetChannel() == nullptr)
+				continue;
+
 			if (steamID64 == 0 || client->GetClientSteamID().ConvertToUint64() == steamID64) {
 				// Client is already loading, telling them to reload now will actually just disconnect them. ("Received signon %i when at %i\n" in client console)
 				if (client->GetSignonState() == SIGNONSTATE_CHANGELEVEL)

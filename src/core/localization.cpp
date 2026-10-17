@@ -12,7 +12,7 @@ namespace {
 
 	std::string_view ClientLanguage(CPlayerSlot slot) {
 		auto player = g_PlayerManager.ToPlayer(slot);
-		if (player != nullptr) {
+		if (player != nullptr && !player->GetLanguageCode().empty()) {
 			return player->GetLanguageCode();
 		}
 		return ServerLanguage();

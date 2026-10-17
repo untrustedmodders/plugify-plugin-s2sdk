@@ -146,8 +146,13 @@ CServerSideClientBase* utils::GetClientBySlot(CPlayerSlot slot) {
 	if (!utils::IsPlayerSlot(slot))
 		return nullptr;
 
+	// Don't require the controller: it is created later than the client (e.g. in ConnectClient post)
 	CUtlVector<CServerSideClientBase*, CPlayerSlot>* clientList = GetClientList();
-	return (clientList && GetController(slot)) ? clientList->Element(slot) : nullptr;
+	if (!clientList || slot.Get() >= clientList->Count())
+		return nullptr;
+
+	CServerSideClientBase* client = clientList->Element(slot);
+	return (client && client->GetPlayerSlot() == slot) ? client : nullptr;
 }
 
 void utils::PlaySoundToClient(CPlayerSlot player, int channel, const char* soundName, float volume, soundlevel_t soundLevel, int flags, int pitch, const Vector& origin, float soundTime) {
