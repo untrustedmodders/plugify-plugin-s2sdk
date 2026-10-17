@@ -1,5 +1,26 @@
 # Changelog
 
+## [3.0.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.5...v3.0.0) (2026-10-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* rework client connect and disconnect listeners
+* rename TransmitInfoTargetSlot methods to TransmitInfoTargetSpawnGroup
+* update sourcesdk
+
+### Features
+
+* rename TransmitInfoTargetSlot methods to TransmitInfoTargetSpawnGroup ([87de888](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/87de888ddc7802504aeb66e4fd4c57d20e767af1))
+* rework client connect and disconnect listeners ([647d8c6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/647d8c67c77da3d2eba773da648360d2deca1913))
+* update sourcesdk ([8135cfe](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8135cfe2af0868034c917bfd14974e7ccbdc00a2))
+
+
+### Bug Fixes
+
+* client lookup and bot net channel crashes ([3215f77](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3215f7752aaa4717f9322e6ebcabafc9da4f9ccc))
+* duplicate OnClientActive call and loadGame param name ([fe312c6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fe312c6ab41f9ef5fe83878bc470716e2e24f43e))
+
 ## [2.18.5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.4...v2.18.5) (2026-10-16)
 
 
