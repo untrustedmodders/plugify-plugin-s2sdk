@@ -33,8 +33,8 @@ void TransmitManager::OnCheckTransmit(const plg::vector<CCheckTransmitInfo*>& tr
 			// Without it the client's reconcile pass deletes the entity, while the server
 			// still counts it as held and later sends a delta for it -- the client dies with
 			// "CopyExistingEntity: missing client entity". Same fix as CS2Fixes 2a7db489.
-			if (info->m_pTransmitNonPlayers) {
-				info->m_pTransmitNonPlayers->Set(entity->GetEntityIndex());
+			if (info->m_pNonTransmitEntity) {
+				info->m_pNonTransmitEntity->Set(entity->GetEntityIndex());
 			}
 		}
 	}

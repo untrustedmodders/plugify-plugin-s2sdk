@@ -7154,10 +7154,10 @@
       }
     },
     {
-      "name": "GetTransmitInfoTargetSlotsCount",
+      "name": "GetTransmitInfoTargetSpawnGroupsCount",
       "group": "Transmit",
-      "description": "Gets the count of target player slots.",
-      "funcName": "GetTransmitInfoTargetSlotsCount",
+      "description": "Gets the count of spawn groups loaded by the client.",
+      "funcName": "GetTransmitInfoTargetSpawnGroupsCount",
       "paramTypes": [
         {
           "name": "info",
@@ -7168,14 +7168,14 @@
       ],
       "retType": {
         "type": "int32",
-        "description": "The number of target player slots, or 0 if the info pointer is null."
+        "description": "The number of loaded spawn groups, or 0 if the info pointer is null."
       }
     },
     {
-      "name": "GetTransmitInfoTargetSlot",
+      "name": "GetTransmitInfoTargetSpawnGroup",
       "group": "Transmit",
-      "description": "Gets a player slot value at a specific index in the target slots vector.",
-      "funcName": "GetTransmitInfoTargetSlot",
+      "description": "Gets a spawn group handle at a specific index in the loaded spawn groups vector.",
+      "funcName": "GetTransmitInfoTargetSpawnGroup",
       "paramTypes": [
         {
           "name": "info",
@@ -7187,19 +7187,19 @@
           "name": "index",
           "type": "int32",
           "ref": false,
-          "description": "The index in the target slots vector."
+          "description": "The index in the loaded spawn groups vector."
         }
       ],
       "retType": {
         "type": "int32",
-        "description": "The player slot value, or -1 if the index is invalid or info is null."
+        "description": "The spawn group handle, or -1 if the index is invalid or info is null."
       }
     },
     {
-      "name": "AddTransmitInfoTargetSlot",
+      "name": "AddTransmitInfoTargetSpawnGroup",
       "group": "Transmit",
-      "description": "Adds a player slot to the target slots vector.",
-      "funcName": "AddTransmitInfoTargetSlot",
+      "description": "Adds a spawn group handle to the loaded spawn groups vector.",
+      "funcName": "AddTransmitInfoTargetSpawnGroup",
       "paramTypes": [
         {
           "name": "info",
@@ -7208,10 +7208,10 @@
           "description": "Pointer to the CCheckTransmitInfo structure."
         },
         {
-          "name": "playerSlot",
+          "name": "spawnGroup",
           "type": "int32",
           "ref": false,
-          "description": "The player slot value to add."
+          "description": "The spawn group handle to add."
         }
       ],
       "retType": {
@@ -7219,10 +7219,10 @@
       }
     },
     {
-      "name": "RemoveTransmitInfoTargetSlot",
+      "name": "RemoveTransmitInfoTargetSpawnGroup",
       "group": "Transmit",
-      "description": "Removes a player slot from the target slots vector.",
-      "funcName": "RemoveTransmitInfoTargetSlot",
+      "description": "Removes a spawn group handle from the loaded spawn groups vector.",
+      "funcName": "RemoveTransmitInfoTargetSpawnGroup",
       "paramTypes": [
         {
           "name": "info",
@@ -7234,7 +7234,7 @@
           "name": "index",
           "type": "int32",
           "ref": false,
-          "description": "Index within the target slots vector to remove."
+          "description": "Index within the loaded spawn groups vector to remove."
         }
       ],
       "retType": {
@@ -7242,10 +7242,10 @@
       }
     },
     {
-      "name": "GetTransmitInfoTargetSlotsAll",
+      "name": "GetTransmitInfoTargetSpawnGroupsAll",
       "group": "Transmit",
-      "description": "Gets the target slots vector.",
-      "funcName": "GetTransmitInfoTargetSlotsAll",
+      "description": "Gets the loaded spawn groups vector.",
+      "funcName": "GetTransmitInfoTargetSpawnGroupsAll",
       "paramTypes": [
         {
           "name": "info",
@@ -7256,14 +7256,14 @@
       ],
       "retType": {
         "type": "int32[]",
-        "description": "The player slots array."
+        "description": "The spawn group handles array."
       }
     },
     {
-      "name": "RemoveTransmitInfoTargetSlotsAll",
+      "name": "RemoveTransmitInfoTargetSpawnGroupsAll",
       "group": "Transmit",
-      "description": "Clears all target player slots from the vector.",
-      "funcName": "RemoveTransmitInfoTargetSlotsAll",
+      "description": "Clears all spawn groups from the loaded spawn groups vector.",
+      "funcName": "RemoveTransmitInfoTargetSpawnGroupsAll",
       "paramTypes": [
         {
           "name": "info",
@@ -29831,32 +29831,32 @@
         },
         {
           "name": "GetTargetSlotsCount",
-          "method": "GetTransmitInfoTargetSlotsCount",
+          "method": "GetTransmitInfoTargetSpawnGroupsCount",
           "bindSelf": true
         },
         {
           "name": "GetTargetSlot",
-          "method": "GetTransmitInfoTargetSlot",
+          "method": "GetTransmitInfoTargetSpawnGroup",
           "bindSelf": true
         },
         {
           "name": "AddTargetSlot",
-          "method": "AddTransmitInfoTargetSlot",
+          "method": "AddTransmitInfoTargetSpawnGroup",
           "bindSelf": true
         },
         {
           "name": "RemoveTargetSlot",
-          "method": "RemoveTransmitInfoTargetSlot",
+          "method": "RemoveTransmitInfoTargetSpawnGroup",
           "bindSelf": true
         },
         {
           "name": "GetTargetSlotsAll",
-          "method": "GetTransmitInfoTargetSlotsAll",
+          "method": "GetTransmitInfoTargetSpawnGroupsAll",
           "bindSelf": true
         },
         {
           "name": "RemoveTargetSlotsAll",
-          "method": "RemoveTransmitInfoTargetSlotsAll",
+          "method": "RemoveTransmitInfoTargetSpawnGroupsAll",
           "bindSelf": true
         },
         {

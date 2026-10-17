@@ -93,12 +93,12 @@ extern "C" PLUGIN_API void ClearTransmitInfoEntityAll(CCheckTransmitInfo* info) 
  * @param entityHandle The index of the non-player entity to mark as transmittable.
  */
 extern "C" PLUGIN_API void SetTransmitInfoNonPlayer(CCheckTransmitInfo* info, int entityHandle) {
-	if (!info || !info->m_pTransmitNonPlayers) {
+	if (!info || !info->m_pNonTransmitEntity) {
 		return;
 	}
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	info->m_pTransmitNonPlayers->Set(entity->entindex());
+	info->m_pNonTransmitEntity->Set(entity->entindex());
 }
 
 /**
@@ -108,12 +108,12 @@ extern "C" PLUGIN_API void SetTransmitInfoNonPlayer(CCheckTransmitInfo* info, in
  * @param entityHandle The index of the non-player entity to mark as not transmittable.
  */
 extern "C" PLUGIN_API void ClearTransmitInfoNonPlayer(CCheckTransmitInfo* info, int entityHandle) {
-	if (!info || !info->m_pTransmitNonPlayers) {
+	if (!info || !info->m_pNonTransmitEntity) {
 		return;
 	}
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	info->m_pTransmitNonPlayers->Clear(entity->entindex());
+	info->m_pNonTransmitEntity->Clear(entity->entindex());
 }
 
 /**
@@ -124,12 +124,12 @@ extern "C" PLUGIN_API void ClearTransmitInfoNonPlayer(CCheckTransmitInfo* info, 
  * @return True if the entity is marked as transmittable, false otherwise.
  */
 extern "C" PLUGIN_API bool IsTransmitInfoNonPlayerSet(CCheckTransmitInfo* info, int entityHandle) {
-	if (!info || !info->m_pTransmitNonPlayers) {
+	if (!info || !info->m_pNonTransmitEntity) {
 		return false;
 	}
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return false;
-	return info->m_pTransmitNonPlayers->IsBitSet(entity->entindex());
+	return info->m_pNonTransmitEntity->IsBitSet(entity->entindex());
 }
 
 /**
@@ -138,10 +138,10 @@ extern "C" PLUGIN_API bool IsTransmitInfoNonPlayerSet(CCheckTransmitInfo* info, 
  * @param info Pointer to the CCheckTransmitInfo structure.
  */
 extern "C" PLUGIN_API void SetTransmitInfoNonPlayerAll(CCheckTransmitInfo* info) {
-	if (!info || !info->m_pTransmitNonPlayers) {
+	if (!info || !info->m_pNonTransmitEntity) {
 		return;
 	}
-	info->m_pTransmitNonPlayers->SetAll();
+	info->m_pNonTransmitEntity->SetAll();
 }
 
 /**
@@ -150,10 +150,10 @@ extern "C" PLUGIN_API void SetTransmitInfoNonPlayerAll(CCheckTransmitInfo* info)
  * @param info Pointer to the CCheckTransmitInfo structure.
  */
 extern "C" PLUGIN_API void ClearTransmitInfoNonPlayerAll(CCheckTransmitInfo* info) {
-	if (!info || !info->m_pTransmitNonPlayers) {
+	if (!info || !info->m_pNonTransmitEntity) {
 		return;
 	}
-	info->m_pTransmitNonPlayers->ClearAll();
+	info->m_pNonTransmitEntity->ClearAll();
 }
 
 // ============================================================================
@@ -309,81 +309,81 @@ extern "C" PLUGIN_API void ClearTransmitInfoAlwaysAll(CCheckTransmitInfo* info) 
 // ============================================================================
 
 /**
- * @brief Gets the count of target player slots.
+ * @brief Gets the count of spawn groups loaded by the client.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
- * @return The number of target player slots, or 0 if the info pointer is null.
+ * @return The number of loaded spawn groups, or 0 if the info pointer is null.
  */
-extern "C" PLUGIN_API int GetTransmitInfoTargetSlotsCount(CCheckTransmitInfo* info) {
+extern "C" PLUGIN_API int GetTransmitInfoTargetSpawnGroupsCount(CCheckTransmitInfo* info) {
 	if (!info) {
 		return 0;
 	}
-	return info->m_vecTargetSlots.Count();
+	return info->m_LoadedSpawnGroups.Count();
 }
 
 /**
- * @brief Gets a player slot value at a specific index in the target slots vector.
+ * @brief Gets a spawn group handle at a specific index in the loaded spawn groups vector.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
- * @param index The index in the target slots vector.
- * @return The player slot value, or -1 if the index is invalid or info is null.
+ * @param index The index in the loaded spawn groups vector.
+ * @return The spawn group handle, or -1 if the index is invalid or info is null.
  */
-extern "C" PLUGIN_API int GetTransmitInfoTargetSlot(CCheckTransmitInfo* info, int index) {
-	if (!info || index < 0 || index >= info->m_vecTargetSlots.Count()) {
+extern "C" PLUGIN_API int GetTransmitInfoTargetSpawnGroup(CCheckTransmitInfo* info, int index) {
+	if (!info || index < 0 || index >= info->m_LoadedSpawnGroups.Count()) {
 		return INVALID_PLAYER_SLOT_INDEX;
 	}
-	return info->m_vecTargetSlots[index].Get();
+	return info->m_LoadedSpawnGroups[index];
 }
 
 /**
- * @brief Adds a player slot to the target slots vector.
+ * @brief Adds a spawn group handle to the loaded spawn groups vector.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
- * @param playerSlot The player slot value to add.
+ * @param spawnGroup The spawn group handle to add.
  */
-extern "C" PLUGIN_API void AddTransmitInfoTargetSlot(CCheckTransmitInfo* info, int playerSlot) {
+extern "C" PLUGIN_API void AddTransmitInfoTargetSpawnGroup(CCheckTransmitInfo* info, int spawnGroup) {
 	if (!info) {
 		return;
 	}
-	info->m_vecTargetSlots.AddToTail(playerSlot);
+	info->m_LoadedSpawnGroups.AddToTail(spawnGroup);
 }
 
 /**
- * @brief Removes a player slot from the target slots vector.
+ * @brief Removes a spawn group handle from the loaded spawn groups vector.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
- * @param index Index within the target slots vector to remove.
+ * @param index Index within the loaded spawn groups vector to remove.
  */
-extern "C" PLUGIN_API void RemoveTransmitInfoTargetSlot(CCheckTransmitInfo* info, int index) {
+extern "C" PLUGIN_API void RemoveTransmitInfoTargetSpawnGroup(CCheckTransmitInfo* info, int index) {
 	if (!info) {
 		return;
 	}
-	info->m_vecTargetSlots.FastRemove(index);
+	info->m_LoadedSpawnGroups.FastRemove(index);
 }
 
 /**
- * @brief Gets the target slots vector.
+ * @brief Gets the loaded spawn groups vector.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
- * @return The player slots array.
+ * @return The spawn group handles array.
  */
-extern "C" PLUGIN_API plg::vector<int> GetTransmitInfoTargetSlotsAll(CCheckTransmitInfo* info) {
+extern "C" PLUGIN_API plg::vector<int> GetTransmitInfoTargetSpawnGroupsAll(CCheckTransmitInfo* info) {
 	if (!info) {
 		return {};
 	}
-	return plg::vector<int>(info->m_vecTargetSlots.begin(), info->m_vecTargetSlots.end());
+	return plg::vector<int>(info->m_LoadedSpawnGroups.begin(), info->m_LoadedSpawnGroups.end());
 }
 
 /**
- * @brief Clears all target player slots from the vector.
+ * @brief Clears all spawn groups from the loaded spawn groups vector.
  *
  * @param info Pointer to the CCheckTransmitInfo structure.
  */
-extern "C" PLUGIN_API void RemoveTransmitInfoTargetSlotsAll(CCheckTransmitInfo* info) {
+extern "C" PLUGIN_API void RemoveTransmitInfoTargetSpawnGroupsAll(CCheckTransmitInfo* info) {
 	if (!info) {
 		return;
 	}
-	info->m_vecTargetSlots.RemoveAll();
+	info->m_LoadedSpawnGroups.RemoveAll();
 }
 
 // ============================================================================

@@ -469,33 +469,6 @@
         GetGameTotalRoundsPlayed;
         TerminateRound;
 
-        KvCreate;
-        KvDestroy;
-        KvGetName;
-        KvSetName;
-        KvFindKey;
-        KvFindKeyOrCreate;
-        KvCreateKey;
-        KvCreateNewKey;
-        KvAddSubKey;
-        KvGetFirstSubKey;
-        KvGetNextKey;
-        KvGetColor;
-        KvSetColor;
-        KvGetInt;
-        KvSetInt;
-        KvGetFloat;
-        KvSetFloat;
-        KvGetString;
-        KvSetString;
-        KvGetPtr;
-        KvSetPtr;
-        KvGetBool;
-        KvSetBool;
-        KvMakeCopy;
-        KvClear;
-        KvIsEmpty;
-
         RegisterLoggingChannel;
         AddLoggerTagToChannel;
         HasLoggerTag;
@@ -731,11 +704,6 @@
         GetTickInterval;
         GetTickedTime;
 
-        SetClientListening;
-        GetClientListening;
-        SetClientVoiceFlags;
-        GetClientVoiceFlags;
-
         HookUserMessage;
         UnhookUserMessage;
         UserMessageCreateFromSerializable;
@@ -894,12 +862,12 @@
         IsTransmitInfoAlwaysSet;
         SetTransmitInfoAlwaysAll;
         ClearTransmitInfoAlwaysAll;
-        GetTransmitInfoTargetSlotsCount;
-        GetTransmitInfoTargetSlot;
-        AddTransmitInfoTargetSlot;
-        RemoveTransmitInfoTargetSlot;
-        GetTransmitInfoTargetSlotsAll;
-        RemoveTransmitInfoTargetSlotsAll;
+        GetTransmitInfoTargetSpawnGroupsCount;
+        GetTransmitInfoTargetSpawnGroup;
+        AddTransmitInfoTargetSpawnGroup;
+        RemoveTransmitInfoTargetSpawnGroup;
+        GetTransmitInfoTargetSpawnGroupsAll;
+        RemoveTransmitInfoTargetSpawnGroupsAll;
         GetTransmitInfoPlayerSlot;
         SetTransmitInfoPlayerSlot;
         GetTransmitInfoFullUpdate;
