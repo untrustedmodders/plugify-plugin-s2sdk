@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.1...v3.0.2) (2026-10-23)
+
+
+### Bug Fixes
+
+* update sourcesdk for 1.41.9.2 ([17c98de](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/17c98de818c6265169f9bef6a195a6a5a2f6742a))
+
 ## [3.0.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.0...v3.0.1) (2026-10-23)
 
 
