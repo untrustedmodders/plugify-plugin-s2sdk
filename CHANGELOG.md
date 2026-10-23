@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.0...v3.0.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* update gamedata for 1.41.9.2 ([697d7ea](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/697d7ea34fdd44c479dbb1e697de5edd757c0e58))
+
 ## [3.0.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v2.18.5...v3.0.0) (2026-10-17)
 
 
