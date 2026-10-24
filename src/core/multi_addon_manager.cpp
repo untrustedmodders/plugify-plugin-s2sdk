@@ -628,7 +628,7 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 	}
 }
 
-thread_local CUtlString originalAddons;
+static CUtlString originalAddons;
 
 void MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServerSideClient* client) {
 	uint64 steamID64 = client->GetClientSteamID().ConvertToUint64();

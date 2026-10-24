@@ -29,5 +29,9 @@ SymbolPtr ModuleLookup::FindSymbol(ModuleHandle module, std::string_view symbol)
 SymbolPtr ModuleLookup::FindSymbolFromModule(std::string_view module, std::string_view symbol) {
 	ModuleHandle mod = FindModule(module);
 	if (!mod) return nullptr;
-	return FindSymbol(mod, symbol);
+	SymbolPtr sym = FindSymbol(mod, symbol);
+#if !PLATFORM_WINDOWS
+	dlclose(mod);
+#endif
+	return sym;
 }

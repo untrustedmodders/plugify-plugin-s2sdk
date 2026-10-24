@@ -265,6 +265,10 @@ std::vector<CModule::RunTimeTypeInfo> CModule::GetRuntimeTypeInfos() const
 				static_cast<std::vector<RunTimeTypeInfo>*>(data)->emplace_back(class_typeinfo, si_class_typeinfo, vmi_class_typeinfo);
 			}
 
+			if (handle) {
+				dlclose(handle);
+			}
+
 			return 0;
 		},
 		&runtime_typeinfos
