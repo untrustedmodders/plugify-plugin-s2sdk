@@ -316,10 +316,7 @@ bool MultiAddonManager::RemoveAddon(PublishedFileId_t addon, bool refresh) {
 	return true;
 }
 
-void MultiAddonManager::OnSteamAPIActivated() {
-	if (m_callbackRegistered)
-		return;
-
+void MultiAddonManager::OnPluginStart() {
 	std::array<uint64, 7> conVarHandles = {
 		s2_addon_mount_download,
 		s2_block_disconnect_messages,
@@ -330,6 +327,11 @@ void MultiAddonManager::OnSteamAPIActivated() {
 		s2_client_extra_addons,
 	};
 	g_ConVarManager.AutoExecConfig(conVarHandles, true, "multi_addon_manager", "");
+}
+
+void MultiAddonManager::OnSteamAPIActivated() {
+	if (m_callbackRegistered)
+		return;
 
 	if (g_pEngineServer->IsDedicatedServer()) {
 		m_callbackRegistered = true;

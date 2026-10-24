@@ -42,6 +42,7 @@ public:
 	plg::vector<PublishedFileId_t> GetClientAddons(uint64 steamID64 = 0);
 
 public:
+	void OnPluginStart();
 	void OnSteamAPIActivated();
 	void OnSteamAPIDeactivated();
 	void OnStartupServer();
