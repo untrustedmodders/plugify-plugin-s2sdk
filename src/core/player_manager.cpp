@@ -339,7 +339,7 @@ void PlayerManager::OnRespondCvarValue(CServerSideClientBase* client, const CCLC
 }
 
 void PlayerManager::UpdatePlayers() {
-	if(!gpGlobals)
+	if (!gpGlobals || !g_pSteam)
 		return;
 
 	for (int i = 0; i < gpGlobals->maxClients; ++i) {
