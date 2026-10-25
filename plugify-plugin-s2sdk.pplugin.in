@@ -12,11 +12,11 @@
   "dependencies": [
     {
       "name": "polyhook",
-      "constraints": ">=2.5.2"
+      "constraints": ">=2.5.7"
     },
     {
       "name": "configs",
-      "constraints": ">=2.1.0"
+      "constraints": ">=2.1.2"
     },
     {
       "name": "translations",
