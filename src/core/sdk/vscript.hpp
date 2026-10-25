@@ -3,12 +3,8 @@
 #include <vscript/ivscript.h>
 
 struct VScriptBinding {
-	static constexpr size_t kNoVTableIndex = static_cast<size_t>(-1);
-
-	void* funcaddr = nullptr;
-	size_t vtable_index = kNoVTableIndex;
-
-	bool IsValid() const { return funcaddr != nullptr || vtable_index != kNoVTableIndex; }
+	void* funcaddr;
+	size_t vtable_index;
 };
 
 struct VScriptFunction {
@@ -41,11 +37,7 @@ template<
 class VScriptMemberFunction {
 public:
 	Ret operator()(Args... args) {
-		static VScriptBinding binding;
-		// Not cached while missing: bindings show up once the VM registers them on map load
-		if (!binding.IsValid()) {
-			binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
-		}
+		static VScriptBinding binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
 		void* instance = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(this) - MemberOffset());
 #if defined(_MSC_VER)
 		// MSVC: Direct member function pointer call
@@ -79,11 +71,7 @@ template<
 class VScriptGlobalFunction {
 public:
 	Ret operator()(Args... args) {
-		static VScriptBinding binding;
-		// Not cached while missing: bindings show up once the VM registers them on map load
-		if (!binding.IsValid()) {
-			binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
-		}
+		static VScriptBinding binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
 #if defined(_MSC_VER)
 		using Func = Ret(__cdecl*)(Args...);
 		auto fn = reinterpret_cast<Func>(binding.funcaddr);
