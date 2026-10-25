@@ -15,12 +15,14 @@ ConVarManager::~ConVarManager() {
 			g_pCVar->UnregisterConVarCallbacks(*cv->conVar);
 		}
 	}
-
-	//ConVar_Unregister();
 }
 
 void ConVarManager::Init() {
 	ConVar_Register(FCVAR_RELEASE | FCVAR_SERVER_CAN_EXECUTE | FCVAR_GAMEDLL);
+}
+
+void ConVarManager::Terminate() {
+	ConVar_Unregister();
 }
 
 bool ConVarManager::RemoveConVar(std::string_view name) {

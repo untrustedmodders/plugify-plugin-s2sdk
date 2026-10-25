@@ -107,6 +107,8 @@ namespace globals {
 	}
 
 	void Terminate() {
+		ConVarManager::Terminate();
+
 		delete g_pCoreConfig;
 		g_pCoreConfig = nullptr;
 		g_pGameConfig = nullptr;
