@@ -254,6 +254,16 @@ void MultiAddonManager::ReloadMap() {
 	g_pEngineServer->ServerCommand(cmd.c_str());
 }
 
+void MultiAddonManager::RestoreCurrentWorkshopMap(std::string_view map) {
+	auto name = std::format("maps/{}.vpk", map);
+	if (g_pFullFileSystem->FileExists(name.c_str(), "MOD"))
+		return;
+
+	std::string_view addons = g_pEngineServiceMgr->GetAddonsString();
+	if (auto addon = plg::cast_to<PublishedFileId_t>(addons.substr(0, addons.find(','))))
+		m_currentWorkshopMap = *addon;
+}
+
 void MultiAddonManager::OnAddonDownloaded(DownloadItemResult_t* result) {
 	if (result->m_eResult == k_EResultOK)
 		plg::print(LS_MESSAGE, "Addon {} downloaded successfully\n", static_cast<PublishedFileId_t>(result->m_nPublishedFileId));

@@ -30,6 +30,7 @@ public:
 	void RefreshAddons(bool reloadMap = false);
 	void ClearAddons();
 	void ReloadMap();
+	void RestoreCurrentWorkshopMap(std::string_view map);
 
 	PublishedFileId_t GetCurrentWorkshopMap() const { return m_currentWorkshopMap; }
 	void SetCurrentWorkshopMap(PublishedFileId_t workshopID) { m_currentWorkshopMap = workshopID; }

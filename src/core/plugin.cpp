@@ -944,6 +944,12 @@ plg::PluginResult Source2SDK::OnPluginStart() {
 	const char* map = gpGlobals ? gpGlobals->mapname.ToCStr() : nullptr;
 	bool lateLoad = map && *map;
 
+#if defined (CS2)
+	if (lateLoad) {
+		g_MultiAddonManager.RestoreCurrentWorkshopMap(map);
+	}
+#endif
+
 	if (g_pEngineServer->IsDedicatedServer() && SteamGameServer()) {
 		OnSteamAPIActivated(false);
 	}
