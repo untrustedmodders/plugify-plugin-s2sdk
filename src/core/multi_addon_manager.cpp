@@ -332,7 +332,7 @@ void MultiAddonManager::OnPluginStart() {
 	m_globalClientAddons = plg::parse<PublishedFileId_t>(s2_client_extra_addons.Get(), ",");
 }
 
-void MultiAddonManager::OnSteamAPIActivated() {
+void MultiAddonManager::OnSteamAPIActivated(bool reloadMap) {
 	if (m_callbackRegistered)
 		return;
 
@@ -342,7 +342,7 @@ void MultiAddonManager::OnSteamAPIActivated() {
 	}
 
 	plg::print(LS_MESSAGE, "Refreshing addons to check for updates\n");
-	RefreshAddons(true);
+	RefreshAddons(reloadMap);
 }
 
 void MultiAddonManager::OnSteamAPIDeactivated() {

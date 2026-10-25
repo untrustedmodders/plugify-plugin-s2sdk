@@ -43,7 +43,7 @@ public:
 
 public:
 	void OnPluginStart();
-	void OnSteamAPIActivated();
+	void OnSteamAPIActivated(bool reloadMap = true);
 	void OnSteamAPIDeactivated();
 	void OnStartupServer();
 	void OnClientConnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID);

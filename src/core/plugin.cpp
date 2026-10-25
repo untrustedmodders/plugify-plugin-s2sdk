@@ -374,6 +374,21 @@ polyhook::ResultType Hook_ClientCommand(polyhook::HookHandle hook, polyhook::Par
 	return polyhook::ResultType::Ignored;
 }
 
+void OnSteamAPIActivated(bool reloadMap = true) {
+	g_pSteam = SteamGameServer();
+	g_pSteamUGC = SteamGameServerUGC();
+
+	if (!g_pSteam || !g_pSteamUGC) {
+		plg::print(LS_WARNING, "StramAPI could not be initialized!\n");
+		return;
+	}
+
+	g_PlayerManager.OnSteamAPIActivated();
+#if defined (CS2)
+	g_MultiAddonManager.OnSteamAPIActivated(reloadMap);
+#endif
+}
+
 polyhook::ResultType Hook_GameServerSteamAPIActivated(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	// This is only intended for dedicated servers
 	if (!g_pEngineServer->IsDedicatedServer())
@@ -381,18 +396,7 @@ polyhook::ResultType Hook_GameServerSteamAPIActivated(polyhook::HookHandle hook,
 
 	plg::print(LS_DETAILED, "[GameServerSteamAPIActivated]\n");
 
-	g_pSteam = SteamGameServer();
-	g_pSteamUGC = SteamGameServerUGC();
-
-	if (!g_pSteam || !g_pSteamUGC) {
-		plg::print(LS_WARNING, "StramAPI could not be initialized!\n");
-		return polyhook::ResultType::Ignored;
-	}
-
-	g_PlayerManager.OnSteamAPIActivated();
-#if defined (CS2)
-	g_MultiAddonManager.OnSteamAPIActivated();
-#endif
+	OnSteamAPIActivated();
 
 	//g_GameServerSteamAPIActivatedListenerManager();
 	return polyhook::ResultType::Ignored;
@@ -935,6 +939,22 @@ plg::PluginResult Source2SDK::OnPluginStart() {
 		if (!result) {
 			return plg::PluginResult{ result.error() };
 		}
+	}
+
+	const char* map = gpGlobals ? gpGlobals->mapname.ToCStr() : nullptr;
+	bool lateLoad = map && *map;
+
+	if (g_pEngineServer->IsDedicatedServer() && SteamGameServer()) {
+		OnSteamAPIActivated(false);
+	}
+
+	if (lateLoad) {
+		plg::print(LS_MESSAGE, "Plugin loaded in the middle of a map, reloading map {}\n", map);
+#if defined (CS2)
+		g_MultiAddonManager.ReloadMap();
+#else
+		g_pEngineServer->ServerCommand(std::format("changelevel {}", map).c_str());
+#endif
 	}
 
 	return{};
