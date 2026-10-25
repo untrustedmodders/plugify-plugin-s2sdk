@@ -73,6 +73,7 @@ struct CTakeDamageInfoContainer {
 
 class CTakeDamage {
 public:
+	DECLARE_VSCRIPT_CLASS2(CTakeDamage)
 
 	using handle = HSCRIPT;
 	VSCRIPT_GLOBAL_FUNCTION(CreateDamageInfo, handle, handle, handle, Vector, Vector, float, int)

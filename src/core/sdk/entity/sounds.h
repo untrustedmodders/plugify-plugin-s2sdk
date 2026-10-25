@@ -23,6 +23,7 @@
 
 class Sounds {
 public:
+	DECLARE_VSCRIPT_CLASS2(Sounds)
 
 	using string = const char*;
 	using handle = HSCRIPT;

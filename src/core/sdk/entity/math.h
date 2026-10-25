@@ -23,6 +23,7 @@
 
 class Math {
 public:
+	DECLARE_VSCRIPT_CLASS2(Math)
 
 	using vector = const Vector&;
 	using qangle = const QAngle&;

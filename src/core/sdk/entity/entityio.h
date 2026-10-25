@@ -27,6 +27,7 @@
 
 class EntityIO {
 public:
+	DECLARE_VSCRIPT_CLASS2(EntityIO)
 
 	using handle = HSCRIPT;
 	using string = const char*;

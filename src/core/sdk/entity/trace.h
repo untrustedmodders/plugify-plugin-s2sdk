@@ -25,6 +25,7 @@
 
 class Trace {
 public:
+	DECLARE_VSCRIPT_CLASS2(Trace)
 
 	using table = HSCRIPT;
 	VSCRIPT_GLOBAL_FUNCTION(TraceCollideable, bool, table)

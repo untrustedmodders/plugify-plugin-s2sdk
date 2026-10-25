@@ -126,6 +126,7 @@ public:
 // only for functions
 class CEntityInstance2 : public CEntityInstance {
 public:
+	using ThisClass = CEntityInstance2;
 	static constexpr const char m_className[] = "CEntityInstance";
 
 	using string = const char*;

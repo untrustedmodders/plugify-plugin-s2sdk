@@ -21,25 +21,40 @@
 #include "utils.hpp"
 
 namespace {
-	using VScriptBindingMap = plg::flat_hash_map<plg::string, VScriptBinding, plg::string_hash, std::equal_to<>>;
+	VScriptBinding ScriptConvertFuncPtrToBinding(ScriptFunctionBinding_t& scriptFunction) {
+	    VScriptBinding result = {};
 
-	struct VScriptClass {
-		VScriptBindingMap functions;
-		ScriptClassDesc_t* descriptor;
-		void* instance;
-	};
+#if defined(_MSC_VER)
+	    result.funcaddr = scriptFunction.m_pFunction;
+		result.vtable_index = -1;
+#elif defined(__GNUC__) || defined(__clang__)
+	    if (scriptFunction.m_flags & SF_MEMBER_FUNC) {
+	        struct GnuMFP {
+	            union {
+	                void* funcadr;
+	                intptr_t vti_plus1;
+	            };
+	            intptr_t delta;
+	        };
 
-	using VScriptClassMap = plg::flat_hash_map<plg::string, VScriptClass, plg::string_hash, std::equal_to<>>;
+	        const GnuMFP* p = reinterpret_cast<const GnuMFP*>(&scriptFunction.m_pFunction);
 
-	VScriptBinding ScriptConvertFuncPtrToBinding(const ScriptFunctionBinding_t& scriptFunction) {
-#if defined(__GNUC__) || defined(__clang__)
-		// Itanium member pointers mark virtual functions as 1 + vtable byte offset
-		auto raw = reinterpret_cast<intptr_t>(scriptFunction.m_pFunction);
-		if ((scriptFunction.m_flags & SF_MEMBER_FUNC) && (raw & 1)) {
-			return { .vtable_index = static_cast<ptrdiff_t>((raw - 1) / sizeof(void*)) };
-		}
+	        if (p->vti_plus1 & 1) {
+	            // Virtual function
+	            result.funcaddr = nullptr;
+	            result.vtable_index = (p->vti_plus1 - 1) / sizeof(void*);
+	        } else {
+	            // Non-virtual
+	            result.funcaddr = p->funcadr;
+	        	result.vtable_index = -1;
+	        }
+	    } else {
+    		result.funcaddr = scriptFunction.m_pFunction;
+	        result.vtable_index = -1;
+	    }
 #endif
-		return { .funcaddr = scriptFunction.m_pFunction };
+
+	    return result;
 	}
 
 	VScriptClassMap scriptClassMap;
@@ -136,7 +151,7 @@ namespace vscript {
 		scriptClassMap.emplace(className, createClass());
 	}
 
-	VScriptBinding GetBinding(std::string_view className, std::string_view functionName, bool reportMissing) {
+	VScriptBinding GetBinding(std::string_view className, std::string_view functionName) {
 		auto it = scriptClassMap.find(className);
 		if (it != scriptClassMap.end()) {
 			auto& table = it->second;
@@ -145,9 +160,16 @@ namespace vscript {
 				return it2->second;
 			}
 		}
-		if (reportMissing) {
-			plg::print(LS_ERROR, "vscript::GetBinding(): '{}' was not found in '{}'!\n", functionName, className);
-		}
+		plg::print(
+			LS_ERROR,
+			"vscript::GetBinding(): '{}' was not found in '{}'!\n",
+			functionName,
+			className
+		);
 		return {};
 	}
-}// namespace vscript
+
+	VScriptBinding GetBinding(const char* className, const char* functionName) {
+		return GetBinding(std::string_view(className), std::string_view(functionName));
+	}
+}
