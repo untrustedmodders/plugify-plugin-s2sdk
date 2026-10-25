@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.3...v3.0.4) (2026-10-25)
+
+
+### Bug Fixes
+
+* bump version polyhook and configs ([7adef37](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7adef37b5124663cc5b6d44c331a6526592a6781))
+* **vscript:** declare field bindings for debugger ([9a4548d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9a4548d060cd5b3756efb513ccf957157784ff05))
+
 ## [3.0.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.2...v3.0.3) (2026-10-25)
 
 
