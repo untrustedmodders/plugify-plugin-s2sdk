@@ -327,6 +327,9 @@ void MultiAddonManager::OnPluginStart() {
 		s2_client_extra_addons,
 	};
 	g_ConVarManager.AutoExecConfig(conVarHandles, true, "multi_addon_manager", "");
+
+	m_extraAddons = plg::parse<PublishedFileId_t>(s2_extra_addons.Get(), ",");
+	m_globalClientAddons = plg::parse<PublishedFileId_t>(s2_client_extra_addons.Get(), ",");
 }
 
 void MultiAddonManager::OnSteamAPIActivated() {
