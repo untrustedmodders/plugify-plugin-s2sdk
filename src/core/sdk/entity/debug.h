@@ -23,7 +23,6 @@
 
 class Debug {
 public:
-	DECLARE_VSCRIPT_CLASS2(Debug);
 
 	using handle = HSCRIPT;
 	using string = const char*;
@@ -44,7 +43,6 @@ public:
 
 class Printing {
 public:
-	DECLARE_VSCRIPT_CLASS2(Printing);
 
 	using handle = HSCRIPT;
 	using string = const char*;

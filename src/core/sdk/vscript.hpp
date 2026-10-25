@@ -2,122 +2,99 @@
 
 #include <vscript/ivscript.h>
 
+#include <algorithm>
+#include <cstring>
+#include <string_view>
+#include <type_traits>
+#include <utility>
+
 struct VScriptBinding {
-	static constexpr size_t kNoVTableIndex = static_cast<size_t>(-1);
+	void* funcaddr = nullptr;    // free function or non-virtual member
+	ptrdiff_t vtable_index = -1; // virtual member (Itanium ABI only)
 
-	void* funcaddr = nullptr;
-	size_t vtable_index = kNoVTableIndex;
+	explicit operator bool() const { return funcaddr != nullptr || vtable_index >= 0; }
 
-	bool IsValid() const { return funcaddr != nullptr || vtable_index != kNoVTableIndex; }
+	void* Resolve(void* instance) const {
+		return funcaddr ? funcaddr : (*static_cast<void***>(instance))[vtable_index];
+	}
 };
 
-struct VScriptFunction {
-	ScriptFunctionBinding_t* binding;
-	void* instance;
-};
-
-using VScriptBindingMap = plg::flat_hash_map<plg::string, VScriptBinding, plg::string_hash, std::equal_to<>>;
-struct VScriptClass {
-	VScriptBindingMap functions;
-	ScriptClassDesc_t* descriptor;
-	void* instance;
-};
-
-using VScriptClassMap = plg::flat_hash_map<plg::string, VScriptClass, plg::string_hash, std::equal_to<>>;
 namespace vscript {
 	void RegisterFunction(ScriptFunctionBinding_t* scriptFunction);
 	void RegisterScriptClass(ScriptClassDesc_t* classDesc, void* instance = nullptr);
 
-	VScriptBinding GetBinding(std::string_view className, std::string_view functionName);
-	VScriptBinding GetBinding(const char* className, const char* functionName);
-}// namespace schema
+	VScriptBinding GetBinding(std::string_view className, std::string_view functionName, bool reportMissing = true);
 
-template<
-	typename ThisClass,
-	char const* FunctionName,
-	size_t(*MemberOffset)(),
-	typename Ret, typename... Args
->
-class VScriptMemberFunction {
-public:
-	Ret operator()(Args... args) {
+	template<size_t N>
+	struct Name {
+		char str[N]{};
+		constexpr Name(const char (&s)[N]) { std::copy_n(s, N, str); }
+	};
+
+	// One cache per (class, function). Not cached while missing: bindings show up once the VM registers them on map load
+	template<typename Class, Name FunctionName>
+	const VScriptBinding& Binding() {
 		static VScriptBinding binding;
-		// Not cached while missing: bindings show up once the VM registers them on map load
-		if (!binding.IsValid()) {
-			binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
+		static bool reported = false;
+		if (!binding) {
+			binding = GetBinding(Class::m_className, FunctionName.str, !std::exchange(reported, true));
 		}
-		void* instance = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(this) - MemberOffset());
-#if defined(_MSC_VER)
-		// MSVC: Direct member function pointer call
-		using MemberFunc = Ret(__thiscall*)(void*, Args...);
-		auto func = reinterpret_cast<MemberFunc>(binding.funcaddr);
-		return func(instance, std::forward<Args>(args)...);
-#elif defined(__GNUC__) || defined(__clang__)
-		// GCC: Handle member function pointer structure
-		using MemberFunc = Ret(*)(void*, Args...);
-		if (!binding.funcaddr) {
-			// Virtual function - vtable lookup
-			void** vtable = *static_cast<void***>(instance);
-			auto func = reinterpret_cast<MemberFunc>(vtable[binding.vtable_index]);
-			return func(instance/* + binding.delta*/, std::forward<Args>(args)...);
-		} else {
-			// Non-virtual function - direct call
-			auto func = reinterpret_cast<MemberFunc>(binding.funcaddr);
-			return func(instance, std::forward<Args>(args)...);
-		}
-#else
-#	error "Unsupported compiler"
-#endif
+		return binding;
 	}
-};
 
-template<
-	typename ThisClass,
-	char const* FunctionName,
-	typename Ret, typename... Args
->
-class VScriptGlobalFunction {
-public:
-	Ret operator()(Args... args) {
-		static VScriptBinding binding;
-		// Not cached while missing: bindings show up once the VM registers them on map load
-		if (!binding.IsValid()) {
-			binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
+	struct Global {
+		static constexpr const char m_className[] = "";
+	};
+
+	template<typename Ret>
+	Ret Fail() {
+		if constexpr (std::is_reference_v<Ret>) {
+			static std::remove_cvref_t<Ret> fallback{};
+			return fallback;
+		} else if constexpr (!std::is_void_v<Ret>) {
+			return Ret{};
 		}
-#if defined(_MSC_VER)
-		using Func = Ret(__cdecl*)(Args...);
-		auto fn = reinterpret_cast<Func>(binding.funcaddr);
-		return fn(std::forward<Args>(args)...);
-#elif defined(__GNUC__) || defined(__clang__)
-		using Func = Ret(*)(Args...);
-		auto fn = reinterpret_cast<Func>(binding.funcaddr);
-		return fn(std::forward<Args>(args)...);
-#else
-#   error "Unsupported compiler"
-#endif
 	}
-};
 
-#define VSCRIPT_GLOBAL_FUNCTION(name, ret, ...) \
-private: \
-	static constexpr const char name##_str[] = #name; \
-public: \
-    PLUGIFY_NO_UNIQUE_ADDRESS VScriptGlobalFunction<ThisClass, name##_str, ret __VA_OPT__(,) __VA_ARGS__> name;
+	struct Dummy {};
+
+	template<typename Class, Name FunctionName, typename Ret, typename... Args>
+	Ret CallMember(Class* instance, std::type_identity_t<Args>... args) {
+		const auto& binding = Binding<Class, FunctionName>();
+		if (!binding) [[unlikely]] {
+			return Fail<Ret>();
+		}
+		// Call through a real member pointer: MSVC x64 passes the hidden return pointer after `this` for members,
+		// but before it for free functions, so Ret(*)(void*, Args...) breaks class-type returns (Vector, QAngle)
+		Ret (Dummy::*method)(Args...);
+		void* func = binding.Resolve(instance);
+		std::memset(&method, 0, sizeof(method));
+		std::memcpy(&method, &func, sizeof(func));
+		return (reinterpret_cast<Dummy*>(instance)->*method)(args...);
+	}
+
+	template<Name FunctionName, typename Ret, typename... Args>
+	Ret CallGlobal(std::type_identity_t<Args>... args) {
+		const auto& binding = Binding<Global, FunctionName>();
+		if (!binding) [[unlikely]] {
+			return Fail<Ret>();
+		}
+		return reinterpret_cast<Ret (*)(Args...)>(binding.funcaddr)(args...);
+	}
+}// namespace vscript
 
 #define VSCRIPT_MEMBER_FUNCTION(name, ret, ...) \
-private: \
-	static constexpr const char name##_str[] = #name; \
-	static PLUGIN_API size_t name##_offset() { return offsetof(ThisClass, name); }; \
-public: \
-    PLUGIFY_NO_UNIQUE_ADDRESS VScriptMemberFunction<ThisClass, name##_str, name##_offset, ret __VA_OPT__(,) __VA_ARGS__> name;
+	template<typename... Ts> \
+	ret name(Ts&&... args) { \
+		return vscript::CallMember<std::remove_pointer_t<decltype(this)>, #name, ret __VA_OPT__(,) __VA_ARGS__>(this, std::forward<Ts>(args)...); \
+	}
+
+#define VSCRIPT_GLOBAL_FUNCTION(name, ret, ...) \
+	template<typename... Ts> \
+	static ret name(Ts&&... args) { \
+		return vscript::CallGlobal<#name, ret __VA_OPT__(,) __VA_ARGS__>(std::forward<Ts>(args)...); \
+	}
 
 #define DECLARE_VSCRIPT_CLASS(ClassName) \
 	public: \
-		using ThisClass = ClassName; \
-		static constexpr const char m_className[] = #ClassName; \
-
-#define DECLARE_VSCRIPT_CLASS2(ClassName) \
-	public: \
-		using ThisClass = ClassName; \
-		static constexpr const char m_className[] = ""; \
-
+		static constexpr const char m_className[] = #ClassName;
