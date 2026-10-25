@@ -3,6 +3,8 @@
 .vs
 .vscode
 .PVS-Studio
+/.ccache
+/compile_commands.json
 
 # CMake
 CMakeUserPresets.json
