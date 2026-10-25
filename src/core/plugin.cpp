@@ -941,13 +941,14 @@ plg::PluginResult Source2SDK::OnPluginStart() {
 }
 
 plg::PluginResult Source2SDK::OnPluginEnd() {
-	globals::Terminate();
 	g_HookManager.UnhookAll();
 	g_PlayerManager.OnSteamAPIDeactivated();
 #if defined (CS2)
 	g_MultiAddonManager.OnSteamAPIDeactivated();
 #endif
 	UnregisterEventListeners();
+	g_pGameEventManager->RemoveListener(&g_EventManager);
+	globals::Terminate();
 
 	plg::print(LS_DETAILED, "[OnPluginEnd] = Source2SDK!\n");
 
