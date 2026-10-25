@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.0.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.2...v3.0.3) (2026-10-25)
+
+
+### Bug Fixes
+
+* call vscript members through member pointers and guard missing bindings ([65ab703](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/65ab7038b3c8f80079db40843d475d7ac1890107))
+* close dlopen handles so libraries can unload on reload ([874721c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/874721c7dade4163e97869530ca37c98066848bd))
+* don't cache missing vscript bindings ([40feb9c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/40feb9c1bdac9e0d0f3dbe6264a16be9ec085778))
+* keep the workshop map when reloading mid-map ([fe4c028](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fe4c028796446120aed0654dac330e0c63afc664))
+* load multi_addon_manager config on plugin start ([f03111c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f03111c73a94fd3ef503931f7b5139e2ec9ee2ad))
+* read extra addon convars on plugin start ([4fa0ccf](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4fa0ccfcb526e956d80119a2d798e85b943c0ba1))
+* reload the current map when plugins are loaded mid-map ([f1307e6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f1307e6934fd857e2bfedde3b9173fee050b4a89))
+* remove game event listener on plugin unload ([9f417cc](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9f417cc7add08ab1c5ef06cd39749f7e97b39ca5))
+* skip UpdatePlayers when Steam API is not available ([25a3f3e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/25a3f3ecea366c2bbfa9678301b77c8fb45aa6a3))
+* unregister convars on plugin unload ([8d22b59](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8d22b59527b460c42a256870207809105ab1e184))
+
 ## [3.0.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.1...v3.0.2) (2026-10-23)
 
 
