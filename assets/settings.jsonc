@@ -25,6 +25,8 @@
   "ServerLanguage": "en",
   // Fixed flashing of the alert message (ONLY CS2)
   "FixFlashAlertMessage": true,
+  // Load the motdfile (motd.txt by default) into the InfoPanel string table on map start
+  "FixLoadMotd": true,
   // Master toggle for the built-in menu implementation (chat/console/centerhtml/button types + their input commands).
   // Disable if you're bringing your own via the RegisterMenuType/CreateMenuHandle exports.
   "MenuEnabled": true,
