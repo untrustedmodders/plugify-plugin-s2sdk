@@ -80,9 +80,10 @@ void TimerSystem::RemoveMapChangeTimers() {
 
 TimerId TimerSystem::CreateTimer(double delay, TimerCallback callback, TimerFlag flags, const plg::vector<plg::any>& userData) {
 	std::scoped_lock lock(m_mutex);
-	// Enforce minimum delay to prevent immediate execution and iterator invalidation
+	// Enforce maximum delay to prevent immediate execution and iterator invalidation
+	double maxDelay = std::max(delay, engineFixedTickInterval);
 	TimerId id = ++m_nextId;
-	m_timers.emplace(id, static_cast<bool>(flags & TimerFlag::Repeat), static_cast<bool>(flags & TimerFlag::NoMapChange), false, false, universalTime, universalTime + std::max(delay, engineFixedTickInterval), delay, callback, userData);
+	m_timers.emplace(id, static_cast<bool>(flags & TimerFlag::Repeat), static_cast<bool>(flags & TimerFlag::NoMapChange), false, false, universalTime, universalTime + maxDelay, maxDelay, callback, userData);
 	return id;
 }
 
@@ -102,7 +103,7 @@ void TimerSystem::KillTimer(TimerId id) {
 	}
 }
 
-void TimerSystem::RescheduleTimer(TimerId id, double newDelay) {
+void TimerSystem::RescheduleTimer(TimerId id, double delay) {
 	std::scoped_lock lock(m_mutex);
 
 	auto it = std::ranges::find_if(m_timers, [id](const Timer& timer) {
@@ -111,9 +112,12 @@ void TimerSystem::RescheduleTimer(TimerId id, double newDelay) {
 
 	if (it != m_timers.end()) {
 		if (!it->exec) {
+			// Enforce maximum delay to prevent immediate execution and iterator invalidation
+			double maxDelay = std::max(delay, engineFixedTickInterval);
+
 			auto node = m_timers.extract(it);
-			node.value().delay = newDelay;
-			node.value().executeTime = universalTime + newDelay;
+			node.value().delay = maxDelay;
+			node.value().executeTime = universalTime + maxDelay;
 			m_timers.insert(std::move(node));
 		}
 	}

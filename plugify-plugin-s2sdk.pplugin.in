@@ -23345,7 +23345,7 @@
           }
         },
         {
-          "name": "newDaly",
+          "name": "delay",
           "type": "double",
           "ref": false,
           "description": "The new delay in seconds between each callback execution."
