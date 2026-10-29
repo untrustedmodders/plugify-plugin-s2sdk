@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.0.5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.4...v3.0.5) (2026-10-29)
+
+
+### Bug Fixes
+
+* change invalid ids to 0 for easy default initialization ([bc47906](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bc479063e131be11495c0e0905b64472c6bfd206))
+* port MultiAddonManager fixes from the metamod version ([#150](https://github.com/untrustedmodders/plugify-plugin-s2sdk/issues/150)) ([b47440c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b47440cde1e02e9b82a796002515e34d36d4f3db))
+* prevent recursion with no delay ([b170110](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b17011002cf64396030c785f0f3327cf1b9f2d9e))
+
 ## [3.0.4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.3...v3.0.4) (2026-10-25)
 
 
