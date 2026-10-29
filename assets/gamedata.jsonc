@@ -413,6 +413,10 @@
         "library": "engine2",
         "table": "CServerSideClient"
       },
+      "CHLTVClient": {
+        "library": "engine2",
+        "table": "CHLTVClient"
+      },
       "CGameRulesGameSystem": {
         "library": "server",
         "table": "CGameRulesGameSystem"
