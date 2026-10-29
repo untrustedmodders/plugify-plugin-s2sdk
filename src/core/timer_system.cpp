@@ -81,7 +81,7 @@ void TimerSystem::RemoveMapChangeTimers() {
 TimerId TimerSystem::CreateTimer(double delay, TimerCallback callback, TimerFlag flags, const plg::vector<plg::any>& userData) {
 	std::scoped_lock lock(m_mutex);
 	// Enforce minimum delay to prevent immediate execution and iterator invalidation
-	TimerId id = m_nextId++;
+	TimerId id = ++m_nextId;
 	m_timers.emplace(id, static_cast<bool>(flags & TimerFlag::Repeat), static_cast<bool>(flags & TimerFlag::NoMapChange), false, false, universalTime, universalTime + std::max(delay, engineFixedTickInterval), delay, callback, userData);
 	return id;
 }

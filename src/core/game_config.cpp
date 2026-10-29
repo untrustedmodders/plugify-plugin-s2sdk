@@ -1453,7 +1453,7 @@ Result<ConfigId> GameConfigManager::LoadConfig(LoadOptions options) {
 		return MakeError(std::move(result.error()));
 	}
 
-	ConfigId id = m_nextId++;
+	ConfigId id = ++m_nextId;
 	m_configs.emplace(id, GameConfigEntry{std::move(config)});
 	return id;
 }

@@ -256,7 +256,7 @@ MenuId MenuManager::CreateMenu(std::string_view title, MenuHandlerCallback handl
 	menu->typeName = menuType;
 	menu->handler = handler;
 
-	MenuId id = m_nextId++;
+	MenuId id = ++m_nextId;
 	m_menuInsts.emplace(id, std::move(menu));
 	return id;
 }

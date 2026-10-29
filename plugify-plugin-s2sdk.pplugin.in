@@ -17548,7 +17548,7 @@
       ],
       "retType": {
         "type": "uint32",
-        "description": "A id to the loaded game configuration object, or -1 if loading fails.",
+        "description": "A id to the loaded game configuration object, or 0 if loading fails.",
         "alias": {
           "name": "ConfigId"
         }
@@ -18411,7 +18411,7 @@
       ],
       "retType": {
         "type": "uint32",
-        "description": "A handle to the created menu.",
+        "description": "A handle to the created menu, or 0 if creating fails.",
         "alias": {
           "name": "MenuId"
         }
@@ -23303,7 +23303,7 @@
       ],
       "retType": {
         "type": "uint32",
-        "description": "A id to the newly created Timer object, or -1 if the timer could not be created.",
+        "description": "A id to the newly created Timer object, or 0 if the timer could not be created.",
         "alias": {
           "name": "TimerId"
         }
