@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.5...v3.0.6) (2026-10-30)
+
+
+### Bug Fixes
+
+* skip configs without the key in GetGameConfig*All ([3ef0ca6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3ef0ca6b562822430f1f0d6f21176acc20830486))
+
 ## [3.0.5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.4...v3.0.5) (2026-10-29)
 
 
