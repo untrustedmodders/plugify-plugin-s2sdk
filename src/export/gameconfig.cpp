@@ -154,6 +154,9 @@ extern "C" PLUGIN_API void* GetGameConfigSignature(ConfigId id, const plg::strin
  */
 extern "C" PLUGIN_API plg::string GetGameConfigPatchAll(const plg::string& name) {
 	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (!gameConfig.config->HasPatch(name)) {
+			continue;
+		}
 		if (auto patch = gameConfig.config->GetPatch(name)) {
 			return *patch;
 		} else {
@@ -176,6 +179,9 @@ extern "C" PLUGIN_API plg::string GetGameConfigPatchAll(const plg::string& name)
  */
 extern "C" PLUGIN_API int GetGameConfigOffsetAll(const plg::string& name) {
 	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (!gameConfig.config->HasOffset(name)) {
+			continue;
+		}
 		if (auto offset = gameConfig.config->GetOffset(name)) {
 			return *offset;
 		} else {
@@ -198,6 +204,9 @@ extern "C" PLUGIN_API int GetGameConfigOffsetAll(const plg::string& name) {
  */
 extern "C" PLUGIN_API void* GetGameConfigAddressAll(const plg::string& name) {
 	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (!gameConfig.config->HasAddress(name)) {
+			continue;
+		}
 		if (auto address = gameConfig.config->GetAddress(name)) {
 			return *address;
 		} else {
@@ -220,6 +229,9 @@ extern "C" PLUGIN_API void* GetGameConfigAddressAll(const plg::string& name) {
  */
 extern "C" PLUGIN_API void* GetGameConfigVTableAll(const plg::string& name) {
 	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (!gameConfig.config->HasVTable(name)) {
+			continue;
+		}
 		if (auto vtable = gameConfig.config->GetVTable(name)) {
 			return *vtable;
 		} else {
@@ -242,6 +254,9 @@ extern "C" PLUGIN_API void* GetGameConfigVTableAll(const plg::string& name) {
  */
 extern "C" PLUGIN_API void* GetGameConfigSignatureAll(const plg::string& name) {
 	for (const auto& [_, gameConfig] : g_GameConfigManager.GetConfigs()) {
+		if (!gameConfig.config->HasSignature(name)) {
+			continue;
+		}
 		if (auto signature = gameConfig.config->GetSignature(name)) {
 			return *signature;
 		} else {
