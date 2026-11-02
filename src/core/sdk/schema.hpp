@@ -136,7 +136,7 @@ class SchemaField {
 	[[nodiscard]] auto Key(this auto&& self) {
 		static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
 		static const bool done = []{
-			if (key.size != sizeof(T)) plg::print(LS_WARNING, "Schema field '{}' mismatсhed in class '{}': expected {}, got {}!\n", ThisClass::m_className, MemberName, key.size, sizeof(T));
+			if (key.size != sizeof(T)) plg::print(LS_WARNING, "Schema field '{}' mismatched in class '{}': expected {}, got {}!\n", ThisClass::m_className, MemberName, key.size, sizeof(T));
 			return true;
 		}();
 		return key;
@@ -285,7 +285,7 @@ class SchemaPointerField {
     [[nodiscard]] auto Key(this auto&& self) {
         static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
     	/*static const bool done = []{
-    		if (key.size != sizeof(T)) plg::print(LS_WARNING, "Schema pointer field '{}' mismatсhed in class '{}': expected {}, got {}!\n", ThisClass::m_className, MemberName, key.size, sizeof(T));
+    		if (key.size != sizeof(T)) plg::print(LS_WARNING, "Schema pointer field '{}' mismatched in class '{}': expected {}, got {}!\n", ThisClass::m_className, MemberName, key.size, sizeof(T));
     		return true;
     	}();*/
         return key;
