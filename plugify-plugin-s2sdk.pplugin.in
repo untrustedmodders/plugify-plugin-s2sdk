@@ -29,6 +29,295 @@
   ],
   "methods": [
     {
+      "name": "AddServerAddon",
+      "group": "Addons",
+      "description": "Adds a workshop addon that is mounted on the server and sent to all clients. Same as adding the addon to s2_extra_addons. If the addon is not downloaded yet, the server downloads it and reloads the map.",
+      "funcName": "AddServerAddon",
+      "paramTypes": [
+        {
+          "name": "addon",
+          "type": "uint64",
+          "ref": false,
+          "description": "The workshop ID of the addon."
+        },
+        {
+          "name": "refresh",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, the addon is mounted right away, otherwise on the next map load."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the addon was added, false if it is already in the list."
+      }
+    },
+    {
+      "name": "RemoveServerAddon",
+      "group": "Addons",
+      "description": "Removes a workshop addon from the server addons.",
+      "funcName": "RemoveServerAddon",
+      "paramTypes": [
+        {
+          "name": "addon",
+          "type": "uint64",
+          "ref": false,
+          "description": "The workshop ID of the addon."
+        },
+        {
+          "name": "refresh",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, the addon is unmounted right away, otherwise on the next map load."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the addon was removed, false if it is not in the list."
+      }
+    },
+    {
+      "name": "GetServerAddons",
+      "group": "Addons",
+      "description": "Retrieves the workshop addons that are mounted on the server and sent to all clients.",
+      "funcName": "GetServerAddons",
+      "paramTypes": [],
+      "retType": {
+        "type": "uint64[]",
+        "description": "An array of workshop IDs from s2_extra_addons."
+      }
+    },
+    {
+      "name": "AddPrivateAddon",
+      "group": "Addons",
+      "description": "Adds a workshop addon that is mounted on the server but sent only to the clients passed to SendAddon. Same as adding the addon to s2_private_addons. If the addon is not downloaded yet, the server downloads it and reloads the map.",
+      "funcName": "AddPrivateAddon",
+      "paramTypes": [
+        {
+          "name": "addon",
+          "type": "uint64",
+          "ref": false,
+          "description": "The workshop ID of the addon."
+        },
+        {
+          "name": "refresh",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, the addon is mounted right away, otherwise on the next map load."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the addon was added, false if it is already in the list."
+      }
+    },
+    {
+      "name": "RemovePrivateAddon",
+      "group": "Addons",
+      "description": "Removes a workshop addon from the private addons.",
+      "funcName": "RemovePrivateAddon",
+      "paramTypes": [
+        {
+          "name": "addon",
+          "type": "uint64",
+          "ref": false,
+          "description": "The workshop ID of the addon."
+        },
+        {
+          "name": "refresh",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, the addon is unmounted right away, otherwise on the next map load."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the addon was removed, false if it is not in the list."
+      }
+    },
+    {
+      "name": "GetPrivateAddons",
+      "group": "Addons",
+      "description": "Retrieves the workshop addons that are mounted on the server but sent only to selected clients.",
+      "funcName": "GetPrivateAddons",
+      "paramTypes": [],
+      "retType": {
+        "type": "uint64[]",
+        "description": "An array of workshop IDs from s2_private_addons."
+      }
+    },
+    {
+      "name": "AddClientOnlyAddon",
+      "group": "Addons",
+      "description": "Adds a workshop addon that is sent to all clients but not mounted on the server. Same as adding the addon to s2_client_extra_addons. Use it only for content the server never loads itself, e.g. replacements of the base game files.",
+      "funcName": "AddClientOnlyAddon",
+      "paramTypes": [
+        {
+          "name": "addon",
+          "type": "uint64",
+          "ref": false,
+          "description": "The workshop ID of the addon."
+        },
+        {
+          "name": "refresh",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, connected clients that do not have the addon yet are told to download it right away."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the addon was added, false if it is already in the list."
+      }
+    },
+    {
+      "name": "RemoveClientOnlyAddon",
+      "group": "Addons",
+      "description": "Removes a workshop addon from the client only addons. Clients that already mounted the addon keep it until they reconnect.",
+      "funcName": "RemoveClientOnlyAddon",
+      "paramTypes": [
+        {
+          "name": "addon",
+          "type": "uint64",
+          "ref": false,
+          "description": "The workshop ID of the addon."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the addon was removed, false if it is not in the list."
+      }
+    },
+    {
+      "name": "GetClientOnlyAddons",
+      "group": "Addons",
+      "description": "Retrieves the workshop addons that are sent to all clients but not mounted on the server.",
+      "funcName": "GetClientOnlyAddons",
+      "paramTypes": [],
+      "retType": {
+        "type": "uint64[]",
+        "description": "An array of workshop IDs from s2_client_extra_addons."
+      }
+    },
+    {
+      "name": "SendAddon",
+      "group": "Addons",
+      "description": "Sends a workshop addon to a specific client. Use it for private addons, or for client only addons that only this client should get. The addon stays sent to this SteamID64 across reconnects and map changes until it is removed with RemoveSentAddon or ClearSentAddons, or the server restarts, so it is enough to call this once, e.g. when the client gets the rights for it.",
+      "funcName": "SendAddon",
+      "paramTypes": [
+        {
+          "name": "steamId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The SteamID64 of the client."
+        },
+        {
+          "name": "addon",
+          "type": "uint64",
+          "ref": false,
+          "description": "The workshop ID of the addon."
+        },
+        {
+          "name": "refresh",
+          "type": "bool",
+          "ref": false,
+          "description": "If true and the client is connected, it is told to download the addon right away, otherwise it gets the addon on the next connect."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the addon was sent, false if the client already has it or the SteamID64 is 0."
+      }
+    },
+    {
+      "name": "RemoveSentAddon",
+      "group": "Addons",
+      "description": "Removes a workshop addon sent to a specific client. The client keeps the mounted addon until it reconnects.",
+      "funcName": "RemoveSentAddon",
+      "paramTypes": [
+        {
+          "name": "steamId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The SteamID64 of the client."
+        },
+        {
+          "name": "addon",
+          "type": "uint64",
+          "ref": false,
+          "description": "The workshop ID of the addon."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the addon was removed, false if it was not sent to the client."
+      }
+    },
+    {
+      "name": "ClearSentAddons",
+      "group": "Addons",
+      "description": "Removes all workshop addons sent to a specific client. The client keeps the mounted addons until it reconnects.",
+      "funcName": "ClearSentAddons",
+      "paramTypes": [
+        {
+          "name": "steamId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The SteamID64 of the client."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetSentAddons",
+      "group": "Addons",
+      "description": "Retrieves the workshop addons sent to a specific client.",
+      "funcName": "GetSentAddons",
+      "paramTypes": [
+        {
+          "name": "steamId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The SteamID64 of the client."
+        }
+      ],
+      "retType": {
+        "type": "uint64[]",
+        "description": "An array of workshop IDs sent with SendAddon or s2_sent_addons."
+      }
+    },
+    {
+      "name": "GetClientAddons",
+      "group": "Addons",
+      "description": "Retrieves all workshop addons a client downloads and mounts when it connects. Includes the current workshop map, the server addons, the client only addons and the addons sent to this client.",
+      "funcName": "GetClientAddons",
+      "paramTypes": [
+        {
+          "name": "steamId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The SteamID64 of the client."
+        }
+      ],
+      "retType": {
+        "type": "uint64[]",
+        "description": "An array of workshop IDs in the order the client mounts them."
+      }
+    },
+    {
+      "name": "GetCurrentWorkshopMap",
+      "group": "Addons",
+      "description": "Retrieves the workshop ID of the current map.",
+      "funcName": "GetCurrentWorkshopMap",
+      "paramTypes": [],
+      "retType": {
+        "type": "uint64",
+        "description": "The workshop ID of the current map, or 0 if the current map is not a workshop map."
+      }
+    },
+    {
       "name": "Kv1Create",
       "group": "Keyvalues",
       "description": "Creates a new KeyValues instance",

@@ -3,6 +3,22 @@
         CreateInterface;
         Plugify_*;
 
+        AddServerAddon;
+        RemoveServerAddon;
+        GetServerAddons;
+        AddPrivateAddon;
+        RemovePrivateAddon;
+        GetPrivateAddons;
+        AddClientOnlyAddon;
+        RemoveClientOnlyAddon;
+        GetClientOnlyAddons;
+        SendAddon;
+        RemoveSentAddon;
+        ClearSentAddons;
+        GetSentAddons;
+        GetClientAddons;
+        GetCurrentWorkshopMap;
+
         AddBodyImpulseAtPosition;
         AddBodyVelocity;
         DetachBodyFromParent;

@@ -58,6 +58,19 @@ CConVar<CUtlString> s2_client_extra_addons("s2_client_extra_addons", FCVAR_NONE,
 		g_MultiAddonManager.m_globalClientAddons = plg::parse<PublishedFileId_t>(*new_val, ",");
 	});
 
+CConVar<CUtlString> s2_private_addons("s2_private_addons", FCVAR_NONE, "The workshop IDs of private addons separated by commas, addons will be downloaded (if not present) and mounted, but only sent to the clients listed in s2_sent_addons or passed to SendAddon", CUtlString(""),
+	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
+	{
+		g_MultiAddonManager.m_privateAddons = plg::parse<PublishedFileId_t>(*new_val, ",");
+		g_MultiAddonManager.RefreshAddons();
+	});
+
+CConVar<CUtlString> s2_sent_addons("s2_sent_addons", FCVAR_NONE, "The workshop IDs of addons sent to specific clients, as <SteamID64>:<workshop IDs separated by commas> entries separated by spaces. Clients get them on their next connect. Example: \"76561198000000000:123,456 76561198000000001:123\" gives addons 123 and 456 to the first client and addon 123 to the second one", CUtlString(""),
+	[](CConVar<CUtlString> *, CSplitScreenSlot, const CUtlString *new_val, const CUtlString *)
+	{
+		g_MultiAddonManager.SetConVarSentAddons(*new_val);
+	});
+
 MultiAddonManager MultiAddonManager::instance;
 
 std::string MultiAddonManager::BuildAddonPath(PublishedFileId_t addon) {
@@ -214,11 +227,25 @@ bool MultiAddonManager::DownloadAddon(PublishedFileId_t addon, bool important, b
 	return true;
 }
 
+plg::vector<PublishedFileId_t> MultiAddonManager::GetServerAddons() const {
+	auto addons = m_extraAddons;
+
+	for (const auto& addon : m_privateAddons) {
+		if (!std::ranges::contains(addons, addon)) {
+			addons.push_back(addon);
+		}
+	}
+
+	return addons;
+}
+
 void MultiAddonManager::RefreshAddons(bool reloadMap) {
 	if (!g_pSteamUGC)
 		return;
 
-	plg::print(LS_MESSAGE, "Refreshing addons ({})\n", plg::join(m_extraAddons, ", "));
+	plg::vector<PublishedFileId_t> addons = GetServerAddons();
+
+	plg::print(LS_MESSAGE, "Refreshing addons ({})\n", plg::join(addons, ", "));
 
 	// Remove our paths first in case addons were switched
 	for (const auto& addon : m_mountedAddons) {
@@ -228,7 +255,7 @@ void MultiAddonManager::RefreshAddons(bool reloadMap) {
 
 	bool refuseMounting = false;
 
-	for (const auto& addon : m_extraAddons) {
+	for (const auto& addon : addons) {
 		refuseMounting |= !MountAddon(addon);
 	}
 
@@ -335,8 +362,46 @@ bool MultiAddonManager::RemoveAddon(PublishedFileId_t addon, bool refresh) {
 	return true;
 }
 
+bool MultiAddonManager::AddPrivateAddon(PublishedFileId_t addon, bool refresh) {
+	if (std::ranges::contains(m_privateAddons, addon)) {
+		plg::print(LS_WARNING, "Addon {} is already in the private list!\n", addon);
+		return false;
+	}
+
+	plg::print(LS_MESSAGE, "Adding {} to private addon list\n", addon);
+
+	m_privateAddons.push_back(addon);
+
+	// Update the convar to reflect the new addon list, but don't trigger the callback
+	s2_private_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_privateAddons, ",");
+
+	if (refresh) {
+		RefreshAddons();
+	}
+
+	return true;
+}
+
+bool MultiAddonManager::RemovePrivateAddon(PublishedFileId_t addon, bool refresh) {
+	plg::print(LS_MESSAGE, "Removing {} from private addon list\n", addon);
+
+	if (!plg::erase(m_privateAddons, addon)) {
+		plg::print(LS_WARNING, "Addon {} is not in the private list!\n", addon);
+		return false;
+	}
+
+	// Update the convar to reflect the new addon list, but don't trigger the callback
+	s2_private_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_privateAddons, ",");
+
+	if (refresh) {
+		RefreshAddons();
+	}
+
+	return true;
+}
+
 void MultiAddonManager::OnPluginStart() {
-	std::array<uint64, 7> conVarHandles = {
+	std::array<uint64, 9> conVarHandles = {
 		s2_addon_mount_download,
 		s2_block_disconnect_messages,
 		s2_cache_clients_with_addons,
@@ -344,11 +409,15 @@ void MultiAddonManager::OnPluginStart() {
 		s2_extra_addons_timeout,
 		s2_extra_addons,
 		s2_client_extra_addons,
+		s2_private_addons,
+		s2_sent_addons,
 	};
 	g_ConVarManager.AutoExecConfig(conVarHandles, true, "multi_addon_manager", "");
 
 	m_extraAddons = plg::parse<PublishedFileId_t>(s2_extra_addons.Get(), ",");
 	m_globalClientAddons = plg::parse<PublishedFileId_t>(s2_client_extra_addons.Get(), ",");
+	m_privateAddons = plg::parse<PublishedFileId_t>(s2_private_addons.Get(), ",");
+	SetConVarSentAddons(s2_sent_addons.Get());
 
 	// Steam can log on before GameServerSteamAPIActivated, so register callbacks right away
 	if (g_pEngineServer->IsDedicatedServer()) {
@@ -418,22 +487,18 @@ bool MultiAddonManager::HasUGCConnection() {
 	return g_pSteamUGC != nullptr && g_pSteam->BLoggedOn();
 }
 
-void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64, bool refresh) {
+bool MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64, bool refresh) {
 	if (!steamID64) {
-		if (std::ranges::contains(m_globalClientAddons, addon)) {
-			plg::print(LS_WARNING, "Addon {} is already in the list!\n", addon);
-			return;
-		}
+		if (std::ranges::contains(m_globalClientAddons, addon))
+			return false;
 
 		m_globalClientAddons.push_back(addon);
 		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = plg::join(m_globalClientAddons, ",");
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 
-		if (std::ranges::contains(clientInfo.addonsToLoad, addon)) {
-			plg::print(LS_WARNING, "Addon {} is already in the list!\n", addon);
-			return;
-		}
+		if (std::ranges::contains(clientInfo.addonsToLoad, addon))
+			return false;
 
 		clientInfo.addonsToLoad.push_back(addon);
 	}
@@ -443,7 +508,7 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 		auto msg = GetAddonSignonStateMessage(addon);
 		if (!msg) {
 			plg::print(LS_WARNING, "Failed to create signon state message for {}\n", addon);
-			return;
+			return true;
 		}
 
 		FOR_EACH_VEC(clients, i) {
@@ -480,16 +545,23 @@ void MultiAddonManager::AddClientAddon(PublishedFileId_t addon, uint64 steamID64
 		}
 		delete msg;
 	}
+
+	return true;
 }
 
-void MultiAddonManager::RemoveClientAddon(PublishedFileId_t addon, uint64 steamID64) {
+bool MultiAddonManager::RemoveClientAddon(PublishedFileId_t addon, uint64 steamID64) {
 	if (!steamID64) {
-		plg::erase(m_globalClientAddons, addon);
+		if (!plg::erase(m_globalClientAddons, addon))
+			return false;
+
 		s2_client_extra_addons.GetConVarData()->Value(0)->m_StringValue = CUtlString(plg::join(m_globalClientAddons, ","));
 	} else {
 		ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
-		plg::erase(clientInfo.addonsToLoad, addon);
+		if (!plg::erase(clientInfo.addonsToLoad, addon))
+			return false;
 	}
+
+	return true;
 }
 
 void MultiAddonManager::ClearClientAddons(uint64 steamID64) {
@@ -502,12 +574,57 @@ void MultiAddonManager::ClearClientAddons(uint64 steamID64) {
 	}
 }
 
+plg::vector<PublishedFileId_t> MultiAddonManager::GetSentAddons(uint64 steamID64) {
+	return g_ClientAddons[steamID64].addonsToLoad;
+}
+
+void MultiAddonManager::SetConVarSentAddons(std::string_view value) {
+	// Take back the addons sent by the previous value, the ones sent with SendAddon stay
+	for (const auto& [steamID64, addons] : m_conVarSentAddons) {
+		for (const auto& addon : addons) {
+			RemoveClientAddon(addon, steamID64);
+		}
+	}
+	m_conVarSentAddons.clear();
+
+	for (const auto& entry : plg::split(value, " ")) {
+		auto separator = entry.find(':');
+		auto steamID64 = plg::cast_to<uint64>(entry.substr(0, separator));
+		if (separator == std::string_view::npos || !steamID64 || !*steamID64) {
+			plg::print(LS_WARNING, "{}: Invalid entry \"{}\", expected <SteamID64>:<workshop IDs separated by commas>\n", __func__, entry);
+			continue;
+		}
+
+		auto& clientAddons = m_conVarSentAddons[*steamID64];
+		for (const auto& addon : plg::parse<PublishedFileId_t>(entry.substr(separator + 1), ",")) {
+			if (!std::ranges::contains(clientAddons, addon)) {
+				AddClientAddon(addon, *steamID64);
+				clientAddons.push_back(addon);
+			}
+		}
+	}
+}
+
+bool MultiAddonManager::IsClientAddonAllowed(PublishedFileId_t addon, uint64 steamID64) {
+	if (!std::ranges::contains(m_privateAddons, addon) || std::ranges::contains(m_globalClientAddons, addon))
+		return true;
+
+	return steamID64 && std::ranges::contains(g_ClientAddons[steamID64].addonsToLoad, addon);
+}
+
 plg::vector<PublishedFileId_t> MultiAddonManager::GetClientAddons(uint64 steamID64) {
-	// The list of mounted addons should never contain the workshop map.
-	auto addons = m_mountedAddons;
+	plg::vector<PublishedFileId_t> addons;
 
 	if (m_currentWorkshopMap != k_PublishedFileIdInvalid) {
-		addons.insert(addons.begin(), m_currentWorkshopMap);
+		addons.push_back(m_currentWorkshopMap);
+	}
+
+	// The list of mounted addons should never contain the workshop map.
+	// Private addons are skipped here, they are added below only for the clients they were sent to with SendAddon or s2_sent_addons.
+	for (const auto& addon : m_mountedAddons) {
+		if (!std::ranges::contains(m_privateAddons, addon)) {
+			addons.push_back(addon);
+		}
 	}
 
 	// Also make sure we don't have duplicates.
@@ -536,7 +653,9 @@ CON_COMMAND_F(s2_add_client_addon, "Add a workshop ID to the global client-only 
 	}
 
 	if (auto addon = plg::cast_to<PublishedFileId_t>(args[1])) {
-		g_MultiAddonManager.AddClientAddon(*addon);
+		if (!g_MultiAddonManager.AddClientAddon(*addon)) {
+			plg::print(LS_WARNING, "Addon {} is already in the list!\n", *addon);
+		}
 	}
 }
 
@@ -643,16 +762,17 @@ void MultiAddonManager::OnHostStateRequest(CHostStateMgr* manager, CHostStateReq
 		}
 	}
 
-	if (g_MultiAddonManager.m_extraAddons.empty()) {
+	plg::vector<PublishedFileId_t> serverAddons = GetServerAddons();
+	if (serverAddons.empty()) {
 		return;
 	}
 
 	// Rebuild the addon list. We always start with the original addon.
 	if (m_loadingWorkshopMap == k_PublishedFileIdInvalid) {
-		request->m_Addons = plg::join(g_MultiAddonManager.m_extraAddons, ",");
+		request->m_Addons = plg::join(serverAddons, ",");
 	} else {
 		// Don't add the same addon twice. Hopefully no server owner is diabolical enough to do things like `map de_dust2 customgamemode=1234,5678`.
-		plg::vector<PublishedFileId_t> newAddons = g_MultiAddonManager.m_extraAddons;
+		plg::vector<PublishedFileId_t> newAddons = std::move(serverAddons);
 		plg::erase(newAddons, m_loadingWorkshopMap);
 		newAddons.insert(newAddons.begin(), m_loadingWorkshopMap);
 		request->m_Addons = plg::join(newAddons, ",");
@@ -727,7 +847,7 @@ void MultiAddonManager::OnReplyConnection_Post(CNetworkGameServerBase* server, C
 }
 
 uint64 MultiAddonManager::OnScriptGetAddon() {
-	if (m_extraAddons.empty())
+	if (m_extraAddons.empty() && m_privateAddons.empty())
 		return 0;
 
 	return m_currentWorkshopMap;
@@ -753,17 +873,19 @@ void MultiAddonManager::OnSendNetMessage(CServerSideClientBase* client, CNetMess
 		// When switching to another map, the signon message might contain more than 1 addon.
 		// This puts the client in limbo because client doesn't know how to handle multiple addons at the same time.
 		plg::vector<PublishedFileId_t> addonsList = plg::parse<PublishedFileId_t>(msg->addons(), ",");
-		if (addonsList.size() > 1) {
-			// If there's more than one addon, ensure that it takes the first addon (which should be the workshop map or the first custom addon)
-			msg->set_addons(std::to_string(addonsList.front()));
-			// Since the client will download the addon contained inside this messsage, we might as well add it to the list of client's downloaded addons.
-			clientInfo.currentPendingAddon = addonsList.front();
-		} else if (addonsList.size() == 1) {
-			// Nothing to do here, the rest of the required addons can be sent later.
-			if (auto addon = plg::cast_to<PublishedFileId_t>(msg->addons())) {
-				clientInfo.currentPendingAddon = *addon;
-			}
+
+		// The engine sends its full addon list, so drop private addons this client wasn't given
+		plg::erase_if(addonsList, [&](const auto& addon) { return !IsClientAddonAllowed(addon, steamID64); });
+
+		if (addonsList.empty()) {
+			msg->set_addons("");
+			return;
 		}
+
+		// Ensure that it takes the first addon (which should be the workshop map or the first custom addon), the rest of the required addons can be sent later.
+		msg->set_addons(std::to_string(addonsList.front()));
+		// Since the client will download the addon contained inside this messsage, we might as well add it to the list of client's downloaded addons.
+		clientInfo.currentPendingAddon = addonsList.front();
 
 		return;
 	}

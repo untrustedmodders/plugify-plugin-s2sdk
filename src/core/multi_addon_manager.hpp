@@ -30,6 +30,7 @@ public:
 	bool DownloadAddon(PublishedFileId_t addon, bool important = false, bool force = false);
 	void PrintDownloadProgress() const;
 	void RefreshAddons(bool reloadMap = false);
+	plg::vector<PublishedFileId_t> GetServerAddons() const;
 	void ClearAddons();
 	void ReloadMap();
 	void RestoreCurrentWorkshopMap(std::string_view map);
@@ -39,10 +40,15 @@ public:
 	void ClearCurrentWorkshopMap() { m_currentWorkshopMap = k_PublishedFileIdInvalid; }
 
 	static bool HasUGCConnection();
-	void AddClientAddon(PublishedFileId_t addon, uint64 steamID64 = 0, bool refresh = false);
-	void RemoveClientAddon(PublishedFileId_t addon, uint64 steamID64 = 0);
+	bool AddPrivateAddon(PublishedFileId_t addon, bool refresh = false);
+	bool RemovePrivateAddon(PublishedFileId_t addon, bool refresh = false);
+	bool AddClientAddon(PublishedFileId_t addon, uint64 steamID64 = 0, bool refresh = false);
+	bool RemoveClientAddon(PublishedFileId_t addon, uint64 steamID64 = 0);
 	void ClearClientAddons(uint64 steamID64 = 0);
 	plg::vector<PublishedFileId_t> GetClientAddons(uint64 steamID64 = 0);
+	bool IsClientAddonAllowed(PublishedFileId_t addon, uint64 steamID64);
+	plg::vector<PublishedFileId_t> GetSentAddons(uint64 steamID64);
+	void SetConVarSentAddons(std::string_view value);
 
 public:
 	void OnPluginStart();
@@ -66,6 +72,7 @@ public:
 	plg::vector<PublishedFileId_t> m_extraAddons;
 	plg::vector<PublishedFileId_t> m_mountedAddons;
 	plg::vector<PublishedFileId_t> m_globalClientAddons;
+	plg::vector<PublishedFileId_t> m_privateAddons; // Mounted like extra addons, but only sent with SendAddon or s2_sent_addons
 
 private:
 	plg::vector<PublishedFileId_t> m_importantDownloads; // Important addon downloads that will trigger a map reload when finished
@@ -77,6 +84,7 @@ private:
 	plg::vector<AddonDownloadInfo> m_preSteamLoginDownloads; // Downloads that failed to start because the server wasn't logged on to Steam yet
 	std::deque<PublishedFileId_t> m_downloadQueue; // Queue of all addon downloads to print progress
 	std::set<uint64> m_timedOutClients;
+	std::map<uint64, plg::vector<PublishedFileId_t>> m_conVarSentAddons; // Addons sent to clients by s2_sent_addons
 
 	STEAM_GAMESERVER_CALLBACK_MANUAL(MultiAddonManager, OnAddonDownloaded, DownloadItemResult_t, m_CallbackDownloadItemResult);
 	STEAM_GAMESERVER_CALLBACK_MANUAL(MultiAddonManager, OnSteamServersConnected, SteamServersConnected_t, m_CallbackSteamServersConnected);
