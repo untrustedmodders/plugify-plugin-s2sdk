@@ -930,9 +930,11 @@ Result<void> ServerStartup() {
 	g_pNetworkGameServer = g_pNetworkServerService->GetIGameServer();
 	if (g_pNetworkGameServer != nullptr) {
 		gpGlobals = g_pNetworkGameServer->GetGlobals();
-		CHECK(g_HookManager.AddHookVTableFunc(STR(CNetworkGameServerBase::ActivateServer), &CNetworkGameServerBase::ActivateServer, g_pNetworkGameServer, Hook_ActivateServer, {Post}));
-		CHECK(g_HookManager.AddHookVTableFunc(STR(CNetworkGameServerBase::SpawnServer), &CNetworkGameServerBase::SpawnServer, g_pNetworkGameServer, Hook_SpawnServer, {Post}));
-		CHECK(g_HookManager.AddHookVTableFunc(STR(CNetworkGameServerBase::ConnectClient), &CNetworkGameServerBase::ConnectClient, g_pNetworkGameServer, Hook_ConnectClient, {Pre}));
+		// The engine allocates a new server on every startup, possibly at the same address, so hook the class vtable instead of the object
+		void* pNetworkGameServer = *reinterpret_cast<void**>(g_pNetworkGameServer);
+		CHECK(g_HookManager.AddHookVFuncFunc(STR(CNetworkGameServerBase::ActivateServer), &CNetworkGameServerBase::ActivateServer, pNetworkGameServer, Hook_ActivateServer, {Post}));
+		CHECK(g_HookManager.AddHookVFuncFunc(STR(CNetworkGameServerBase::SpawnServer), &CNetworkGameServerBase::SpawnServer, pNetworkGameServer, Hook_SpawnServer, {Post}));
+		CHECK(g_HookManager.AddHookVFuncFunc(STR(CNetworkGameServerBase::ConnectClient), &CNetworkGameServerBase::ConnectClient, pNetworkGameServer, Hook_ConnectClient, {Pre}));
 	}
 
 	g_pGameEntitySystem = GameEntitySystem();
