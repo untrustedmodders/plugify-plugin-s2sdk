@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.1.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.6...v3.1.0) (2026-11-02)
+
+
+### Features
+
+* add private addons and addon exports ([a909889](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a909889afbc102633866557e1178f32202988fce))
+
+
+### Bug Fixes
+
+* bind `CNetworkGameServer` hooks to object lifecycle ([9571269](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9571269b86f601f14b37b16b4f6bb506cccc9773))
+
 ## [3.0.6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.0.5...v3.0.6) (2026-10-30)
 
 
