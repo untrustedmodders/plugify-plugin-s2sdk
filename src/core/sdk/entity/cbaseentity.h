@@ -148,7 +148,7 @@ public:
 	SCHEMA_FIELD(CNetworkTransmitComponent, m_NetworkTransmitComponent)
 	SCHEMA_FIELD(int, m_iHealth)
 	SCHEMA_FIELD(int, m_iMaxHealth)
-	SCHEMA_FIELD(CSTeam, m_iTeamNum)
+	SCHEMA_FIELD(uint8, m_iTeamNum)
 	SCHEMA_FIELD(bool, m_bLagCompensate)
 	SCHEMA_FIELD(Vector, m_vecAbsVelocity)
 	SCHEMA_FIELD(Vector, m_vecBaseVelocity)

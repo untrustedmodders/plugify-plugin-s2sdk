@@ -703,7 +703,7 @@ polyhook::ResultType Hook_OnEntitySpawned(polyhook::HookHandle hook, polyhook::P
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
 	if (name.ends_with("team_manager")) {
-		g_TeamManagers[entity->m_iTeamNum] = static_cast<CTeam *>(entity);
+		g_TeamManagers[static_cast<CSTeam>(*entity->m_iTeamNum)] = static_cast<CTeam *>(entity);
 	}
 	g_EntitySpawnedListenerManager(entity->GetRefEHandle().ToInt());
 	return polyhook::ResultType::Ignored;
@@ -716,7 +716,7 @@ polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::P
 		g_pGameRulesProxy = nullptr;
 		g_pGameRules = nullptr;
 	} else if (name.ends_with("team_manager")) {
-		g_TeamManagers.erase(entity->m_iTeamNum);
+		g_TeamManagers.erase(static_cast<CSTeam>(*entity->m_iTeamNum));
 	} else if (entity == g_pPointScript) {
 		g_pPointScript = nullptr;
 	}
