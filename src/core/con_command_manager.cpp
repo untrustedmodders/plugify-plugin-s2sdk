@@ -137,7 +137,7 @@ bool ConCommandManager::IsValidValveCommand(std::string_view name) {
 	return commandRef.IsValidRef();
 }
 
-static bool CheckCommandAccess(CPlayerSlot slot, const plg::string& permission) {
+static bool CheckCommandAccess(CPlayerSlot slot, const plg::string& permission, bool notify) {
 	if (permission.empty()) {
 		return true;
 	}
@@ -158,7 +158,9 @@ static bool CheckCommandAccess(CPlayerSlot slot, const plg::string& permission) 
 
 	CSteamID steamID = player->GetSteamId(true);
 	if (!steamID.IsValid() || permissions::HasPermission(steamID.ConvertToUint64(), permission) != permissions::Status::Allow) {
-		utils::PrintChat(slot, lang::Get(slot, "S2SDK.Command.NoAccess").value_or("You don't have access to this command."));
+		if (notify) {
+			utils::PrintChat(slot, lang::Get(slot, "S2SDK.Command.NoAccess").value_or("You don't have access to this command."));
+		}
 		return false;
 	}
 
@@ -206,7 +208,7 @@ ResultType ConCommandManager::ExecuteCommandCallbacks(std::string_view name, con
 	if (it != m_cmdLookup.end()) {
 		auto commandInfo = it->second;
 
-		if (!CheckCommandAccess(caller, commandInfo->permission)) {
+		if (!CheckCommandAccess(caller, commandInfo->permission, mode == HookMode::Post)) {
 			return result;
 		}
 
