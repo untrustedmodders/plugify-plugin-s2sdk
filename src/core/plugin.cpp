@@ -687,7 +687,7 @@ polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::P
 
 		g_pPointScript = static_cast<CBaseEntity*>(addresses::CreateEntityByName("point_script", -1));
 		g_pPointScript->DispatchSpawn({
-			{"target_name", "plugify_script"},
+			{"targetname", "plugify_script"},
 			/*{"cs_script", CS_SCRIPT_PATH}*/
 		});
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
