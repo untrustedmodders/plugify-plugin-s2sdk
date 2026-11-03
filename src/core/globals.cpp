@@ -173,9 +173,9 @@ namespace entities {
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 
-	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
+	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const Vector& origin, float maxRadius) {
 		ParamScope params(startEntity);
-		auto handle = CEntities{}.FindInSphere(params[0], name, origin, maxRadius);
+		auto handle = CEntities{}.FindInSphere(params[0], origin, maxRadius);
 		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
 	}
 }// namespace entities

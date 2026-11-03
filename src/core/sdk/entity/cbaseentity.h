@@ -405,7 +405,7 @@ public:
 	VSCRIPT_MEMBER_FUNCTION(FindByModel, handle, handle, string)
 	VSCRIPT_MEMBER_FUNCTION(FindByModelWithin, handle, handle, string, vector, float)
 	VSCRIPT_MEMBER_FUNCTION(FindByTarget, handle, handle, string)
-	VSCRIPT_MEMBER_FUNCTION(FindInSphere, handle, handle, string, vector, float)
+	VSCRIPT_MEMBER_FUNCTION(FindInSphere, handle, handle, vector, float)
 };
 
 class SpawnPoint : public CBaseEntity {

@@ -330,7 +330,7 @@ extern "C" PLUGIN_API int FindEntityByTarget(int startFrom, const plg::string& n
  */
 extern "C" PLUGIN_API int FindEntityInSphere(int startFrom, const plg::vec3& origin, float radius) {
 	CEntityInstance* startEnt = g_pGameEntitySystem->GetEntityInstance(CEntityHandle(startFrom));
-	CEntityInstance* found = entities::FindInSphere(startEnt, nullptr, std::bit_cast<Vector>(origin), radius);
+	CEntityInstance* found = entities::FindInSphere(startEnt, std::bit_cast<Vector>(origin), radius);
 	return found ? found->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
 

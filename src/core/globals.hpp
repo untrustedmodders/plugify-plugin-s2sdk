@@ -132,7 +132,7 @@ namespace entities {
 	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name);
 	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius);
 	CEntityInstance* FindByTarget(CEntityInstance* startEntity, const char* name);
-	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius);
+	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const Vector& origin, float maxRadius);
 }// namespace entities
 
 inline Color NewColor(const plg::vec4& color) {
