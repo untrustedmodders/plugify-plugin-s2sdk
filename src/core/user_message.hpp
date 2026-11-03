@@ -67,6 +67,18 @@ namespace pb = google::protobuf;
 		}                                                                                          \
 	}
 
+#define CHECK_FIELD_MESSAGE_TYPE(type)                                                             \
+	if (field->message_type()->full_name() != type::descriptor()->full_name()) {                   \
+		plg::print(                                                                                \
+			LS_WARNING,                                                                            \
+			"Field '{}' has wrong message type: expected {}, got {}\n",                            \
+			field->name(),                                                                         \
+			#type,                                                                                 \
+			field->message_type()->name()                                                          \
+		);                                                                                         \
+		return false;                                                                              \
+	}
+
 #define CHECK_FIELD_REPEATED()                                                                     \
 	if (field->label() != pb::FieldDescriptor::LABEL_REPEATED) {                                   \
 		plg::print(LS_WARNING, "Field '{}' is not repeated as expected\n", field->name());         \
@@ -582,6 +594,7 @@ public:
 	bool GetColor(std::string_view fieldName, plg::vec4& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgRGBA);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgRGBA* msgRGBA = static_cast<CMsgRGBA*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -596,6 +609,7 @@ public:
 	bool SetColor(std::string_view fieldName, const plg::vec4& value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgRGBA);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgRGBA* msgRGBA = static_cast<CMsgRGBA*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -610,6 +624,7 @@ public:
 	bool GetRepeatedColor(std::string_view fieldName, int index, plg::vec4& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgRGBA);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -625,6 +640,7 @@ public:
 	bool SetRepeatedColor(std::string_view fieldName, int index, const plg::vec4& value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgRGBA);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -640,6 +656,7 @@ public:
 	bool AddColor(std::string_view fieldName, const plg::vec4& value) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgRGBA);
 		CHECK_FIELD_REPEATED();
 
 		CMsgRGBA* msgRGBA = static_cast<CMsgRGBA*>(m_msg->GetReflection()->AddMessage(m_msg, field));
@@ -654,6 +671,7 @@ public:
 	bool GetVector2D(std::string_view fieldName, plg::vec2& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector2D);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgVector2D* msgVec2d = static_cast<CMsgVector2D*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -666,6 +684,7 @@ public:
 	bool SetVector2D(std::string_view fieldName, const plg::vec2& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector2D);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgVector2D* msgVec2d = static_cast<CMsgVector2D*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -678,6 +697,7 @@ public:
 	bool GetRepeatedVector2D(std::string_view fieldName, int index, plg::vec2& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector2D);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -691,6 +711,7 @@ public:
 	bool SetRepeatedVector2D(std::string_view fieldName, int index, const plg::vec2& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector2D);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -704,6 +725,7 @@ public:
 	bool AddVector2D(std::string_view fieldName, const plg::vec2& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector2D);
 		CHECK_FIELD_REPEATED();
 
 		CMsgVector2D* msgVec2d = static_cast<CMsgVector2D*>(m_msg->GetReflection()->AddMessage(m_msg, field));
@@ -716,6 +738,7 @@ public:
 	bool GetVector(std::string_view fieldName, plg::vec3& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgVector* msgVec = static_cast<CMsgVector*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -729,6 +752,7 @@ public:
 	bool SetVector(std::string_view fieldName, const plg::vec3& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgVector* msgVec = static_cast<CMsgVector*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -742,6 +766,7 @@ public:
 	bool GetRepeatedVector(std::string_view fieldName, int index, plg::vec3& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -756,6 +781,7 @@ public:
 	bool SetRepeatedVector(std::string_view fieldName, int index, const plg::vec3& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -770,6 +796,7 @@ public:
 	bool AddVector(std::string_view fieldName, const plg::vec3& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_REPEATED();
 
 		CMsgVector* msgVec = static_cast<CMsgVector*>(m_msg->GetReflection()->AddMessage(m_msg, field));
@@ -783,6 +810,7 @@ public:
 	bool GetVector4D(std::string_view fieldName, plg::vec4& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgVector* msgVec = static_cast<CMsgVector*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -797,6 +825,7 @@ public:
 	bool SetVector4D(std::string_view fieldName, const plg::vec4& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgVector* msgVec = static_cast<CMsgVector*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -811,6 +840,7 @@ public:
 	bool GetRepeatedVector4D(std::string_view fieldName, int index, plg::vec4& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -826,6 +856,7 @@ public:
 	bool SetRepeatedVector4D(std::string_view fieldName, int index, const plg::vec4& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -841,6 +872,7 @@ public:
 	bool AddVector4D(std::string_view fieldName, const plg::vec4& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgVector);
 		CHECK_FIELD_REPEATED();
 
 		CMsgVector* msgVec = static_cast<CMsgVector*>(m_msg->GetReflection()->AddMessage(m_msg, field));
@@ -855,6 +887,7 @@ public:
 	bool GetQAngle(std::string_view fieldName, plg::vec3& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgQAngle);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgQAngle* msgAng = static_cast<CMsgQAngle*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -868,6 +901,7 @@ public:
 	bool SetQAngle(std::string_view fieldName, const plg::vec3& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgQAngle);
 		CHECK_FIELD_NOT_REPEATED();
 
 		CMsgQAngle* msgAng = static_cast<CMsgQAngle*>(m_msg->GetReflection()->MutableMessage(m_msg, field));
@@ -881,6 +915,7 @@ public:
 	bool GetRepeatedQAngle(std::string_view fieldName, int index, plg::vec3& out) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgQAngle);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -895,6 +930,7 @@ public:
 	bool SetRepeatedQAngle(std::string_view fieldName, int index, const plg::vec3& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgQAngle);
 		CHECK_FIELD_REPEATED();
 		CHECK_REPEATED_ELEMENT(index);
 
@@ -909,6 +945,7 @@ public:
 	bool AddQAngle(std::string_view fieldName, const plg::vec3& vec) {
 		GETCHECK_FIELD();
 		CHECK_FIELD_TYPE(MESSAGE);
+		CHECK_FIELD_MESSAGE_TYPE(CMsgQAngle);
 		CHECK_FIELD_REPEATED();
 
 		CMsgQAngle* msgAng = static_cast<CMsgQAngle*>(m_msg->GetReflection()->AddMessage(m_msg, field));
