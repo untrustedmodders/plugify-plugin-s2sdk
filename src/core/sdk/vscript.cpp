@@ -93,7 +93,10 @@ namespace vscript {
 
 	void RegisterScriptClass(ScriptClassDesc_t* classDesc, void* instance) {
 		std::string_view className = classDesc->m_pszScriptName;
-		if (scriptClassMap.contains(className)) {
+		if (auto it = scriptClassMap.find(className); it != scriptClassMap.end()) {
+			if (instance) {
+				it->second.instance = instance;
+			}
 			return;
 		}
 
@@ -167,6 +170,11 @@ namespace vscript {
 			className
 		);
 		return {};
+	}
+
+	void* GetInstance(std::string_view className) {
+		auto it = scriptClassMap.find(className);
+		return it != scriptClassMap.end() ? it->second.instance : nullptr;
 	}
 
 	VScriptBinding GetBinding(const char* className, const char* functionName) {

@@ -66,44 +66,46 @@ public:
 	VSCRIPT_GLOBAL_FUNCTION(Warning, void, string)
 };
 
-#if 0
 class CDebugOverlayScriptHelper {
 public:
 	DECLARE_VSCRIPT_CLASS(CDebugOverlayScriptHelper);
 
-	VSCRIPT_MEMBER_FUNCTION(Axis, void, Vector, Quaternion, float, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Box, void, Vector, Vector, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(BoxAngles, void, Vector, Vector, Vector, Quaternion, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Capsule, void, Vector, Quaternion, float, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Circle, void, Vector, Quaternion, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(CircleScreenOriented, void, Vector, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Cone, void, Vector, Vector, float, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Cross, void, Vector, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Cross3D, void, Vector, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Cross3DOriented, void, Vector, Quaternion, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(DrawTickMarkedLine, void, Vector, Vector, float, int, int, int, int, int, bool, float)
+	using handle = int;
+	using string = const char*;
+	using vector = const Vector&;
+	using vector2d = const Vector2D&;
+	using quaternion = const Quaternion&;
+	VSCRIPT_MEMBER_FUNCTION(Axis, void, vector, quaternion, float, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Box, void, vector, vector, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(BoxAngles, void, vector, vector, vector, quaternion, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Capsule, void, vector, quaternion, float, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Circle, void, vector, quaternion, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(CircleScreenOriented, void, vector, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Cone, void, vector, vector, float, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Cross, void, vector, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Cross3D, void, vector, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Cross3DOriented, void, vector, quaternion, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(DrawTickMarkedLine, void, vector, vector, float, int, int, int, int, int, bool, float)
 	VSCRIPT_MEMBER_FUNCTION(EntityAttachments, void, handle, float, float)
 	VSCRIPT_MEMBER_FUNCTION(EntityAxis, void, handle, float, bool, float)
 	VSCRIPT_MEMBER_FUNCTION(EntityBounds, void, handle, int, int, int, int, bool, float)
 	VSCRIPT_MEMBER_FUNCTION(EntitySkeleton, void, handle, float)
 	VSCRIPT_MEMBER_FUNCTION(EntityText, void, handle, int, string, int, int, int, int, float)
-	VSCRIPT_MEMBER_FUNCTION(FilledRect2D, void, Vector2D, Vector2D, int, int, int, int, float)
-	VSCRIPT_MEMBER_FUNCTION(HorzArrow, void, Vector, Vector, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Line, void, Vector, Vector, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Line2D, void, Vector2D, Vector2D, int, int, int, int, float)
+	VSCRIPT_MEMBER_FUNCTION(FilledRect2D, void, vector2d, vector2d, int, int, int, int, float)
+	VSCRIPT_MEMBER_FUNCTION(HorzArrow, void, vector, vector, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Line, void, vector, vector, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Line2D, void, vector2d, vector2d, int, int, int, int, float)
 	VSCRIPT_MEMBER_FUNCTION(PopDebugOverlayScope, void)
 	VSCRIPT_MEMBER_FUNCTION(PushAndClearDebugOverlayScope, void, CUtlStringToken)
 	VSCRIPT_MEMBER_FUNCTION(PushDebugOverlayScope, void, CUtlStringToken)
 	VSCRIPT_MEMBER_FUNCTION(RemoveAllInScope, void, CUtlStringToken)
-	VSCRIPT_MEMBER_FUNCTION(SolidCone, void, Vector, Vector, float, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(Sphere, void, Vector, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(SweptBox, void, Vector, Vector, Vector, Vector, Quaternion, int, int, int, int, float)
-	VSCRIPT_MEMBER_FUNCTION(Text, void, Vector, int, string, float, int, int, int, int, float)
-	VSCRIPT_MEMBER_FUNCTION(Texture, void, string, Vector2D, Vector2D, int, int, int, int, Vector2D, Vector2D, float)
-	VSCRIPT_MEMBER_FUNCTION(Triangle, void, Vector, Vector, Vector, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(VectorText3D, void, Vector, Quaternion, string, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(VertArrow, void, Vector, Vector, float, int, int, int, int, bool, float)
-	VSCRIPT_MEMBER_FUNCTION(YawArrow, void, Vector, float, float, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(SolidCone, void, vector, vector, float, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(Sphere, void, vector, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(SweptBox, void, vector, vector, vector, vector, quaternion, int, int, int, int, float)
+	VSCRIPT_MEMBER_FUNCTION(Text, void, vector, int, string, float, int, int, int, int, float)
+	VSCRIPT_MEMBER_FUNCTION(Texture, void, string, vector2d, vector2d, int, int, int, int, vector2d, vector2d, float)
+	VSCRIPT_MEMBER_FUNCTION(Triangle, void, vector, vector, vector, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(VectorText3D, void, vector, quaternion, string, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(VertArrow, void, vector, vector, float, int, int, int, int, bool, float)
+	VSCRIPT_MEMBER_FUNCTION(YawArrow, void, vector, float, float, float, int, int, int, int, bool, float)
 };
-
-#endif

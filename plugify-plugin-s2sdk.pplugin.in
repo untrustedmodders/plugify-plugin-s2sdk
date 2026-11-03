@@ -6235,6 +6235,1790 @@
       }
     },
     {
+      "name": "DebugAxis",
+      "group": "Debug",
+      "description": "Draws an axis at a specified world-space origin.",
+      "funcName": "DebugAxis",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The origin of the axis in world space."
+        },
+        {
+          "name": "orientation",
+          "type": "vec4",
+          "ref": false,
+          "description": "The orientation as a quaternion."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "ref": false,
+          "description": "The scale of the axis."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the axis."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugBox",
+      "group": "Debug",
+      "description": "Draws a world-space axis-aligned box.",
+      "funcName": "DebugBox",
+      "paramTypes": [
+        {
+          "name": "mins",
+          "type": "vec3",
+          "ref": false,
+          "description": "The minimum corner of the box in world space."
+        },
+        {
+          "name": "maxs",
+          "type": "vec3",
+          "ref": false,
+          "description": "The maximum corner of the box in world space."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the box."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugBoxAngles",
+      "group": "Debug",
+      "description": "Draws an oriented box in world space.",
+      "funcName": "DebugBoxAngles",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The box origin in world space."
+        },
+        {
+          "name": "mins",
+          "type": "vec3",
+          "ref": false,
+          "description": "The local-space minimum corner."
+        },
+        {
+          "name": "maxs",
+          "type": "vec3",
+          "ref": false,
+          "description": "The local-space maximum corner."
+        },
+        {
+          "name": "orientation",
+          "type": "vec4",
+          "ref": false,
+          "description": "The box orientation as a quaternion."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the box."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugCapsule",
+      "group": "Debug",
+      "description": "Draws a capsule in world space.",
+      "funcName": "DebugCapsule",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The capsule origin in world space."
+        },
+        {
+          "name": "orientation",
+          "type": "vec4",
+          "ref": false,
+          "description": "The capsule orientation as a quaternion."
+        },
+        {
+          "name": "radius",
+          "type": "float",
+          "ref": false,
+          "description": "The capsule radius."
+        },
+        {
+          "name": "halfHeight",
+          "type": "float",
+          "ref": false,
+          "description": "Half the capsule height."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the capsule."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugCircle",
+      "group": "Debug",
+      "description": "Draws a circle in world space.",
+      "funcName": "DebugCircle",
+      "paramTypes": [
+        {
+          "name": "center",
+          "type": "vec3",
+          "ref": false,
+          "description": "The center of the circle in world space."
+        },
+        {
+          "name": "orientation",
+          "type": "vec4",
+          "ref": false,
+          "description": "The orientation as a quaternion."
+        },
+        {
+          "name": "radius",
+          "type": "float",
+          "ref": false,
+          "description": "The circle radius."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the circle."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugCircleScreenOriented",
+      "group": "Debug",
+      "description": "Draws a screen-oriented circle in world space.",
+      "funcName": "DebugCircleScreenOriented",
+      "paramTypes": [
+        {
+          "name": "center",
+          "type": "vec3",
+          "ref": false,
+          "description": "The center of the circle in world space."
+        },
+        {
+          "name": "radius",
+          "type": "float",
+          "ref": false,
+          "description": "The radius of the circle."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the circle."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugCone",
+      "group": "Debug",
+      "description": "Draws a wireframe cone in world space.",
+      "funcName": "DebugCone",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The base position of the cone in world space."
+        },
+        {
+          "name": "direction",
+          "type": "vec3",
+          "ref": false,
+          "description": "The direction vector of the cone in world space."
+        },
+        {
+          "name": "radius",
+          "type": "float",
+          "ref": false,
+          "description": "The cone base radius."
+        },
+        {
+          "name": "height",
+          "type": "float",
+          "ref": false,
+          "description": "The cone height."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the cone."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugCross",
+      "group": "Debug",
+      "description": "Draws a screen-aligned cross in world space.",
+      "funcName": "DebugCross",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The center position of the cross in world space."
+        },
+        {
+          "name": "size",
+          "type": "float",
+          "ref": false,
+          "description": "The size of the cross."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the cross."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugCross3D",
+      "group": "Debug",
+      "description": "Draws a world-aligned cross in world space.",
+      "funcName": "DebugCross3D",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The center of the cross in world space."
+        },
+        {
+          "name": "size",
+          "type": "float",
+          "ref": false,
+          "description": "The size of the cross."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the cross."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugCross3DOriented",
+      "group": "Debug",
+      "description": "Draws an oriented cross in world space.",
+      "funcName": "DebugCross3DOriented",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "The center position of the cross."
+        },
+        {
+          "name": "orientation",
+          "type": "vec4",
+          "ref": false,
+          "description": "The orientation of the cross as a quaternion."
+        },
+        {
+          "name": "size",
+          "type": "float",
+          "ref": false,
+          "description": "The size of the cross."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the cross."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugDrawTickMarkedLine",
+      "group": "Debug",
+      "description": "Draws a dashed (tick-marked) line in world space.",
+      "funcName": "DebugDrawTickMarkedLine",
+      "paramTypes": [
+        {
+          "name": "start",
+          "type": "vec3",
+          "ref": false,
+          "description": "The start point in world space."
+        },
+        {
+          "name": "end",
+          "type": "vec3",
+          "ref": false,
+          "description": "The end point in world space."
+        },
+        {
+          "name": "tickDist",
+          "type": "float",
+          "ref": false,
+          "description": "Distance between tick marks."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "tickCount",
+          "type": "int32",
+          "ref": false,
+          "description": "tickCount"
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the line."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugEntityAttachments",
+      "group": "Debug",
+      "description": "Draws the attachments of an entity.",
+      "funcName": "DebugEntityAttachments",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "Entity handle."
+        },
+        {
+          "name": "size",
+          "type": "float",
+          "ref": false,
+          "description": "Size of attachment markers."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugEntityAxis",
+      "group": "Debug",
+      "description": "Draws the local axis of an entity at its origin.",
+      "funcName": "DebugEntityAxis",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "Entity handle."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "ref": false,
+          "description": "Axis size."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugEntityBounds",
+      "group": "Debug",
+      "description": "Draws an entity\u2019s world-space bounding box.",
+      "funcName": "DebugEntityBounds",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "Entity handle."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugEntitySkeleton",
+      "group": "Debug",
+      "description": "Draws the skeleton of a model for a given entity.",
+      "funcName": "DebugEntitySkeleton",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "Entity handle."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugEntityText",
+      "group": "Debug",
+      "description": "Draws text attached to an entity.",
+      "funcName": "DebugEntityText",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "Entity handle."
+        },
+        {
+          "name": "textOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "Offset index for text position."
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "ref": false,
+          "description": "Text to display."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugFilledRect2D",
+      "group": "Debug",
+      "description": "Draws a filled 2D rectangle in screen space.",
+      "funcName": "DebugFilledRect2D",
+      "paramTypes": [
+        {
+          "name": "min",
+          "type": "vec2",
+          "ref": false,
+          "description": "The top-left corner in pixels."
+        },
+        {
+          "name": "max",
+          "type": "vec2",
+          "ref": false,
+          "description": "The bottom-right corner in pixels."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugHorzArrow",
+      "group": "Debug",
+      "description": "Draws a horizontal arrow between two points in world space.",
+      "funcName": "DebugHorzArrow",
+      "paramTypes": [
+        {
+          "name": "start",
+          "type": "vec3",
+          "ref": false,
+          "description": "The start point in world space."
+        },
+        {
+          "name": "end",
+          "type": "vec3",
+          "ref": false,
+          "description": "The end point in world space."
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "ref": false,
+          "description": "Arrow width."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugLine",
+      "group": "Debug",
+      "description": "Draws a 3D line between two world-space points.",
+      "funcName": "DebugLine",
+      "paramTypes": [
+        {
+          "name": "start",
+          "type": "vec3",
+          "ref": false,
+          "description": "The start point."
+        },
+        {
+          "name": "end",
+          "type": "vec3",
+          "ref": false,
+          "description": "The end point."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugLine2D",
+      "group": "Debug",
+      "description": "Draws a line between two points in screen space.",
+      "funcName": "DebugLine2D",
+      "paramTypes": [
+        {
+          "name": "start",
+          "type": "vec2",
+          "ref": false,
+          "description": "The start position in pixels."
+        },
+        {
+          "name": "end",
+          "type": "vec2",
+          "ref": false,
+          "description": "The end position in pixels."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugPopDebugOverlayScope",
+      "group": "Debug",
+      "description": "Pops the current debug overlay scope, ending a grouped overlay batch.",
+      "funcName": "DebugPopDebugOverlayScope",
+      "paramTypes": [],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugPushAndClearDebugOverlayScope",
+      "group": "Debug",
+      "description": "Pushes a new debug overlay scope and clears all overlays with this identifier.",
+      "funcName": "DebugPushAndClearDebugOverlayScope",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "Overlay scope name."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugPushDebugOverlayScope",
+      "group": "Debug",
+      "description": "Pushes a new debug overlay scope without clearing.",
+      "funcName": "DebugPushDebugOverlayScope",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "Overlay scope name."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugRemoveAllInScope",
+      "group": "Debug",
+      "description": "Removes all debug overlays marked with a specific identifier.",
+      "funcName": "DebugRemoveAllInScope",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "Overlay scope name."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugSolidCone",
+      "group": "Debug",
+      "description": "Draws a solid cone in world space.",
+      "funcName": "DebugSolidCone",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "Base position of the cone in world space."
+        },
+        {
+          "name": "direction",
+          "type": "vec3",
+          "ref": false,
+          "description": "Direction vector of the cone in world space."
+        },
+        {
+          "name": "radius",
+          "type": "float",
+          "ref": false,
+          "description": "Base radius of the cone."
+        },
+        {
+          "name": "height",
+          "type": "float",
+          "ref": false,
+          "description": "Cone height."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the cone."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugSphere",
+      "group": "Debug",
+      "description": "Draws a wireframe sphere in world space.",
+      "funcName": "DebugSphere",
+      "paramTypes": [
+        {
+          "name": "center",
+          "type": "vec3",
+          "ref": false,
+          "description": "Center of the sphere in world space."
+        },
+        {
+          "name": "radius",
+          "type": "float",
+          "ref": false,
+          "description": "Sphere radius."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the sphere."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugSweptBox",
+      "group": "Debug",
+      "description": "Draws a swept box between two points in world space.",
+      "funcName": "DebugSweptBox",
+      "paramTypes": [
+        {
+          "name": "start",
+          "type": "vec3",
+          "ref": false,
+          "description": "Start point in world space."
+        },
+        {
+          "name": "end",
+          "type": "vec3",
+          "ref": false,
+          "description": "End point in world space."
+        },
+        {
+          "name": "mins",
+          "type": "vec3",
+          "ref": false,
+          "description": "Local-space minimum bounds."
+        },
+        {
+          "name": "maxs",
+          "type": "vec3",
+          "ref": false,
+          "description": "Local-space maximum bounds."
+        },
+        {
+          "name": "orientation",
+          "type": "vec4",
+          "ref": false,
+          "description": "Orientation of the box."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the swept box."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugText",
+      "group": "Debug",
+      "description": "Draws 2D text in world space.",
+      "funcName": "DebugText",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "Origin of the text in world space."
+        },
+        {
+          "name": "lineOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "Line offset index."
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "ref": false,
+          "description": "Text to display."
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "ref": false,
+          "description": "Text scale factor."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugTexture",
+      "group": "Debug",
+      "description": "Draws a textured rectangle on screen.",
+      "funcName": "DebugTexture",
+      "paramTypes": [
+        {
+          "name": "textureName",
+          "type": "string",
+          "ref": false,
+          "description": "Name of the texture to draw."
+        },
+        {
+          "name": "min",
+          "type": "vec2",
+          "ref": false,
+          "description": "Top-left screen-space coordinate in pixels."
+        },
+        {
+          "name": "max",
+          "type": "vec2",
+          "ref": false,
+          "description": "Bottom-right screen-space coordinate in pixels."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "uvMin",
+          "type": "vec2",
+          "ref": false,
+          "description": "Minimum UV coordinate."
+        },
+        {
+          "name": "uvMax",
+          "type": "vec2",
+          "ref": false,
+          "description": "Maximum UV coordinate."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the texture."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugTriangle",
+      "group": "Debug",
+      "description": "Draws a filled triangle in world space.",
+      "funcName": "DebugTriangle",
+      "paramTypes": [
+        {
+          "name": "v1",
+          "type": "vec3",
+          "ref": false,
+          "description": "First vertex."
+        },
+        {
+          "name": "v2",
+          "type": "vec3",
+          "ref": false,
+          "description": "Second vertex."
+        },
+        {
+          "name": "v3",
+          "type": "vec3",
+          "ref": false,
+          "description": "Third vertex."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the triangle."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugVectorText3D",
+      "group": "Debug",
+      "description": "Draws 3D text in world space with orientation.",
+      "funcName": "DebugVectorText3D",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "Origin position in world space."
+        },
+        {
+          "name": "orientation",
+          "type": "vec4",
+          "ref": false,
+          "description": "Orientation of the text."
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "ref": false,
+          "description": "Text to display."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the text."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugVertArrow",
+      "group": "Debug",
+      "description": "Draws a vertical arrow between two points in world space.",
+      "funcName": "DebugVertArrow",
+      "paramTypes": [
+        {
+          "name": "start",
+          "type": "vec3",
+          "ref": false,
+          "description": "Start point in world space."
+        },
+        {
+          "name": "end",
+          "type": "vec3",
+          "ref": false,
+          "description": "End point in world space."
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "ref": false,
+          "description": "Arrow width."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "DebugYawArrow",
+      "group": "Debug",
+      "description": "Draws a yaw-based directional arrow in world space.",
+      "funcName": "DebugYawArrow",
+      "paramTypes": [
+        {
+          "name": "origin",
+          "type": "vec3",
+          "ref": false,
+          "description": "Origin position in world space."
+        },
+        {
+          "name": "yaw",
+          "type": "float",
+          "ref": false,
+          "description": "Yaw angle in degrees."
+        },
+        {
+          "name": "length",
+          "type": "float",
+          "ref": false,
+          "description": "Length of the arrow."
+        },
+        {
+          "name": "width",
+          "type": "float",
+          "ref": false,
+          "description": "Arrow width."
+        },
+        {
+          "name": "r",
+          "type": "int32",
+          "ref": false,
+          "description": "Red color value."
+        },
+        {
+          "name": "g",
+          "type": "int32",
+          "ref": false,
+          "description": "Green color value."
+        },
+        {
+          "name": "b",
+          "type": "int32",
+          "ref": false,
+          "description": "Blue color value."
+        },
+        {
+          "name": "a",
+          "type": "int32",
+          "ref": false,
+          "description": "Alpha (transparency) value."
+        },
+        {
+          "name": "zTest",
+          "type": "bool",
+          "ref": false,
+          "description": "Whether to perform depth testing."
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "ref": false,
+          "description": "Duration (in seconds) to display the arrow."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "AnglesDiff",
       "group": "Math",
       "description": "Returns angular difference in degrees",

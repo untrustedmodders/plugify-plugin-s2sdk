@@ -26,6 +26,7 @@ namespace vscript {
 
 	VScriptBinding GetBinding(std::string_view className, std::string_view functionName);
 	VScriptBinding GetBinding(const char* className, const char* functionName);
+	void* GetInstance(std::string_view className);
 }// namespace schema
 
 template<
