@@ -23687,6 +23687,30 @@
       }
     },
     {
+      "name": "OnClientConnect_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientConnect_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientConnectCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientConnect_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnClientConnect_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -23716,6 +23740,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnClientConnectedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientConnected_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientConnected_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientConnectedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientConnected_Register uses 0."
         }
       ],
       "retType": {
@@ -23759,6 +23807,30 @@
       }
     },
     {
+      "name": "OnClientPutInServer_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientPutInServer_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientPutInServerCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientPutInServer_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnClientPutInServer_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -23788,6 +23860,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnClientDisconnectCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientDisconnect_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientDisconnect_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientDisconnectCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientDisconnect_Register uses 0."
         }
       ],
       "retType": {
@@ -23831,6 +23927,30 @@
       }
     },
     {
+      "name": "OnClientActive_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientActive_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientActiveCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientActive_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnClientActive_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -23860,6 +23980,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnClientSignonStateChangedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSignonStateChanged_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientSignonStateChanged_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSignonStateChangedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientSignonStateChanged_Register uses 0."
         }
       ],
       "retType": {
@@ -23903,6 +24047,30 @@
       }
     },
     {
+      "name": "OnClientFullyConnect_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientFullyConnect_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientFullyConnectCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientFullyConnect_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnClientFullyConnect_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -23932,6 +24100,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnClientSettingsChangedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSettingsChanged_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientSettingsChanged_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSettingsChangedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientSettingsChanged_Register uses 0."
         }
       ],
       "retType": {
@@ -23975,6 +24167,30 @@
       }
     },
     {
+      "name": "OnClientAuthenticated_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientAuthenticated_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientAuthenticatedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientAuthenticated_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnClientAuthenticated_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24004,6 +24220,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnRoundTerminatedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnRoundTerminated_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnRoundTerminated_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnRoundTerminatedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnRoundTerminated_Register uses 0."
         }
       ],
       "retType": {
@@ -24047,6 +24287,30 @@
       }
     },
     {
+      "name": "OnEntityCreated_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnEntityCreated_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnEntityCreatedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnEntityCreated_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnEntityCreated_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24076,6 +24340,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnEntitySpawnedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnEntitySpawned_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnEntitySpawned_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnEntitySpawnedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnEntitySpawned_Register uses 0."
         }
       ],
       "retType": {
@@ -24119,6 +24407,30 @@
       }
     },
     {
+      "name": "OnEntityDeleted_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnEntityDeleted_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnEntityDeletedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnEntityDeleted_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnEntityDeleted_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24148,6 +24460,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnEntityParentChangedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnEntityParentChanged_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnEntityParentChanged_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnEntityParentChangedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnEntityParentChanged_Register uses 0."
         }
       ],
       "retType": {
@@ -24191,6 +24527,30 @@
       }
     },
     {
+      "name": "OnServerCheckTransmit_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnServerCheckTransmit_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnServerCheckTransmitCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnServerCheckTransmit_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnServerCheckTransmit_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24220,6 +24580,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnServerStartupCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnServerStartup_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnServerStartup_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnServerStartupCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnServerStartup_Register uses 0."
         }
       ],
       "retType": {
@@ -24263,6 +24647,30 @@
       }
     },
     {
+      "name": "OnBuildGameSessionManifest_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnBuildGameSessionManifest_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnBuildGameSessionManifestCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnBuildGameSessionManifest_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnBuildGameSessionManifest_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24292,6 +24700,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnServerActivateCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnServerActivate_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnServerActivate_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnServerActivateCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnServerActivate_Register uses 0."
         }
       ],
       "retType": {
@@ -24335,6 +24767,30 @@
       }
     },
     {
+      "name": "OnServerSpawn_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnServerSpawn_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnServerSpawnCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnServerSpawn_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnServerSpawn_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24364,6 +24820,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnServerStartedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnServerStarted_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnServerStarted_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnServerStartedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnServerStarted_Register uses 0."
         }
       ],
       "retType": {
@@ -24407,6 +24887,30 @@
       }
     },
     {
+      "name": "OnMapStart_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnMapStart_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnMapStartCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnMapStart_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnMapStart_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24436,6 +24940,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnMapEndCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnMapEnd_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnMapEnd_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnMapEndCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnMapEnd_Register uses 0."
         }
       ],
       "retType": {
@@ -24479,6 +25007,30 @@
       }
     },
     {
+      "name": "OnGameFrame_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnGameFrame_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnGameFrameCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnGameFrame_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnGameFrame_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24508,6 +25060,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnUpdateWhenNotInGameCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnUpdateWhenNotInGame_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnUpdateWhenNotInGame_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnUpdateWhenNotInGameCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnUpdateWhenNotInGame_Register uses 0."
         }
       ],
       "retType": {
@@ -24551,6 +25127,30 @@
       }
     },
     {
+      "name": "OnPreWorldUpdate_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnPreWorldUpdate_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnPreWorldUpdateCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnPreWorldUpdate_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnPreWorldUpdate_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24587,6 +25187,30 @@
       }
     },
     {
+      "name": "OnSendNetMessage_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnSendNetMessage_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnSendNetMessageCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnSendNetMessage_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnSendNetMessage_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
@@ -24616,6 +25240,30 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnSerializeMessageCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnSerializeMessage_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnSerializeMessage_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnSerializeMessageCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnSerializeMessage_Register uses 0."
         }
       ],
       "retType": {
