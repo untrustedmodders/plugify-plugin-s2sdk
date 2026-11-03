@@ -290,6 +290,8 @@ extern "C" PLUGIN_API void DebugCapsule(const plg::vec3& origin, const plg::vec4
 /**
  * @brief Draws a circle in world space.
  *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
+ *
  * @param center The center of the circle in world space.
  * @param orientation The orientation as a quaternion.
  * @param radius The circle radius.
@@ -311,6 +313,8 @@ extern "C" PLUGIN_API void DebugCircle(const plg::vec3& center, const plg::vec4&
 
 /**
  * @brief Draws a screen-oriented circle in world space.
+ *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
  *
  * @param center The center of the circle in world space.
  * @param radius The radius of the circle.
@@ -353,6 +357,8 @@ extern "C" PLUGIN_API void DebugCone(const plg::vec3& origin, const plg::vec3& d
 
 /**
  * @brief Draws a screen-aligned cross in world space.
+ *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
  *
  * @param origin The center position of the cross in world space.
  * @param size The size of the cross.
@@ -411,6 +417,8 @@ extern "C" PLUGIN_API void DebugCross3DOriented(const plg::vec3& origin, const p
 
 /**
  * @brief Draws a dashed (tick-marked) line in world space.
+ *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
  *
  * @param start The start point in world space.
  * @param end The end point in world space.
@@ -480,6 +488,8 @@ extern "C" PLUGIN_API void DebugEntityBounds(int entityHandle, int r, int g, int
 /**
  * @brief Draws the skeleton of a model for a given entity.
  *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
+ *
  * @param entityHandle Entity handle.
  * @param duration Duration (in seconds) to display.
  */
@@ -510,6 +520,8 @@ extern "C" PLUGIN_API void DebugEntityText(int entityHandle, int textOffset, con
 
 /**
  * @brief Draws a filled 2D rectangle in screen space.
+ *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
  *
  * @param min The top-left corner in pixels.
  * @param max The bottom-right corner in pixels.
@@ -574,6 +586,8 @@ extern "C" PLUGIN_API void DebugLine(const plg::vec3& start, const plg::vec3& en
 /**
  * @brief Draws a line between two points in screen space.
  *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
+ *
  * @param start The start position in pixels.
  * @param end The end position in pixels.
  * @param r Red color value.
@@ -635,6 +649,8 @@ extern "C" PLUGIN_API void DebugRemoveAllInScope(const plg::string& name) {
 
 /**
  * @brief Draws a solid cone in world space.
+ *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
  *
  * @param origin Base position of the cone in world space.
  * @param direction Direction vector of the cone in world space.
@@ -754,6 +770,8 @@ extern "C" PLUGIN_API void DebugTexture(const plg::string& textureName, const pl
 /**
  * @brief Draws a filled triangle in world space.
  *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
+ *
  * @param v1 First vertex.
  * @param v2 Second vertex.
  * @param v3 Third vertex.
@@ -776,6 +794,8 @@ extern "C" PLUGIN_API void DebugTriangle(const plg::vec3& v1, const plg::vec3& v
 
 /**
  * @brief Draws 3D text in world space with orientation.
+ *
+ * Not displayed on clients of a dedicated server: the server does not send this primitive.
  *
  * @param origin Origin position in world space.
  * @param orientation Orientation of the text.

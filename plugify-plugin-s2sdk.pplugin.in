@@ -6479,7 +6479,7 @@
     {
       "name": "DebugCircle",
       "group": "Debug",
-      "description": "Draws a circle in world space.",
+      "description": "Draws a circle in world space. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugCircle",
       "paramTypes": [
         {
@@ -6544,7 +6544,7 @@
     {
       "name": "DebugCircleScreenOriented",
       "group": "Debug",
-      "description": "Draws a screen-oriented circle in world space.",
+      "description": "Draws a screen-oriented circle in world space. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugCircleScreenOriented",
       "paramTypes": [
         {
@@ -6674,7 +6674,7 @@
     {
       "name": "DebugCross",
       "group": "Debug",
-      "description": "Draws a screen-aligned cross in world space.",
+      "description": "Draws a screen-aligned cross in world space. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugCross",
       "paramTypes": [
         {
@@ -6857,7 +6857,7 @@
     {
       "name": "DebugDrawTickMarkedLine",
       "group": "Debug",
-      "description": "Draws a dashed (tick-marked) line in world space.",
+      "description": "Draws a dashed (tick-marked) line in world space. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugDrawTickMarkedLine",
       "paramTypes": [
         {
@@ -7045,7 +7045,7 @@
     {
       "name": "DebugEntitySkeleton",
       "group": "Debug",
-      "description": "Draws the skeleton of a model for a given entity.",
+      "description": "Draws the skeleton of a model for a given entity. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugEntitySkeleton",
       "paramTypes": [
         {
@@ -7127,7 +7127,7 @@
     {
       "name": "DebugFilledRect2D",
       "group": "Debug",
-      "description": "Draws a filled 2D rectangle in screen space.",
+      "description": "Draws a filled 2D rectangle in screen space. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugFilledRect2D",
       "paramTypes": [
         {
@@ -7304,7 +7304,7 @@
     {
       "name": "DebugLine2D",
       "group": "Debug",
-      "description": "Draws a line between two points in screen space.",
+      "description": "Draws a line between two points in screen space. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugLine2D",
       "paramTypes": [
         {
@@ -7418,7 +7418,7 @@
     {
       "name": "DebugSolidCone",
       "group": "Debug",
-      "description": "Draws a solid cone in world space.",
+      "description": "Draws a solid cone in world space. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugSolidCone",
       "paramTypes": [
         {
@@ -7755,7 +7755,7 @@
     {
       "name": "DebugTriangle",
       "group": "Debug",
-      "description": "Draws a filled triangle in world space.",
+      "description": "Draws a filled triangle in world space. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugTriangle",
       "paramTypes": [
         {
@@ -7820,7 +7820,7 @@
     {
       "name": "DebugVectorText3D",
       "group": "Debug",
-      "description": "Draws 3D text in world space with orientation.",
+      "description": "Draws 3D text in world space with orientation. Not displayed on clients of a dedicated server: the server does not send this primitive.",
       "funcName": "DebugVectorText3D",
       "paramTypes": [
         {
