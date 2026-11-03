@@ -275,10 +275,6 @@ public:
 
 	int entindex() { return m_pEntity->m_EHandle.GetEntryIndex(); }
 
-	string GetName() {
-		return m_iGlobalname->String();
-	}
-
 	void SetCollisionGroup(StandardCollisionGroups_t collisionGroup) {
 		if (m_pCollision == nullptr)
 			return;
