@@ -29,15 +29,15 @@ public:
 	using string = const char*;
 	using vector = Vector;
 	VSCRIPT_GLOBAL_FUNCTION(DebugBreak, void)
-	VSCRIPT_GLOBAL_FUNCTION(DebugDrawBox, void, vector, vector, vector, int, int, int, int, float)
+	VSCRIPT_GLOBAL_FUNCTION(DebugDrawBox, void, const Vector&, const Vector&, const Vector&, int, int, int, int, float)
 	VSCRIPT_GLOBAL_FUNCTION(DebugDrawBoxDirection, void, vector, vector, vector, vector, vector, float, float)
 	VSCRIPT_GLOBAL_FUNCTION(DebugDrawCircle, void, vector, vector, float, float, bool, float)
 	VSCRIPT_GLOBAL_FUNCTION(DebugDrawClear, void)
-	VSCRIPT_GLOBAL_FUNCTION(DebugDrawLine, void, vector, vector, int, int, int, bool, float)
+	VSCRIPT_GLOBAL_FUNCTION(DebugDrawLine, void, const Vector&, const Vector&, int, int, int, bool, float)
 	VSCRIPT_GLOBAL_FUNCTION(DebugDrawLine_vCol, void, vector, vector, vector, bool, float)
 	VSCRIPT_GLOBAL_FUNCTION(DebugDrawScreenTextLine, void, float, float, int, string, int, int, int, int, float)
 	VSCRIPT_GLOBAL_FUNCTION(DebugDrawSphere, void, vector, vector, float, float, bool, float)
-	VSCRIPT_GLOBAL_FUNCTION(DebugDrawText, void, vector, string, bool, float)
+	VSCRIPT_GLOBAL_FUNCTION(DebugDrawText, void, const Vector&, string, bool, float)
 	VSCRIPT_GLOBAL_FUNCTION(DebugScreenTextPretty, void, float, float, int, string, int, int, int, int, float, string, int, bool)
 	VSCRIPT_GLOBAL_FUNCTION(DoScriptAssert, void, bool, string)
 };
