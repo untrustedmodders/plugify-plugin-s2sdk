@@ -76,10 +76,6 @@
         SetClientName;
         GetClientTime;
         GetClientLatency;
-        GetUserFlagBits;
-        SetUserFlagBits;
-        AddUserFlags;
-        RemoveUserFlags;
         IsClientAuthorized;
         IsClientConnected;
         IsClientInGame;
