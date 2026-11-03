@@ -47,6 +47,8 @@ bool EntityOutputManager::UnhookEntityOutput(std::string_view classname, std::st
 ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntityInstance* activator, CEntityInstance* caller, float delay) {
 	std::scoped_lock lock(m_mutex);
 
+	auto& callbackHooks = m_callbackStack.emplace();
+
 	if (caller) {
 		plg::print(LS_DETAILED, "[EntityOutputManager][FireOutputHook] - {}, {}\n", self->GetDescription()->m_pName, caller->GetClassname());
 
@@ -57,12 +59,10 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 				OutputView{caller->GetClassname(), "*"}
 		};
 
-		m_callbackHooks.clear();
-
 		for (const auto& searchKey : searchKeys) {
 			auto it = m_hookMap.find(searchKey);
 			if (it != m_hookMap.end()) {
-				m_callbackHooks.push_back(it->second);
+				callbackHooks.push_back(it->second);
 			}
 		}
 	} else {
@@ -74,19 +74,27 @@ ResultType EntityOutputManager::FireOutputInternal(CEntityIOOutput* self, CEntit
 	int activatorHandle = activator != nullptr ? activator->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 	int callerHandle = caller != nullptr ? caller->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 
-	for (const auto& hook : m_callbackHooks) {
+	for (const auto& hook : callbackHooks) {
 		if (auto funcs = hook->callbacks[HookMode::Pre].Get()) {
 			for (const auto& func : funcs->handlers) {
 				auto thisResult = func(activatorHandle, callerHandle, delay);
-				if (thisResult >= ResultType::Stop) {
-					break;
-				}
-
 				if (thisResult > result) {
 					result = thisResult;
 				}
+
+				if (result >= ResultType::Stop) {
+					break;
+				}
 			}
 		}
+
+		if (result >= ResultType::Stop) {
+			break;
+		}
+	}
+
+	if (result >= ResultType::Handled) {
+		callbackHooks.clear();
 	}
 
 	return result;
@@ -97,7 +105,14 @@ ResultType EntityOutputManager::FireOutputInternal_Post(CEntityIOOutput* self, C
 	int callerHandle = caller != nullptr ? caller->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 
 	std::scoped_lock lock(m_mutex);
-	for (const auto& hook : m_callbackHooks) {
+	if (m_callbackStack.empty()) {
+		return ResultType::Continue;
+	}
+
+	auto callbackHooks = std::move(m_callbackStack.top());
+	m_callbackStack.pop();
+
+	for (const auto& hook : callbackHooks) {
 		auto& callback = hook->callbacks[HookMode::Post];
 		callback(activatorHandle, callerHandle, delay);
 	}

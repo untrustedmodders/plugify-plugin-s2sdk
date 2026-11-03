@@ -35,7 +35,7 @@ public:
 private:
 	plg::flat_hash_map<OutputStr, std::shared_ptr<EntityOutputHook>, plg::pair_hash, std::equal_to<>> m_hookMap;
 	std::recursive_mutex m_mutex;
-	std::inplace_vector<std::shared_ptr<EntityOutputHook>, 4> m_callbackHooks;
+	std::stack<std::inplace_vector<std::shared_ptr<EntityOutputHook>, 4>> m_callbackStack;
 };
 inline EntityOutputManager& g_EntityOutputManager = EntityOutputManager::Instance();
 
