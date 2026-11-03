@@ -80,7 +80,7 @@ namespace vscript {
 										   scriptFunction->m_desc.m_pszDescription : "(none)");
 		plg::print(LS_DETAILED, "│ Returns:     {}\n", GetScriptTypeName(scriptFunction->m_desc.m_ReturnType));
 		plg::print(LS_DETAILED, "│ Parameters:  {}\n", scriptFunction->m_desc.m_iParamCount);
-		plg::print(LS_DETAILED, "│ Address:     {:#x}\n", reinterpret_cast<uintptr_t>(binding.funcadr));
+		plg::print(LS_DETAILED, "│ Address:     {:#x}\n", reinterpret_cast<uintptr_t>(binding.funcaddr));
 		plg::print(LS_DETAILED, "│ Virtual:     {}\n", binding.vtable_index != -1 ? "yes" : "no");
 		if (binding.vtable_index != -1) {
 			plg::print(LS_DETAILED, "│ VTable idx:  {}\n", binding.vtable_index);
