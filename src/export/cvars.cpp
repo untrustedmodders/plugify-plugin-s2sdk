@@ -392,7 +392,7 @@ extern "C" PLUGIN_API ConVarHandle FindConVar2(const plg::string& name, EConVarT
  *
  * @param conVarHandle The handle to the console variable data.
  * @param callback The callback function to be executed when the variable's value changes.
- * @return A boolean indicating whether the command was successfully added.
+ * @return True if the callback was registered, false if the convar is invalid or the callback is already registered.
  */
 extern "C" PLUGIN_API bool HookConVarChange(uint64 conVarHandle, ConVarListenerCallback callback) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {
@@ -410,7 +410,7 @@ extern "C" PLUGIN_API bool HookConVarChange(uint64 conVarHandle, ConVarListenerC
  *
  * @param conVarHandle The handle to the console variable data.
  * @param callback The callback function to be removed.
- * @return A boolean indicating whether the command was successfully added.
+ * @return True if the callback was removed, false if the convar is invalid or the callback was not registered.
  */
 extern "C" PLUGIN_API bool UnhookConVarChange(uint64 conVarHandle, ConVarListenerCallback callback) {
 	if (auto conVar = cvars::CreateConVar(conVarHandle)) {

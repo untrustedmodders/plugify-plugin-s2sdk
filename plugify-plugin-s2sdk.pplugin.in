@@ -12537,7 +12537,8 @@
         }
       ],
       "retType": {
-        "type": "void"
+        "type": "bool",
+        "description": "True if the callback was registered, false if the convar is invalid or the callback is already registered."
       }
     },
     {
@@ -12561,7 +12562,8 @@
         }
       ],
       "retType": {
-        "type": "void"
+        "type": "bool",
+        "description": "True if the callback was removed, false if the convar is invalid or the callback was not registered."
       }
     },
     {
