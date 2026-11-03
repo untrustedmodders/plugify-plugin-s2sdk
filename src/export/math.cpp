@@ -205,7 +205,7 @@ extern "C" PLUGIN_API QAngle VectorToAngles(const Vector& input) {
  * @return Random float in range [min, max]
  */
 extern "C" PLUGIN_API float RandomFlt(float min, float max) {
-	return Math{}.RandomFloat(min, max);
+	return Math{}.RandomFloatWrapper(min, max);
 }
 
 /**
