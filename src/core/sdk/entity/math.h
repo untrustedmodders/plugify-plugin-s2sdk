@@ -30,7 +30,7 @@ public:
 	using quaternion = const Quaternion&;
 
 	VSCRIPT_GLOBAL_FUNCTION(AngleDiff, float, float, float)
-	VSCRIPT_GLOBAL_FUNCTION(AnglesToVector, Vector, qangle)
+	VSCRIPT_GLOBAL_FUNCTION(AnglesToVector, Vector, QAngle)
 	VSCRIPT_GLOBAL_FUNCTION(AxisAngleToQuaternion, Quaternion, vector, float)
 	VSCRIPT_GLOBAL_FUNCTION(CalcClosestPointOnEntityOBB, Vector, HSCRIPT, vector)
 	VSCRIPT_GLOBAL_FUNCTION(CalcDistanceBetweenEntityOBB, float, HSCRIPT, HSCRIPT)
@@ -46,7 +46,7 @@ public:
 	VSCRIPT_GLOBAL_FUNCTION(RotationDeltaAsAngularVelocity, Vector, qangle, qangle)
 	VSCRIPT_GLOBAL_FUNCTION(SplineQuaternions, Quaternion, quaternion, quaternion, float)
 	VSCRIPT_GLOBAL_FUNCTION(SplineVectors, Vector, vector, vector, float)
-	VSCRIPT_GLOBAL_FUNCTION(VectorToAngles, QAngle, vector)
+	VSCRIPT_GLOBAL_FUNCTION(VectorToAngles, QAngle, Vector)
 	VSCRIPT_GLOBAL_FUNCTION(RandomFloatWrapper, float, float, float)
 	VSCRIPT_GLOBAL_FUNCTION(RandomInt, int, int, int)
 
