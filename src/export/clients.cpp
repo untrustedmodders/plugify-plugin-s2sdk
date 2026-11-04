@@ -1538,10 +1538,7 @@ extern "C" PLUGIN_API int TakeClientDamage(int playerSlot, int inflictorSlot, in
 	if (!inflictor) return {};
 	auto [controller3, attacker] = helpers::GetController2(attackerSlot);
 	if (!attacker) return {};
-	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(inflictor->GetScriptInstance(), attacker->GetScriptInstance(), std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
-	int applied = pawn->TakeDamage(takeDamageInfo);
-	CTakeDamage{}.DestroyDamageInfo(takeDamageInfo);
-	return applied;
+	return helpers::TakeDamage(pawn, inflictor, attacker, std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
 }
 
 /////

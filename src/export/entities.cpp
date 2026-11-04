@@ -1683,11 +1683,7 @@ extern "C" PLUGIN_API int TakeEntityDamage(int entityHandle, int inflictorHandle
 	if (!inflictor) return {};
 	auto* attacker = helpers::GetEntity(attackerHandle);
 	if (!attacker) return {};
-	ParamScope params(inflictor, attacker);
-	HSCRIPT takeDamageInfo = CTakeDamage{}.CreateDamageInfo(params[0], params[1], std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
-	int applied = entity->TakeDamage(takeDamageInfo);
-	CTakeDamage{}.DestroyDamageInfo(takeDamageInfo);
-	return applied;
+	return helpers::TakeDamage(entity, inflictor, attacker, std::bit_cast<Vector>(force), std::bit_cast<Vector>(hitPos), damage, damageTypes);
 }
 
 /**

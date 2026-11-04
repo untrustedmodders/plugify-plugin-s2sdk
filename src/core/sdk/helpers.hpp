@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity/cplayerpawn.h"
+#include "entity/ctakedamageinfo.h"
 #include "entity/cplayercontroller.h"
 #include "utils.hpp"
 
@@ -296,3 +297,16 @@ private:
 
 	plg::inplace_vector<HSCRIPT, 3> m_instances;
 };
+
+namespace helpers {
+	inline int TakeDamage(CBaseEntity* entity, CBaseEntity* inflictor, CBaseEntity* attacker, const Vector& force, const Vector& hitPos, float damage, int damageTypes) {
+		ParamScope params(inflictor, attacker);
+		HSCRIPT info = CTakeDamage{}.CreateDamageInfo(params[0], params[1], force, hitPos, damage, damageTypes);
+		void* infoPtr = g_pScriptVM->GetInstanceValue(info);
+		int applied = entity->TakeDamage(info);
+		// DestroyDamageInfo aborts: the destructor unrefs the script handle, then it calls RemoveInstance on that handle
+		g_pScriptVM->RemoveInstance(info);
+		g_pMemAlloc->Free(infoPtr);
+		return applied;
+	}
+}// namespace helpers
