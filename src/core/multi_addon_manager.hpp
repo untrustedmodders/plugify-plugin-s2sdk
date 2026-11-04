@@ -62,6 +62,7 @@ public:
 	void OnPostEvent(INetworkMessageInternal* message, CNetMessage* data, uint64_t* clients);
 
 	void OnSendNetMessage(CServerSideClientBase* client, CNetMessage* data, NetChannelBufType_t bufType);
+	void OnSerializeMessage(const CNetMessage* data);
 	void OnHostStateRequest(CHostStateMgr* manager, CHostStateRequest* request);
 	void OnSwitchToLoop(const char* loopModeName);
 	bool OnReplyConnection(CNetworkGameServerBase* server, CServerSideClient* client);

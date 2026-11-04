@@ -900,6 +900,20 @@ void MultiAddonManager::OnSendNetMessage(CServerSideClientBase* client, CNetMess
 	msg->set_signon_state(SIGNONSTATE_CHANGELEVEL);
 }
 
+void MultiAddonManager::OnSerializeMessage(const CNetMessage* data) {
+	INetworkSerializerPB* serializerPB = data->GetSerializerPB();
+	if (!serializerPB || serializerPB->GetNetMessageInfo()->m_MessageId != svc_ServerInfo || m_privateAddons.empty()) {
+		return;
+	}
+
+	auto msg = const_cast<CNetMessage*>(data)->As<CSVCMsg_ServerInfo_t>();
+
+	// The engine sends its full addon list here too, and the client it goes to is unknown at this point
+	plg::vector<PublishedFileId_t> addonsList = plg::parse<PublishedFileId_t>(msg->addon_name(), ",");
+	plg::erase_if(addonsList, [&](const auto& addon) { return !IsClientAddonAllowed(addon, 0); });
+	msg->set_addon_name(plg::join(addonsList, ",").c_str());
+}
+
 void MultiAddonManager::OnGameFrame() {
 	static double s_time = 0.0;
 

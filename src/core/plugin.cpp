@@ -652,6 +652,11 @@ polyhook::ResultType Hook_SendNetMessage_HLTVClient(polyhook::HookHandle hook, p
 
 polyhook::ResultType Hook_Serialize(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto data = polyhook::GetArgument<const CNetMessage*>(params, 2);
+#if defined (CS2)
+	if (data != nullptr) {
+		g_MultiAddonManager.OnSerializeMessage(data);
+	}
+#endif
 	if (data == nullptr || g_SerializeMessageListenerManager.Empty()) {
 		return polyhook::ResultType::Ignored;
 	}
