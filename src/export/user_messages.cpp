@@ -50,7 +50,12 @@ extern "C" PLUGIN_API UserMessage* UserMessageCreateFromSerializable(INetworkMes
  * @return A pointer to the newly created UserMessage.
  */
 extern "C" PLUGIN_API UserMessage* UserMessageCreateFromName(const plg::string& messageName) {
-	return new UserMessage(messageName.c_str());
+	auto* userMessage = new UserMessage(messageName.c_str());
+	if (!userMessage->GetSerializableMessage()) {
+		delete userMessage;
+		return nullptr;
+	}
+	return userMessage;
 }
 
 /**
@@ -60,7 +65,12 @@ extern "C" PLUGIN_API UserMessage* UserMessageCreateFromName(const plg::string& 
  * @return A pointer to the newly created UserMessage.
  */
 extern "C" PLUGIN_API UserMessage* UserMessageCreateFromId(int16_t messageId) {
-	return new UserMessage(messageId);
+	auto* userMessage = new UserMessage(messageId);
+	if (!userMessage->GetSerializableMessage()) {
+		delete userMessage;
+		return nullptr;
+	}
+	return userMessage;
 }
 
 /**
