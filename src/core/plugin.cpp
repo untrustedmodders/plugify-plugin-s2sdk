@@ -311,16 +311,6 @@ polyhook::ResultType Hook_ClientSettingsChanged(polyhook::HookHandle hook, polyh
 	return polyhook::ResultType::Ignored;
 }
 
-polyhook::ResultType Hook_ClientFullyConnect(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	// CPlayerSlot slot
-	auto slot = polyhook::GetArgument<int>(params, 1);
-
-	plg::print(LS_DETAILED, "[ClientFullyConnect] = {}\n", slot);
-
-	g_ClientFullyConnectListenerManager(slot);
-	return polyhook::ResultType::Ignored;
-}
-
 polyhook::ResultType Hook_ConnectClient(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto server = polyhook::GetArgument<CNetworkGameServerBase*>(params, 0);
 	bool isGameServer = server == g_pNetworkGameServer || !server->IsHLTV(); // Let GOTV clients connect
@@ -600,6 +590,11 @@ polyhook::ResultType Hook_ProcessSignonStateMsg(polyhook::HookHandle hook, polyh
 
 	plg::print(LS_DETAILED, "[ProcessSignonStateMsg] = {}, {}, msg: {}, {}\n", slot.Get(), SignonState_t_Name(state), SignonState_t_Name(msgState), spawnCount);
 
+	// ClientFullyConnect is not used: the engine also calls it for SourceTV spectators, with a slot of the HLTV server
+	if (msgState == SIGNONSTATE_FULL) {
+		g_ClientFullyConnectListenerManager(slot);
+	}
+
 	g_ClientSignonStateChangedListenerManager(slot, state, spawnCount);
 
 	return polyhook::ResultType::Ignored;
@@ -827,7 +822,6 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientActive), &IServerGameClients::ClientActive, g_pSource2GameClients, Hook_ClientActive, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientPutInServer), &IServerGameClients::ClientPutInServer, g_pSource2GameClients, Hook_ClientPutInServer, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientSettingsChanged), &IServerGameClients::ClientSettingsChanged, g_pSource2GameClients, Hook_ClientSettingsChanged, {Post}));
-	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientFullyConnect), &IServerGameClients::ClientFullyConnect, g_pSource2GameClients, Hook_ClientFullyConnect, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(INetworkServerService::StartupServer), &INetworkServerService::StartupServer, g_pNetworkServerService, Hook_StartupServer, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(INetworkServerService::DisconnectGameNow), &INetworkServerService::DisconnectGameNow, g_pNetworkServerService, Hook_DisconnectGameNow, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(ISource2Server::GameServerSteamAPIActivated), &ISource2Server::GameServerSteamAPIActivated, g_pSource2Server, Hook_GameServerSteamAPIActivated, {Post}));
