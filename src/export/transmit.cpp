@@ -1,4 +1,5 @@
 #include <iservernetworkable.h>
+#include <entity2/entityclass.h>
 #include <playerslot.h>
 #include <core/sdk/utils.hpp>
 #include <core/sdk/helpers.hpp>
@@ -24,6 +25,8 @@ extern "C" PLUGIN_API void SetTransmitInfoEntity(CCheckTransmitInfo* info, int e
 	}
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
+	// The engine has no baseline for server-only entities and aborts when one is transmitted
+	if (!entity->m_pEntity->m_pClass->m_pServerClass) return;
 	info->m_pTransmitEntity->Set(entity->entindex());
 }
 
