@@ -1659,7 +1659,7 @@ extern "C" PLUGIN_API void FollowEntityMerge(int entityHandle, int attachmentHan
 	auto* attach = helpers::GetEntity(attachmentHandle);
 	if (!attach) return;
 	ParamScope params(attach);
-	entity->FollowEntity(params[0], boneOrAttachName.c_str());
+	entity->FollowEntityMerge(params[0], boneOrAttachName.c_str());
 }
 
 /**

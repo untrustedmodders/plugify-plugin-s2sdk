@@ -1514,7 +1514,7 @@ extern "C" PLUGIN_API void FollowClientMerge(int playerSlot, int attachmentHandl
 	if (!pawn) return;
 	auto* attach = helpers::GetEntity(attachmentHandle);
 	if (!attach) return;
-	pawn->FollowEntity(attach->GetScriptInstance(), boneOrAttachName.c_str());
+	pawn->FollowEntityMerge(attach->GetScriptInstance(), boneOrAttachName.c_str());
 }
 
 /**
