@@ -1555,7 +1555,9 @@ extern "C" PLUGIN_API void AcceptEntityInput(int entityHandle, const plg::string
 extern "C" PLUGIN_API void ConnectEntityOutput(int entityHandle, const plg::string& output, const plg::string& functionName) {
 	auto* entity = helpers::GetEntity<CEntityInstance2>(entityHandle);
 	if (!entity) return;
-	entity->ConnectOutput(output.c_str(), functionName.c_str());
+	// Called outside a script, the game's ConnectOutput leaves the connection without a target
+	ParamScope params(entity);
+	entity->RedirectOutput(output.c_str(), functionName.c_str(), params[0]);
 }
 
 /**
@@ -1570,7 +1572,8 @@ extern "C" PLUGIN_API void ConnectEntityOutput(int entityHandle, const plg::stri
 extern "C" PLUGIN_API void DisconnectEntityOutput(int entityHandle, const plg::string& output, const plg::string& functionName) {
 	auto* entity = helpers::GetEntity<CEntityInstance2>(entityHandle);
 	if (!entity) return;
-	entity->DisconnectOutput(output.c_str(), functionName.c_str());
+	ParamScope params(entity);
+	entity->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), params[0]);
 }
 
 /**

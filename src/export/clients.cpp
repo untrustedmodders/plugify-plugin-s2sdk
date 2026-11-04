@@ -1413,7 +1413,8 @@ extern "C" PLUGIN_API void AcceptClientInput(int playerSlot, const plg::string& 
 extern "C" PLUGIN_API void ConnectClientOutput(int playerSlot, const plg::string& output, const plg::string& functionName) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	reinterpret_cast<CEntityInstance2*>(pawn)->ConnectOutput(output.c_str(), functionName.c_str());
+	// Called outside a script, the game's ConnectOutput leaves the connection without a target
+	reinterpret_cast<CEntityInstance2*>(pawn)->RedirectOutput(output.c_str(), functionName.c_str(), pawn->GetScriptInstance());
 }
 
 /**
@@ -1428,7 +1429,7 @@ extern "C" PLUGIN_API void ConnectClientOutput(int playerSlot, const plg::string
 extern "C" PLUGIN_API void DisconnectClientOutput(int playerSlot, const plg::string& output, const plg::string& functionName) {
 	auto [controller, pawn] = helpers::GetController2(playerSlot);
 	if (!pawn) return;
-	reinterpret_cast<CEntityInstance2*>(pawn)->DisconnectOutput(output.c_str(), functionName.c_str());
+	reinterpret_cast<CEntityInstance2*>(pawn)->DisconnectRedirectedOutput(output.c_str(), functionName.c_str(), pawn->GetScriptInstance());
 }
 
 /**
