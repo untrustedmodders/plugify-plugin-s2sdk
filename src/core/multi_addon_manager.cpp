@@ -790,13 +790,7 @@ static CUtlString originalAddons;
 bool MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServerSideClient* client) {
 	uint64 steamID64 = client->GetClientSteamID().ConvertToUint64();
 
-	// Clear cache if necessary.
 	ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
-	if (s2_cache_clients_with_addons.Get() && s2_cache_clients_duration.Get() != 0 && Plat_FloatTime() - clientInfo.lastActiveTime > s2_cache_clients_duration.Get()) {
-		plg::print(LS_MESSAGE, "{}: Client {} has not connected for a while, clearing the cache\n", __func__, steamID64);
-		clientInfo.currentPendingAddon = 0;
-		clientInfo.downloadedAddons.clear();
-	}
 	clientInfo.lastActiveTime = Plat_FloatTime();
 
 	// Server copies the CUtlString from CNetworkGameServer to this client.
@@ -954,6 +948,15 @@ void MultiAddonManager::OnPostEvent(INetworkMessageInternal* message, CNetMessag
 void MultiAddonManager::OnClientConnect(uint64 steamID64) {
 	ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 	clientInfo.connectedState = CLIENTCONN_JOINED;
+
+	// Clear cache if necessary, unless the client is still downloading addons.
+	double timeAway = Plat_FloatTime() - clientInfo.lastActiveTime;
+	bool pendingInTime = clientInfo.currentPendingAddon != 0 && timeAway <= s2_extra_addons_timeout.Get();
+	if (s2_cache_clients_with_addons.Get() && s2_cache_clients_duration.Get() != 0 && !clientInfo.downloadedAddons.empty() && !pendingInTime && timeAway > s2_cache_clients_duration.Get()) {
+		plg::print(LS_MESSAGE, "{}: Client {} has not connected for a while, clearing the cache\n", __func__, steamID64);
+		clientInfo.currentPendingAddon = 0;
+		clientInfo.downloadedAddons.clear();
+	}
 
 	plg::vector<PublishedFileId_t> addons = GetClientAddons(steamID64);
 	// We don't have an extra addon set so do nothing here, also don't do anything if we're a listenserver
