@@ -13,6 +13,7 @@ public:
 
 	bool IsSilentChatTrigger(std::string_view message) const;
 	bool IsPublicChatTrigger(std::string_view message) const;
+	size_t GetChatTriggerLength(std::string_view message) const;
 	bool IsRegexMatch(std::string_view message) const;
 
 private:

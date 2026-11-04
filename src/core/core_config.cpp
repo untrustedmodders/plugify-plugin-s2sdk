@@ -179,6 +179,19 @@ bool CoreConfig::IsPublicChatTrigger(std::string_view message) const {
 	return IsTriggerInternal(PublicChatTrigger, message);
 }
 
+size_t CoreConfig::GetChatTriggerLength(std::string_view message) const {
+	size_t length = 0;
+	for (const auto* triggers : { &SilentChatTrigger, &PublicChatTrigger }) {
+		for (const plg::string& trigger : *triggers) {
+			if (message.starts_with(trigger)) {
+				length = std::max(length, trigger.size());
+			}
+		}
+	}
+
+	return length;
+}
+
 bool CoreConfig::IsRegexMatch(std::string_view message) const {
 	/*for (const auto& regex : FilterConsoleCleaner) {
 		if (std::regex_match(message.begin(), message.end(), regex))

@@ -257,7 +257,8 @@ ResultType ConCommandManager::DispatchConCommand(const CCommandContext* ctx, con
     		std::string_view message_sv = args->ArgS();
     		trim_left(message_sv, '"');
     		trim_right(message_sv, '"');
-    		message_sv.remove_prefix(1);
+    		trim_left(message_sv, ' ');
+    		message_sv.remove_prefix(g_pCoreConfig->GetChatTriggerLength(message_sv));
 
     		CCommand nargs;
     		nargs.Tokenize(CUtlString(message_sv));
