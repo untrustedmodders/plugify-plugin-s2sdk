@@ -259,6 +259,12 @@ polyhook::ResultType Hook_ClientActive(polyhook::HookHandle hook, polyhook::Para
 	return polyhook::ResultType::Ignored;
 }
 
+void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
+	g_PlayerManager.OnClientDisconnect(slot, reason);
+	g_PanoramaVoteHandler.RemovePlayerFromVote(slot);
+	g_MenuManager.OnClientDisconnect(slot);
+}
+
 polyhook::ResultType Hook_PerformDisconnection(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	// CServerSideClientBase* client, ENetworkDisconnectionReason reason
 	auto client = polyhook::GetArgument<CServerSideClientBase*>(params, 0);
@@ -279,11 +285,49 @@ polyhook::ResultType Hook_PerformDisconnection(polyhook::HookHandle hook, polyho
 		g_MultiAddonManager.OnClientDisconnect(slot, name, steamID64, networkID);
 	}
 #endif
-	g_PlayerManager.OnClientDisconnect(slot, reason);
+	Player* player = g_PlayerManager.FindSession(client);
+	if (player == nullptr) {
+		return polyhook::ResultType::Ignored;
+	}
 
+	// ClientDisconnect already handled a player who leaves while loading the next map
+	if (player->IsOnMap()) {
+		OnClientDisconnect(slot, reason);
+	}
+
+	g_PlayerManager.OnClientSessionEnd(slot, reason);
 	g_PlayerManager.OnClientDisconnected(slot);
-	g_PanoramaVoteHandler.RemovePlayerFromVote(slot);
-	g_MenuManager.OnClientDisconnect(slot);
+
+	return polyhook::ResultType::Ignored;
+}
+
+polyhook::ResultType Hook_ClientDisconnect(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	// CPlayerSlot slot, ENetworkDisconnectionReason reason, const char* name, uint64 xuid, const char* networkID
+	CPlayerSlot slot = polyhook::GetArgument<int>(params, 1);
+	auto reason = (ENetworkDisconnectionReason) polyhook::GetArgument<int>(params, 2);
+	auto xuid = polyhook::GetArgument<uint64_t>(params, 4);
+
+	// PerformDisconnection already handled and reset a player who really left.
+	// On a map change the engine only calls this, and the player stays on the server.
+	Player* player = g_PlayerManager.ToPlayer(slot);
+	if (player == nullptr || !player->IsOnMap() || player->GetSteamId().ConvertToUint64() != xuid) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	plg::print(LS_DETAILED, "[ClientDisconnect] = {}, {}, {}\n", slot.Get(), static_cast<int>(reason), xuid);
+
+	OnClientDisconnect(slot, reason);
+
+	return polyhook::ResultType::Ignored;
+}
+
+polyhook::ResultType Hook_Reactivate(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	// CServerSideClientBase* client, CPlayerSlot slot
+	auto client = polyhook::GetArgument<CServerSideClientBase*>(params, 0);
+
+	plg::print(LS_DETAILED, "[Reactivate] = {}, {}\n", client->GetClientName(), client->GetPlayerSlot().Get());
+
+	g_PlayerManager.OnClientReactivate(client);
 
 	return polyhook::ResultType::Ignored;
 }
@@ -297,7 +341,7 @@ polyhook::ResultType Hook_ClientPutInServer(polyhook::HookHandle hook, polyhook:
 
 	plg::print(LS_DETAILED, "[ClientPutInServer] = {}, {}, {}, {}\n", slot, name, conType, steamID64);
 
-	g_PlayerManager.OnClientPutInServer(slot, name);
+	g_PlayerManager.OnClientPutInServer(slot, name, steamID64);
 	return polyhook::ResultType::Ignored;
 }
 
@@ -826,6 +870,7 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientCommand), &IServerGameClients::ClientCommand, g_pSource2GameClients, Hook_ClientCommand, {Pre}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientActive), &IServerGameClients::ClientActive, g_pSource2GameClients, Hook_ClientActive, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientPutInServer), &IServerGameClients::ClientPutInServer, g_pSource2GameClients, Hook_ClientPutInServer, {Post}));
+	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientDisconnect), &IServerGameClients::ClientDisconnect, g_pSource2GameClients, Hook_ClientDisconnect, {Pre}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientSettingsChanged), &IServerGameClients::ClientSettingsChanged, g_pSource2GameClients, Hook_ClientSettingsChanged, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(INetworkServerService::StartupServer), &INetworkServerService::StartupServer, g_pNetworkServerService, Hook_StartupServer, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(INetworkServerService::DisconnectGameNow), &INetworkServerService::DisconnectGameNow, g_pNetworkServerService, Hook_DisconnectGameNow, {Post}));
@@ -874,6 +919,7 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::ProcessRespondCvarValue), &CServerSideClientBase::ProcessRespondCvarValue, CServerSideClient, Hook_ProcessRespondCvarValue, {Pre}));
 	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::SendNetMessage), &CServerSideClientBase::SendNetMessage, CServerSideClient, Hook_SendNetMessage, {Pre}));
 	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::PerformDisconnection), &CServerSideClientBase::PerformDisconnection, CServerSideClient, Hook_PerformDisconnection, {Pre}));
+	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::Reactivate), &CServerSideClientBase::Reactivate, CServerSideClient, Hook_Reactivate, {Post}));
 	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::ProcessSignonStateMsg), &CServerSideClientBase::ProcessSignonStateMsg, CServerSideClient, Hook_ProcessSignonStateMsg, {Post}));
 
 	static Memory CHLTVClient;

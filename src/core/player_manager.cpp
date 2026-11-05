@@ -49,6 +49,10 @@ const plg::flat_hash_map<std::string_view, std::string_view, plg::case_insensiti
 };
 
 CBasePlayerController* Player::GetController() const {
+	if (!m_onMap) {
+		return nullptr;
+	}
+
 	auto entIndex = GetEntityIndex();
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(entIndex));
 	if (!entity) {
@@ -284,7 +288,8 @@ ENetworkDisconnectionReason PlayerManager::OnClientConnect(char const* name, cha
 
 void PlayerManager::OnClientConnected(CPlayerSlot slot, uint64 steamID64) {
 	if (Player* player = ToPlayer(slot)) {
-		player->Init(slot, steamID64);
+		player->Init(slot, steamID64, utils::GetClientBySlot(slot));
+		g_ClientSessionStartListenerManager(slot);
 		g_ClientConnectedListenerManager(slot);
 	}
 }
@@ -294,11 +299,32 @@ void PlayerManager::QueryClientInfo(CPlayerSlot slot) {
 	cvars::SendConVarValueQueryToClient(slot, "engine_ostype", CLIENT_OPERATING_SYSTEMID);
 }
 
-void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name) {
+void PlayerManager::OnClientReactivate(CServerSideClientBase* client) {
+	Player* player = FindSession(client);
+	Player* target = ToPlayer(client->GetPlayerSlot());
+	if (player == nullptr || target == nullptr || player == target) {
+		return;
+	}
+
+	// The target can still hold a client whose own Reactivate comes later
+	std::swap(*player, *target);
+	target->SetPlayerSlot(client->GetPlayerSlot());
+	if (player->GetSessionClient()) {
+		player->SetPlayerSlot(static_cast<int>(player - m_players.data()));
+	}
+}
+
+void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name, uint64 steamID64) {
 	if (Player* player = ToPlayer(slot)) {
-		// For bots only
-		if (player->GetPlayerSlot() == INVALID_PLAYER_SLOT) {
-			player->Init(slot, 0);
+		if (player->GetSessionClient()) {
+			player->SetOnMap(true);
+		} else {
+			// The plugin was loaded in the middle of the session and missed OnClientConnected
+			player->Init(slot, steamID64, utils::GetClientBySlot(slot));
+			if (!player->IsFakeClient()) {
+				QueryClientInfo(slot);
+			}
+			g_ClientSessionStartListenerManager(slot);
 		}
 
 		g_ClientPutInServerListenerManager(slot);
@@ -307,6 +333,14 @@ void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name) {
 
 void PlayerManager::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
 	g_ClientDisconnectListenerManager(slot, reason);
+
+	if (Player* player = ToPlayer(slot)) {
+		player->SetOnMap(false);
+	}
+}
+
+void PlayerManager::OnClientSessionEnd(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
+	g_ClientSessionEndListenerManager(slot, reason);
 }
 
 void PlayerManager::OnClientDisconnected(CPlayerSlot slot) {
@@ -422,6 +456,16 @@ Player* PlayerManager::ToPlayer(CPlayerUserId userID) const {
 Player* PlayerManager::ToPlayer(CSteamID steamid, bool validate) const {
 	for (const auto& player : m_players) {
 		if (utils::IsPlayerSlot(player.GetPlayerSlot()) && player.GetSteamId(validate) == steamid) {
+			return const_cast<Player*>(&player);
+		}
+	}
+
+	return nullptr;
+}
+
+Player* PlayerManager::FindSession(const CServerSideClientBase* client) const {
+	for (const auto& player : m_players) {
+		if (player.GetSessionClient() == client) {
 			return const_cast<Player*>(&player);
 		}
 	}

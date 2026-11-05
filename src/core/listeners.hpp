@@ -11,8 +11,10 @@ using Manager = ListenerManager<Name, Func>;
 #define LISTENER_LIST(X) \
 	X(ClientConnect, ENetworkDisconnectionReason, const plg::string& playerName, const plg::string& address, uint64 steamID) \
 	X(ClientConnected, void, int playerSlot) \
+	X(ClientSessionStart, void, int playerSlot) \
 	X(ClientPutInServer, void, int playerSlot) \
 	X(ClientDisconnect, void, int playerSlot, ENetworkDisconnectionReason reason) \
+	X(ClientSessionEnd, void, int playerSlot, ENetworkDisconnectionReason reason) \
 	X(ClientActive, void, int playerSlot, bool loadGame) \
 	X(ClientSignonStateChanged, void, int playerSlot, SignonState_t state, int spawnCount) \
 	X(ClientFullyConnect, void, int playerSlot) \

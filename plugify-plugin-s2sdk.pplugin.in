@@ -25429,6 +25429,7 @@
       "name": "OnClientConnected_Register",
       "group": "Listeners",
       "description": "Register callback to event.",
+      "deprecated": "Use OnClientSessionStart_Register instead. Will be removed soon",
       "funcName": "OnClientConnected_Register",
       "paramTypes": [
         {
@@ -25447,6 +25448,7 @@
       "name": "OnClientConnected_Register2",
       "group": "Listeners",
       "description": "Register callback to event with a priority.",
+      "deprecated": "Use OnClientSessionStart_Register2 instead. Will be removed soon",
       "funcName": "OnClientConnected_Register2",
       "paramTypes": [
         {
@@ -25471,6 +25473,7 @@
       "name": "OnClientConnected_Unregister",
       "group": "Listeners",
       "description": "Unregister callback to event.",
+      "deprecated": "Use OnClientSessionStart_Unregister instead. Will be removed soon",
       "funcName": "OnClientConnected_Unregister",
       "paramTypes": [
         {
@@ -25479,6 +25482,66 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnClientConnectedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSessionStart_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnClientSessionStart_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSessionStartCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSessionStart_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientSessionStart_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSessionStartCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientSessionStart_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSessionStart_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnClientSessionStart_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSessionStartCallback"
         }
       ],
       "retType": {
@@ -25599,6 +25662,66 @@
           "ref": false,
           "description": "Function callback.",
           "prototype": "OnClientDisconnectCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSessionEnd_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnClientSessionEnd_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSessionEndCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSessionEnd_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientSessionEnd_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSessionEndCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientSessionEnd_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSessionEnd_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnClientSessionEnd_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSessionEndCallback"
         }
       ],
       "retType": {
@@ -33334,7 +33457,23 @@
     {
       "name": "OnClientConnectedCallback",
       "funcName": "OnClientConnectedCallback",
-      "description": "Called once a client has connected and got a player slot, for players (after OnClientConnect accepted them) and bots alike, right after the player_connect event and before OnClientPutInServer. This callback is paired with OnClientDisconnect.",
+      "description": "Deprecated, use OnClientSessionStart. Called once a client has connected and got a player slot, for players (after OnClientConnect accepted them) and bots alike, right after the player_connect event and before OnClientPutInServer. Not called for clients already connected when the plugins are loaded.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The player slot"
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": ""
+      }
+    },
+    {
+      "name": "OnClientSessionStartCallback",
+      "funcName": "OnClientSessionStartCallback",
+      "description": "Called once when a client connection starts, for players (after OnClientConnect accepted them) and bots alike, right after the player_connect event and before OnClientPutInServer. Paired with OnClientSessionEnd. For clients already connected when the plugins are loaded it is called right before their OnClientPutInServer. A map change can move a player to another slot during the session, so keep per-player data by SteamID rather than by slot.",
       "paramTypes": [
         {
           "name": "playerSlot",
@@ -33366,7 +33505,29 @@
     {
       "name": "OnClientDisconnectCallback",
       "funcName": "OnClientDisconnectCallback",
-      "description": "Called when a client is disconnecting from the server, for players and bots, before the player_disconnect event. The client data is still available here and is reset once the callbacks return.",
+      "description": "Called when a client leaves the current map, for players and bots, before the player_disconnect event. Paired with OnClientPutInServer: a player staying through a map change gets it too, with the reason NETWORK_DISCONNECT_SHUTDOWN. It can also come without OnClientPutInServer if the client leaves before entering the game. Use OnClientSessionEnd for the end of the connection. The controller and pawn are unavailable once the callbacks return.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The player slot"
+        },
+        {
+          "name": "reason",
+          "type": "int32",
+          "description": "The reason for disconnect",
+          "enum": "NetworkDisconnectionReason"
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": ""
+      }
+    },
+    {
+      "name": "OnClientSessionEndCallback",
+      "funcName": "OnClientSessionEndCallback",
+      "description": "Called when a client connection really ends, for players and bots. Paired with OnClientSessionStart: unlike OnClientDisconnect it does not fire for a player staying through a map change, or when the plugins are unloaded. With extra addons a client really reconnects on a map change, so it fires with the reason NETWORK_DISCONNECT_LOOPDEACTIVATE and a new session starts. The SteamID, language and other client data are still available and are reset once the callbacks return; the controller and pawn are not, the client has already left the map.",
       "paramTypes": [
         {
           "name": "playerSlot",

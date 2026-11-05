@@ -42,8 +42,10 @@ public:
 	Player() = default;
 	~Player() = default;
 
-	void Init(int slot, uint64 steamID64) {
+	void Init(int slot, uint64 steamID64, CServerSideClientBase* client) {
 		m_slot = slot;
+		m_client = client;
+		m_onMap = true;
 		m_unauthenticatedSteamID = CSteamID(steamID64);
 		m_language.clear();
 		m_languageCode = {};
@@ -53,6 +55,8 @@ public:
 
 	void Reset() {
 		m_slot = -1;
+		m_client = nullptr;
+		m_onMap = false;
 		m_unauthenticatedSteamID = k_steamIDNil;
 		m_language.clear();
 		m_languageCode = {};
@@ -95,11 +99,29 @@ public:
 		return m_slot + 1;
 	}
 
+	CServerSideClientBase* GetSessionClient() const {
+		return m_client;
+	}
+
+	bool IsOnMap() const {
+		return m_onMap;
+	}
+
+	void SetOnMap(bool onMap) {
+		m_onMap = onMap;
+	}
+
+	void SetPlayerSlot(int slot) {
+		m_slot = slot;
+	}
+
 	void QueryCvar(int queryCvarCookie, CvarQuery query);
 	void OnRepondCvarValue(const CCLCMsg_RespondCvarValue_t& msg);
 
 private:
 	int m_slot{-1};
+	CServerSideClientBase* m_client{};
+	bool m_onMap{};
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
 	plg::string m_language;
 	std::string_view m_languageCode;
@@ -126,6 +148,7 @@ public:
 	Player* ToPlayer(CEntityIndex entIndex) const;
 	Player* ToPlayer(CPlayerUserId userID) const;
 	Player* ToPlayer(CSteamID steamid, bool validate = false) const;
+	Player* FindSession(const CServerSideClientBase* client) const;
 
 	void OnGameFrame();
 	void OnSteamAPIActivated();
@@ -133,8 +156,10 @@ public:
 	ENetworkDisconnectionReason OnClientConnect(char const* name, char const* address, uint64 steamID64);
 	void OnClientConnected(CPlayerSlot slot, uint64 steamID64);
 	void QueryClientInfo(CPlayerSlot slot);
-	void OnClientPutInServer(CPlayerSlot slot, char const* name);
+	void OnClientReactivate(CServerSideClientBase* client);
+	void OnClientPutInServer(CPlayerSlot slot, char const* name, uint64 steamID64);
 	void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason);
+	void OnClientSessionEnd(CPlayerSlot slot, ENetworkDisconnectionReason reason);
 	void OnClientDisconnected(CPlayerSlot slot);
 	void OnClientActive(CPlayerSlot slot, bool loadGame) const;
 
