@@ -58,7 +58,7 @@ class CModule final
     CAddress             m_base_address{};
     size_t               m_size{};
     std::string          m_module_name{};
-    CreateInterfaceFn    m_createInterface;
+    CreateInterfaceFn    m_createInterface{};
 
     mutable plg::flat_hash_map<std::string, CAddress, plg::string_hash, std::equal_to<>>              m_cached_vtables{};
     mutable plg::flat_hash_map<std::string, std::vector<CAddress>, plg::string_hash, std::equal_to<>> m_vtable_functions{};

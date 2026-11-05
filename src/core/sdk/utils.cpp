@@ -59,7 +59,7 @@ CBaseEntity* utils::CreateBeam(const Vector& from, const Vector& to, Color color
 Result<CAddress> utils::QueryInterface(std::string_view library, std::string_view name) {
 	auto& provider = g_GameConfigManager.GetModuleProvider();
 	auto module = provider.GetModule(library);
-	if (!module) {
+	if (!module || !module->IsValid()) {
 		return MakeError("Module not found: \"{}\"", library);
 	}
 	auto interface = module->FindInterface(name);
