@@ -188,6 +188,10 @@ float Player::GetTimeConnected() const {
 }
 
 float Player::GetLatency() const {
+	if (!IsConnected() || IsFakeClient()) {
+		return 0;
+	}
+
 	return GetNetInfo()->GetAvgLatency();
 }
 
