@@ -45,9 +45,8 @@ export class ZombieMod extends Plugin {
         s2.HookEvent("player_hurt", OnPlayerHurt, s2.HookMode.Post)
 
         s2.OnServerActivate_Register(OnServerActivated)
-        s2.OnClientConnected_Register(OnClientConnected)
-        //s2.OnClientPutInServer_Register(OnClientPutInServer)
-        s2.OnClientDisconnect_Post_Register(OnClientDisconnected)
+        s2.OnClientPutInServer_Register(OnClientPutInServer)
+        s2.OnClientDisconnect_Register(OnClientDisconnect)
 
         this.initCvars()
         this.hookFuncs()
@@ -68,9 +67,8 @@ export class ZombieMod extends Plugin {
         s2.UnhookEvent("player_hurt", OnPlayerHurt, s2.HookMode.Post)
 
         s2.OnServerActivate_Unregister(OnServerActivated)
-        s2.OnClientConnected_Unregister(OnClientConnected)
-        //s2.OnClientPutInServer_Unregister(OnClientPutInServer)
-        s2.OnClientDisconnect_Post_Unregister(OnClientDisconnected)
+        s2.OnClientPutInServer_Unregister(OnClientPutInServer)
+        s2.OnClientDisconnect_Unregister(OnClientDisconnect)
 
         if (canAcquireFunc) {
             pl.UnhookDetour(canAcquireFunc)
@@ -112,12 +110,12 @@ export class ZombieMod extends Plugin {
 
     hookFuncs() {
         const gameConfig = s2.LoadGameConfigFile([`gamedata.jsonc`])
-        const canAcquireAddress = s2.GetGameConfigMemSig(gameConfig, "CCSPlayer_ItemServices::CanAcquire")
+        const canAcquireAddress = s2.GetGameConfigSignature(gameConfig, "CCSPlayer_ItemServices::CanAcquire")
 
         const preHook = pl.CallbackType.Pre
 
         // CPlayer_ItemServices::CanAcquire( CEconItemView *pItem, AcquireMethod::Type acquireMethod, uint16 *pLimit )
-        canAcquireFunc = pl.HookDetour(canAcquireAddress, pl.DataType.Int8, [pl.DataType.Pointer, pl.DataType.Pointer, pl.DataType.Int32, pl.DataType.Pointer], -1)
+        canAcquireFunc = pl.HookDetour(canAcquireAddress, pl.DataType.Int8, [pl.DataType.Pointer, pl.DataType.Pointer, pl.DataType.Int32, pl.DataType.Pointer], -1, "CCSPlayer_ItemServices::CanAcquire")
         if (canAcquireFunc === 0) {
             s2.PrintToServer("[ZM] Failed to find 'CPlayer_ItemServices::CanAcquire' function address")
             return
@@ -147,11 +145,11 @@ function OnServerActivated() {
 }
 
 /**
- * Called once a client successfully connects.
+ * Called when a client enters the current map. A map change can move a player to another slot.
  *
  * @param {number} clientIndex - The client index.
  */
-function OnClientConnected(clientIndex) {
+function OnClientPutInServer(clientIndex) {
     // Reset player data array
     if (clientIndex >= 0 && clientIndex < g_Players.length) {
         g_Players[clientIndex] = new Player(clientIndex)
@@ -159,11 +157,11 @@ function OnClientConnected(clientIndex) {
 }
 
 /**
- * Called when a client is disconnected from the server.
+ * Called when a client leaves the current map.
  *
  * @param {number} clientIndex - The client index.
  */
-function OnClientDisconnected(clientIndex) {
+function OnClientDisconnect(clientIndex) {
     // Reset player data array
     if (clientIndex >= 0 && clientIndex < g_Players.length) {
         g_Players[clientIndex] = null
