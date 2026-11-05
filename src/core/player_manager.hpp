@@ -120,8 +120,8 @@ public:
 
 private:
 	int m_slot{-1};
-	CServerSideClientBase* m_client{};
 	bool m_onMap{};
+	CServerSideClientBase* m_client{};
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
 	plg::string m_language;
 	std::string_view m_languageCode;
