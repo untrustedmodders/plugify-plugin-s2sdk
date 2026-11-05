@@ -11637,14 +11637,14 @@
     {
       "name": "ConnectClientOutput",
       "group": "Clients",
-      "description": "Connects a script function to an player output.",
+      "description": "Connects a script function to an output of the player pawn. When the output fires, the game calls InputCallScriptFunction(args) in the private script scope of the pawn with functionName in args.value. A function named functionName is not called directly.",
       "funcName": "ConnectClientOutput",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The handle of the player."
+          "description": "The slot of the player."
         },
         {
           "name": "output",
@@ -11656,7 +11656,7 @@
           "name": "functionName",
           "type": "string",
           "ref": false,
-          "description": "The name of the script function to call."
+          "description": "The value passed to InputCallScriptFunction in args.value."
         }
       ],
       "retType": {
@@ -11666,14 +11666,14 @@
     {
       "name": "DisconnectClientOutput",
       "group": "Clients",
-      "description": "Disconnects a script function from an player output.",
+      "description": "Disconnects a script function from an output of the player pawn.",
       "funcName": "DisconnectClientOutput",
       "paramTypes": [
         {
           "name": "playerSlot",
           "type": "int32",
           "ref": false,
-          "description": "The handle of the player."
+          "description": "The slot of the player."
         },
         {
           "name": "output",
