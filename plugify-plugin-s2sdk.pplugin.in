@@ -18167,7 +18167,7 @@
     {
       "name": "ConnectEntityOutput",
       "group": "Entities",
-      "description": "Connects a script function to an entity output.",
+      "description": "Connects a script function to an entity output. When the output fires, the game calls InputCallScriptFunction(args) in the private script scope of the entity with functionName in args.value. A function named functionName is not called directly.",
       "funcName": "ConnectEntityOutput",
       "paramTypes": [
         {
@@ -18186,7 +18186,7 @@
           "name": "functionName",
           "type": "string",
           "ref": false,
-          "description": "The name of the script function to call."
+          "description": "The value passed to InputCallScriptFunction in args.value."
         }
       ],
       "retType": {
