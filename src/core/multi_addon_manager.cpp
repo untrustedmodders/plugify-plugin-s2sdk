@@ -20,12 +20,12 @@
 #include "game_config.hpp"
 #include "sdk/utils.hpp"
 
-CConVar<bool> s2_addon_mount_download("s2_addon_mount_download", FCVAR_NONE, "Whether to download an addon upon mounting even if it's installed", false);
+CConVar<bool> s2_addon_mount_download("s2_addon_mount_download", FCVAR_NONE, "Whether to check for updates of an installed addon upon mounting, an update applies from the next mount. A missing addon is always downloaded", false);
 CConVar<bool> s2_block_disconnect_messages("s2_block_disconnect_messages", FCVAR_NONE, "Whether to block \"loop shutdown\" disconnect messages", false);
 CConVar<bool> s2_cache_clients_with_addons("s2_cache_clients_with_addons", FCVAR_NONE, "Whether to cache clients addon download list, this will prevent reconnects on mapchange/rejoin", false);
 CConVar<double> s2_cache_clients_duration("s2_cache_clients_duration", FCVAR_NONE, "How long to cache clients' downloaded addons list in seconds, pass 0 for forever.", 0.0);
 CConVar<double> s2_extra_addons_timeout("s2_extra_addons_timeout", FCVAR_NONE, "How long until clients are timed out in between connects for extra addons in seconds, requires s2_extra_addons to be used", 10.0);
-CConVar<float> s2_addon_connection_timeout("s2_addon_connection_timeout", FCVAR_NONE, "How long until clients are timed out while downloading the first required addon (usually the current map), 0 disables", 30.f);
+CConVar<float> s2_addon_connection_timeout("s2_addon_connection_timeout", FCVAR_NONE, "How long until clients are timed out while downloading the first required addon (usually the current map), 0 disables", 300.f);
 
 enum ClientConnectedState_t {
 	CLIENTCONN_NONE,
@@ -401,12 +401,13 @@ bool MultiAddonManager::RemovePrivateAddon(PublishedFileId_t addon, bool refresh
 }
 
 void MultiAddonManager::OnPluginStart() {
-	std::array<uint64, 9> conVarHandles = {
+	std::array<uint64, 10> conVarHandles = {
 		s2_addon_mount_download,
 		s2_block_disconnect_messages,
 		s2_cache_clients_with_addons,
 		s2_cache_clients_duration,
 		s2_extra_addons_timeout,
+		s2_addon_connection_timeout,
 		s2_extra_addons,
 		s2_client_extra_addons,
 		s2_private_addons,
