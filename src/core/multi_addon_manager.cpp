@@ -807,7 +807,9 @@ bool MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServe
 		return false;
 	}
 
-	if (clientInfo.connectedState != CLIENTCONN_CONNECTING) {
+	// A downloading client keeps asking until it reconnects
+	bool firstReply = clientInfo.connectedState != CLIENTCONN_CONNECTING;
+	if (firstReply) {
 		clientInfo.connectionStartTime = Plat_FloatTime();
 		clientInfo.connectedState = CLIENTCONN_CONNECTING;
 	}
@@ -833,7 +835,9 @@ bool MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServe
 
 	addon = plg::join(clientAddons, ",");
 
-	plg::print(LS_MESSAGE, "{}: Sending addons {} to steamID64 {}\n", __func__, addon.Get(), steamID64);
+	if (firstReply) {
+		plg::print(LS_MESSAGE, "{}: Sending addons {} to steamID64 {}\n", __func__, addon.Get(), steamID64);
+	}
 	return false;
 }
 
