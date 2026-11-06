@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.3.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.2.0...v3.3.0) (2026-11-06)
+
+
+### Features
+
+* add chat flags and listen overrides for clients ([6dcfb22](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6dcfb22b6f50c2bbad4f183cc6e8c31cbfee8f60))
+* add HookSendNetMessage to block net messages ([c8ff7ec](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c8ff7ec5dd91a42537046944d08cb3b8593a4976))
+* add voice flags and listen overrides for clients ([3c2ceca](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3c2ceca97117e47f9eaf8ee569b8cdf878c36446))
+
+
+### Bug Fixes
+
+* remove deleted point_script from scripts list ([d94ded9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d94ded942895e08df9d1b172dc0f2c9c8aea68f2))
+* restore console cleaner ([08d4caa](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/08d4caaf58d049b7fffaede24c2ff3b6aa1d3535))
+
 ## [3.2.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.1.1...v3.2.0) (2026-11-06)
 
 
