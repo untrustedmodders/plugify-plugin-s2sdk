@@ -818,8 +818,9 @@ extern "C" PLUGIN_API int GetEntityOwner(int entityHandle) {
 extern "C" PLUGIN_API void SetEntityOwner(int entityHandle, int ownerHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return;
-	auto* owner = helpers::GetEntity(ownerHandle);
-	if (!owner) return;
+	// INVALID_EHANDLE_INDEX clears the owner
+	auto* owner = ownerHandle != INVALID_EHANDLE_INDEX ? helpers::GetEntity(ownerHandle) : nullptr;
+	if (!owner && ownerHandle != INVALID_EHANDLE_INDEX) return;
 	ParamScope params(owner);
 	entity->SetOwner(params[0]);
 }
