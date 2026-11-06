@@ -195,7 +195,7 @@ void PanoramaVoteHandler::InitVoters(IRecipientFilter* filter) {
 	}
 
 	const CPlayerBitVec& recipients = filter->GetRecipients();
-	for (int i = 0; i < filter->GetRecipientCount(); ++i) {
+	for (int i = 0; i < recipients.GetNumBits(); ++i) {
 		if (recipients.IsBitSet(i)) {
 			m_voters.push_back(i);
 		}
