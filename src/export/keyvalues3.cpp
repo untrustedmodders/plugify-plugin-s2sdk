@@ -1900,7 +1900,7 @@ extern "C" PLUGIN_API bool Kv3LoadTextNoHeader(KeyValues3* kv, plg::string& erro
  */
 extern "C" PLUGIN_API bool Kv3Save(const KeyValues3* kv, plg::string& error, plg::vector<uint8_t>& output, uint32_t flags) {
     if (!kv) return false;
-    CUtlBuffer buffer;
+    CUtlBuffer buffer(0, 0, CUtlBuffer::TEXT_BUFFER);
     CUtlString err;
     bool result = SaveKV3(g_KV3Encoding_Text, g_KV3Format_Generic, kv, &err, &buffer, flags);
     utils::ConvertUtlStringToPlgString(&err, error);
@@ -1919,7 +1919,7 @@ extern "C" PLUGIN_API bool Kv3Save(const KeyValues3* kv, plg::string& error, plg
  */
 extern "C" PLUGIN_API bool Kv3SaveAsJSON(const KeyValues3* kv, plg::string& error, plg::vector<uint8_t>& output) {
     if (!kv) return false;
-    CUtlBuffer buffer;
+    CUtlBuffer buffer(0, 0, CUtlBuffer::TEXT_BUFFER);
     CUtlString err;
     bool result = SaveKV3AsJSON(kv, &err, &buffer);
     utils::ConvertUtlStringToPlgString(&err, error);
@@ -2000,7 +2000,7 @@ extern "C" PLUGIN_API bool Kv3SaveAsKV1TextTranslated(const KeyValues3* kv, plg:
  */
 extern "C" PLUGIN_API bool Kv3SaveTextNoHeaderToBuffer(const KeyValues3* kv, plg::string& error, plg::vector<uint8_t>& output, uint32_t flags) {
     if (!kv) return false;
-    CUtlBuffer buffer;
+    CUtlBuffer buffer(0, 0, CUtlBuffer::TEXT_BUFFER);
     CUtlString err;
     bool result = SaveKV3Text_NoHeader(kv, &err, &buffer, flags);
     utils::ConvertUtlStringToPlgString(&err, error);
