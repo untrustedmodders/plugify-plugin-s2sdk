@@ -80,6 +80,10 @@
         IsClientConnected;
         IsClientInGame;
         IsClientSourceTV;
+        GetClientVoiceFlags;
+        SetClientVoiceFlags;
+        GetClientListening;
+        SetClientListening;
         IsClientAlive;
         IsFakeClient;
         GetClientMoveType;

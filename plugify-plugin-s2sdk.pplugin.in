@@ -10235,6 +10235,104 @@
       }
     },
     {
+      "name": "GetClientVoiceFlags",
+      "group": "Clients",
+      "description": "Gets the voice flags of the client.",
+      "funcName": "GetClientVoiceFlags",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "uint8",
+        "description": "The voice flags of the client.",
+        "enum": "VoiceFlag"
+      }
+    },
+    {
+      "name": "SetClientVoiceFlags",
+      "group": "Clients",
+      "description": "Sets the voice flags of the client until they disconnect.",
+      "funcName": "SetClientVoiceFlags",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "flags",
+          "type": "uint8",
+          "ref": false,
+          "description": "The voice flags to set.",
+          "enum": "VoiceFlag"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientListening",
+      "group": "Clients",
+      "description": "Gets the listen override between a receiver and a sender.",
+      "funcName": "GetClientListening",
+      "paramTypes": [
+        {
+          "name": "receiverSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot of the player who listens."
+        },
+        {
+          "name": "senderSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot of the player who speaks."
+        }
+      ],
+      "retType": {
+        "type": "uint8",
+        "description": "The listen override for this pair.",
+        "enum": "ListenOverride"
+      }
+    },
+    {
+      "name": "SetClientListening",
+      "group": "Clients",
+      "description": "Sets the listen override between a receiver and a sender until the receiver disconnects.",
+      "funcName": "SetClientListening",
+      "paramTypes": [
+        {
+          "name": "receiverSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot of the player who listens."
+        },
+        {
+          "name": "senderSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot of the player who speaks."
+        },
+        {
+          "name": "listen",
+          "type": "uint8",
+          "ref": false,
+          "description": "The listen override to set.",
+          "enum": "ListenOverride"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "IsClientAlive",
       "group": "Clients",
       "description": "Checks if the client is alive or dead.",
@@ -34004,6 +34102,63 @@
     }
   ],
   "enums": [
+    {
+      "name": "VoiceFlag",
+      "description": "Flags that control whom a player hears and who hears them.",
+      "values": [
+        {
+          "name": "Normal",
+          "description": "The engine decides.",
+          "value": 0
+        },
+        {
+          "name": "Muted",
+          "description": "Nobody hears the player.",
+          "value": 1
+        },
+        {
+          "name": "All",
+          "description": "Everyone hears the player.",
+          "value": 2
+        },
+        {
+          "name": "ListenAll",
+          "description": "The player hears everyone.",
+          "value": 4
+        },
+        {
+          "name": "Team",
+          "description": "Only the player's team hears the player.",
+          "value": 8
+        },
+        {
+          "name": "ListenTeam",
+          "description": "The player hears only their team.",
+          "value": 16
+        }
+      ]
+    },
+    {
+      "name": "ListenOverride",
+      "description": "Override of whether a receiver hears a sender.",
+      "values": [
+        {
+          "name": "Default",
+          "description": "Voice flags decide.",
+          "value": 0
+        },
+        {
+          "name": "Mute",
+          "description": "The receiver doesn't hear the sender.",
+          "value": 1
+        },
+        {
+          "name": "Hear",
+          "description": "The receiver hears the sender.",
+          "value": 2
+        }
+      ]
+    },
     {
       "name": "MoveType",
       "description": "Enum representing various movement types for entities.",

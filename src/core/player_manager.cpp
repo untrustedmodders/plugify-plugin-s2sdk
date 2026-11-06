@@ -290,6 +290,47 @@ ENetworkDisconnectionReason PlayerManager::OnClientConnect(char const* name, cha
 	return result;
 }
 
+ListenOverride Player::GetListenOverride(uint64 steamID64) const {
+	auto it = m_listenOverrides.find(steamID64);
+	return it != m_listenOverrides.end() ? it->second : Listen_Default;
+}
+
+void Player::SetListenOverride(uint64 steamID64, ListenOverride listen) {
+	if (listen == Listen_Default) {
+		m_listenOverrides.erase(steamID64);
+	} else {
+		m_listenOverrides[steamID64] = listen;
+	}
+}
+
+std::optional<bool> Player::CanHearVoice(const Player& sender) const {
+	const uint8_t senderFlags = sender.GetVoiceFlags();
+	if (senderFlags & Speak_Muted) {
+		return false;
+	}
+
+	if (!m_listenOverrides.empty()) {
+		const ListenOverride listen = GetListenOverride(sender.GetSteamId().ConvertToUint64());
+		if (listen != Listen_Default) {
+			return listen == Listen_Hear;
+		}
+	}
+
+	if ((senderFlags & Speak_All) || (m_voiceFlags & Speak_ListenAll)) {
+		return true;
+	}
+
+	if ((senderFlags & Speak_Team) || (m_voiceFlags & Speak_ListenTeam)) {
+		auto receiverController = GetController();
+		auto senderController = sender.GetController();
+		if (receiverController && senderController) {
+			return *receiverController->m_iTeamNum == *senderController->m_iTeamNum;
+		}
+	}
+
+	return std::nullopt;
+}
+
 void PlayerManager::OnClientConnected(CPlayerSlot slot, uint64 steamID64) {
 	if (Player* player = ToPlayer(slot)) {
 		player->Init(slot, steamID64, utils::GetClientBySlot(slot));

@@ -822,6 +822,41 @@ polyhook::ResultType Hook_ProcessRespondCvarValue(polyhook::HookHandle hook, pol
 	return polyhook::ResultType::Ignored;
 }
 
+polyhook::ResultType Hook_ProcessVoiceData(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	auto client = polyhook::GetArgument<CServerSideClientBase*>(params, 0);
+
+	auto player = g_PlayerManager.ToPlayer(client);
+	if (player != nullptr && (player->GetVoiceFlags() & Speak_Muted)) {
+		polyhook::SetReturn<bool>(ret, true);
+		return polyhook::ResultType::Supercede;
+	}
+
+	return polyhook::ResultType::Ignored;
+}
+
+polyhook::ResultType Hook_IsHearingClient(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	auto client = polyhook::GetArgument<CServerSideClientBase*>(params, 0);
+	auto senderSlot = CPlayerSlot(polyhook::GetArgument<int>(params, 1));
+
+	// The sender's own voice is the loopback setting of the client
+	if (client->GetPlayerSlot() == senderSlot) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	auto receiver = g_PlayerManager.ToPlayer(client);
+	auto sender = g_PlayerManager.ToPlayer(senderSlot);
+	if (receiver == nullptr || sender == nullptr) {
+		return polyhook::ResultType::Ignored;
+	}
+
+	if (auto hearing = receiver->CanHearVoice(*sender)) {
+		polyhook::SetReturn<bool>(ret, *hearing);
+		return polyhook::ResultType::Supercede;
+	}
+
+	return polyhook::ResultType::Ignored;
+}
+
 polyhook::ResultType Hook_BuildGameSessionManifest(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	//auto system = polyhook::GetArgument<IGameSystem*>(params, 0);
 	auto msg = polyhook::GetArgument<EventBuildGameSessionManifest_t*>(params, 1);
@@ -958,6 +993,8 @@ Result<void> SetupHooks() {
 	static Memory CServerSideClient;
 	UNWRAP(CServerSideClient, g_pGameConfig->GetVTable("CServerSideClient"));
 	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::ProcessRespondCvarValue), &CServerSideClientBase::ProcessRespondCvarValue, CServerSideClient, Hook_ProcessRespondCvarValue, {Pre}));
+	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::ProcessVoiceData), &CServerSideClientBase::ProcessVoiceData, CServerSideClient, Hook_ProcessVoiceData, {Pre}));
+	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::IsHearingClient), &CServerSideClientBase::IsHearingClient, CServerSideClient, Hook_IsHearingClient, {Pre}));
 	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::SendNetMessage), &CServerSideClientBase::SendNetMessage, CServerSideClient, Hook_SendNetMessage, {Pre}));
 	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::PerformDisconnection), &CServerSideClientBase::PerformDisconnection, CServerSideClient, Hook_PerformDisconnection, {Pre}));
 	CHECK(g_HookManager.AddHookVFuncFunc(STR(CServerSideClientBase::Reactivate), &CServerSideClientBase::Reactivate, CServerSideClient, Hook_Reactivate, {Post}));

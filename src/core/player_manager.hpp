@@ -23,6 +23,21 @@ enum class TargetType {
 class CPlayerPawnComponent;
 class CCSObserverPawn;
 
+enum VoiceFlag : uint8_t {
+	Speak_Normal = 0,
+	Speak_Muted = 1 << 0, // Nobody hears the player
+	Speak_All = 1 << 1, // Everyone hears the player
+	Speak_ListenAll = 1 << 2, // The player hears everyone
+	Speak_Team = 1 << 3, // Only the player's team hears the player
+	Speak_ListenTeam = 1 << 4, // The player hears only their team
+};
+
+enum ListenOverride : uint8_t {
+	Listen_Default = 0, // Voice flags decide
+	Listen_Mute, // The receiver doesn't hear the sender
+	Listen_Hear, // The receiver hears the sender
+};
+
 enum class CvarValueStatus {
 	ValueIntact = 0,	// It got the value fine.
 	CvarNotFound = 1,
@@ -46,6 +61,8 @@ public:
 		m_slot = slot;
 		m_client = client;
 		m_onMap = true;
+		m_voiceFlags = Speak_Normal;
+		m_listenOverrides.clear();
 		m_unauthenticatedSteamID = CSteamID(steamID64);
 		m_language.clear();
 		m_languageCode = {};
@@ -57,6 +74,8 @@ public:
 		m_slot = -1;
 		m_client = nullptr;
 		m_onMap = false;
+		m_voiceFlags = Speak_Normal;
+		m_listenOverrides.clear();
 		m_unauthenticatedSteamID = k_steamIDNil;
 		m_language.clear();
 		m_languageCode = {};
@@ -115,12 +134,29 @@ public:
 		m_slot = slot;
 	}
 
+	uint8_t GetVoiceFlags() const {
+		return m_voiceFlags;
+	}
+
+	void SetVoiceFlags(uint8_t flags) {
+		m_voiceFlags = flags;
+	}
+
+	ListenOverride GetListenOverride(uint64 steamID64) const;
+	void SetListenOverride(uint64 steamID64, ListenOverride listen);
+
+	// Returns whether this player hears the sender, or nothing if the voice flags leave it to the engine
+	std::optional<bool> CanHearVoice(const Player& sender) const;
+
 	void QueryCvar(int queryCvarCookie, CvarQuery query);
 	void OnRepondCvarValue(const CCLCMsg_RespondCvarValue_t& msg);
 
 private:
 	int m_slot{-1};
 	bool m_onMap{};
+	uint8_t m_voiceFlags{Speak_Normal};
+	// Steam ids because the slots of connected players can change on a map change
+	plg::flat_hash_map<uint64, ListenOverride> m_listenOverrides;
 	CServerSideClientBase* m_client{};
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
 	plg::string m_language;

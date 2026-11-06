@@ -403,6 +403,70 @@ extern "C" PLUGIN_API bool IsClientSourceTV(int playerSlot) {
 }
 
 /**
+ * @brief Gets the voice flags of the client.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The voice flags of the client.
+ */
+extern "C" PLUGIN_API uint8_t GetClientVoiceFlags(int playerSlot) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
+		return Speak_Normal;
+	}
+
+	return player->GetVoiceFlags();
+}
+
+/**
+ * @brief Sets the voice flags of the client until they disconnect.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param flags The voice flags to set.
+ */
+extern "C" PLUGIN_API void SetClientVoiceFlags(int playerSlot, uint8_t flags) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
+		return;
+	}
+
+	player->SetVoiceFlags(flags);
+}
+
+/**
+ * @brief Gets the listen override between a receiver and a sender.
+ *
+ * @param receiverSlot The slot of the player who listens.
+ * @param senderSlot The slot of the player who speaks.
+ * @return The listen override for this pair.
+ */
+extern "C" PLUGIN_API uint8_t GetClientListening(int receiverSlot, int senderSlot) {
+	auto receiver = g_PlayerManager.ToPlayer(CPlayerSlot(receiverSlot));
+	auto sender = g_PlayerManager.ToPlayer(CPlayerSlot(senderSlot));
+	if (receiver == nullptr || sender == nullptr) {
+		return Listen_Default;
+	}
+
+	return receiver->GetListenOverride(sender->GetSteamId().ConvertToUint64());
+}
+
+/**
+ * @brief Sets the listen override between a receiver and a sender until the receiver disconnects.
+ *
+ * @param receiverSlot The slot of the player who listens.
+ * @param senderSlot The slot of the player who speaks.
+ * @param listen The listen override to set.
+ */
+extern "C" PLUGIN_API void SetClientListening(int receiverSlot, int senderSlot, uint8_t listen) {
+	auto receiver = g_PlayerManager.ToPlayer(CPlayerSlot(receiverSlot));
+	auto sender = g_PlayerManager.ToPlayer(CPlayerSlot(senderSlot));
+	if (receiver == nullptr || sender == nullptr) {
+		return;
+	}
+
+	receiver->SetListenOverride(sender->GetSteamId().ConvertToUint64(), static_cast<ListenOverride>(listen));
+}
+
+/**
  * @brief Checks if the client is alive or dead.
  *
  * @param playerSlot The index of the player's slot.
