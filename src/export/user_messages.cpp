@@ -163,7 +163,10 @@ extern "C" PLUGIN_API int16_t UserMessageFindMessageIdByName(const plg::string& 
  * @return The recipient mask.
  */
 extern "C" PLUGIN_API uint64_t UserMessageGetRecipientMask(UserMessage* userMessage) {
-	return userMessage && userMessage->GetRecipientFilter().GetRecipientCount() ? static_cast<uint64_t>(*userMessage->GetRecipientFilter().GetRecipients().Base()) : 0;
+	if (!userMessage) return 0;
+	uint64_t mask = 0;
+	std::memcpy(&mask, userMessage->GetRecipientFilter().GetRecipients().Base(), sizeof(mask));
+	return mask;
 }
 
 /**
@@ -192,7 +195,10 @@ extern "C" PLUGIN_API void UserMessageAddAllPlayers(UserMessage* userMessage) {
  * @param mask The recipient mask to set.
  */
 extern "C" PLUGIN_API void UserMessageSetRecipientMask(UserMessage* userMessage, uint64_t recipients) {
-	if (userMessage) userMessage->GetRecipientFilter().SetRecipients(recipients);
+	if (userMessage) {
+		userMessage->GetRecipientFilter().Reset();
+		userMessage->GetRecipientFilter().SetRecipients(recipients);
+	}
 }
 
 /**
