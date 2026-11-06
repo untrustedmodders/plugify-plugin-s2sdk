@@ -43,6 +43,31 @@ bool UserMessageManager::UnhookUserMessage(int16_t messageId, UserMessageCallbac
 	return false;
 }
 
+bool UserMessageManager::HookSendNetMessage(SendNetMessageHookCallback callback) {
+	return m_sendNetMessageHooks.Register(callback);
+}
+
+bool UserMessageManager::UnhookSendNetMessage(SendNetMessageHookCallback callback) {
+	return m_sendNetMessageHooks.Unregister(callback);
+}
+
+bool UserMessageManager::HasSendNetMessageHooks() const {
+	return !m_sendNetMessageHooks.Empty();
+}
+
+ResultType UserMessageManager::ExecuteSendNetMessageCallbacks(int playerSlot, UserMessage* message) {
+	ResultType result = ResultType::Continue;
+	if (auto funcs = m_sendNetMessageHooks.Get()) {
+		for (const auto& func : funcs->handlers) {
+			result = std::max(result, func(playerSlot, message));
+			if (result >= ResultType::Stop) {
+				break;
+			}
+		}
+	}
+	return result;
+}
+
 ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 

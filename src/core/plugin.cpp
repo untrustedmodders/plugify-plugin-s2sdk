@@ -699,10 +699,15 @@ polyhook::ResultType Hook_SendNetMessage(polyhook::HookHandle hook, polyhook::Pa
 
 	g_MultiAddonManager.OnSendNetMessage(client, data, bufType);
 
-	if (!g_SendNetMessageListenerManager.Empty()) {
+	if (g_UserMessageManager.HasSendNetMessageHooks() || !g_SendNetMessageListenerManager.Empty()) {
 		if (auto* msgSerializable = data->GetSerializerPB()) {
 			int playerSlot = client->GetPlayerSlot().Get();
 			UserMessage message(msgSerializable, data, 1ULL << playerSlot);
+			if (g_UserMessageManager.ExecuteSendNetMessageCallbacks(playerSlot, &message) >= ResultType::Handled) {
+				// A blocked message still counts as sent, the caller has no reason to treat it as a failure
+				polyhook::SetReturn<bool>(ret, true);
+				return polyhook::ResultType::Supercede;
+			}
 			g_SendNetMessageListenerManager(playerSlot, &message);
 		}
 	}

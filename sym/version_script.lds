@@ -718,6 +718,8 @@
 
         HookUserMessage;
         UnhookUserMessage;
+        HookSendNetMessage;
+        UnhookSendNetMessage;
         UserMessageCreateFromSerializable;
         UserMessageCreateFromName;
         UserMessageCreateFromId;

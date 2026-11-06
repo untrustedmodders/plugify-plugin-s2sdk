@@ -32,6 +32,26 @@ extern "C" PLUGIN_API bool UnhookUserMessage(int16_t messageId, UserMessageCallb
 }
 
 /**
+ * @brief Hooks every net message sent to a single client, allowing to block it for that client.
+ *
+ * @param callback The callback function to invoke before the message is sent. Handled or Stop blocks the message, Stop also skips the remaining callbacks.
+ * @return True if the hook was successfully added, false otherwise.
+ */
+extern "C" PLUGIN_API bool HookSendNetMessage(SendNetMessageHookCallback callback) {
+	return g_UserMessageManager.HookSendNetMessage(callback);
+}
+
+/**
+ * @brief Unhooks a previously hooked callback from HookSendNetMessage.
+ *
+ * @param callback The callback function to remove.
+ * @return True if the hook was successfully removed, false otherwise.
+ */
+extern "C" PLUGIN_API bool UnhookSendNetMessage(SendNetMessageHookCallback callback) {
+	return g_UserMessageManager.UnhookSendNetMessage(callback);
+}
+
+/**
  * @brief Creates a UserMessage from a serializable message.
  *
  * @param msgSerializable The serializable message.

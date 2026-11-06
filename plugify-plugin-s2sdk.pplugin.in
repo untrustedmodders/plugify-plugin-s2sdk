@@ -27287,6 +27287,44 @@
       }
     },
     {
+      "name": "HookSendNetMessage",
+      "group": "Protobuf",
+      "description": "Hooks every net message sent to a single client, allowing to block it for that client.",
+      "funcName": "HookSendNetMessage",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "The callback function to invoke before the message is sent.",
+          "prototype": "SendNetMessageHookCallback"
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the hook was successfully added, false otherwise."
+      }
+    },
+    {
+      "name": "UnhookSendNetMessage",
+      "group": "Protobuf",
+      "description": "Unhooks a previously hooked callback from HookSendNetMessage.",
+      "funcName": "UnhookSendNetMessage",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "The callback function to remove.",
+          "prototype": "SendNetMessageHookCallback"
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the hook was successfully removed, false otherwise."
+      }
+    },
+    {
       "name": "UserMessageCreateFromSerializable",
       "group": "Protobuf",
       "description": "Creates a UserMessage from a serializable message.",
@@ -33921,6 +33959,29 @@
       "retType": {
         "type": "void",
         "description": ""
+      }
+    },
+    {
+      "name": "SendNetMessageHookCallback",
+      "funcName": "SendNetMessageHookCallback",
+      "description": "Callback function for net messages sent to a single client. Runs before OnSendNetMessage, blocked messages don't reach it.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The slot of the client the message is sent to."
+        },
+        {
+          "name": "message",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The user message."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "Handled or Stop blocks the message for this client, Stop also skips the remaining callbacks.",
+        "enum": "ResultType"
       }
     },
     {

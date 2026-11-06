@@ -7,6 +7,8 @@
 class UserMessage;
 using UserMessageCallback = ResultType (*)(UserMessage* message);
 inline char UserMessageStr[] = S2SDK_PACKAGE "::UserMessageListener";
+using SendNetMessageHookCallback = ResultType (*)(int playerSlot, UserMessage* message);
+inline char SendNetMessageHookStr[] = S2SDK_PACKAGE "::SendNetMessageHook";
 
 struct UserMessageHook {
 	plg::enum_array<ListenerManager<UserMessageStr, UserMessageCallback>, HookMode> callbacks;
@@ -26,11 +28,17 @@ public:
 	bool HookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode);
 	bool UnhookUserMessage(int16_t messageId, UserMessageCallback callback, HookMode mode);
 
+	bool HookSendNetMessage(SendNetMessageHookCallback callback);
+	bool UnhookSendNetMessage(SendNetMessageHookCallback callback);
+	bool HasSendNetMessageHooks() const;
+	ResultType ExecuteSendNetMessageCallbacks(int playerSlot, UserMessage* message);
+
 	ResultType ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode);
 
 private:
 	plg::flat_hash_map<int16_t, std::shared_ptr<UserMessageHook>> m_hookMap;
 	std::recursive_mutex m_mutex;
 	UserMessageHook m_global;
+	ListenerManager<SendNetMessageHookStr, SendNetMessageHookCallback> m_sendNetMessageHooks;
 };
 inline UserMessageManager& g_UserMessageManager = UserMessageManager::Instance();
