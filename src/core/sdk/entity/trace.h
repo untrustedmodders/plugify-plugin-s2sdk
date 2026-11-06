@@ -46,6 +46,10 @@ public:
 		bool& outStartSolid,
 		Vector& outNormal
 	) {
+		// The game leaves out the keys of a trace that hit nothing or started outside a solid
+		outHit = false;
+		outStartSolid = false;
+
 		ParamScope params(ent);
 
 		// Create input table
@@ -115,6 +119,10 @@ public:
 		CEntityInstance*& outEntHit,
 		bool& outStartSolid
 	) {
+		// The game leaves out the keys of a trace that hit nothing or started outside a solid
+		outHit = false;
+		outStartSolid = false;
+
 		ParamScope params(ignore);
 
 		// Create input table
@@ -123,8 +131,8 @@ public:
 		table table = inputTableVar;
 
 		// Populate input table with parameters
-		g_pScriptVM->SetValue(table, "start", start);
-		g_pScriptVM->SetValue(table, "end", end);
+		g_pScriptVM->SetValue(table, "startpos", start);
+		g_pScriptVM->SetValue(table, "endpos", end);
 		g_pScriptVM->SetValue(table, "min", min);
 		g_pScriptVM->SetValue(table, "max", max);
 		g_pScriptVM->SetValue(table, "mask", mask);
@@ -179,6 +187,10 @@ public:
 		CEntityInstance*& outEntHit,
 		bool& outStartSolid
 	) {
+		// The game leaves out the keys of a trace that hit nothing or started outside a solid
+		outHit = false;
+		outStartSolid = false;
+
 		ParamScope params(ignore);
 		// Create input table
 		ScriptVariant_t inputTableVar;
