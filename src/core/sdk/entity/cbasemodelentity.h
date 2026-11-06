@@ -36,7 +36,7 @@ public:
     VSCRIPT_MEMBER_FUNCTION(GetMaterialGroupMask, uint64)
     VSCRIPT_MEMBER_FUNCTION(GetModelScale, float)
     VSCRIPT_MEMBER_FUNCTION(GetRenderAlpha, int)
-    VSCRIPT_MEMBER_FUNCTION(GetRenderColor, vector)
+    VSCRIPT_MEMBER_FUNCTION(GetRenderColor, Vector)
     VSCRIPT_MEMBER_FUNCTION(ScriptLookupAttachment, int, string)
     VSCRIPT_MEMBER_FUNCTION(SetBodygroup, void, int, int)
     VSCRIPT_MEMBER_FUNCTION(SetBodygroupByName, void, string, int)
