@@ -303,24 +303,36 @@ void Player::SetListenOverride(uint64 steamID64, ListenOverride listen) {
 	}
 }
 
-std::optional<bool> Player::CanHearVoice(const Player& sender) const {
-	const uint8_t senderFlags = sender.GetVoiceFlags();
+ListenOverride Player::GetChatListenOverride(uint64 steamID64) const {
+	auto it = m_chatListenOverrides.find(steamID64);
+	return it != m_chatListenOverrides.end() ? it->second : Listen_Default;
+}
+
+void Player::SetChatListenOverride(uint64 steamID64, ListenOverride listen) {
+	if (listen == Listen_Default) {
+		m_chatListenOverrides.erase(steamID64);
+	} else {
+		m_chatListenOverrides[steamID64] = listen;
+	}
+}
+
+std::optional<bool> Player::ResolveAccess(const Player& sender, uint8_t senderFlags, uint8_t receiverFlags, const plg::flat_hash_map<uint64, ListenOverride>& overrides) const {
 	if (senderFlags & Speak_Muted) {
 		return false;
 	}
 
-	if (!m_listenOverrides.empty()) {
-		const ListenOverride listen = GetListenOverride(sender.GetSteamId().ConvertToUint64());
-		if (listen != Listen_Default) {
-			return listen == Listen_Hear;
+	if (!overrides.empty()) {
+		auto it = overrides.find(sender.GetSteamId().ConvertToUint64());
+		if (it != overrides.end()) {
+			return it->second == Listen_Hear;
 		}
 	}
 
-	if ((senderFlags & Speak_All) || (m_voiceFlags & Speak_ListenAll)) {
+	if ((senderFlags & Speak_All) || (receiverFlags & Speak_ListenAll)) {
 		return true;
 	}
 
-	if ((senderFlags & Speak_Team) || (m_voiceFlags & Speak_ListenTeam)) {
+	if ((senderFlags & Speak_Team) || (receiverFlags & Speak_ListenTeam)) {
 		auto receiverController = GetController();
 		auto senderController = sender.GetController();
 		if (receiverController && senderController) {
@@ -329,6 +341,14 @@ std::optional<bool> Player::CanHearVoice(const Player& sender) const {
 	}
 
 	return std::nullopt;
+}
+
+std::optional<bool> Player::CanHearVoice(const Player& sender) const {
+	return ResolveAccess(sender, sender.m_voiceFlags, m_voiceFlags, m_listenOverrides);
+}
+
+std::optional<bool> Player::CanSeeChat(const Player& sender) const {
+	return ResolveAccess(sender, sender.m_chatFlags, m_chatFlags, m_chatListenOverrides);
 }
 
 void PlayerManager::OnClientConnected(CPlayerSlot slot, uint64 steamID64) {

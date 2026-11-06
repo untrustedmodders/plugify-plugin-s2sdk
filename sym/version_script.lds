@@ -84,6 +84,10 @@
         SetClientVoiceFlags;
         GetClientListening;
         SetClientListening;
+        GetClientChatFlags;
+        SetClientChatFlags;
+        GetClientChatListening;
+        SetClientChatListening;
         IsClientAlive;
         IsFakeClient;
         GetClientMoveType;

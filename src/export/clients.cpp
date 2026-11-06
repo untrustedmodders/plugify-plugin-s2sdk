@@ -467,6 +467,70 @@ extern "C" PLUGIN_API void SetClientListening(int receiverSlot, int senderSlot, 
 }
 
 /**
+ * @brief Gets the chat flags of the client.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return The chat flags of the client.
+ */
+extern "C" PLUGIN_API uint8_t GetClientChatFlags(int playerSlot) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
+		return Speak_Normal;
+	}
+
+	return player->GetChatFlags();
+}
+
+/**
+ * @brief Sets the chat flags of the client until they disconnect. Flags can only hide messages the engine sends, chat commands keep working.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param flags The chat flags to set.
+ */
+extern "C" PLUGIN_API void SetClientChatFlags(int playerSlot, uint8_t flags) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (player == nullptr) {
+		return;
+	}
+
+	player->SetChatFlags(flags);
+}
+
+/**
+ * @brief Gets the chat override between a receiver and a sender.
+ *
+ * @param receiverSlot The slot of the player who reads.
+ * @param senderSlot The slot of the player who writes.
+ * @return The chat override for this pair.
+ */
+extern "C" PLUGIN_API uint8_t GetClientChatListening(int receiverSlot, int senderSlot) {
+	auto receiver = g_PlayerManager.ToPlayer(CPlayerSlot(receiverSlot));
+	auto sender = g_PlayerManager.ToPlayer(CPlayerSlot(senderSlot));
+	if (receiver == nullptr || sender == nullptr) {
+		return Listen_Default;
+	}
+
+	return receiver->GetChatListenOverride(sender->GetSteamId().ConvertToUint64());
+}
+
+/**
+ * @brief Sets the chat override between a receiver and a sender until the receiver disconnects.
+ *
+ * @param receiverSlot The slot of the player who reads.
+ * @param senderSlot The slot of the player who writes.
+ * @param listen The chat override to set.
+ */
+extern "C" PLUGIN_API void SetClientChatListening(int receiverSlot, int senderSlot, uint8_t listen) {
+	auto receiver = g_PlayerManager.ToPlayer(CPlayerSlot(receiverSlot));
+	auto sender = g_PlayerManager.ToPlayer(CPlayerSlot(senderSlot));
+	if (receiver == nullptr || sender == nullptr) {
+		return;
+	}
+
+	receiver->SetChatListenOverride(sender->GetSteamId().ConvertToUint64(), static_cast<ListenOverride>(listen));
+}
+
+/**
  * @brief Checks if the client is alive or dead.
  *
  * @param playerSlot The index of the player's slot.

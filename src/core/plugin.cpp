@@ -8,6 +8,7 @@
 #include <igameevents.h>
 #include <iserver.h>
 #include <netmessages.h>
+#include <usermessages.pb.h>
 #include <networksystem/inetworksystem.h>
 #include <steam_gameserver.h>
 #include <vscript/ccscript.h>
@@ -691,6 +692,16 @@ polyhook::ResultType Hook_SendNetMessage(polyhook::HookHandle hook, polyhook::Pa
 	auto client = polyhook::GetArgument<CServerSideClient*>(params, 0);
 	auto data = polyhook::GetArgument<CNetMessage*>(params, 1);
 	auto bufType = (NetChannelBufType_t) polyhook::GetArgument<int8_t>(params, 2);
+
+	if (auto* serializer = data->GetSerializerPB(); serializer && serializer->GetNetMessageInfo()->m_MessageId == UM_SayText2) {
+		auto* chat = static_cast<const CUserMessageSayText2*>(data->AsMessage());
+		auto receiver = g_PlayerManager.ToPlayer(client);
+		auto sender = g_PlayerManager.ToPlayer(CPlayerSlot(chat->entityindex() - 1));
+		if (receiver != nullptr && sender != nullptr && receiver->CanSeeChat(*sender) == false) {
+			polyhook::SetReturn<bool>(ret, true);
+			return polyhook::ResultType::Supercede;
+		}
+	}
 
 	if (client->IsFakeClient() || client->IsHLTV()) {
 		// Don't send messages to fake clients or replay clients

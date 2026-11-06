@@ -10250,7 +10250,7 @@
       "retType": {
         "type": "uint8",
         "description": "The voice flags of the client.",
-        "enum": "VoiceFlag"
+        "enum": "SpeakFlags"
       }
     },
     {
@@ -10270,7 +10270,7 @@
           "type": "uint8",
           "ref": false,
           "description": "The voice flags to set.",
-          "enum": "VoiceFlag"
+          "enum": "SpeakFlags"
         }
       ],
       "retType": {
@@ -10325,6 +10325,104 @@
           "type": "uint8",
           "ref": false,
           "description": "The listen override to set.",
+          "enum": "ListenOverride"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientChatFlags",
+      "group": "Clients",
+      "description": "Gets the chat flags of the client.",
+      "funcName": "GetClientChatFlags",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "uint8",
+        "description": "The chat flags of the client.",
+        "enum": "SpeakFlags"
+      }
+    },
+    {
+      "name": "SetClientChatFlags",
+      "group": "Clients",
+      "description": "Sets the chat flags of the client until they disconnect. Flags can only hide messages the engine sends, chat commands keep working.",
+      "funcName": "SetClientChatFlags",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "flags",
+          "type": "uint8",
+          "ref": false,
+          "description": "The chat flags to set.",
+          "enum": "SpeakFlags"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetClientChatListening",
+      "group": "Clients",
+      "description": "Gets the chat override between a receiver and a sender.",
+      "funcName": "GetClientChatListening",
+      "paramTypes": [
+        {
+          "name": "receiverSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot of the player who reads."
+        },
+        {
+          "name": "senderSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot of the player who writes."
+        }
+      ],
+      "retType": {
+        "type": "uint8",
+        "description": "The chat override for this pair.",
+        "enum": "ListenOverride"
+      }
+    },
+    {
+      "name": "SetClientChatListening",
+      "group": "Clients",
+      "description": "Sets the chat override between a receiver and a sender until the receiver disconnects.",
+      "funcName": "SetClientChatListening",
+      "paramTypes": [
+        {
+          "name": "receiverSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot of the player who reads."
+        },
+        {
+          "name": "senderSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot of the player who writes."
+        },
+        {
+          "name": "listen",
+          "type": "uint8",
+          "ref": false,
+          "description": "The chat override to set.",
           "enum": "ListenOverride"
         }
       ],
@@ -34103,7 +34201,7 @@
   ],
   "enums": [
     {
-      "name": "VoiceFlag",
+      "name": "SpeakFlags",
       "description": "Flags that control whom a player hears and who hears them.",
       "values": [
         {
