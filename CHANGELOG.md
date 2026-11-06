@@ -1,5 +1,56 @@
 # Changelog
 
+## [3.2.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.1.1...v3.2.0) (2026-11-06)
+
+
+### Features
+
+* expose debug overlay helper functions in the API ([4e15a3a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4e15a3a9f0b83091ef50f7e0117e2ffd5f77b5dd))
+* expose listener priorities through On*_Register2 in the manifest ([026816f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/026816fe56a206375ec4e9324591bcc546cfdc47))
+* track client sessions across map changes ([640fa0d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/640fa0da73d4297cc32772b5d087b3a1c27a24f2))
+
+
+### Bug Fixes
+
+* allow clearing the entity owner ([7de8d55](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7de8d558ae7e665d18e5d30089b726644e79916b))
+* avoid DestroyDamageInfo double release in damage exports ([3a49391](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3a49391baca3e85a726e3f03936ce876940472c3))
+* bind RandomFlt to the RandomFloatWrapper script function ([71a931e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/71a931ef85448685b77d43e42c6df1ca5a05744c))
+* check admin command access with a Steam-validated SteamID ([33a0ce7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/33a0ce7335cd848b72e72837541f87e5e6f9cd1d))
+* check nested message type in protobuf vector and color accessors ([350f6d7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/350f6d753724ea0d4982e87f1aeeee0a974b759e))
+* collect vote recipients from all slots ([13ca8e6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/13ca8e6a35d656ebfa92a594f28d6d4704f852fe))
+* connect entity and client outputs through a redirect to self ([c5832a5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c5832a509ef1ef3d46a87b5399aeaba226b536e2))
+* create a child key in Kv1CreateKey instead of a peer ([10b1736](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/10b17364b4dd1eab0494244036d3181a9f5c1008))
+* declare bool return of HookConVarChange and UnhookConVarChange in the manifest ([8597322](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8597322b0d5d0259a7fda69dc24d4a4385415a69))
+* declare m_iTeamNum as uint8 to match the schema ([2c19148](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2c191483c4fe2f79a7cde6a5727d1367001e2360))
+* expire client addon cache on connect ([23290f7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/23290f7f34f56a043cafed5d33bff2edac59aa77))
+* handle unknown modules in QueryInterface ([adf5da2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/adf5da2d6a6358328836de553a4a27d5201c1fae))
+* hide private addons from the server info message ([f63c9bb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f63c9bbae703329e331f663cf7c4cc330db753c5))
+* ignore server-only entities in SetTransmitInfoEntity ([d1cb409](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d1cb409509ffb5360daf29109f5fe53ee303230c))
+* keep other event hooks when unhooking one mode ([9844f9b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9844f9b3177e11ddf6f4f12a4e055af84bb58422))
+* keep output hook lists per call and honor Stop in entity output hooks ([64081f7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/64081f7bfd0c4af5c06f62047f836cf3089b9a55))
+* log the addon list once per connection ([4330e9e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4330e9ed27c481ae8f48af93b3ca06f546c09fd5))
+* match game ABI in angle and vector script bindings ([90f04d2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/90f04d2eec76a44d03600e9a347a1b26098cd97a))
+* match game ABI in the remaining vector script bindings ([5520916](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5520916e4f67ac809935a1f50914ee5939e02e12))
+* pass attachment name in follow merge exports ([9257c8c](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9257c8c76788bd5be3058694a41c1fb7e994274f))
+* pass the expected keys to TraceHull and default trace outputs ([d74f424](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d74f424dd5dc6ce8b3922cb7fc6f7f5db307509e))
+* print the no-access message once per command ([e748c1d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e748c1d8465db946f83d7aa984ccae9307f1d489))
+* raise addon connection timeout and add it to the config ([5033c44](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5033c4446ce69d9c5f0280ab053921316e065a0b))
+* read and set the full recipient mask ([5962b4e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/5962b4ea204fb7f15df676cfee693675295d9227))
+* remove extra string argument from FindInSphere ([338cde5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/338cde5069e68c4faf616bb498ac768a7ca9dd79))
+* remove padding in Player ([bbb5f52](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bbb5f52526b8192f22dc30a72295d5f6eab2e7bd))
+* remove unimplemented user flag exports ([fffca49](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fffca4918a9f56d247473ff5106defdc1e49bc4f))
+* return m_name from GetEntityName instead of the global name ([42e0c0e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/42e0c0e8a7a5038947859f10b8da5b50e4ade3f4))
+* return null when creating an unknown user message ([7cdd2f5](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/7cdd2f5e27769e74f0698b7b6656fbfa87b72e06))
+* return render color by value ([c0c907b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c0c907bcdd85fd4227c40c5794476d888ae4ae63))
+* return zero latency for bots ([0867caf](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0867caff3ea93dd64083ab32e1fb5f80159ca51f))
+* save KeyValues3 into text buffers ([c49e5c6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/c49e5c6f19e71c2acf947799ff7ff569150a837f))
+* skip OnClientFullyConnect for SourceTV spectators ([859c498](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/859c4988f6ce2bd8538d3d814a86f6971941f987))
+* skip post event hooks when an event is blocked in pre ([4f08641](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4f0864145e7877e9e91312ff81877c672ddf0ef6))
+* strip the full chat trigger and leading spaces from commands ([85d84a6](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/85d84a60a8fc96392f0a8f155d7a7cd742fc55a4))
+* update zombie_mod to the current API ([40545c2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/40545c25bd16d0cfbbf15c7c7cf20e4cf78e21ef))
+* use targetname key when spawning point_script ([a0657c0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a0657c0c715232e190899aea92bab06132b60678))
+* vscript debug ([0836db8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0836db8e09ab237de317b3bca5b09c04efc00d3b))
+
 ## [3.1.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.1.0...v3.1.1) (2026-11-02)
 
 
