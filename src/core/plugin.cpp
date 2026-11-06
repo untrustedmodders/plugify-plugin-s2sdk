@@ -46,6 +46,33 @@ GAME_EVENT_F(round_start) {
 	g_TransmitManager.RoundStart();
 }
 
+polyhook::ResultType Hook_LogDirect(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	// CLoggingSystem* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, const void* context, const char* message, va_list* args
+	auto message = polyhook::GetArgument<const char*>(params, 4);
+	auto args = polyhook::GetArgument<va_list*>(params, 5);
+
+	bool matched;
+	if (args) {
+		char buffer[MAX_LOGGING_MESSAGE_LENGTH];
+		// The original function still has to read the arguments
+		va_list copy;
+		va_copy(copy, *args);
+		V_vsnprintf(buffer, sizeof(buffer), message, copy);
+		va_end(copy);
+
+		matched = g_pCoreConfig->IsRegexMatch(buffer);
+	} else {
+		matched = g_pCoreConfig->IsRegexMatch(message);
+	}
+
+	if (matched) {
+		polyhook::SetReturn<int>(ret, LR_CONTINUE);
+		return polyhook::ResultType::Supercede;
+	}
+
+	return polyhook::ResultType::Ignored;
+}
+
 polyhook::ResultType Hook_StartupServer(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	//auto config = polyhook::GetArgument<const GameSessionConfiguration_t *>(params, 1);
 	//auto worldSession = polyhook::GetArgument<ISource2WorldSession*>(params, 2);
@@ -890,8 +917,12 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IEntityListener::OnEntityDeleted), &IEntityListener::OnEntityDeleted, pSource2GameEntitiesEntityListener, Hook_OnEntityDeleted, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IEntityListener::OnEntityParentChanged), &IEntityListener::OnEntityParentChanged, pSource2GameEntitiesEntityListener, Hook_OnEntityParentChanged, {Post}));
 
-	//using LogDirect = LoggingResponse_t (*)(void* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, LeafCodeInfo_t*, LoggingMetaData_t*, Color, char const*, va_list*);
-	//CHECK(g_HookManager.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, {Pre}));
+	if (!g_pCoreConfig->FilterConsoleCleaner.empty()) {
+		using LogDirect = LoggingResponse_t (*)(void* loggingSystem, LoggingChannelID_t channel, LoggingSeverity_t severity, const void* context, const char* message, va_list* args);
+		if (auto result = g_HookManager.AddHookDetourFunc<LogDirect>("LogDirect", Hook_LogDirect, {Pre}); !result) {
+			plg::print(LS_WARNING, "FilterConsoleCleaner is disabled: {}\n", result.error());
+		}
+	}
 
 	static Memory CLuaVM;
 	UNWRAP(CLuaVM, g_pGameConfig->GetVTable("CLuaVM"));

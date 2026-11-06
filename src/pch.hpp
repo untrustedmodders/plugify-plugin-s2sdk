@@ -31,7 +31,7 @@
 #include <thread>
 #include <execution>
 #include <random>
-//#include <regex>
+#include <regex>
 
 namespace fs = std::filesystem;
 

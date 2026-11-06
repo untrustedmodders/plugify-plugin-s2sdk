@@ -2,6 +2,12 @@
   "$schema": "https://raw.githubusercontent.com/untrustedmodders/plugify-plugin-s2sdk/refs/heads/main/schemas/gamedata.schema.json",
   "csgo": {
     "Signatures": {
+      // Internal CLoggingSystem function, the exported LoggingSystem_LogDirect jumps straight to it
+      "LogDirect": {
+        "library": "tier0",
+        "win64": "4C 89 4C 24 20 44 89 44 24 18 89 54 24 10 55",
+        "linuxsteamrt64": "55 89 D0 49 89 FA 89 F7 48 89 E5"
+      },
       // PreloadLibrary signature for engine2
       "PreloadLibrary": {
         "library": "engine2",

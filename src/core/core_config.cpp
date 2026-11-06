@@ -45,9 +45,6 @@ CoreConfig::CoreConfig(plg::vector<plg::string> paths) : m_paths(std::move(paths
 }
 
 CoreConfig::~CoreConfig() {
-	/*for (auto& regex : FilterConsoleCleaner) {
-		delete regex;
-	}*/
 }
 
 Result<bool> CoreConfig::Initialize() {
@@ -78,17 +75,21 @@ Result<bool> CoreConfig::Initialize() {
 		config.JumpBack();
 	}
 
-	/*FilterConsoleCleaner.clear();
+	FilterConsoleCleaner.clear();
 	if (config.JumpKey("FilterConsoleCleaner")) {
 		if (config.IsArray() && config.JumpFirst()) {
 			do {
 				plg::string pattern = config.GetString();
-				FilterConsoleCleaner.emplace_back(pattern.begin(), pattern.end());
+				try {
+					FilterConsoleCleaner.emplace_back(pattern.begin(), pattern.end(), std::regex::optimize);
+				} catch (const std::regex_error& error) {
+					plg::print(LS_WARNING, "Invalid FilterConsoleCleaner pattern '{}': {}\n", pattern, error.what());
+				}
 			} while (config.JumpNext());
 			config.JumpBack();
 		}
 		config.JumpBack();
-	}*/
+	}
 
 	ServerLanguage = config.GetString("ServerLanguage", "en");
 	FollowCS2ServerGuidelines = config.GetBool("FollowCS2ServerGuidelines", true);
@@ -193,9 +194,16 @@ size_t CoreConfig::GetChatTriggerLength(std::string_view message) const {
 }
 
 bool CoreConfig::IsRegexMatch(std::string_view message) const {
-	/*for (const auto& regex : FilterConsoleCleaner) {
-		if (std::regex_match(message.begin(), message.end(), regex))
-			return true;
-	}*/
+	// '.' doesn't match a line break, so every line of a message is checked on its own
+	while (!message.empty()) {
+		auto end = message.find('\n');
+		auto line = message.substr(0, end);
+		message.remove_prefix(end == std::string_view::npos ? message.size() : end + 1);
+
+		for (const auto& regex : FilterConsoleCleaner) {
+			if (std::regex_match(line.begin(), line.end(), regex))
+				return true;
+		}
+	}
 	return false;
 }

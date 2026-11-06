@@ -22,7 +22,7 @@ private:
 public:
 	std::vector<plg::string> PublicChatTrigger{"!"};
 	std::vector<plg::string> SilentChatTrigger{"/"};
-	//std::vector<std::regex> FilterConsoleCleaner{};
+	std::vector<std::regex> FilterConsoleCleaner{};
 	plg::string ServerLanguage{"en"};
 	bool FollowCS2ServerGuidelines{true};
 	bool FixFlashAlertMessage{true};
