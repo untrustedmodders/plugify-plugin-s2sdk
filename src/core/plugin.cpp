@@ -789,6 +789,11 @@ polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::P
 	} else if (name.ends_with("team_manager")) {
 		g_TeamManagers.erase(static_cast<CSTeam>(*entity->m_iTeamNum));
 	} else if (entity == g_pPointScript) {
+#if defined (CS2)
+		// CSScript::ResolveModule uses the last script without checking it, so a deleted one must not stay there
+		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
+		g_pScripts->FindAndRemove(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);
+#endif
 		g_pPointScript = nullptr;
 	}
 
