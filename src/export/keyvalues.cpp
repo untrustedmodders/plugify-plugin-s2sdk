@@ -1,5 +1,6 @@
 #include <keyvalues.h>
 #include <filesystem.h>
+#include <utlbuffer.h>
 
 PLUGIFY_WARN_PUSH()
 
@@ -487,6 +488,63 @@ extern "C" PLUGIN_API KeyValues* Kv1GetFirstTrueSubKey(KeyValues* kv) {
  */
 extern "C" PLUGIN_API KeyValues* Kv1GetNextTrueSubKey(KeyValues* kv) {
 	return kv ? kv->GetNextTrueSubKey() : nullptr;
+}
+
+/**
+ * @brief Removes a child by its pointer and deletes it with its subkeys. Get the next key before calling this while iterating.
+ *
+ * @param kv Pointer to the parent KeyValues object
+ * @param child Pointer to the child to remove
+ * @return true if it was a child of this key and was removed, false otherwise
+ */
+extern "C" PLUGIN_API bool Kv1RemoveSubKey(KeyValues* kv, KeyValues* child) {
+	if (!kv || !child) return false;
+	for (auto* subKey = kv->GetFirstSubKey(); subKey; subKey = subKey->GetNextKey()) {
+		if (subKey == child) {
+			kv->RemoveSubKey(child);
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * @brief Sets whether \\n, \\t and \\" are treated as escape sequences when this instance is loaded or saved
+ *
+ * @param kv Pointer to the KeyValues object
+ * @param enabled true to use escape sequences, false to keep them as plain text
+ */
+extern "C" PLUGIN_API void Kv1SetEscapeSequences(KeyValues* kv, bool enabled) {
+	if (kv) kv->UsesEscapeSequences(enabled);
+}
+
+/**
+ * @brief Replaces the subkeys of another instance with copies of the subkeys of this one
+ *
+ * @note The keys are not merged: everything the target already had is deleted, even keys the source doesn't have.
+ *       Copying an instance into itself does nothing.
+ *
+ * @param kv Pointer to the source KeyValues object
+ * @param target Pointer to the KeyValues object that receives the copies, its existing keys are deleted
+ */
+extern "C" PLUGIN_API void Kv1CopySubkeys(KeyValues* kv, KeyValues* target) {
+	if (!kv || !target || kv == target) return;
+	// CopySubkeys overwrites the subkey pointer, so the old keys would leak
+	target->Clear();
+	kv->CopySubkeys(target);
+}
+
+/**
+ * @brief Writes this instance as KeyValues text
+ *
+ * @param kv Pointer to the KeyValues object
+ * @return The KeyValues text, empty if kv is null
+ */
+extern "C" PLUGIN_API plg::string Kv1ExportToString(KeyValues* kv) {
+	if (!kv) return {};
+	CUtlBuffer buffer(0, 0, CUtlBuffer::TEXT_BUFFER);
+	kv->RecursiveSaveToFile(buffer, 0, true, true);
+	return plg::string(static_cast<const char*>(buffer.Base()), buffer.TellPut());
 }
 
 PLUGIFY_WARN_POP()

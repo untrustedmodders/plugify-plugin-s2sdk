@@ -67,6 +67,10 @@
         Kv1GetNextValue;
         Kv1GetFirstTrueSubKey;
         Kv1GetNextTrueSubKey;
+        Kv1RemoveSubKey;
+        Kv1SetEscapeSequences;
+        Kv1CopySubkeys;
+        Kv1ExportToString;
 
         EntPointerToPlayerSlot;
         PlayerSlotToEntPointer;

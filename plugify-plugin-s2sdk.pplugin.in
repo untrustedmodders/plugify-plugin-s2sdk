@@ -1196,6 +1196,94 @@
       }
     },
     {
+      "name": "Kv1RemoveSubKey",
+      "group": "Keyvalues",
+      "description": "Removes a child by its pointer and deletes it with its subkeys. Get the next key before calling this while iterating.",
+      "funcName": "Kv1RemoveSubKey",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the parent KeyValues object"
+        },
+        {
+          "name": "child",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the child to remove"
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "true if it was a child of this key and was removed, false otherwise"
+      }
+    },
+    {
+      "name": "Kv1SetEscapeSequences",
+      "group": "Keyvalues",
+      "description": "Sets whether escape sequences are processed when this instance is loaded or saved",
+      "funcName": "Kv1SetEscapeSequences",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the KeyValues object"
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "ref": false,
+          "description": "true to use escape sequences, false to keep them as plain text"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "Kv1CopySubkeys",
+      "group": "Keyvalues",
+      "description": "Replaces the subkeys of another instance with copies of the subkeys of this one. The keys are not merged: everything the target already had is deleted, even keys the source doesn't have. Copying an instance into itself does nothing.",
+      "funcName": "Kv1CopySubkeys",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the source KeyValues object"
+        },
+        {
+          "name": "target",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the KeyValues object that receives the copies, its existing keys are deleted"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "Kv1ExportToString",
+      "group": "Keyvalues",
+      "description": "Writes this instance as KeyValues text",
+      "funcName": "Kv1ExportToString",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the KeyValues object"
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The KeyValues text, empty if kv is null"
+      }
+    },
+    {
       "name": "Kv1IsEmpty",
       "group": "Keyvalues",
       "description": "Checks if a key exists and has no value or subkeys",
