@@ -836,8 +836,18 @@ polyhook::ResultType Hook_ProcessRespondCvarValue(polyhook::HookHandle hook, pol
 polyhook::ResultType Hook_ProcessVoiceData(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto client = polyhook::GetArgument<CServerSideClientBase*>(params, 0);
 
+	// Counts muted players too, so plugins can tell them why nobody hears them
+	g_PlayerManager.OnClientVoiceData(client->GetPlayerSlot());
+
 	auto player = g_PlayerManager.ToPlayer(client);
 	if (player != nullptr && (player->GetVoiceFlags() & Speak_Muted)) {
+		polyhook::SetReturn<bool>(ret, true);
+		return polyhook::ResultType::Supercede;
+	}
+
+	// The engine broadcasts this message after the hook, so changes reach every listener
+	auto msg = const_cast<CCLCMsg_VoiceData_t*>(polyhook::GetArgument<const CCLCMsg_VoiceData_t*>(params, 1));
+	if (g_UserMessageManager.ExecuteClientVoiceDataCallbacks(client->GetPlayerSlot().Get(), msg) >= ResultType::Handled) {
 		polyhook::SetReturn<bool>(ret, true);
 		return polyhook::ResultType::Supercede;
 	}

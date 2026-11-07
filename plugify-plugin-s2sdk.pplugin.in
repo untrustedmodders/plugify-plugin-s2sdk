@@ -27537,6 +27537,78 @@
       }
     },
     {
+      "name": "OnClientSpeakingStart_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnClientSpeakingStart_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSpeakingStartCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSpeakingStart_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnClientSpeakingStart_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSpeakingStartCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSpeakingEnd_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnClientSpeakingEnd_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSpeakingEndCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientSpeakingEnd_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnClientSpeakingEnd_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientSpeakingEndCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnSendNetMessage_Register",
       "group": "Listeners",
       "description": "Register callback to event.",
@@ -27870,6 +27942,292 @@
       "retType": {
         "type": "bool",
         "description": "True if the hook was successfully removed, false otherwise."
+      }
+    },
+    {
+      "name": "HookClientVoiceData",
+      "group": "Voice",
+      "description": "Hooks every voice packet a client sends, before the engine passes it on. The packet can be changed or blocked.",
+      "funcName": "HookClientVoiceData",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "The callback function to invoke.",
+          "prototype": "ClientVoiceDataHookCallback"
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the hook was successfully added, false otherwise."
+      }
+    },
+    {
+      "name": "UnhookClientVoiceData",
+      "group": "Voice",
+      "description": "Unhooks a previously hooked callback from HookClientVoiceData.",
+      "funcName": "UnhookClientVoiceData",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "The callback function to remove.",
+          "prototype": "ClientVoiceDataHookCallback"
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the hook was successfully removed, false otherwise."
+      }
+    },
+    {
+      "name": "VoiceDataGetFormat",
+      "group": "Voice",
+      "description": "Gets the codec of a voice packet.",
+      "funcName": "VoiceDataGetFormat",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The voice data format.",
+        "enum": "VoiceDataFormat"
+      }
+    },
+    {
+      "name": "VoiceDataSetFormat",
+      "group": "Voice",
+      "description": "Sets the codec of a voice packet.",
+      "funcName": "VoiceDataSetFormat",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        },
+        {
+          "name": "format",
+          "type": "int32",
+          "ref": false,
+          "description": "The voice data format.",
+          "enum": "VoiceDataFormat"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "VoiceDataGetAudio",
+      "group": "Voice",
+      "description": "Gets the compressed audio of a voice packet.",
+      "funcName": "VoiceDataGetAudio",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        }
+      ],
+      "retType": {
+        "type": "uint8[]",
+        "description": "The compressed audio bytes."
+      }
+    },
+    {
+      "name": "VoiceDataSetAudio",
+      "group": "Voice",
+      "description": "Replaces the compressed audio of a voice packet.",
+      "funcName": "VoiceDataSetAudio",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        },
+        {
+          "name": "audio",
+          "type": "uint8[]",
+          "ref": false,
+          "description": "The compressed audio bytes."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "VoiceDataGetSampleRate",
+      "group": "Voice",
+      "description": "Gets the sample rate of a voice packet.",
+      "funcName": "VoiceDataGetSampleRate",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        }
+      ],
+      "retType": {
+        "type": "uint32",
+        "description": "The sample rate in Hz."
+      }
+    },
+    {
+      "name": "VoiceDataSetSampleRate",
+      "group": "Voice",
+      "description": "Sets the sample rate of a voice packet.",
+      "funcName": "VoiceDataSetSampleRate",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        },
+        {
+          "name": "sampleRate",
+          "type": "uint32",
+          "ref": false,
+          "description": "The sample rate in Hz."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "VoiceDataGetNumPackets",
+      "group": "Voice",
+      "description": "Gets the number of codec packets in a voice packet.",
+      "funcName": "VoiceDataGetNumPackets",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        }
+      ],
+      "retType": {
+        "type": "uint32",
+        "description": "The number of codec packets."
+      }
+    },
+    {
+      "name": "VoiceDataSetNumPackets",
+      "group": "Voice",
+      "description": "Sets the number of codec packets in a voice packet.",
+      "funcName": "VoiceDataSetNumPackets",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        },
+        {
+          "name": "numPackets",
+          "type": "uint32",
+          "ref": false,
+          "description": "The number of codec packets."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "VoiceDataGetPacketOffsets",
+      "group": "Voice",
+      "description": "Gets the offsets of the codec packets inside the audio of a voice packet.",
+      "funcName": "VoiceDataGetPacketOffsets",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        }
+      ],
+      "retType": {
+        "type": "uint32[]",
+        "description": "The packet offsets in bytes."
+      }
+    },
+    {
+      "name": "VoiceDataSetPacketOffsets",
+      "group": "Voice",
+      "description": "Replaces the offsets of the codec packets inside the audio of a voice packet.",
+      "funcName": "VoiceDataSetPacketOffsets",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        },
+        {
+          "name": "offsets",
+          "type": "uint32[]",
+          "ref": false,
+          "description": "The packet offsets in bytes."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "VoiceDataGetVoiceLevel",
+      "group": "Voice",
+      "description": "Gets the voice level the client reported for a voice packet.",
+      "funcName": "VoiceDataGetVoiceLevel",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The voice level."
+      }
+    },
+    {
+      "name": "VoiceDataSetVoiceLevel",
+      "group": "Voice",
+      "description": "Sets the voice level of a voice packet.",
+      "funcName": "VoiceDataSetVoiceLevel",
+      "paramTypes": [
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet from HookClientVoiceData."
+        },
+        {
+          "name": "voiceLevel",
+          "type": "float",
+          "ref": false,
+          "description": "The voice level."
+        }
+      ],
+      "retType": {
+        "type": "void"
       }
     },
     {
@@ -34471,6 +34829,38 @@
       }
     },
     {
+      "name": "OnClientSpeakingStartCallback",
+      "funcName": "OnClientSpeakingStartCallback",
+      "description": "Called when a client starts sending voice, also when the client's voice is muted.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The slot of the player who started talking."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": ""
+      }
+    },
+    {
+      "name": "OnClientSpeakingEndCallback",
+      "funcName": "OnClientSpeakingEndCallback",
+      "description": "Called when a client stops sending voice for 0.3 seconds, or right before OnClientDisconnect if the client disconnects while talking.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The slot of the player who stopped talking."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": ""
+      }
+    },
+    {
       "name": "OnSendNetMessageCallback",
       "funcName": "OnSendNetMessageCallback",
       "description": "Called when a net message is sent to a single client (e.g. net_SignonState). Messages that never go through here or PostEventAbstract (e.g. svc_ClearAllStringTables, sent as part of the initial signon bundle) are instead only visible through OnSerializeMessage.",
@@ -34533,6 +34923,29 @@
       }
     },
     {
+      "name": "ClientVoiceDataHookCallback",
+      "funcName": "ClientVoiceDataHookCallback",
+      "description": "Callback function for voice packets sent by clients. Runs after the Speak_Muted check, so packets of muted players don't reach it.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The slot of the player who talks."
+        },
+        {
+          "name": "voiceData",
+          "type": "ptr64",
+          "ref": false,
+          "description": "The voice packet, valid only during the callback."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "Handled or Stop blocks the packet for everyone, Stop also skips the remaining callbacks.",
+        "enum": "ResultType"
+      }
+    },
+    {
       "name": "UserMessageCallback",
       "funcName": "UserMessageCallback",
       "description": "Callback function for user messages.",
@@ -34552,6 +34965,27 @@
     }
   ],
   "enums": [
+    {
+      "name": "VoiceDataFormat",
+      "description": "The codec of a voice packet.",
+      "values": [
+        {
+          "name": "Steam",
+          "description": "Steam voice codec.",
+          "value": 0
+        },
+        {
+          "name": "Engine",
+          "description": "Engine voice codec.",
+          "value": 1
+        },
+        {
+          "name": "Opus",
+          "description": "Opus.",
+          "value": 2
+        }
+      ]
+    },
     {
       "name": "KeyValuesType",
       "description": "The data type of a KeyValues key.",

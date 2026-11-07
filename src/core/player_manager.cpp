@@ -233,10 +233,30 @@ void Player::OnRepondCvarValue(const CCLCMsg_RespondCvarValue_t& msg) {
 
 PlayerManager PlayerManager::instance;
 
+// A client sends voice packets many times per second while talking, a longer gap means it stopped
+static constexpr double kSpeakingEndDelay = 0.3;
+
+void PlayerManager::OnClientVoiceData(CPlayerSlot slot) {
+	if (Player* player = ToPlayer(slot)) {
+		player->m_lastVoiceTime = Plat_FloatTime();
+		if (!player->m_speaking) {
+			player->m_speaking = true;
+			g_ClientSpeakingStartListenerManager(slot);
+		}
+	}
+}
+
 void PlayerManager::OnGameFrame() {
 	static double s_nextUpdate = 0.0;
 
 	double currentTime = Plat_FloatTime();
+	for (Player& player : m_players) {
+		if (player.m_speaking && currentTime - player.m_lastVoiceTime > kSpeakingEndDelay) {
+			player.m_speaking = false;
+			g_ClientSpeakingEndListenerManager(player.GetPlayerSlot());
+		}
+	}
+
 	if (currentTime > s_nextUpdate) {
 		UpdatePlayers();
 
@@ -397,6 +417,12 @@ void PlayerManager::OnClientPutInServer(CPlayerSlot slot, char const* name, uint
 }
 
 void PlayerManager::OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
+	// Plugins should get the end of speech before the player is gone
+	if (Player* player = ToPlayer(slot); player && player->m_speaking) {
+		player->m_speaking = false;
+		g_ClientSpeakingEndListenerManager(slot);
+	}
+
 	g_ClientDisconnectListenerManager(slot, reason);
 
 	if (Player* player = ToPlayer(slot)) {
@@ -410,6 +436,9 @@ void PlayerManager::OnClientSessionEnd(CPlayerSlot slot, ENetworkDisconnectionRe
 
 void PlayerManager::OnClientDisconnected(CPlayerSlot slot) {
 	if (Player* player = ToPlayer(slot)) {
+		if (player->m_speaking) {
+			g_ClientSpeakingEndListenerManager(slot);
+		}
 		player->Reset();
 	}
 }

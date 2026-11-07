@@ -36,6 +36,8 @@ using Manager = ListenerManager<Name, Func>;
 	X(GameFrame, void, bool simulating, bool firstTick, bool lastTick) \
 	X(UpdateWhenNotInGame, void, float frameTime) \
 	X(PreWorldUpdate, void, bool simulating) \
+	X(ClientSpeakingStart, void, int playerSlot) \
+	X(ClientSpeakingEnd, void, int playerSlot) \
 	X(SendNetMessage, void, int playerSlot, UserMessage* message) \
 	X(SerializeMessage, void, UserMessage* message) \
 

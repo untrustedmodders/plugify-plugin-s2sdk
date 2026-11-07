@@ -68,6 +68,27 @@ ResultType UserMessageManager::ExecuteSendNetMessageCallbacks(int playerSlot, Us
 	return result;
 }
 
+bool UserMessageManager::HookClientVoiceData(ClientVoiceDataHookCallback callback) {
+	return m_clientVoiceDataHooks.Register(callback);
+}
+
+bool UserMessageManager::UnhookClientVoiceData(ClientVoiceDataHookCallback callback) {
+	return m_clientVoiceDataHooks.Unregister(callback);
+}
+
+ResultType UserMessageManager::ExecuteClientVoiceDataCallbacks(int playerSlot, CCLCMsg_VoiceData* voiceData) {
+	ResultType result = ResultType::Continue;
+	if (auto funcs = m_clientVoiceDataHooks.Get()) {
+		for (const auto& func : funcs->handlers) {
+			result = std::max(result, func(playerSlot, voiceData));
+			if (result >= ResultType::Stop) {
+				break;
+			}
+		}
+	}
+	return result;
+}
+
 ResultType UserMessageManager::ExecuteMessageCallbacks(INetworkMessageInternal* msgSerializable, const CNetMessage* msgData, uint64_t* clients, HookMode mode) {
 	std::scoped_lock lock(m_mutex);
 

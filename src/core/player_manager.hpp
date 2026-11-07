@@ -53,6 +53,8 @@ struct CvarQuery {
 };
 
 class Player {
+	friend class PlayerManager;
+
 public:
 	Player() = default;
 	~Player() = default;
@@ -65,6 +67,8 @@ public:
 		m_listenOverrides.clear();
 		m_chatFlags = Speak_Normal;
 		m_chatListenOverrides.clear();
+		m_speaking = false;
+		m_lastVoiceTime = 0.0;
 		m_unauthenticatedSteamID = CSteamID(steamID64);
 		m_language.clear();
 		m_languageCode = {};
@@ -80,6 +84,8 @@ public:
 		m_listenOverrides.clear();
 		m_chatFlags = Speak_Normal;
 		m_chatListenOverrides.clear();
+		m_speaking = false;
+		m_lastVoiceTime = 0.0;
 		m_unauthenticatedSteamID = k_steamIDNil;
 		m_language.clear();
 		m_languageCode = {};
@@ -149,6 +155,10 @@ public:
 	ListenOverride GetListenOverride(uint64 steamID64) const;
 	void SetListenOverride(uint64 steamID64, ListenOverride listen);
 
+	bool IsSpeaking() const {
+		return m_speaking;
+	}
+
 	uint8_t GetChatFlags() const {
 		return m_chatFlags;
 	}
@@ -177,6 +187,8 @@ private:
 	// Steam ids because the slots of connected players can change on a map change
 	plg::flat_hash_map<uint64, ListenOverride> m_listenOverrides;
 	uint8_t m_chatFlags{Speak_Normal};
+	bool m_speaking{};
+	double m_lastVoiceTime{};
 	plg::flat_hash_map<uint64, ListenOverride> m_chatListenOverrides;
 	CServerSideClientBase* m_client{};
 	CSteamID m_unauthenticatedSteamID{k_steamIDNil};
@@ -208,6 +220,7 @@ public:
 	Player* FindSession(const CServerSideClientBase* client) const;
 
 	void OnGameFrame();
+	void OnClientVoiceData(CPlayerSlot slot);
 	void OnSteamAPIActivated();
 	void OnSteamAPIDeactivated();
 	ENetworkDisconnectionReason OnClientConnect(char const* name, char const* address, uint64 steamID64);
