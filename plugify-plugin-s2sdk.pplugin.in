@@ -932,6 +932,270 @@
       }
     },
     {
+      "name": "Kv1LoadFromFile",
+      "group": "Keyvalues",
+      "description": "Loads a KeyValues file into this instance, merging it with the existing keys",
+      "funcName": "Kv1LoadFromFile",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the KeyValues object"
+        },
+        {
+          "name": "path",
+          "type": "string",
+          "ref": false,
+          "description": "An absolute path, for example from the plugin directories, or a path relative to the search path"
+        },
+        {
+          "name": "pathID",
+          "type": "string",
+          "ref": false,
+          "description": "The search path ID, empty to search all paths"
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "true if the file was loaded, false otherwise"
+      }
+    },
+    {
+      "name": "Kv1LoadFromString",
+      "group": "Keyvalues",
+      "description": "Loads KeyValues text into this instance, merging it with the existing keys",
+      "funcName": "Kv1LoadFromString",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the KeyValues object"
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "ref": false,
+          "description": "The KeyValues text"
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "true if the text was parsed, false otherwise"
+      }
+    },
+    {
+      "name": "Kv1SaveToFile",
+      "group": "Keyvalues",
+      "description": "Saves this instance to a text file",
+      "funcName": "Kv1SaveToFile",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the KeyValues object"
+        },
+        {
+          "name": "path",
+          "type": "string",
+          "ref": false,
+          "description": "An absolute path, for example from the plugin directories, or a path relative to the search path"
+        },
+        {
+          "name": "pathID",
+          "type": "string",
+          "ref": false,
+          "description": "The search path ID, empty to use the default write path"
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "true if the file was saved, false otherwise, for example if its directory does not exist"
+      }
+    },
+    {
+      "name": "Kv1RemoveKey",
+      "group": "Keyvalues",
+      "description": "Removes a direct child key and deletes it with its subkeys",
+      "funcName": "Kv1RemoveKey",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the parent KeyValues object"
+        },
+        {
+          "name": "keyName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the key to remove"
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "true if the key existed and was removed, false otherwise"
+      }
+    },
+    {
+      "name": "Kv1GetUint64",
+      "group": "Keyvalues",
+      "description": "Gets an unsigned 64-bit value from a key",
+      "funcName": "Kv1GetUint64",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the KeyValues object"
+        },
+        {
+          "name": "keyName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the key, empty to read this key"
+        },
+        {
+          "name": "defaultValue",
+          "type": "uint64",
+          "ref": false,
+          "description": "The value to return if the key is not found"
+        }
+      ],
+      "retType": {
+        "type": "uint64",
+        "description": "The value, or defaultValue if the key is not found"
+      }
+    },
+    {
+      "name": "Kv1SetUint64",
+      "group": "Keyvalues",
+      "description": "Sets an unsigned 64-bit value on a key",
+      "funcName": "Kv1SetUint64",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the KeyValues object"
+        },
+        {
+          "name": "keyName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the key, empty to set this key"
+        },
+        {
+          "name": "value",
+          "type": "uint64",
+          "ref": false,
+          "description": "The value to set"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "Kv1GetDataType",
+      "group": "Keyvalues",
+      "description": "Gets the data type of a key",
+      "funcName": "Kv1GetDataType",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the KeyValues object"
+        },
+        {
+          "name": "keyName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the key, empty to read this key"
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The data type of the key, None if it has no value or doesn't exist",
+        "enum": "KeyValuesType"
+      }
+    },
+    {
+      "name": "Kv1GetFirstValue",
+      "group": "Keyvalues",
+      "description": "Gets the first child that has no subkeys of its own",
+      "funcName": "Kv1GetFirstValue",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the parent KeyValues object"
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "Pointer to the first value, or NULL if there are none"
+      }
+    },
+    {
+      "name": "Kv1GetNextValue",
+      "group": "Keyvalues",
+      "description": "Gets the next sibling that has no subkeys of its own",
+      "funcName": "Kv1GetNextValue",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the current value"
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "Pointer to the next value, or NULL if there are no more"
+      }
+    },
+    {
+      "name": "Kv1GetFirstTrueSubKey",
+      "group": "Keyvalues",
+      "description": "Gets the first child that is a block with subkeys",
+      "funcName": "Kv1GetFirstTrueSubKey",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the parent KeyValues object"
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "Pointer to the first block, or NULL if there are none"
+      }
+    },
+    {
+      "name": "Kv1GetNextTrueSubKey",
+      "group": "Keyvalues",
+      "description": "Gets the next sibling that is a block with subkeys",
+      "funcName": "Kv1GetNextTrueSubKey",
+      "paramTypes": [
+        {
+          "name": "kv",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the current block"
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "Pointer to the next block, or NULL if there are no more"
+      }
+    },
+    {
       "name": "Kv1IsEmpty",
       "group": "Keyvalues",
       "description": "Checks if a key exists and has no value or subkeys",
@@ -34200,6 +34464,52 @@
     }
   ],
   "enums": [
+    {
+      "name": "KeyValuesType",
+      "description": "The data type of a KeyValues key.",
+      "values": [
+        {
+          "name": "None",
+          "description": "No value",
+          "value": 0
+        },
+        {
+          "name": "String",
+          "description": "String",
+          "value": 1
+        },
+        {
+          "name": "Int",
+          "description": "32-bit integer",
+          "value": 2
+        },
+        {
+          "name": "Float",
+          "description": "Float",
+          "value": 3
+        },
+        {
+          "name": "Ptr",
+          "description": "Pointer",
+          "value": 4
+        },
+        {
+          "name": "WString",
+          "description": "Wide string",
+          "value": 5
+        },
+        {
+          "name": "Color",
+          "description": "Color",
+          "value": 6
+        },
+        {
+          "name": "Uint64",
+          "description": "Unsigned 64-bit integer",
+          "value": 7
+        }
+      ]
+    },
     {
       "name": "SpeakFlags",
       "description": "Flags that control whom a player hears and who hears them.",
