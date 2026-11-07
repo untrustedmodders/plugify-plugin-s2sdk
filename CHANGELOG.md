@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.3.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.3.0...v3.3.1) (2026-11-07)
+
+
+### Bug Fixes
+
+* add load, save and iteration methods for KeyValues ([3f680d3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3f680d3391cc716eb3110c971c96c63ee90034dc))
+* add remove, copy, escape and export methods for KeyValues ([edc848d](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/edc848d4b5f016ddc5eaf63075b7665fb9ef2b91))
+
 ## [3.3.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.2.0...v3.3.0) (2026-11-06)
 
 
