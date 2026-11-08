@@ -40,7 +40,6 @@ public:
     VSCRIPT_MEMBER_FUNCTION(ScriptLookupAttachment, int, string)
     VSCRIPT_MEMBER_FUNCTION(SetBodygroup, void, int, int)
     VSCRIPT_MEMBER_FUNCTION(SetBodygroupByName, void, string, int)
-    VSCRIPT_MEMBER_FUNCTION(SetLightGroup, void, string)
     VSCRIPT_MEMBER_FUNCTION(SetMaterialGroup, void, string)
     VSCRIPT_MEMBER_FUNCTION(SetMaterialGroupHash, void, unsigned)
     VSCRIPT_MEMBER_FUNCTION(SetMaterialGroupMask, void, uint64)

@@ -22,10 +22,7 @@
         AddBodyImpulseAtPosition;
         AddBodyVelocity;
         DetachBodyFromParent;
-        GetBodySequence;
         IsBodyAttachedToParent;
-        LookupBodySequence;
-        SetBodySequenceDuration;
         SetBodyAngularVelocity;
         SetBodyMaterialGroup;
         SetBodyVelocity;
@@ -533,7 +530,6 @@
         ScriptLookupAttachment;
         SetEntityBodygroup;
         SetEntityBodygroupByName;
-        SetEntityLightGroup;
         SetEntityMaterialGroup;
         SetEntityMaterialGroupHash;
         SetEntityMaterialGroupMask;

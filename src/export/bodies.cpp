@@ -46,18 +46,6 @@ extern "C" PLUGIN_API void DetachBodyFromParent(int entityHandle) {
 }
 
 /**
- * @brief Retrieves the currently active sequence of the entity.
- *
- * @param entityHandle The handle of the entity.
- * @return The sequence ID of the active sequence, or -1 if invalid.
- */
-extern "C" PLUGIN_API int GetBodySequence(int entityHandle) {
-	auto* entity = helpers::GetEntity(entityHandle);
-	if (!entity) return -1;
-	return entity->m_CBodyComponent->GetSequence();
-}
-
-/**
  * @brief Checks whether the entity is attached to a parent.
  *
  * @param entityHandle The handle of the entity.
@@ -67,32 +55,6 @@ extern "C" PLUGIN_API bool IsBodyAttachedToParent(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return false;
 	return entity->m_CBodyComponent->IsAttachedToParent();
-}
-
-/**
- * @brief Looks up a sequence ID by its name.
- *
- * @param entityHandle The handle of the entity.
- * @param name The name of the sequence.
- * @return The sequence ID, or -1 if not found.
- */
-extern "C" PLUGIN_API int LookupBodySequence(int entityHandle, const plg::string& name) {
-	auto* entity = helpers::GetEntity(entityHandle);
-	if (!entity) return -1;
-	return entity->m_CBodyComponent->LookupSequence(name.c_str());
-}
-
-/**
- * @brief Retrieves the duration of a specified sequence.
- *
- * @param entityHandle The handle of the entity.
- * @param sequenceName The name of the sequence.
- * @return The duration of the sequence in seconds, or 0 if invalid.
- */
-extern "C" PLUGIN_API float SetBodySequenceDuration(int entityHandle, const plg::string& sequenceName) {
-	auto* entity = helpers::GetEntity(entityHandle);
-	if (!entity) return 0.0f;
-	return entity->m_CBodyComponent->SequenceDuration(sequenceName.c_str());
 }
 
 /**

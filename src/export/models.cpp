@@ -181,21 +181,6 @@ extern "C" PLUGIN_API void SetEntityBodygroupByName(int entityHandle, const plg:
 }
 
 /**
- * @brief Sets the light group of an entity.
- *
- * This function assigns the entity to the specified light group.
- * If the entity is invalid, the function does nothing.
- *
- * @param entityHandle The handle of the entity.
- * @param lightGroup The light group name.
- */
-extern "C" PLUGIN_API void SetEntityLightGroup(int entityHandle, const plg::string& lightGroup) {
-	auto* entity = helpers::GetEntity<CBaseModelEntity>(entityHandle);
-	if (!entity) return;
-	entity->SetLightGroup(lightGroup.c_str());
-}
-
-/**
  * @brief Sets the material group of an entity.
  *
  * This function changes the entity’s material group.

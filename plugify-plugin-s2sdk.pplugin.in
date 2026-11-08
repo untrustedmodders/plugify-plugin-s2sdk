@@ -10015,24 +10015,6 @@
       }
     },
     {
-      "name": "GetBodySequence",
-      "group": "Bodies",
-      "description": "Retrieves the currently active sequence of the entity.",
-      "funcName": "GetBodySequence",
-      "paramTypes": [
-        {
-          "name": "entityHandle",
-          "type": "int32",
-          "ref": false,
-          "description": "The handle of the entity."
-        }
-      ],
-      "retType": {
-        "type": "int32",
-        "description": "The sequence ID of the active sequence, or -1 if invalid."
-      }
-    },
-    {
       "name": "IsBodyAttachedToParent",
       "group": "Bodies",
       "description": "Checks whether the entity is attached to a parent.",
@@ -10048,54 +10030,6 @@
       "retType": {
         "type": "bool",
         "description": "True if attached to a parent, false otherwise."
-      }
-    },
-    {
-      "name": "LookupBodySequence",
-      "group": "Bodies",
-      "description": "Looks up a sequence ID by its name.",
-      "funcName": "LookupBodySequence",
-      "paramTypes": [
-        {
-          "name": "entityHandle",
-          "type": "int32",
-          "ref": false,
-          "description": "The handle of the entity."
-        },
-        {
-          "name": "name",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the sequence."
-        }
-      ],
-      "retType": {
-        "type": "int32",
-        "description": "The sequence ID, or -1 if not found."
-      }
-    },
-    {
-      "name": "SetBodySequenceDuration",
-      "group": "Bodies",
-      "description": "Retrieves the duration of a specified sequence.",
-      "funcName": "SetBodySequenceDuration",
-      "paramTypes": [
-        {
-          "name": "entityHandle",
-          "type": "int32",
-          "ref": false,
-          "description": "The handle of the entity."
-        },
-        {
-          "name": "sequenceName",
-          "type": "string",
-          "ref": false,
-          "description": "The name of the sequence."
-        }
-      ],
-      "retType": {
-        "type": "float",
-        "description": "The duration of the sequence in seconds, or 0 if invalid."
       }
     },
     {
@@ -22169,29 +22103,6 @@
           "type": "int32",
           "ref": false,
           "description": "The new value to set for the bodygroup."
-        }
-      ],
-      "retType": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "SetEntityLightGroup",
-      "group": "Models",
-      "description": "Sets the light group of an entity.",
-      "funcName": "SetEntityLightGroup",
-      "paramTypes": [
-        {
-          "name": "entityHandle",
-          "type": "int32",
-          "ref": false,
-          "description": "The handle of the entity."
-        },
-        {
-          "name": "lightGroup",
-          "type": "string",
-          "ref": false,
-          "description": "The light group name."
         }
       ],
       "retType": {

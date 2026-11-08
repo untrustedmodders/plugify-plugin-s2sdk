@@ -4009,34 +4009,11 @@ declare module ":s2sdk" {
   export function DetachBodyFromParent(entityHandle: number): void;
 
   /**
-   * Retrieves the currently active sequence of the entity.
-   * @param entityHandle - The handle of the entity.
-   * @returns The sequence ID of the active sequence, or -1 if invalid.
-   */
-  export function GetBodySequence(entityHandle: number): number;
-
-  /**
    * Checks whether the entity is attached to a parent.
    * @param entityHandle - The handle of the entity.
    * @returns True if attached to a parent, false otherwise.
    */
   export function IsBodyAttachedToParent(entityHandle: number): boolean;
-
-  /**
-   * Looks up a sequence ID by its name.
-   * @param entityHandle - The handle of the entity.
-   * @param name - The name of the sequence.
-   * @returns The sequence ID, or -1 if not found.
-   */
-  export function LookupBodySequence(entityHandle: number, name: string): number;
-
-  /**
-   * Retrieves the duration of a specified sequence.
-   * @param entityHandle - The handle of the entity.
-   * @param sequenceName - The name of the sequence.
-   * @returns The duration of the sequence in seconds, or 0 if invalid.
-   */
-  export function SetBodySequenceDuration(entityHandle: number, sequenceName: string): number;
 
   /**
    * Sets the angular velocity of the entity.
@@ -7792,13 +7769,6 @@ declare module ":s2sdk" {
    * @param value - The new value to set for the bodygroup.
    */
   export function SetEntityBodygroupByName(entityHandle: number, name: string, value: number): void;
-
-  /**
-   * Sets the light group of an entity.
-   * @param entityHandle - The handle of the entity.
-   * @param lightGroup - The light group name.
-   */
-  export function SetEntityLightGroup(entityHandle: number, lightGroup: string): void;
 
   /**
    * Sets the material group of an entity.
