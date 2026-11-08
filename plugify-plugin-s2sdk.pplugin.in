@@ -23027,6 +23027,338 @@
       }
     },
     {
+      "name": "GetEntDataCArray2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves the fixed-size integer array at the given offset.",
+      "funcName": "GetEntDataCArray2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "arraySize",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of elements in the array."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (1, 2, 4 or 8)."
+        }
+      ],
+      "retType": {
+        "type": "int64[]",
+        "description": "The array values at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataCArray2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the fixed-size integer array at the given offset.",
+      "funcName": "SetEntDataCArray2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "int64[]",
+          "ref": false,
+          "description": "The array values to set."
+        },
+        {
+          "name": "arraySize",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of elements in the array."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (1, 2, 4 or 8)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataCArrayFloat2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves the fixed-size float array at the given offset.",
+      "funcName": "GetEntDataCArrayFloat2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "arraySize",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of elements in the array."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (4 or 8)."
+        }
+      ],
+      "retType": {
+        "type": "double[]",
+        "description": "The array values at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataCArrayFloat2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the fixed-size float array at the given offset.",
+      "funcName": "SetEntDataCArrayFloat2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "double[]",
+          "ref": false,
+          "description": "The array values to set."
+        },
+        {
+          "name": "arraySize",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of elements in the array."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (4 or 8)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataArray2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves the integer vector (CUtlVector) at the given offset.",
+      "funcName": "GetEntDataArray2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (1, 2, 4 or 8)."
+        }
+      ],
+      "retType": {
+        "type": "int64[]",
+        "description": "The vector elements at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataArray2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and replaces the integer vector (CUtlVector) at the given offset.",
+      "funcName": "SetEntDataArray2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "int64[]",
+          "ref": false,
+          "description": "The vector elements to set."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (1, 2, 4 or 8)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataArrayFloat2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves the float vector (CUtlVector) at the given offset.",
+      "funcName": "GetEntDataArrayFloat2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (4 or 8)."
+        }
+      ],
+      "retType": {
+        "type": "double[]",
+        "description": "The vector elements at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataArrayFloat2",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and replaces the float vector (CUtlVector) at the given offset.",
+      "funcName": "SetEntDataArrayFloat2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "double[]",
+          "ref": false,
+          "description": "The vector elements to set."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (4 or 8)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "GetEntDataVector3D2",
       "group": "Schema",
       "description": "Peeks into an entity's object schema and retrieves the vector value at the given offset.",
@@ -23701,6 +24033,338 @@
       }
     },
     {
+      "name": "GetEntDataCArray",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves the fixed-size integer array at the given offset.",
+      "funcName": "GetEntDataCArray",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "arraySize",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of elements in the array."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (1, 2, 4 or 8)."
+        }
+      ],
+      "retType": {
+        "type": "int64[]",
+        "description": "The array values at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataCArray",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the fixed-size integer array at the given offset.",
+      "funcName": "SetEntDataCArray",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "int64[]",
+          "ref": false,
+          "description": "The array values to set."
+        },
+        {
+          "name": "arraySize",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of elements in the array."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (1, 2, 4 or 8)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataCArrayFloat",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves the fixed-size float array at the given offset.",
+      "funcName": "GetEntDataCArrayFloat",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "arraySize",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of elements in the array."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (4 or 8)."
+        }
+      ],
+      "retType": {
+        "type": "double[]",
+        "description": "The array values at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataCArrayFloat",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and sets the fixed-size float array at the given offset.",
+      "funcName": "SetEntDataCArrayFloat",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "double[]",
+          "ref": false,
+          "description": "The array values to set."
+        },
+        {
+          "name": "arraySize",
+          "type": "int32",
+          "ref": false,
+          "description": "Number of elements in the array."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (4 or 8)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataArray",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves the integer vector (CUtlVector) at the given offset.",
+      "funcName": "GetEntDataArray",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (1, 2, 4 or 8)."
+        }
+      ],
+      "retType": {
+        "type": "int64[]",
+        "description": "The vector elements at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataArray",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and replaces the integer vector (CUtlVector) at the given offset.",
+      "funcName": "SetEntDataArray",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "int64[]",
+          "ref": false,
+          "description": "The vector elements to set."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (1, 2, 4 or 8)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntDataArrayFloat",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and retrieves the float vector (CUtlVector) at the given offset.",
+      "funcName": "GetEntDataArrayFloat",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (4 or 8)."
+        }
+      ],
+      "retType": {
+        "type": "double[]",
+        "description": "The vector elements at the given memory location."
+      }
+    },
+    {
+      "name": "SetEntDataArrayFloat",
+      "group": "Schema",
+      "description": "Peeks into an entity's object data and replaces the float vector (CUtlVector) at the given offset.",
+      "funcName": "SetEntDataArrayFloat",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be set."
+        },
+        {
+          "name": "offset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the schema to use."
+        },
+        {
+          "name": "value",
+          "type": "double[]",
+          "ref": false,
+          "description": "The vector elements to set."
+        },
+        {
+          "name": "dataSize",
+          "type": "int32",
+          "ref": false,
+          "description": "Size of each element in bytes (4 or 8)."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        },
+        {
+          "name": "chainOffset",
+          "type": "int32",
+          "ref": false,
+          "description": "The offset of the chain entity in the class (-2 for non-entity classes)."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "GetEntDataVector3D",
       "group": "Schema",
       "description": "Peeks into an entity's object schema and retrieves the vector value at the given offset.",
@@ -24245,6 +24909,148 @@
       "retType": {
         "type": "void",
         "description": "A float value at the given schema offset."
+      }
+    },
+    {
+      "name": "GetEntSchemaArray2",
+      "group": "Schema",
+      "description": "Retrieves all elements of an integer array from an entity's schema.",
+      "funcName": "GetEntSchemaArray2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be retrieved."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        }
+      ],
+      "retType": {
+        "type": "int64[]",
+        "description": "The array elements, or an empty array if the field is not found or is not an integer array."
+      }
+    },
+    {
+      "name": "SetEntSchemaArray2",
+      "group": "Schema",
+      "description": "Sets all elements of an integer array in an entity's schema.",
+      "funcName": "SetEntSchemaArray2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "value",
+          "type": "int64[]",
+          "ref": false,
+          "description": "The array elements to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntSchemaArrayFloat2",
+      "group": "Schema",
+      "description": "Retrieves all elements of a float array from an entity's schema.",
+      "funcName": "GetEntSchemaArrayFloat2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be retrieved."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        }
+      ],
+      "retType": {
+        "type": "double[]",
+        "description": "The array elements, or an empty array if the field is not found or is not a float array."
+      }
+    },
+    {
+      "name": "SetEntSchemaArrayFloat2",
+      "group": "Schema",
+      "description": "Sets all elements of a float array in an entity's schema.",
+      "funcName": "SetEntSchemaArrayFloat2",
+      "paramTypes": [
+        {
+          "name": "entity",
+          "type": "ptr64",
+          "ref": false,
+          "description": "Pointer to the instance of the class where the value is to be set."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "value",
+          "type": "double[]",
+          "ref": false,
+          "description": "The array elements to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        }
+      ],
+      "retType": {
+        "type": "void"
       }
     },
     {
@@ -25096,6 +25902,148 @@
       "retType": {
         "type": "void",
         "description": "A float value at the given schema offset."
+      }
+    },
+    {
+      "name": "GetEntSchemaArray",
+      "group": "Schema",
+      "description": "Retrieves all elements of an integer array from an entity's schema.",
+      "funcName": "GetEntSchemaArray",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        }
+      ],
+      "retType": {
+        "type": "int64[]",
+        "description": "The array elements, or an empty array if the field is not found or is not an integer array."
+      }
+    },
+    {
+      "name": "SetEntSchemaArray",
+      "group": "Schema",
+      "description": "Sets all elements of an integer array in an entity's schema.",
+      "funcName": "SetEntSchemaArray",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be set."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "value",
+          "type": "int64[]",
+          "ref": false,
+          "description": "The array elements to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "GetEntSchemaArrayFloat",
+      "group": "Schema",
+      "description": "Retrieves all elements of a float array from an entity's schema.",
+      "funcName": "GetEntSchemaArrayFloat",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be retrieved."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        }
+      ],
+      "retType": {
+        "type": "double[]",
+        "description": "The array elements, or an empty array if the field is not found or is not a float array."
+      }
+    },
+    {
+      "name": "SetEntSchemaArrayFloat",
+      "group": "Schema",
+      "description": "Sets all elements of a float array in an entity's schema.",
+      "funcName": "SetEntSchemaArrayFloat",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity from which the value is to be set."
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the schema member."
+        },
+        {
+          "name": "value",
+          "type": "double[]",
+          "ref": false,
+          "description": "The array elements to set."
+        },
+        {
+          "name": "changeState",
+          "type": "bool",
+          "ref": false,
+          "description": "If true, change will be sent over the network."
+        }
+      ],
+      "retType": {
+        "type": "void"
       }
     },
     {
