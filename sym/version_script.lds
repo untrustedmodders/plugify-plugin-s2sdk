@@ -757,6 +757,7 @@
         VoiceDataSetPacketOffsets;
         VoiceDataGetVoiceLevel;
         VoiceDataSetVoiceLevel;
+        SendVoiceData;
         UserMessageCreateFromSerializable;
         UserMessageCreateFromName;
         UserMessageCreateFromId;

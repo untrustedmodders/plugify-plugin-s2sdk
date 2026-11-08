@@ -3,6 +3,9 @@
 #include <core/user_message_manager.hpp>
 #include <engine/igameeventsystem.h>
 #include <netmessages.pb.h>
+#include <serversideclient.h>
+#include <core/sdk/utils.hpp>
+#include <core/player_manager.hpp>
 
 PLUGIFY_WARN_PUSH()
 
@@ -197,6 +200,58 @@ extern "C" PLUGIN_API float VoiceDataGetVoiceLevel(const CCLCMsg_VoiceData* voic
  */
 extern "C" PLUGIN_API void VoiceDataSetVoiceLevel(CCLCMsg_VoiceData* voiceData, float voiceLevel) {
 	if (voiceData) voiceData->mutable_audio()->set_voice_level(voiceLevel);
+}
+
+/**
+ * @brief Sends Opus voice frames to clients as if a player was talking.
+ *
+ * @param recipients The slots of the players who receive the voice.
+ * @param speakerSlot The slot of the player shown as talking, or -1 for none.
+ * @param audio Raw Opus packets encoded at 48 kHz, written back to back without a container (no Ogg) or length prefixes. Frame boundaries are given by packetOffsets.
+ * @param packetOffsets For every Opus packet in audio, the byte offset where it ends, in ascending order; the last offset equals the size of audio. Example: packets of 60, 55 and 62 bytes give [60, 115, 177].
+ * @param sectionNumber A number that grows with every call while one stream plays.
+ * @return True if the voice was sent to at least one client, false otherwise.
+ */
+extern "C" PLUGIN_API bool SendVoiceData(const plg::vector<int>& recipients, int speakerSlot, const plg::vector<uint8_t>& audio, const plg::vector<uint32_t>& packetOffsets, uint32_t sectionNumber) {
+	if (audio.empty() || packetOffsets.empty()) {
+		return false;
+	}
+
+	INetworkMessageInternal* netMsg = g_pNetworkMessages->FindNetworkMessagePartial("CSVCMsg_VoiceData");
+	if (!netMsg) {
+		return false;
+	}
+
+	auto* data = netMsg->AllocateMessage()->As<CSVCMsg_VoiceData_t>();
+	auto* voice = data->mutable_audio();
+	voice->set_format(VOICEDATA_FORMAT_OPUS);
+	voice->set_sample_rate(48000);
+	voice->set_voice_data(audio.data(), audio.size());
+	voice->set_num_packets(static_cast<uint32_t>(packetOffsets.size()));
+	for (uint32_t offset : packetOffsets) {
+		voice->add_packet_offsets(offset);
+	}
+	voice->set_section_number(sectionNumber);
+	voice->set_sequence_bytes(0);
+
+	if (speakerSlot >= 0) {
+		data->set_client_deprecated(speakerSlot);
+		data->set_entity(speakerSlot + 1);
+		if (auto player = g_PlayerManager.ToPlayer(CPlayerSlot(speakerSlot))) {
+			data->set_xuid(player->GetSteamId().ConvertToUint64());
+		}
+	}
+
+	bool sent = false;
+	for (int slot : recipients) {
+		auto* client = utils::GetClientBySlot(CPlayerSlot(slot));
+		if (client && !client->IsFakeClient() && client->IsActive()) {
+			sent |= client->SendNetMessage(data, BUF_VOICE);
+		}
+	}
+
+	delete data;
+	return sent;
 }
 
 /**

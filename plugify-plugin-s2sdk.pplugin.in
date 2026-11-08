@@ -28231,6 +28231,48 @@
       }
     },
     {
+      "name": "SendVoiceData",
+      "group": "Voice",
+      "description": "Sends Opus voice frames to clients as if a player was talking.",
+      "funcName": "SendVoiceData",
+      "paramTypes": [
+        {
+          "name": "recipients",
+          "type": "int32[]",
+          "ref": false,
+          "description": "The slots of the players who receive the voice."
+        },
+        {
+          "name": "speakerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The slot of the player shown as talking, or -1 for none."
+        },
+        {
+          "name": "audio",
+          "type": "uint8[]",
+          "ref": false,
+          "description": "Raw Opus packets encoded at 48 kHz, written back to back without a container (no Ogg) or length prefixes. Frame boundaries are given by packetOffsets."
+        },
+        {
+          "name": "packetOffsets",
+          "type": "uint32[]",
+          "ref": false,
+          "description": "For every Opus packet in audio, the byte offset where it ends, in ascending order; the last offset equals the size of audio. Example: packets of 60, 55 and 62 bytes give [60, 115, 177]."
+        },
+        {
+          "name": "sectionNumber",
+          "type": "uint32",
+          "ref": false,
+          "description": "A number that grows with every call while one stream plays."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the voice was sent to at least one client, false otherwise."
+      }
+    },
+    {
       "name": "UserMessageCreateFromSerializable",
       "group": "Protobuf",
       "description": "Creates a UserMessage from a serializable message.",
