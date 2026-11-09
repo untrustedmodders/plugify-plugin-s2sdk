@@ -54,11 +54,22 @@ namespace schema {
 		return DispatchSize<T>(dataSize, []<typename S>() {});
 	}
 
+	// Converts a stored element to T; `isUnsigned` zero-extends integers instead of sign-extending them.
+	template<typename T, typename S>
+	T FromStorage(S value, bool isUnsigned) {
+		if constexpr (std::is_integral_v<S>) {
+			if (isUnsigned) {
+				return static_cast<T>(static_cast<std::make_unsigned_t<S>>(value));
+			}
+		}
+		return static_cast<T>(value);
+	}
+
 	template<typename T>
-	T ReadValue(const void* src, int dataSize) {
+	T ReadValue(const void* src, int dataSize, bool isUnsigned = false) {
 		T result{};
 		DispatchSize<T>(dataSize, [&]<typename S>() {
-			result = static_cast<T>(*static_cast<const S*>(src));
+			result = FromStorage<T>(*static_cast<const S*>(src), isUnsigned);
 		});
 		return result;
 	}
@@ -71,12 +82,12 @@ namespace schema {
 	}
 
 	template<typename T>
-	plg::vector<T> ReadValues(const void* src, size_t count, int dataSize) {
+	plg::vector<T> ReadValues(const void* src, size_t count, int dataSize, bool isUnsigned = false) {
 		plg::vector<T> result;
 		DispatchSize<T>(dataSize, [&]<typename S>() {
 			const S* p = static_cast<const S*>(src);
 			result.resize(count);
-			std::transform(p, p + count, result.begin(), [](const S v) { return static_cast<T>(v); });
+			std::transform(p, p + count, result.begin(), [isUnsigned](const S v) { return FromStorage<T>(v, isUnsigned); });
 		});
 		return result;
 	}
@@ -225,7 +236,7 @@ namespace schema {
 		}
 
 		const auto [ptr, size] = field.SizedElement(sized, element, numericName<T>);
-		return ptr ? ReadValue<T>(ptr, size) : T{};
+		return ptr ? ReadValue<T>(ptr, size, IsUnsignedElement(field.key.type)) : T{};
 	}
 
 	template<typename T>
@@ -288,7 +299,7 @@ namespace schema {
 				if (view.count <= 0) {
 					return {};
 				}
-				return ReadValues<T>(reinterpret_cast<const void*>(view.data), static_cast<size_t>(view.count), elementSize);
+				return ReadValues<T>(reinterpret_cast<const void*>(view.data), static_cast<size_t>(view.count), elementSize, IsUnsignedElement(field.key.type));
 			}
 			case Single:
 				plg::print(LS_WARNING, "Schema field '{}::{}' is not an array\n", className, memberName);

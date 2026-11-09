@@ -187,6 +187,52 @@ namespace schema {
 		PLUGIFY_UNREACHABLE();
 	}
 
+	// float32/float64, or a class holding a single float field (GameTime_t).
+	static bool IsFloatElement(const CSchemaType* type) {
+		if (!type) {
+			return false;
+		}
+		switch (type->m_eTypeCategory) {
+			case SCHEMA_TYPE_BUILTIN: {
+				auto builtin = static_cast<const CSchemaType_Builtin*>(type)->m_eBuiltinType;
+				return builtin == SCHEMA_BUILTIN_TYPE_FLOAT32 || builtin == SCHEMA_BUILTIN_TYPE_FLOAT64;
+			}
+			case SCHEMA_TYPE_DECLARED_CLASS: {
+				const auto* classInfo = static_cast<const CSchemaType_DeclaredClass*>(type)->m_pClassInfo;
+				return classInfo && classInfo->m_nFieldCount == 1 && classInfo->m_nBaseClassCount == 0 && IsFloatElement(classInfo->m_pFields[0].m_pType);
+			}
+			default:
+				return false;
+		}
+	}
+
+	// Element type of a fixed array or a collection, the type itself otherwise.
+	static const CSchemaType* ElementTypeOf(const CSchemaType* type) {
+		if (type->m_eTypeCategory == SCHEMA_TYPE_FIXED_ARRAY) {
+			return static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
+		}
+		if (type->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && type->m_eAtomicCategory == SCHEMA_ATOMIC_COLLECTION_OF_T) {
+			return static_cast<const CSchemaType_Atomic_CollectionOfT*>(type)->m_pTemplateType;
+		}
+		return type;
+	}
+
+	bool IsUnsignedElement(CSchemaType* type) {
+		const auto* elementType = ElementTypeOf(type);
+		if (!elementType || elementType->m_eTypeCategory != SCHEMA_TYPE_BUILTIN) {
+			return false;
+		}
+		switch (static_cast<const CSchemaType_Builtin*>(elementType)->m_eBuiltinType) {
+			case SCHEMA_BUILTIN_TYPE_UINT8:
+			case SCHEMA_BUILTIN_TYPE_UINT16:
+			case SCHEMA_BUILTIN_TYPE_UINT32:
+			case SCHEMA_BUILTIN_TYPE_UINT64:
+				return true;
+			default:
+				return false;
+		}
+	}
+
 	ElementSizedType IsIntType(CSchemaType* type) {
 		switch (type->m_eTypeCategory) {
 			case SCHEMA_TYPE_FIXED_ARRAY: {
@@ -221,6 +267,9 @@ namespace schema {
 						}
 					}
 					case SCHEMA_TYPE_DECLARED_CLASS: {
+						if (IsFloatElement(elementType)) {
+							return {Invalid, -1};
+						}
 						int size = static_cast<CSchemaType_DeclaredClass*>(elementType)->m_pClassInfo->m_nSize;
 						if (size <= sizeof(double)) {
 							return {Array, size};
@@ -259,6 +308,9 @@ namespace schema {
 								return {Invalid, -1};
 						}
 					case SCHEMA_ATOMIC_COLLECTION_OF_T:
+						if (IsFloatElement(static_cast<CSchemaType_Atomic_CollectionOfT*>(type)->m_pTemplateType)) {
+							return {Invalid, -1};
+						}
 						switch (static_cast<CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize) {
 							case sizeof(int8):
 								return {Collection, static_cast<int>(sizeof(int8))};
@@ -333,6 +385,9 @@ namespace schema {
 						}
 					}
 					case SCHEMA_TYPE_DECLARED_CLASS: {
+						if (!IsFloatElement(elementType)) {
+							return {Invalid, -1};
+						}
 						int size = static_cast<CSchemaType_DeclaredClass*>(elementType)->m_pClassInfo->m_nSize;
 						if (size <= sizeof(double)) {
 							return {Array, size};
@@ -352,7 +407,7 @@ namespace schema {
 				return {Invalid, -1};
 			}
 			case SCHEMA_TYPE_ATOMIC: {
-				if (type->m_eAtomicCategory == SCHEMA_ATOMIC_COLLECTION_OF_T) {
+				if (type->m_eAtomicCategory == SCHEMA_ATOMIC_COLLECTION_OF_T && IsFloatElement(static_cast<const CSchemaType_Atomic_CollectionOfT*>(type)->m_pTemplateType)) {
 					switch (static_cast<const CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize) {
 						case sizeof(float32):
 							return {Collection, static_cast<int>(sizeof(float32))};

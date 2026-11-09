@@ -106,6 +106,8 @@ namespace schema {
 	ElementType GetElementType(CSchemaType* type);
 	ElementSizedType IsIntType(CSchemaType* type);
 	ElementSizedType IsFloatType(CSchemaType* type);
+	// True for uint8/uint16/uint32/uint64 fields, fixed arrays and collections; their values must not be sign-extended.
+	bool IsUnsignedElement(CSchemaType* type);
 	ElementType IsPlainType(CSchemaType* type, size_t size);
 	ElementType IsAtomicType(CSchemaType* type, size_t size);
 
