@@ -184,7 +184,7 @@ namespace schema {
 		int stride{};
 	};
 
-	ArrayView GetArrayView(intptr_t base, CSchemaType* type, ElementType elementType);
+	ArrayView GetArrayView(intptr_t base, CSchemaType* type, FieldKind elementType);
 
 	// A resolved schema member of a concrete entity.
 	struct EntityField {
@@ -203,9 +203,21 @@ namespace schema {
 
 		void WarnType(std::string_view expected) const;
 
-		// Address of `element` for arrays and collections, or of the field itself for single values.
+		// Address of `element` for arrays and collections, or of the field itself for single values (element 0).
 		// Warns and returns nullptr on a type mismatch or when the element is out of range.
-		void* Element(ElementType elementType, int element, std::string_view expected) const;
+		void* Element(FieldKind elementType, int element, std::string_view expected) const;
+
+		// Typed element of a field holding plain atomic values of `Size` bytes (Vector, CUtlString, ...).
+		template<typename T, size_t Size = sizeof(T)>
+		T* Plain(int element, std::string_view expected) const {
+			return static_cast<T*>(Element(MatchPlain(key.type, Size), element, expected));
+		}
+
+		// Typed element of a field holding templated atomic values of `Size` bytes (CHandle<T>, ...).
+		template<typename T, size_t Size = sizeof(T)>
+		T* Atomic(int element, std::string_view expected) const {
+			return static_cast<T*>(Element(MatchAtomic(key.type, Size), element, expected));
+		}
 
 		// Marks the field as changed for networking if `changeState` is set.
 		void NotifyChanged(bool changeState) const;
@@ -218,11 +230,11 @@ namespace schema {
 
 	// Integer (int64_t) or floating-point (double) schema values.
 	template<typename T>
-	ElementSizedType ClassifyNumeric(CSchemaType* type) {
+	NumericField ClassifyNumeric(CSchemaType* type) {
 		if constexpr (std::is_floating_point_v<T>) {
-			return IsFloatType(type);
+			return MatchFloat(type);
 		} else {
-			return IsIntType(type);
+			return MatchInteger(type);
 		}
 	}
 
@@ -239,7 +251,7 @@ namespace schema {
 		const auto sized = ClassifyNumeric<T>(field.key.type);
 		if constexpr (std::is_integral_v<T>) {
 			// Structures larger than 8 bytes are returned by address.
-			if (sized.type == Class) {
+			if (sized.type == FieldKind::Class) {
 				return static_cast<T>(field.Base());
 			}
 		}
@@ -273,7 +285,7 @@ namespace schema {
 			return {};
 		}
 
-		const auto* ptr = static_cast<const T*>(field.Element(IsPlainType(field.key.type, Size), element, expected));
+		const auto* ptr = field.template Plain<const T, Size>(element, expected);
 		return ptr ? *ptr : T{};
 	}
 
@@ -284,7 +296,7 @@ namespace schema {
 			return;
 		}
 
-		auto* ptr = static_cast<T*>(field.Element(IsPlainType(field.key.type, Size), element, expected));
+		auto* ptr = field.template Plain<T, Size>(element, expected);
 		if (!ptr) {
 			return;
 		}
@@ -303,15 +315,15 @@ namespace schema {
 
 		const auto [elementType, storage] = ClassifyNumeric<T>(field.key.type);
 		switch (elementType) {
-			case Array:
-			case Collection: {
+			case FieldKind::Array:
+			case FieldKind::Collection: {
 				const auto view = GetArrayView(field.Base(), field.key.type, elementType);
 				if (view.count <= 0) {
 					return {};
 				}
 				return ReadValues<T>(reinterpret_cast<const void*>(view.data), static_cast<size_t>(view.count), storage);
 			}
-			case Single:
+			case FieldKind::Single:
 				plg::print(LS_WARNING, "Schema field '{}::{}' is not an array\n", className, memberName);
 				return {};
 			default:
@@ -329,7 +341,7 @@ namespace schema {
 
 		const auto [elementType, storage] = ClassifyNumeric<T>(field.key.type);
 		switch (elementType) {
-			case Array: {
+			case FieldKind::Array: {
 				const int count = static_cast<const CSchemaType_FixedArray*>(field.key.type)->m_nElementCount;
 				if (value.size() > static_cast<size_t>(count)) {
 					plg::print(LS_WARNING, "Schema array '{}::{}' can hold {} elements, {} were given, extra elements are ignored\n", className, memberName, count, value.size());
@@ -339,7 +351,7 @@ namespace schema {
 				WriteValues<T>(reinterpret_cast<void*>(field.Base()), value.data(), n, storage);
 				break;
 			}
-			case Collection: {
+			case FieldKind::Collection: {
 				field.NotifyChanged(changeState);
 				const int count = static_cast<int>(value.size());
 				void* data = ResizeUtlVector(field.Base(), count, SizeOf(storage));
@@ -348,7 +360,7 @@ namespace schema {
 				}
 				break;
 			}
-			case Single:
+			case FieldKind::Single:
 				plg::print(LS_WARNING, "Schema field '{}::{}' is not an array\n", className, memberName);
 				break;
 			default:

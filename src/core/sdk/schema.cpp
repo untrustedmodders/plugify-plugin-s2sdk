@@ -170,58 +170,36 @@ namespace schema {
 		}
 	}
 
-	ElementType GetElementType(CSchemaType* type) {
-		switch (type->m_eTypeCategory) {
-			case SCHEMA_TYPE_FIXED_ARRAY: {
-				return Array;
-			}
-			case SCHEMA_TYPE_ATOMIC: {
-				if (type->m_eAtomicCategory == SCHEMA_ATOMIC_COLLECTION_OF_T)
-					return Collection;
-				else
-					return Invalid;
-			}
-			default:
-				return Single;
+	// A schema type split into its container (single value, fixed array or collection) and its element.
+	struct Layout {
+		FieldKind kind;
+		const CSchemaType* element; // may be null for collections with an unknown template type
+		int stride;                 // size of one element in bytes
+	};
+
+	static Layout Unwrap(const CSchemaType* type) {
+		if (type->m_eTypeCategory == SCHEMA_TYPE_FIXED_ARRAY) {
+			const auto* array = static_cast<const CSchemaType_FixedArray*>(type);
+			return {FieldKind::Array, array->m_pElementType, array->m_nElementSize};
 		}
-		PLUGIFY_UNREACHABLE();
+		if (type->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && type->m_eAtomicCategory == SCHEMA_ATOMIC_COLLECTION_OF_T) {
+			const auto* collection = static_cast<const CSchemaType_Atomic_CollectionOfT*>(type);
+			return {FieldKind::Collection, collection->m_pTemplateType, collection->m_nElementSize};
+		}
+		int size = 0;
+		uint8 alignment = 0;
+		type->GetSizeAndAlignment(size, alignment);
+		return {FieldKind::Single, type, size};
 	}
 
-	// float32/float64, or a class holding a single float field (GameTime_t).
-	static bool IsFloatElement(const CSchemaType* type) {
-		if (!type) {
-			return false;
-		}
-		switch (type->m_eTypeCategory) {
-			case SCHEMA_TYPE_BUILTIN: {
-				auto builtin = static_cast<const CSchemaType_Builtin*>(type)->m_eBuiltinType;
-				return builtin == SCHEMA_BUILTIN_TYPE_FLOAT32 || builtin == SCHEMA_BUILTIN_TYPE_FLOAT64;
-			}
-			case SCHEMA_TYPE_DECLARED_CLASS: {
-				const auto* classInfo = static_cast<const CSchemaType_DeclaredClass*>(type)->m_pClassInfo;
-				return classInfo && classInfo->m_nFieldCount == 1 && classInfo->m_nBaseClassCount == 0 && IsFloatElement(classInfo->m_pFields[0].m_pType);
-			}
-			default:
-				return false;
-		}
-	}
-
-	static constexpr ElementSizedType InvalidSized{Invalid, Storage::Invalid};
-
-	// `type` with `storage`, or Invalid when the storage is not a valid numeric one.
-	static ElementSizedType Sized(ElementType type, Storage storage) {
-		return storage == Storage::Invalid ? InvalidSized : ElementSizedType{type, storage};
-	}
-
-	static Storage IntBuiltinStorage(SchemaBuiltinType_t builtin) {
+	static Storage BuiltinStorage(SchemaBuiltinType_t builtin) {
 		switch (builtin) {
 			case SCHEMA_BUILTIN_TYPE_BOOL:
+			case SCHEMA_BUILTIN_TYPE_UINT8:
 				return Storage::U8;
 			case SCHEMA_BUILTIN_TYPE_CHAR:
 			case SCHEMA_BUILTIN_TYPE_INT8:
 				return Storage::I8;
-			case SCHEMA_BUILTIN_TYPE_UINT8:
-				return Storage::U8;
 			case SCHEMA_BUILTIN_TYPE_INT16:
 				return Storage::I16;
 			case SCHEMA_BUILTIN_TYPE_UINT16:
@@ -236,13 +214,6 @@ namespace schema {
 				return Storage::U64;
 			case SCHEMA_BUILTIN_TYPE_COUNT:
 				return sizeof(size_t) == sizeof(uint64) ? Storage::U64 : Storage::U32;
-			default:
-				return Storage::Invalid;
-		}
-	}
-
-	static Storage FloatBuiltinStorage(SchemaBuiltinType_t builtin) {
-		switch (builtin) {
 			case SCHEMA_BUILTIN_TYPE_FLOAT32:
 				return Storage::F32;
 			case SCHEMA_BUILTIN_TYPE_FLOAT64:
@@ -252,173 +223,83 @@ namespace schema {
 		}
 	}
 
-	// Storage of one integer value of `type`: builtins by their own type, a class wrapping a single
-	// integer field (CUtlStringToken and alike) by that field, other small classes, enums and pointers
-	// as signed integers of their size.
-	static Storage IntElementStorage(const CSchemaType* type) {
-		if (!type) {
-			return Storage::Invalid;
-		}
-		switch (type->m_eTypeCategory) {
-			case SCHEMA_TYPE_BUILTIN:
-				return IntBuiltinStorage(static_cast<const CSchemaType_Builtin*>(type)->m_eBuiltinType);
-			case SCHEMA_TYPE_DECLARED_CLASS: {
-				const auto* classInfo = static_cast<const CSchemaType_DeclaredClass*>(type)->m_pClassInfo;
-				if (classInfo->m_nFieldCount == 1 && classInfo->m_nBaseClassCount == 0) {
-					const Storage inner = IntElementStorage(classInfo->m_pFields[0].m_pType);
-					if (inner != Storage::Invalid && SizeOf(inner) == classInfo->m_nSize) {
-						return inner;
+	// Storage of one numeric value of `type`, which is `size` bytes:
+	// - builtins by their own type;
+	// - a class wrapping a single field (GameTime_t, CUtlStringToken, ...) by that field;
+	// - other small classes, enums, pointers and atomics as signed integers of their size.
+	static Storage ScalarStorage(const CSchemaType* type, int size) {
+		if (type) {
+			switch (type->m_eTypeCategory) {
+				case SCHEMA_TYPE_BUILTIN:
+					return BuiltinStorage(static_cast<const CSchemaType_Builtin*>(type)->m_eBuiltinType);
+				case SCHEMA_TYPE_DECLARED_CLASS: {
+					const auto* classInfo = static_cast<const CSchemaType_DeclaredClass*>(type)->m_pClassInfo;
+					if (classInfo && classInfo->m_nFieldCount == 1 && classInfo->m_nBaseClassCount == 0) {
+						const Storage inner = ScalarStorage(classInfo->m_pFields[0].m_pType, classInfo->m_nSize);
+						if (inner != Storage::Invalid && SizeOf(inner) == static_cast<size_t>(size)) {
+							return inner;
+						}
 					}
+					break;
 				}
-				return IntStorage(classInfo->m_nSize);
+				case SCHEMA_TYPE_DECLARED_ENUM:
+				case SCHEMA_TYPE_POINTER:
+				case SCHEMA_TYPE_ATOMIC:
+					break;
+				default:
+					return Storage::Invalid;
 			}
-			case SCHEMA_TYPE_DECLARED_ENUM:
-				return IntStorage(static_cast<const CSchemaType_DeclaredEnum*>(type)->m_pEnumInfo->m_nSize);
-			case SCHEMA_TYPE_POINTER:
-				return IntStorage(sizeof(void*));
-			default:
-				return Storage::Invalid;
 		}
+		return IntStorage(size);
 	}
 
-	ElementSizedType IsIntType(CSchemaType* type) {
-		switch (type->m_eTypeCategory) {
-			case SCHEMA_TYPE_FIXED_ARRAY: {
-				const auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
-				if (IsFloatElement(elementType)) {
-					return InvalidSized;
-				}
-				return Sized(Array, IntElementStorage(elementType));
-			}
-			case SCHEMA_TYPE_DECLARED_CLASS: {
-				if (static_cast<const CSchemaType_DeclaredClass*>(type)->m_pClassInfo->m_nSize > static_cast<int>(sizeof(void*))) {
-					return {Class, Storage::Invalid};
-				}
-				return Sized(Single, IntElementStorage(type));
-			}
-			case SCHEMA_TYPE_ATOMIC: {
-				switch (type->m_eAtomicCategory) {
-					case SCHEMA_ATOMIC_PLAIN:
-						return Sized(Single, IntStorage(static_cast<const CSchemaType_Atomic*>(type)->m_nSize));
-					case SCHEMA_ATOMIC_COLLECTION_OF_T: {
-						const auto* collection = static_cast<const CSchemaType_Atomic_CollectionOfT*>(type);
-						if (IsFloatElement(collection->m_pTemplateType)) {
-							return InvalidSized;
-						}
-						Storage storage = IntElementStorage(collection->m_pTemplateType);
-						if (SizeOf(storage) != collection->m_nElementSize) {
-							storage = IntStorage(collection->m_nElementSize);
-						}
-						return Sized(Collection, storage);
-					}
-					default:
-						return InvalidSized;
-				}
-			}
-			case SCHEMA_TYPE_BUILTIN:
-			case SCHEMA_TYPE_DECLARED_ENUM:
-			case SCHEMA_TYPE_POINTER:
-				return Sized(Single, IntElementStorage(type));
-			default:
-				return InvalidSized;
-		}
+	static constexpr NumericField InvalidSized{FieldKind::Invalid, Storage::Invalid};
+
+	FieldKind GetFieldKind(CSchemaType* type) {
+		return Unwrap(type).kind;
 	}
 
-	ElementSizedType IsFloatType(CSchemaType* type) {
-		switch (type->m_eTypeCategory) {
-			case SCHEMA_TYPE_FIXED_ARRAY: {
-				const auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
-				switch (elementType->m_eTypeCategory) {
-					case SCHEMA_TYPE_BUILTIN:
-						return Sized(Array, FloatBuiltinStorage(static_cast<const CSchemaType_Builtin*>(elementType)->m_eBuiltinType));
-					case SCHEMA_TYPE_DECLARED_CLASS:
-						if (!IsFloatElement(elementType)) {
-							return InvalidSized;
-						}
-						return Sized(Array, FloatStorage(static_cast<const CSchemaType_DeclaredClass*>(elementType)->m_pClassInfo->m_nSize));
-					default:
-						return InvalidSized;
-				}
-			}
-			case SCHEMA_TYPE_DECLARED_CLASS:
-				return Sized(Single, FloatStorage(static_cast<const CSchemaType_DeclaredClass*>(type)->m_pClassInfo->m_nSize));
-			case SCHEMA_TYPE_ATOMIC: {
-				if (type->m_eAtomicCategory != SCHEMA_ATOMIC_COLLECTION_OF_T) {
-					return InvalidSized;
-				}
-				const auto* collection = static_cast<const CSchemaType_Atomic_CollectionOfT*>(type);
-				if (!IsFloatElement(collection->m_pTemplateType)) {
-					return InvalidSized;
-				}
-				return Sized(Collection, FloatStorage(collection->m_nElementSize));
-			}
-			case SCHEMA_TYPE_BUILTIN:
-				return Sized(Single, FloatBuiltinStorage(static_cast<const CSchemaType_Builtin*>(type)->m_eBuiltinType));
-			default:
-				return InvalidSized;
+	NumericField MatchInteger(CSchemaType* type) {
+		const auto [kind, element, stride] = Unwrap(type);
+		if (const Storage storage = ScalarStorage(element, stride); IsInteger(storage)) {
+			return {kind, storage};
 		}
+		// Structures larger than 8 bytes are exposed by address.
+		if (kind == FieldKind::Single && type->m_eTypeCategory == SCHEMA_TYPE_DECLARED_CLASS && stride > static_cast<int>(sizeof(void*))) {
+			return {FieldKind::Class, Storage::Invalid};
+		}
+		return InvalidSized;
 	}
 
-	ElementType IsPlainType(CSchemaType* type, size_t size) {
-		switch (type->m_eTypeCategory) {
-			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
-				if (elementType->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && elementType->m_eAtomicCategory == SCHEMA_ATOMIC_PLAIN) {
-					if (static_cast<CSchemaType_Atomic*>(elementType)->m_nSize == size)
-						return Array;
-				}
-				return Invalid;
-			}
-			case SCHEMA_TYPE_ATOMIC: {
-				switch (type->m_eAtomicCategory) {
-					case SCHEMA_ATOMIC_PLAIN:
-						if (static_cast<const CSchemaType_Atomic*>(type)->m_nSize == size)
-							return Single;
-						break;
-					case SCHEMA_ATOMIC_COLLECTION_OF_T:
-						if (static_cast<const CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize == size)
-							return Collection;
-						break;
-					default:
-						return Invalid;
-				}
-				PLUGIFY_UNREACHABLE();
-			}
-			default:
-				return Invalid;
+	NumericField MatchFloat(CSchemaType* type) {
+		const auto [kind, element, stride] = Unwrap(type);
+		if (const Storage storage = ScalarStorage(element, stride); IsFloat(storage)) {
+			return {kind, storage};
 		}
-		PLUGIFY_UNREACHABLE();
+		return InvalidSized;
 	}
 
-	ElementType IsAtomicType(CSchemaType* type, size_t size) {
-		switch (type->m_eTypeCategory) {
-			case SCHEMA_TYPE_FIXED_ARRAY: {
-				auto* elementType = static_cast<const CSchemaType_FixedArray*>(type)->m_pElementType;
-				if (elementType->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && elementType->m_eAtomicCategory == SCHEMA_ATOMIC_T) {
-					if (static_cast<CSchemaType_Atomic_T*>(elementType)->m_nSize == size)
-						return Array;
-				}
-				return Invalid;
-			}
-			case SCHEMA_TYPE_ATOMIC: {
-				switch (type->m_eAtomicCategory) {
-					case SCHEMA_ATOMIC_T:
-						if (static_cast<const CSchemaType_Atomic_T*>(type)->m_nSize == size)
-							return Single;
-						break;
-					case SCHEMA_ATOMIC_COLLECTION_OF_T:
-						if (static_cast<const CSchemaType_Atomic_CollectionOfT*>(type)->m_nElementSize == size)
-							return Collection;
-						break;
-					default:
-						return Invalid;
-				}
-				PLUGIFY_UNREACHABLE();
-			}
-			default:
-				return Invalid;
+	// Matches atomic values (or arrays of them) of the given category and size; collections by element size.
+	static FieldKind MatchAtomicCategory(const CSchemaType* type, SchemaAtomicCategory_t category, size_t size) {
+		const auto [kind, element, stride] = Unwrap(type);
+		if (static_cast<size_t>(stride) != size) {
+			return FieldKind::Invalid;
 		}
-		PLUGIFY_UNREACHABLE();
+		if (kind == FieldKind::Collection) {
+			return FieldKind::Collection;
+		}
+		if (element->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && element->m_eAtomicCategory == category) {
+			return kind;
+		}
+		return FieldKind::Invalid;
+	}
+
+	FieldKind MatchPlain(CSchemaType* type, size_t size) {
+		return MatchAtomicCategory(type, SCHEMA_ATOMIC_PLAIN, size);
+	}
+
+	FieldKind MatchAtomic(CSchemaType* type, size_t size) {
+		return MatchAtomicCategory(type, SCHEMA_ATOMIC_T, size);
 	}
 
 	//
@@ -431,7 +312,7 @@ namespace schema {
 		void* data = nullptr;
 		Dispatch(IntStorage(dataSize), [&]<typename S>() {
 			auto* vec = reinterpret_cast<CUtlVector<S>*>(address);
-			vec->SetCount(count);
+			vec->SetCount(static_cast<int>(count));
 			data = vec->Base();
 		});
 		return data;
@@ -443,13 +324,13 @@ namespace schema {
 		}
 	}
 
-	ArrayView GetArrayView(intptr_t base, CSchemaType* type, ElementType elementType) {
+	ArrayView GetArrayView(intptr_t base, CSchemaType* type, FieldKind elementType) {
 		switch (elementType) {
-			case Array: {
+			case FieldKind::Array: {
 				const auto* arrayType = static_cast<const CSchemaType_FixedArray*>(type);
 				return {base, arrayType->m_nElementCount, arrayType->m_nElementSize};
 			}
-			case Collection: {
+			case FieldKind::Collection: {
 				const auto* vec = reinterpret_cast<CUtlVector<uint8>*>(base);
 				const auto* collectionType = static_cast<const CSchemaType_Atomic_CollectionOfT*>(type);
 				return {reinterpret_cast<intptr_t>(vec->Base()), vec->Count(), collectionType->m_nElementSize};
@@ -463,12 +344,16 @@ namespace schema {
 		plg::print(LS_WARNING, "Schema field '{}::{}' is not a {}, but '{}'\n", className, memberName, expected, key.type->m_sTypeName.Get());
 	}
 
-	void* EntityField::Element(ElementType elementType, int element, std::string_view expected) const {
+	void* EntityField::Element(FieldKind elementType, int element, std::string_view expected) const {
 		switch (elementType) {
-			case Single:
+			case FieldKind::Single:
+				if (element != 0) {
+					plg::print(LS_WARNING, "Element {} is out of range for '{}::{}' (size: 1)\n", element, className, memberName);
+					return nullptr;
+				}
 				return reinterpret_cast<void*>(Base());
-			case Array:
-			case Collection: {
+			case FieldKind::Array:
+			case FieldKind::Collection: {
 				const auto view = GetArrayView(Base(), key.type, elementType);
 				if (element < 0 || element >= view.count) {
 					plg::print(LS_WARNING, "Element {} is out of range for '{}::{}' (size: {})\n", element, className, memberName, view.count);
@@ -489,7 +374,7 @@ namespace schema {
 		if (key.networked) {
 			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), key.offset, FindChainOffset(className));
 		} else {
-			plg::print(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+			plg::print(LS_WARNING, "Schema field '{}::{}' cannot be sent over network\n", className, memberName);
 		}
 	}
 

@@ -81,7 +81,7 @@ namespace schema {
 			"m_nMusicID",
 	};
 
-	enum ElementType : uint8_t {
+	enum class FieldKind : uint8_t {
 		Invalid,
 		Single,
 		Array,
@@ -105,7 +105,7 @@ namespace schema {
 		F64
 	};
 
-	constexpr size_t SizeOf(Storage storage) {
+	constexpr int SizeOf(Storage storage) {
 		switch (storage) {
 			case Storage::I8:
 			case Storage::U8:
@@ -154,8 +154,16 @@ namespace schema {
 		}
 	}
 
-	struct ElementSizedType {
-		ElementType type;
+	constexpr bool IsInteger(Storage storage) {
+		return storage != Storage::Invalid && storage != Storage::F32 && storage != Storage::F64;
+	}
+
+	constexpr bool IsFloat(Storage storage) {
+		return storage == Storage::F32 || storage == Storage::F64;
+	}
+
+	struct NumericField {
+		FieldKind type;
 		Storage storage;
 	};
 
@@ -168,11 +176,11 @@ namespace schema {
 
     void NetworkStateChanged(intptr_t chainEntity, uint32_t localOffset, int32_t arrayIndex = 0xFFFFFFFF);
 
-	ElementType GetElementType(CSchemaType* type);
-	ElementSizedType IsIntType(CSchemaType* type);
-	ElementSizedType IsFloatType(CSchemaType* type);
-	ElementType IsPlainType(CSchemaType* type, size_t size);
-	ElementType IsAtomicType(CSchemaType* type, size_t size);
+	FieldKind GetFieldKind(CSchemaType* type);
+	NumericField MatchInteger(CSchemaType* type);
+	NumericField MatchFloat(CSchemaType* type);
+	FieldKind MatchPlain(CSchemaType* type, size_t size);
+	FieldKind MatchAtomic(CSchemaType* type, size_t size);
 
 } // namespace schema
 

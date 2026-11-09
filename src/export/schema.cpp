@@ -876,7 +876,7 @@ extern "C" PLUGIN_API int GetEntSchemaArraySize2(CEntityInstance* entity, const 
 		return {};
 	}
 
-	return schema::GetArrayView(field.Base(), field.key.type, schema::GetElementType(field.key.type)).count;
+	return schema::GetArrayView(field.Base(), field.key.type, schema::GetFieldKind(field.key.type)).count;
 }
 
 /**
@@ -897,13 +897,7 @@ extern "C" PLUGIN_API void* GetEntSchemaPtr2(CEntityInstance* entity, const plg:
 		return nullptr;
 	}
 
-	const auto elementType = schema::GetElementType(field.key.type);
-	if (elementType == schema::ElementType::Single && element != 0) {
-		plg::print(LS_WARNING, "Element {} is out of range for '{}::{}' (size: 1)\n", element, className, memberName);
-		return nullptr;
-	}
-
-	return field.Element(elementType, element, "supported type");
+	return field.Element(schema::GetFieldKind(field.key.type), element, "supported type");
 }
 
 //
@@ -1063,7 +1057,7 @@ extern "C" PLUGIN_API plg::vec4 GetEntSchemaColor2(CEntityInstance* entity, cons
 		return {};
 	}
 
-	const auto sized = schema::IsIntType(field.key.type);
+	const auto sized = schema::MatchInteger(field.key.type);
 	if (schema::SizeOf(sized.storage) != sizeof(Color)) {
 		field.WarnType("color");
 		return {};
@@ -1096,7 +1090,7 @@ extern "C" PLUGIN_API void SetEntSchemaColor2(CEntityInstance* entity, const plg
 		return;
 	}
 
-	const auto sized = schema::IsIntType(field.key.type);
+	const auto sized = schema::MatchInteger(field.key.type);
 	if (schema::SizeOf(sized.storage) != sizeof(Color)) {
 		field.WarnType("color");
 		return;
@@ -1131,27 +1125,27 @@ extern "C" PLUGIN_API plg::string GetEntSchemaString2(CEntityInstance* entity, c
 	}
 
 	// CUtlString fields
-	if (const auto stringType = schema::IsPlainType(field.key.type, sizeof(CUtlString)); stringType != schema::ElementType::Invalid) {
-		const auto* ptr = static_cast<const CUtlString*>(field.Element(stringType, element, "string"));
+	if (schema::MatchPlain(field.key.type, sizeof(CUtlString)) != schema::FieldKind::Invalid) {
+		const auto* ptr = field.Plain<const CUtlString>(element, "string");
 		return ptr ? plg::string(ptr->Get()) : plg::string();
 	}
 
 	// char[N], CUtlVector<char> and char fields
-	const auto [elementType, storage] = schema::IsIntType(field.key.type);
+	const auto [elementType, storage] = schema::MatchInteger(field.key.type);
 	switch (elementType) {
-		case schema::ElementType::Array:
+		case schema::FieldKind::Array:
 			if (schema::SizeOf(storage) == sizeof(char)) {
 				const char* src = reinterpret_cast<const char*>(field.Base());
 				return plg::string(src, strnlen(src, field.key.size));
 			}
 			break;
-		case schema::ElementType::Collection:
+		case schema::FieldKind::Collection:
 			if (schema::SizeOf(storage) == sizeof(char)) {
 				const auto& vec = *reinterpret_cast<const CUtlVector<char>*>(field.Base());
 				return plg::string(vec.Base(), static_cast<size_t>(vec.Count()));
 			}
 			break;
-		case schema::ElementType::Single:
+		case schema::FieldKind::Single:
 			if (field.key.size == sizeof(char)) {
 				return plg::string(1, *reinterpret_cast<const char*>(field.Base()));
 			}
@@ -1184,8 +1178,8 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 	}
 
 	// CUtlString fields
-	if (const auto stringType = schema::IsPlainType(field.key.type, sizeof(CUtlString)); stringType != schema::ElementType::Invalid) {
-		auto* ptr = static_cast<CUtlString*>(field.Element(stringType, element, "string"));
+	if (schema::MatchPlain(field.key.type, sizeof(CUtlString)) != schema::FieldKind::Invalid) {
+		auto* ptr = field.Plain<CUtlString>(element, "string");
 		if (ptr) {
 			field.NotifyChanged(changeState);
 			*ptr = value;
@@ -1194,9 +1188,9 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 	}
 
 	// char[N], CUtlVector<char> and char fields
-	const auto [elementType, storage] = schema::IsIntType(field.key.type);
+	const auto [elementType, storage] = schema::MatchInteger(field.key.type);
 	switch (elementType) {
-		case schema::ElementType::Array:
+		case schema::FieldKind::Array:
 			if (schema::SizeOf(storage) == sizeof(char)) {
 				field.NotifyChanged(changeState);
 				char* dst = reinterpret_cast<char*>(field.Base());
@@ -1206,14 +1200,14 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 				return;
 			}
 			break;
-		case schema::ElementType::Collection:
+		case schema::FieldKind::Collection:
 			if (schema::SizeOf(storage) == sizeof(char)) {
 				field.NotifyChanged(changeState);
 				reinterpret_cast<CUtlVector<char>*>(field.Base())->CopyArray(value.data(), static_cast<CUtlVector<char>::IndexType_t>(value.size()));
 				return;
 			}
 			break;
-		case schema::ElementType::Single:
+		case schema::FieldKind::Single:
 			if (field.key.size == sizeof(char)) {
 				field.NotifyChanged(changeState);
 				*reinterpret_cast<char*>(field.Base()) = value.empty() ? 0 : value.front();
@@ -1352,7 +1346,7 @@ extern "C" PLUGIN_API int GetEntSchemaEnt2(CEntityInstance* entity, const plg::s
 		return INVALID_EHANDLE_INDEX;
 	}
 
-	const auto* ptr = static_cast<const CEntityHandle*>(field.Element(schema::IsAtomicType(field.key.type, sizeof(CEntityHandle)), element, "entity handle"));
+	const auto* ptr = field.Atomic<const CEntityHandle>(element, "entity handle");
 	return ptr ? ptr->ToInt() : INVALID_EHANDLE_INDEX;
 }
 
@@ -1377,7 +1371,7 @@ extern "C" PLUGIN_API void SetEntSchemaEnt2(CEntityInstance* entity, const plg::
 		return;
 	}
 
-	auto* ptr = static_cast<CEntityHandle*>(field.Element(schema::IsAtomicType(field.key.type, sizeof(CEntityHandle)), element, "entity handle"));
+	auto* ptr = field.Atomic<CEntityHandle>(element, "entity handle");
 	if (!ptr) {
 		return;
 	}
@@ -1408,7 +1402,7 @@ extern "C" PLUGIN_API void PushEntSchemaEnt2(CEntityInstance* entity, const plg:
 		return;
 	}
 
-	if (schema::IsAtomicType(field.key.type, sizeof(CEntityHandle)) != schema::ElementType::Collection) {
+	if (schema::MatchAtomic(field.key.type, sizeof(CEntityHandle)) != schema::FieldKind::Collection) {
 		field.WarnType("collection of entity handles");
 		return;
 	}
@@ -1439,7 +1433,7 @@ extern "C" PLUGIN_API void EraseEntSchemaEnt2(CEntityInstance* entity, const plg
 		return;
 	}
 
-	if (schema::IsAtomicType(field.key.type, sizeof(CEntityHandle)) != schema::ElementType::Collection) {
+	if (schema::MatchAtomic(field.key.type, sizeof(CEntityHandle)) != schema::FieldKind::Collection) {
 		field.WarnType("collection of entity handles");
 		return;
 	}
