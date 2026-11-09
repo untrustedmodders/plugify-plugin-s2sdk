@@ -184,15 +184,17 @@ float Player::GetTimeConnected() const {
 		return 0;
 	}
 
-	return GetNetInfo()->GetTimeConnected();
+	INetChannelInfo* netInfo = GetNetInfo();
+	return netInfo ? netInfo->GetTimeConnected() : 0;
 }
 
 float Player::GetLatency() const {
 	if (!IsConnected() || IsFakeClient()) {
 		return 0;
 	}
-
-	return GetNetInfo()->GetAvgLatency();
+	
+	INetChannelInfo* netInfo = GetNetInfo();
+	return netInfo ? netInfo->GetAvgLatency() : 0;
 }
 
 void Player::Kick(const char* internalReason, ENetworkDisconnectionReason reason) const {
