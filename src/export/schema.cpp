@@ -23,7 +23,7 @@ PLUGIFY_LINKAGE()
  * @return The offset of the member in the class, or -1 if the offset is not found.
  */
 extern "C" PLUGIN_API int32_t GetSchemaOffset(const plg::string& className, const plg::string& memberName) {
-	return schema::GetOffset(className, memberName).offset;
+	return schema::FindOffset(className, memberName).offset;
 }
 
 /**
@@ -48,7 +48,7 @@ extern "C" PLUGIN_API int32_t GetSchemaChainOffset(const plg::string& className)
  * @return True if the member is networked, false otherwise.
  */
 extern "C" PLUGIN_API bool IsSchemaFieldNetworked(const plg::string& className, const plg::string& memberName) {
-	return schema::GetOffset(className, memberName).networked;
+	return schema::FindOffset(className, memberName).networked;
 }
 
 /**

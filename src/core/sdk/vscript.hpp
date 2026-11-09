@@ -24,9 +24,9 @@ namespace vscript {
 	void RegisterFunction(ScriptFunctionBinding_t* scriptFunction);
 	void RegisterScriptClass(ScriptClassDesc_t* classDesc, void* instance = nullptr);
 
-	VScriptBinding GetBinding(std::string_view className, std::string_view functionName);
-	VScriptBinding GetBinding(const char* className, const char* functionName);
-	void* GetInstance(std::string_view className);
+	VScriptBinding FindBinding(std::string_view className, std::string_view functionName);
+	VScriptBinding FindBinding(const char* className, const char* functionName);
+	void* FindInstance(std::string_view className);
 }// namespace schema
 
 template<
@@ -38,7 +38,7 @@ template<
 class VScriptMemberFunction {
 public:
 	Ret operator()(Args... args) {
-		static VScriptBinding binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
+		static VScriptBinding binding = vscript::FindBinding(ThisClass::m_className, FunctionName);
 		void* instance = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(this) - MemberOffset());
 #if defined(_MSC_VER)
 		// MSVC: Direct member function pointer call
@@ -72,7 +72,7 @@ template<
 class VScriptGlobalFunction {
 public:
 	Ret operator()(Args... args) {
-		static VScriptBinding binding = vscript::GetBinding(ThisClass::m_className, FunctionName);
+		static VScriptBinding binding = vscript::FindBinding(ThisClass::m_className, FunctionName);
 #if defined(_MSC_VER)
 		using Func = Ret(__cdecl*)(Args...);
 		auto fn = reinterpret_cast<Func>(binding.funcaddr);

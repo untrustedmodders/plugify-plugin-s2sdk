@@ -193,7 +193,7 @@ extern "C" PLUGIN_API void DebugScriptAssert(bool assertion, const plg::string& 
 
 namespace {
 	CDebugOverlayScriptHelper* GetDebugOverlay() {
-		auto* overlay = static_cast<CDebugOverlayScriptHelper*>(vscript::GetInstance(CDebugOverlayScriptHelper::m_className));
+		auto* overlay = static_cast<CDebugOverlayScriptHelper*>(vscript::FindInstance(CDebugOverlayScriptHelper::m_className));
 		if (!overlay) {
 			plg::print(LS_WARNING, "Debug overlay helper is not available yet\n");
 		}

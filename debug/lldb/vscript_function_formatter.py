@@ -38,7 +38,7 @@ class ScriptFunctionSynthProvider:
             traceback.print_exc()
             self.cached_value = None
 
-    def _get_member_offset(self, parent_name, field_name):
+    def _find_member_offset(self, parent_name, field_name):
         key = (parent_name, field_name)
         if key in _member_offset_cache:
             return _member_offset_cache[key]
@@ -57,7 +57,7 @@ class ScriptFunctionSynthProvider:
         _member_offset_cache[key] = offset
         return offset
 
-    def _get_script_binding(self, parent_name, function_name):
+    def _find_script_binding(self, parent_name, function_name):
         key = (parent_name, function_name)
         if key in _script_binding_cache:
             return _script_binding_cache[key]
@@ -65,7 +65,7 @@ class ScriptFunctionSynthProvider:
         options = lldb.SBExpressionOptions()
         options.SetLanguage(lldb.eLanguageTypeC_plus_plus)
         options.SetSuppressPersistentResult(False)
-        expr = f'vscript::GetBinding("{parent_name}", "{function_name}")'
+        expr = f'vscript::FindBinding("{parent_name}", "{function_name}")'
         result = self.valobj.target.EvaluateExpression(expr, options)
 
         if not result.IsValid() or result.GetError().Fail():
@@ -139,7 +139,7 @@ class ScriptFunctionSynthProvider:
 
         parent_name = parent_type.GetUnqualifiedType().GetName() if parent_type else "void*"
 
-        binding = self._get_script_binding(parent_name, function_name)
+        binding = self._find_script_binding(parent_name, function_name)
         if binding == 0:
             self.cached_value = None
             return
@@ -154,7 +154,7 @@ class ScriptFunctionSynthProvider:
 
         # Case 2: Only vtable_index available - resolve via parent's vtable
         if vtable_index != 0:
-            member_offset = self._get_member_offset(parent_name, function_name)
+            member_offset = self._find_member_offset(parent_name, function_name)
             if member_offset is None:
                 self.cached_value = None
                 return

@@ -95,11 +95,11 @@ namespace schema {
 	};
 
     int32_t FindChainOffset(std::string_view className);
-    SchemaKey GetOffset(std::string_view className, std::string_view memberName);
+    SchemaKey FindOffset(std::string_view className, std::string_view memberName);
 
 	// for llvm debug mode
     int32_t FindChainOffset(const char* className);
-    SchemaKey GetOffset(const char* className, const char* memberName);
+    SchemaKey FindOffset(const char* className, const char* memberName);
 
     void NetworkStateChanged(intptr_t chainEntity, uint32_t localOffset, int32_t arrayIndex = 0xFFFFFFFF);
 
@@ -138,7 +138,7 @@ class SchemaField {
 
 	// Compact internal helpers
 	[[nodiscard]] auto Key(this auto&& self) {
-		static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
+		static const auto key = schema::FindOffset(ThisClass::m_className, MemberName);
 		static const bool done = []{
 			if constexpr (!requires { T::m_className; }) {
 				if (std::string_view(MemberName) != schema::chainKey && key.size != sizeof(T))
@@ -290,7 +290,7 @@ class SchemaPointerField {
 
     // Compact internal helpers
     [[nodiscard]] auto Key(this auto&& self) {
-        static const auto key = schema::GetOffset(ThisClass::m_className, MemberName);
+        static const auto key = schema::FindOffset(ThisClass::m_className, MemberName);
         return key;
     }
     [[nodiscard]] auto Chain(this auto&& self) {

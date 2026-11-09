@@ -38,12 +38,12 @@ class SchemaFieldSynthProvider:
             traceback.print_exc()
             self.cached_value = None
 
-    def _get_schema_offset(self, parent_name, field_name):
+    def _find_schema_offset(self, parent_name, field_name):
         key = (parent_name, field_name)
         if key in _schema_offset_cache:
             return _schema_offset_cache[key]
 
-        expr = f'schema::GetOffset("{parent_name}", "{field_name}")'
+        expr = f'schema::FindOffset("{parent_name}", "{field_name}")'
 
         options = lldb.SBExpressionOptions()
         options.SetLanguage(lldb.eLanguageTypeC_plus_plus)
@@ -57,7 +57,7 @@ class SchemaFieldSynthProvider:
         _schema_offset_cache[key] = offset
         return offset
 
-    def _get_member_offset(self, parent_name, field_name):
+    def _find_member_offset(self, parent_name, field_name):
         key = (parent_name, field_name)
         if key in _member_offset_cache:
             return _member_offset_cache[key]
@@ -141,8 +141,8 @@ class SchemaFieldSynthProvider:
 
         parent_name = parent_type.GetUnqualifiedType().GetName() if parent_type else "void*"
 
-        offset = self._get_schema_offset(parent_name, field_name)
-        member_offset = self._get_member_offset(parent_name, field_name)
+        offset = self._find_schema_offset(parent_name, field_name)
+        member_offset = self._find_member_offset(parent_name, field_name)
 
         if member_offset is None:
             self.cached_value = None

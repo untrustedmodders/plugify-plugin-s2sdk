@@ -154,7 +154,7 @@ namespace vscript {
 		scriptClassMap.emplace(className, createClass());
 	}
 
-	VScriptBinding GetBinding(std::string_view className, std::string_view functionName) {
+	VScriptBinding FindBinding(std::string_view className, std::string_view functionName) {
 		auto it = scriptClassMap.find(className);
 		if (it != scriptClassMap.end()) {
 			auto& table = it->second;
@@ -165,19 +165,19 @@ namespace vscript {
 		}
 		plg::print(
 			LS_ERROR,
-			"vscript::GetBinding(): '{}' was not found in '{}'!\n",
+			"vscript::FindBinding(): '{}' was not found in '{}'!\n",
 			functionName,
 			className
 		);
 		return {};
 	}
 
-	void* GetInstance(std::string_view className) {
+	void* FindInstance(std::string_view className) {
 		auto it = scriptClassMap.find(className);
 		return it != scriptClassMap.end() ? it->second.instance : nullptr;
 	}
 
-	VScriptBinding GetBinding(const char* className, const char* functionName) {
-		return GetBinding(std::string_view(className), std::string_view(functionName));
+	VScriptBinding FindBinding(const char* className, const char* functionName) {
+		return FindBinding(std::string_view(className), std::string_view(functionName));
 	}
 }

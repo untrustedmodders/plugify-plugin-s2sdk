@@ -120,10 +120,10 @@ namespace {
 
 namespace schema {
 	int32_t FindChainOffset(std::string_view className) {
-		return GetOffset(className, chainKey).offset;
+		return FindOffset(className, chainKey).offset;
 	}
 
-	SchemaKey GetOffset(std::string_view className, std::string_view memberName) {
+	SchemaKey FindOffset(std::string_view className, std::string_view memberName) {
 		{
 			std::shared_lock lock(schemaMutex);
 			auto it = schemaTableMap.find(className);
@@ -150,15 +150,15 @@ namespace schema {
 			schemaTableMap.emplace(className, InitSchemaFieldsForClass(moduleName, className));
 		}
 
-		return GetOffset(className, memberName);
+		return FindOffset(className, memberName);
 	}
 
 	int32_t FindChainOffset(const char* className) {
-		return GetOffset(className, chainKey).offset;
+		return FindOffset(className, chainKey).offset;
 	}
 
-	SchemaKey GetOffset(const char* className, const char* memberName) {
-		return GetOffset(std::string_view(className), std::string_view(memberName));
+	SchemaKey FindOffset(const char* className, const char* memberName) {
+		return FindOffset(std::string_view(className), std::string_view(memberName));
 	}
 
 	void NetworkStateChanged(intptr_t chainEntity, int32_t localOffset, int32_t arrayIndex) {
@@ -521,7 +521,7 @@ namespace schema {
 	}
 
 	EntityField FindField(CEntityInstance* entity, std::string_view className, std::string_view memberName) {
-		const SchemaKey key = GetOffset(className, memberName);
+		const SchemaKey key = FindOffset(className, memberName);
 		if (!key) {
 			plg::print(LS_WARNING, "Cannot find offset for '{}::{}' with entity pointer: {}\n", className, memberName, static_cast<const void*>(entity));
 			return {};
