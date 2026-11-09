@@ -18,7 +18,10 @@
  */
 
 #include "schema.hpp"
+#include "schema_helpers.hpp"
 #include "utils.hpp"
+
+#include <core/core_config.hpp>
 
 #include <schemasystem/schemasystem.h>
 #include <entity2/entitynetwork.h>
@@ -437,5 +440,100 @@ namespace schema {
 				return Invalid;
 		}
 		PLUGIFY_UNREACHABLE();
+	}
+
+	//
+	// Typed access helpers (schema_helpers.hpp)
+	//
+
+	void* ResizeUtlVector(intptr_t address, int count, int dataSize) {
+		// The layout of CUtlVector (and CNetworkUtlVectorBase) does not depend on T, only the
+		// allocation size does, so the element size picks the instantiation.
+		void* data = nullptr;
+		DispatchSize<int64_t>(dataSize, [&]<typename S>() {
+			auto* vec = reinterpret_cast<CUtlVector<S>*>(address);
+			vec->SetCount(count);
+			data = vec->Base();
+		});
+		return data;
+	}
+
+	void NotifyDataChanged(CEntityInstance* entity, int offset, int chainOffset, bool changeState) {
+		if (changeState) {
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), offset, chainOffset);
+		}
+	}
+
+	ArrayView GetArrayView(intptr_t base, CSchemaType* type, ElementType elementType) {
+		switch (elementType) {
+			case Array: {
+				const auto* arrayType = static_cast<const CSchemaType_FixedArray*>(type);
+				return {base, arrayType->m_nElementCount, arrayType->m_nElementSize};
+			}
+			case Collection: {
+				const auto* vec = reinterpret_cast<CUtlVector<uint8>*>(base);
+				const auto* collectionType = static_cast<const CSchemaType_Atomic_CollectionOfT*>(type);
+				return {reinterpret_cast<intptr_t>(vec->Base()), vec->Count(), collectionType->m_nElementSize};
+			}
+			default:
+				return {};
+		}
+	}
+
+	void EntityField::WarnType(std::string_view expected) const {
+		plg::print(LS_WARNING, "Schema field '{}::{}' is not a {}, but '{}'\n", className, memberName, expected, key.type->m_sTypeName.Get());
+	}
+
+	void* EntityField::Element(ElementType elementType, int element, std::string_view expected) const {
+		switch (elementType) {
+			case Single:
+				return reinterpret_cast<void*>(Base());
+			case Array:
+			case Collection: {
+				const auto view = GetArrayView(Base(), key.type, elementType);
+				if (element < 0 || element >= view.count) {
+					plg::print(LS_WARNING, "Element {} is out of range for '{}::{}' (size: {})\n", element, className, memberName, view.count);
+					return nullptr;
+				}
+				return reinterpret_cast<void*>(view.data + static_cast<intptr_t>(element) * view.stride);
+			}
+			default:
+				WarnType(expected);
+				return nullptr;
+		}
+	}
+
+	std::pair<void*, int> EntityField::SizedElement(ElementSizedType sized, int element, std::string_view expected) const {
+		void* ptr = Element(sized.type, element, expected);
+		const int size = sized.type == Single ? static_cast<int>(key.size) : sized.size;
+		return {ptr, size};
+	}
+
+	void EntityField::NotifyChanged(bool changeState) const {
+		if (!changeState) {
+			return;
+		}
+		if (key.networked) {
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), key.offset, FindChainOffset(className));
+		} else {
+			plg::print(LS_WARNING, "Schema field '{}::{}' cannot be send over network\n", className, memberName);
+		}
+	}
+
+	std::optional<EntityField> FindField(CEntityInstance* entity, const plg::string& className, const plg::string& memberName) {
+		const SchemaKey key = GetOffset(className, memberName);
+		if (key.offset == -1) {
+			plg::print(LS_WARNING, "Cannot find offset for '{}::{}' with entity pointer: {}\n", className, memberName, static_cast<const void*>(entity));
+			return std::nullopt;
+		}
+		return EntityField{entity, className, memberName, key};
+	}
+
+	std::optional<EntityField> FindWritableField(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, std::string_view action) {
+		if (g_pCoreConfig->FollowCS2ServerGuidelines && CS2BadList.contains(memberName)) {
+			plg::print(LS_WARNING, "Cannot {} '{}::{}' with \"FollowCS2ServerGuidelines\" option enabled.\n", action, className, memberName);
+			return std::nullopt;
+		}
+		return FindField(entity, className, memberName);
 	}
 }// namespace schema

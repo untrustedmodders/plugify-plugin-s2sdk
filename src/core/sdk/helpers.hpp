@@ -20,6 +20,35 @@ namespace helpers {
 		return entity;
 	}
 
+	// Resolves an entity handle and calls `fn` with the entity, or returns `fallback` if the handle is invalid.
+	template<typename R, typename F>
+	R WithEntity(
+		int entityHandle,
+		R fallback,
+		F&& fn,
+		const std::source_location& location = std::source_location::current()
+	) {
+		auto* entity = GetEntity<CEntityInstance>(entityHandle, location);
+		if (!entity) {
+			return fallback;
+		}
+		return fn(entity);
+	}
+
+	// Same as above, returns a value-initialized result (or nothing) if the handle is invalid.
+	template<typename F>
+	auto WithEntity(
+		int entityHandle,
+		F&& fn,
+		const std::source_location& location = std::source_location::current()
+	) -> std::invoke_result_t<F, CEntityInstance*> {
+		auto* entity = GetEntity<CEntityInstance>(entityHandle, location);
+		if (!entity) {
+			return std::invoke_result_t<F, CEntityInstance*>();
+		}
+		return fn(entity);
+	}
+
 	inline CPlayerController* GetController(
 		int playerSlot,
 		const std::source_location& location = std::source_location::current()
