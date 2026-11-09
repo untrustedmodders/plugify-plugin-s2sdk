@@ -520,19 +520,19 @@ namespace schema {
 		}
 	}
 
-	std::optional<EntityField> FindField(CEntityInstance* entity, const plg::string& className, const plg::string& memberName) {
+	EntityField FindField(CEntityInstance* entity, std::string_view className, std::string_view memberName) {
 		const SchemaKey key = GetOffset(className, memberName);
-		if (key.offset == -1) {
+		if (!key) {
 			plg::print(LS_WARNING, "Cannot find offset for '{}::{}' with entity pointer: {}\n", className, memberName, static_cast<const void*>(entity));
-			return std::nullopt;
+			return {};
 		}
 		return EntityField{entity, className, memberName, key};
 	}
 
-	std::optional<EntityField> FindWritableField(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, std::string_view action) {
+	EntityField FindWritableField(CEntityInstance* entity, std::string_view className, std::string_view memberName, std::string_view action) {
 		if (g_pCoreConfig->FollowCS2ServerGuidelines && CS2BadList.contains(memberName)) {
 			plg::print(LS_WARNING, "Cannot {} '{}::{}' with \"FollowCS2ServerGuidelines\" option enabled.\n", action, className, memberName);
-			return std::nullopt;
+			return {};
 		}
 		return FindField(entity, className, memberName);
 	}

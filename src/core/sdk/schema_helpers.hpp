@@ -165,10 +165,14 @@ namespace schema {
 
 	// A resolved schema member of a concrete entity.
 	struct EntityField {
-		CEntityInstance* entity;
-		const plg::string& className;
-		const plg::string& memberName;
+		CEntityInstance* entity{};
+		std::string_view className;
+		std::string_view memberName;
 		SchemaKey key;
+
+		explicit operator bool() const noexcept {
+			return static_cast<bool>(key);
+		}
 
 		intptr_t Base() const {
 			return reinterpret_cast<intptr_t>(entity) + key.offset;
@@ -187,10 +191,10 @@ namespace schema {
 		void NotifyChanged(bool changeState) const;
 	};
 
-	std::optional<EntityField> FindField(CEntityInstance* entity, const plg::string& className, const plg::string& memberName);
+	EntityField FindField(CEntityInstance* entity, std::string_view className, std::string_view memberName);
 
 	// Same as FindField, but also refuses members blocked by the "FollowCS2ServerGuidelines" option.
-	std::optional<EntityField> FindWritableField(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, std::string_view action = "set");
+	EntityField FindWritableField(CEntityInstance* entity, std::string_view className, std::string_view memberName, std::string_view action = "set");
 
 	// Integer (int64_t) or floating-point (double) schema values.
 	template<typename T>
@@ -206,81 +210,81 @@ namespace schema {
 	constexpr std::string_view numericName = std::is_floating_point_v<T> ? "float" : "integer";
 
 	template<typename T>
-	T GetNumeric(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, int element) {
+	T GetNumeric(CEntityInstance* entity, std::string_view className, std::string_view memberName, int element) {
 		const auto field = FindField(entity, className, memberName);
 		if (!field) {
 			return {};
 		}
 
-		const auto sized = ClassifyNumeric<T>(field->key.type);
+		const auto sized = ClassifyNumeric<T>(field.key.type);
 		if constexpr (std::is_integral_v<T>) {
 			// Structures larger than 8 bytes are returned by address.
 			if (sized.type == Class) {
-				return static_cast<T>(field->Base());
+				return static_cast<T>(field.Base());
 			}
 		}
 
-		const auto [ptr, size] = field->SizedElement(sized, element, numericName<T>);
+		const auto [ptr, size] = field.SizedElement(sized, element, numericName<T>);
 		return ptr ? ReadValue<T>(ptr, size) : T{};
 	}
 
 	template<typename T>
-	void SetNumeric(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, T value, bool changeState, int element) {
+	void SetNumeric(CEntityInstance* entity, std::string_view className, std::string_view memberName, T value, bool changeState, int element) {
 		const auto field = FindWritableField(entity, className, memberName);
 		if (!field) {
 			return;
 		}
 
-		const auto [ptr, size] = field->SizedElement(ClassifyNumeric<T>(field->key.type), element, numericName<T>);
+		const auto [ptr, size] = field.SizedElement(ClassifyNumeric<T>(field.key.type), element, numericName<T>);
 		if (!ptr || !IsValidElementSize<T>(size)) {
 			return;
 		}
 
-		field->NotifyChanged(changeState);
+		field.NotifyChanged(changeState);
 		WriteValue<T>(ptr, size, value);
 	}
 
 	// Values stored as-is (vectors), matched by their size.
 	template<typename T, size_t Size = sizeof(T)>
-	T GetPlain(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, int element, std::string_view expected) {
+	T GetPlain(CEntityInstance* entity, std::string_view className, std::string_view memberName, int element, std::string_view expected) {
 		const auto field = FindField(entity, className, memberName);
 		if (!field) {
 			return {};
 		}
 
-		const auto* ptr = static_cast<const T*>(field->Element(IsPlainType(field->key.type, Size), element, expected));
+		const auto* ptr = static_cast<const T*>(field.Element(IsPlainType(field.key.type, Size), element, expected));
 		return ptr ? *ptr : T{};
 	}
 
 	template<typename T, size_t Size = sizeof(T)>
-	void SetPlain(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, const T& value, bool changeState, int element, std::string_view expected) {
+	void SetPlain(CEntityInstance* entity, std::string_view className, std::string_view memberName, const T& value, bool changeState, int element, std::string_view expected) {
 		const auto field = FindWritableField(entity, className, memberName);
 		if (!field) {
 			return;
 		}
 
-		auto* ptr = static_cast<T*>(field->Element(IsPlainType(field->key.type, Size), element, expected));
+		auto* ptr = static_cast<T*>(field.Element(IsPlainType(field.key.type, Size), element, expected));
 		if (!ptr) {
 			return;
 		}
 
-		field->NotifyChanged(changeState);
+		field.NotifyChanged(changeState);
 		*ptr = value;
 	}
 
 	// Whole fixed arrays and collections of integers or floats.
 	template<typename T>
-	plg::vector<T> GetArray(CEntityInstance* entity, const plg::string& className, const plg::string& memberName) {
+	plg::vector<T> GetArray(CEntityInstance* entity, std::string_view className, std::string_view memberName) {
 		const auto field = FindField(entity, className, memberName);
 		if (!field) {
 			return {};
 		}
 
-		const auto [elementType, elementSize] = ClassifyNumeric<T>(field->key.type);
+		const auto [elementType, elementSize] = ClassifyNumeric<T>(field.key.type);
 		switch (elementType) {
 			case Array:
 			case Collection: {
-				const auto view = GetArrayView(field->Base(), field->key.type, elementType);
+				const auto view = GetArrayView(field.Base(), field.key.type, elementType);
 				if (view.count <= 0) {
 					return {};
 				}
@@ -290,40 +294,40 @@ namespace schema {
 				plg::print(LS_WARNING, "Schema field '{}::{}' is not an array\n", className, memberName);
 				return {};
 			default:
-				field->WarnType(std::is_floating_point_v<T> ? "float array" : "integer array");
+				field.WarnType(std::is_floating_point_v<T> ? "float array" : "integer array");
 				return {};
 		}
 	}
 
 	template<typename T>
-	void SetArray(CEntityInstance* entity, const plg::string& className, const plg::string& memberName, const plg::vector<T>& value, bool changeState) {
+	void SetArray(CEntityInstance* entity, std::string_view className, std::string_view memberName, const plg::vector<T>& value, bool changeState) {
 		const auto field = FindWritableField(entity, className, memberName);
 		if (!field) {
 			return;
 		}
 
-		const auto [elementType, elementSize] = ClassifyNumeric<T>(field->key.type);
+		const auto [elementType, elementSize] = ClassifyNumeric<T>(field.key.type);
 		switch (elementType) {
 			case Array: {
 				if (!IsValidElementSize<T>(elementSize)) {
 					return;
 				}
-				const int count = static_cast<const CSchemaType_FixedArray*>(field->key.type)->m_nElementCount;
+				const int count = static_cast<const CSchemaType_FixedArray*>(field.key.type)->m_nElementCount;
 				if (value.size() > static_cast<size_t>(count)) {
 					plg::print(LS_WARNING, "Schema array '{}::{}' can hold {} elements, {} were given, extra elements are ignored\n", className, memberName, count, value.size());
 				}
-				field->NotifyChanged(changeState);
+				field.NotifyChanged(changeState);
 				const size_t n = std::min(value.size(), static_cast<size_t>(count));
-				WriteValues<T>(reinterpret_cast<void*>(field->Base()), value.data(), n, elementSize);
+				WriteValues<T>(reinterpret_cast<void*>(field.Base()), value.data(), n, elementSize);
 				break;
 			}
 			case Collection: {
 				if (!IsValidElementSize<T>(elementSize)) {
 					return;
 				}
-				field->NotifyChanged(changeState);
+				field.NotifyChanged(changeState);
 				const int count = static_cast<int>(value.size());
-				void* data = ResizeUtlVector(field->Base(), count, elementSize);
+				void* data = ResizeUtlVector(field.Base(), count, elementSize);
 				if (data && count > 0) {
 					WriteValues<T>(data, value.data(), value.size(), elementSize);
 				}
@@ -333,7 +337,7 @@ namespace schema {
 				plg::print(LS_WARNING, "Schema field '{}::{}' is not an array\n", className, memberName);
 				break;
 			default:
-				field->WarnType(std::is_floating_point_v<T> ? "float array" : "integer array");
+				field.WarnType(std::is_floating_point_v<T> ? "float array" : "integer array");
 				break;
 		}
 	}

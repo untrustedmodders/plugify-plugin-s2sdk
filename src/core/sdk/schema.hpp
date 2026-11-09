@@ -32,6 +32,10 @@ struct SchemaKey {
 	bool networked{};
 	size_t size{};
 	CSchemaType* type{};
+
+	explicit operator bool() const noexcept {
+		return offset != -1;
+	}
 };
 
 namespace schema {
