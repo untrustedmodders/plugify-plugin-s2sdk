@@ -86,35 +86,14 @@ extern "C" PLUGIN_API void ServerCommand(const plg::string& command) {
 	g_pEngineServer->ServerCommand(cleanCommand.c_str());
 }
 /**
- * @brief Executes a server command as if it were on the server console (or RCON) and stores the printed text into buffer.
+ * @brief Executes a server command right away as if it were on the server console (or RCON) and returns the printed text.
+ * Console commands and convars only: commands are split on ';' and new lines, aliases are not expanded.
  *
  * @param command The command to execute on the server.
  * @return String to store command result into.
  */
 extern "C" PLUGIN_API plg::string ServerCommandEx(const plg::string& command) {
-	auto cleanCommand = command + '\n';
-
-	if (!g_ShouldCatchSpew) {
-		g_ShouldCatchSpew = true;
-		g_pEngineServer->ServerCommand("s2_conhook_start\n");
-		g_pEngineServer->ServerCommand(cleanCommand.c_str());
-		g_pEngineServer->ServerCommand("s2_conhook_stop\n");
-	} else {
-		g_pEngineServer->ServerCommand(cleanCommand.c_str());
-	}
-
-	switch (g_ServerCommandBuffer.size()) {
-		case 0:
-			return "";
-
-		case 1:
-			return g_ServerCommandBuffer[0];
-
-		default:
-			plg::string result = plg::join(g_ServerCommandBuffer, "");
-			g_ServerCommandBuffer.clear();
-			return result;
-	}
+	return ExecuteServerCommandCapture(command);
 }
 
 /**
