@@ -81,7 +81,7 @@ namespace {
 				field.m_pszName,
 				field.m_nSingleInheritanceOffset,
 				index != cli.InvalidIndex() && cli[index]->FindField(field.m_pszName),
-				static_cast<size_t>(size),
+				size,
 				field.m_pType
 			);
 
@@ -173,23 +173,23 @@ namespace schema {
 	// A schema type split into its container (single value, fixed array or collection) and its element.
 	struct Layout {
 		FieldKind kind;
-		const CSchemaType* element; // may be null for collections with an unknown template type
 		int stride;                 // size of one element in bytes
+		const CSchemaType* element; // may be null for collections with an unknown template type
 	};
 
 	static Layout Unwrap(const CSchemaType* type) {
 		if (type->m_eTypeCategory == SCHEMA_TYPE_FIXED_ARRAY) {
 			const auto* array = static_cast<const CSchemaType_FixedArray*>(type);
-			return {FieldKind::Array, array->m_pElementType, array->m_nElementSize};
+			return {FieldKind::Array, array->m_nElementSize, array->m_pElementType};
 		}
 		if (type->m_eTypeCategory == SCHEMA_TYPE_ATOMIC && type->m_eAtomicCategory == SCHEMA_ATOMIC_COLLECTION_OF_T) {
 			const auto* collection = static_cast<const CSchemaType_Atomic_CollectionOfT*>(type);
-			return {FieldKind::Collection, collection->m_pTemplateType, collection->m_nElementSize};
+			return {FieldKind::Collection, collection->m_nElementSize, collection->m_pTemplateType};
 		}
 		int size = 0;
 		uint8 alignment = 0;
 		type->GetSizeAndAlignment(size, alignment);
-		return {FieldKind::Single, type, size};
+		return {FieldKind::Single, size, type};
 	}
 
 	static Storage BuiltinStorage(SchemaBuiltinType_t builtin) {
@@ -236,7 +236,7 @@ namespace schema {
 					const auto* classInfo = static_cast<const CSchemaType_DeclaredClass*>(type)->m_pClassInfo;
 					if (classInfo && classInfo->m_nFieldCount == 1 && classInfo->m_nBaseClassCount == 0) {
 						const Storage inner = ScalarStorage(classInfo->m_pFields[0].m_pType, classInfo->m_nSize);
-						if (inner != Storage::Invalid && SizeOf(inner) == static_cast<size_t>(size)) {
+						if (inner != Storage::Invalid && SizeOf(inner) == size) {
 							return inner;
 						}
 					}
@@ -255,12 +255,12 @@ namespace schema {
 
 	static constexpr NumericField InvalidSized{FieldKind::Invalid, Storage::Invalid};
 
-	FieldKind GetFieldKind(CSchemaType* type) {
+	FieldKind GetFieldKind(const CSchemaType* type) {
 		return Unwrap(type).kind;
 	}
 
-	NumericField MatchInteger(CSchemaType* type) {
-		const auto [kind, element, stride] = Unwrap(type);
+	NumericField MatchInteger(const CSchemaType* type) {
+		const auto [kind, stride, element] = Unwrap(type);
 		if (const Storage storage = ScalarStorage(element, stride); IsInteger(storage)) {
 			return {kind, storage};
 		}
@@ -271,8 +271,8 @@ namespace schema {
 		return InvalidSized;
 	}
 
-	NumericField MatchFloat(CSchemaType* type) {
-		const auto [kind, element, stride] = Unwrap(type);
+	NumericField MatchFloat(const CSchemaType* type) {
+		const auto [kind, stride, element] = Unwrap(type);
 		if (const Storage storage = ScalarStorage(element, stride); IsFloat(storage)) {
 			return {kind, storage};
 		}
@@ -280,9 +280,9 @@ namespace schema {
 	}
 
 	// Matches atomic values (or arrays of them) of the given category and size; collections by element size.
-	static FieldKind MatchAtomicCategory(const CSchemaType* type, SchemaAtomicCategory_t category, size_t size) {
-		const auto [kind, element, stride] = Unwrap(type);
-		if (static_cast<size_t>(stride) != size) {
+	static FieldKind MatchAtomicCategory(const CSchemaType* type, SchemaAtomicCategory_t category, int size) {
+		const auto [kind, stride, element] = Unwrap(type);
+		if (stride != size) {
 			return FieldKind::Invalid;
 		}
 		if (kind == FieldKind::Collection) {
@@ -294,11 +294,11 @@ namespace schema {
 		return FieldKind::Invalid;
 	}
 
-	FieldKind MatchPlain(CSchemaType* type, size_t size) {
+	FieldKind MatchPlain(const CSchemaType* type, int size) {
 		return MatchAtomicCategory(type, SCHEMA_ATOMIC_PLAIN, size);
 	}
 
-	FieldKind MatchAtomic(CSchemaType* type, size_t size) {
+	FieldKind MatchAtomic(const CSchemaType* type, int size) {
 		return MatchAtomicCategory(type, SCHEMA_ATOMIC_T, size);
 	}
 
@@ -312,7 +312,7 @@ namespace schema {
 		void* data = nullptr;
 		Dispatch(IntStorage(dataSize), [&]<typename S>() {
 			auto* vec = reinterpret_cast<CUtlVector<S>*>(address);
-			vec->SetCount(static_cast<int>(count));
+			vec->SetCount(count);
 			data = vec->Base();
 		});
 		return data;
@@ -324,7 +324,7 @@ namespace schema {
 		}
 	}
 
-	ArrayView GetArrayView(intptr_t base, CSchemaType* type, FieldKind elementType) {
+	ArrayView GetArrayView(intptr_t base, const CSchemaType* type, FieldKind elementType) {
 		switch (elementType) {
 			case FieldKind::Array: {
 				const auto* arrayType = static_cast<const CSchemaType_FixedArray*>(type);

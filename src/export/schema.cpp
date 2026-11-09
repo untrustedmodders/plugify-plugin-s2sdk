@@ -1136,7 +1136,7 @@ extern "C" PLUGIN_API plg::string GetEntSchemaString2(CEntityInstance* entity, c
 		case schema::FieldKind::Array:
 			if (schema::SizeOf(storage) == sizeof(char)) {
 				const char* src = reinterpret_cast<const char*>(field.Base());
-				return plg::string(src, strnlen(src, field.key.size));
+				return plg::string(src, strnlen(src, static_cast<size_t>(field.key.size)));
 			}
 			break;
 		case schema::FieldKind::Collection:
@@ -1179,8 +1179,7 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 
 	// CUtlString fields
 	if (schema::MatchPlain(field.key.type, sizeof(CUtlString)) != schema::FieldKind::Invalid) {
-		auto* ptr = field.Plain<CUtlString>(element, "string");
-		if (ptr) {
+		if (auto* ptr = field.Plain<CUtlString>(element, "string")) {
 			field.NotifyChanged(changeState);
 			*ptr = value;
 		}
@@ -1194,7 +1193,7 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 			if (schema::SizeOf(storage) == sizeof(char)) {
 				field.NotifyChanged(changeState);
 				char* dst = reinterpret_cast<char*>(field.Base());
-				const size_t n = std::min(value.size(), field.key.size - 1);
+				const size_t n = std::min(value.size(), static_cast<size_t>(field.key.size - 1));
 				value.copy(dst, n);
 				dst[n] = '\0';
 				return;

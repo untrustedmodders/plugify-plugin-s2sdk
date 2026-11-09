@@ -208,13 +208,13 @@ namespace schema {
 		void* Element(FieldKind elementType, int element, std::string_view expected) const;
 
 		// Typed element of a field holding plain atomic values of `Size` bytes (Vector, CUtlString, ...).
-		template<typename T, size_t Size = sizeof(T)>
+		template<typename T, int Size = sizeof(T)>
 		T* Plain(int element, std::string_view expected) const {
 			return static_cast<T*>(Element(MatchPlain(key.type, Size), element, expected));
 		}
 
 		// Typed element of a field holding templated atomic values of `Size` bytes (CHandle<T>, ...).
-		template<typename T, size_t Size = sizeof(T)>
+		template<typename T, int Size = sizeof(T)>
 		T* Atomic(int element, std::string_view expected) const {
 			return static_cast<T*>(Element(MatchAtomic(key.type, Size), element, expected));
 		}
@@ -278,7 +278,7 @@ namespace schema {
 	}
 
 	// Values stored as-is (vectors), matched by their size.
-	template<typename T, size_t Size = sizeof(T)>
+	template<typename T, int Size = sizeof(T)>
 	T GetPlain(CEntityInstance* entity, std::string_view className, std::string_view memberName, int element, std::string_view expected) {
 		const auto field = FindField(entity, className, memberName);
 		if (!field) {
@@ -289,7 +289,7 @@ namespace schema {
 		return ptr ? *ptr : T{};
 	}
 
-	template<typename T, size_t Size = sizeof(T)>
+	template<typename T, int Size = sizeof(T)>
 	void SetPlain(CEntityInstance* entity, std::string_view className, std::string_view memberName, const T& value, bool changeState, int element, std::string_view expected) {
 		const auto field = FindWritableField(entity, className, memberName);
 		if (!field) {

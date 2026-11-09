@@ -31,7 +31,7 @@ struct SchemaKey {
 	int32_t offset{-1};
 	bool networked{};
 	size_t size{};
-	CSchemaType* type{};
+	const CSchemaType* type{};
 
 	explicit operator bool() const noexcept {
 		return offset != -1;
@@ -176,11 +176,11 @@ namespace schema {
 
     void NetworkStateChanged(intptr_t chainEntity, uint32_t localOffset, int32_t arrayIndex = 0xFFFFFFFF);
 
-	FieldKind GetFieldKind(CSchemaType* type);
-	NumericField MatchInteger(CSchemaType* type);
-	NumericField MatchFloat(CSchemaType* type);
-	FieldKind MatchPlain(CSchemaType* type, size_t size);
-	FieldKind MatchAtomic(CSchemaType* type, size_t size);
+	FieldKind GetFieldKind(const CSchemaType* type);
+	NumericField MatchInteger(const CSchemaType* type);
+	NumericField MatchFloat(const CSchemaType* type);
+	FieldKind MatchPlain(const CSchemaType* type, size_t size);
+	FieldKind MatchAtomic(const CSchemaType* type, size_t size);
 
 } // namespace schema
 
