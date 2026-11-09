@@ -396,7 +396,7 @@ public:
 		CHECK_FIELD_TYPE(UINT64);
 		CHECK_FIELD_REPEATED();
 
-		m_msg->GetReflection()->AddUInt32(m_msg, field, value);
+		m_msg->GetReflection()->AddUInt64(m_msg, field, value);
 		return true;
 	}
 
