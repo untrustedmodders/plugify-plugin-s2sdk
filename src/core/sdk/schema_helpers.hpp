@@ -12,89 +12,97 @@ namespace schema {
 	// Raw values
 	//
 
-	// Calls `fn.template operator()<S>()` with the storage type S matching `dataSize`:
-	// int8_t/int16_t/int32_t/int64_t for integer T, float/double for floating-point T.
-	template<typename T, typename F>
-	bool DispatchSize(int dataSize, F&& fn) {
-		if constexpr (std::is_floating_point_v<T>) {
-			switch (dataSize) {
-				case sizeof(float):
-					fn.template operator()<float>();
-					return true;
-				case sizeof(double):
-					fn.template operator()<double>();
-					return true;
-				default:
-					break;
-			}
-		} else {
-			switch (dataSize) {
-				case sizeof(int8_t):
-					fn.template operator()<int8_t>();
-					return true;
-				case sizeof(int16_t):
-					fn.template operator()<int16_t>();
-					return true;
-				case sizeof(int32_t):
-					fn.template operator()<int32_t>();
-					return true;
-				case sizeof(int64_t):
-					fn.template operator()<int64_t>();
-					return true;
-				default:
-					break;
-			}
+	// Calls `fn.template operator()<S>()` with the C++ type S of `storage`.
+	// Returns false (without calling `fn`) for Storage::Invalid.
+	template<typename F>
+	bool Dispatch(Storage storage, F&& fn) {
+		switch (storage) {
+			case Storage::I8:
+				fn.template operator()<int8_t>();
+				return true;
+			case Storage::U8:
+				fn.template operator()<uint8_t>();
+				return true;
+			case Storage::I16:
+				fn.template operator()<int16_t>();
+				return true;
+			case Storage::U16:
+				fn.template operator()<uint16_t>();
+				return true;
+			case Storage::I32:
+				fn.template operator()<int32_t>();
+				return true;
+			case Storage::U32:
+				fn.template operator()<uint32_t>();
+				return true;
+			case Storage::I64:
+				fn.template operator()<int64_t>();
+				return true;
+			case Storage::U64:
+				fn.template operator()<uint64_t>();
+				return true;
+			case Storage::F32:
+				fn.template operator()<float>();
+				return true;
+			case Storage::F64:
+				fn.template operator()<double>();
+				return true;
+			default:
+				return false;
 		}
-		plg::print(LS_WARNING, "Invalid {} element size: {}\n", std::is_floating_point_v<T> ? "float" : "integer", dataSize);
-		return false;
+	}
+
+	// Storage for raw offset access, where only the size is known: signed integers for integer T,
+	// floats for floating-point T. Warns and returns Storage::Invalid on an unsupported size.
+	template<typename T>
+	Storage StorageFor(int dataSize) {
+		const Storage storage = std::is_floating_point_v<T> ? FloatStorage(dataSize) : IntStorage(dataSize);
+		if (storage == Storage::Invalid) {
+			plg::print(LS_WARNING, "Invalid {} element size: {}\n", std::is_floating_point_v<T> ? "float" : "integer", dataSize);
+		}
+		return storage;
 	}
 
 	template<typename T>
-	bool IsValidElementSize(int dataSize) {
-		return DispatchSize<T>(dataSize, []<typename S>() {});
-	}
-
-	// Converts a stored element to T; `isUnsigned` zero-extends integers instead of sign-extending them.
-	template<typename T, typename S>
-	T FromStorage(S value, bool isUnsigned) {
-		if constexpr (std::is_integral_v<S>) {
-			if (isUnsigned) {
-				return static_cast<T>(static_cast<std::make_unsigned_t<S>>(value));
-			}
-		}
-		return static_cast<T>(value);
-	}
-
-	template<typename T>
-	T ReadValue(const void* src, int dataSize, bool isUnsigned = false) {
+	T ReadValue(const void* src, Storage storage) {
 		T result{};
-		DispatchSize<T>(dataSize, [&]<typename S>() {
-			result = FromStorage<T>(*static_cast<const S*>(src), isUnsigned);
+		Dispatch(storage, [&]<typename S>() {
+			result = static_cast<T>(*static_cast<const S*>(src));
 		});
 		return result;
 	}
 
 	template<typename T>
-	void WriteValue(void* dst, int dataSize, T value) {
-		DispatchSize<T>(dataSize, [&]<typename S>() {
+	T ReadValue(const void* src, int dataSize) {
+		return ReadValue<T>(src, StorageFor<T>(dataSize));
+	}
+
+	template<typename T>
+	void WriteValue(void* dst, Storage storage, T value) {
+		Dispatch(storage, [&]<typename S>() {
 			*static_cast<S*>(dst) = static_cast<S>(value);
 		});
 	}
 
 	template<typename T>
-	plg::vector<T> ReadValues(const void* src, size_t count, int dataSize, bool isUnsigned = false) {
+	void WriteValue(void* dst, int dataSize, T value) {
+		WriteValue<T>(dst, StorageFor<T>(dataSize), value);
+	}
+
+	template<typename T>
+	plg::vector<T> ReadValues(const void* src, size_t count, Storage storage) {
 		plg::vector<T> result;
-		DispatchSize<T>(dataSize, [&]<typename S>() {
+		Dispatch(storage, [&]<typename S>() {
 			const S* p = static_cast<const S*>(src);
 			result.resize(count);
-			std::transform(p, p + count, result.begin(), [isUnsigned](const S v) { return FromStorage<T>(v, isUnsigned); });
+			std::transform(p, p + count, result.begin(), [](const S v) { return static_cast<T>(v); });
 		});
 		return result;
 	}
 
 	template<typename T>
-	void WriteValues(void* dst, const T* src, size_t count, int dataSize) {
-		DispatchSize<T>(dataSize, [&]<typename S>() {
+	void WriteValues(void* dst, const T* src, size_t count, Storage storage) {
+		Dispatch(storage, [&]<typename S>() {
 			std::transform(src, src + count, static_cast<S*>(dst), [](const T v) { return static_cast<S>(v); });
 		});
 	}
@@ -122,42 +130,46 @@ namespace schema {
 	// Fixed-size array (T[N]) of integers or floats.
 	template<typename T>
 	plg::vector<T> GetDataCArray(CEntityInstance* entity, int offset, int arraySize, int dataSize) {
-		if (arraySize <= 0) {
+		const Storage storage = StorageFor<T>(dataSize);
+		if (arraySize <= 0 || storage == Storage::Invalid) {
 			return {};
 		}
-		return ReadValues<T>(&DataAt<uint8>(entity, offset), static_cast<size_t>(arraySize), dataSize);
+		return ReadValues<T>(&DataAt<uint8>(entity, offset), static_cast<size_t>(arraySize), storage);
 	}
 
 	template<typename T>
 	void SetDataCArray(CEntityInstance* entity, int offset, const plg::vector<T>& value, int arraySize, int dataSize, bool changeState, int chainOffset) {
-		if (arraySize <= 0 || !IsValidElementSize<T>(dataSize)) {
+		const Storage storage = StorageFor<T>(dataSize);
+		if (arraySize <= 0 || storage == Storage::Invalid) {
 			return;
 		}
 		NotifyDataChanged(entity, offset, chainOffset, changeState);
 		const size_t n = std::min(value.size(), static_cast<size_t>(arraySize));
-		WriteValues<T>(&DataAt<uint8>(entity, offset), value.data(), n, dataSize);
+		WriteValues<T>(&DataAt<uint8>(entity, offset), value.data(), n, storage);
 	}
 
 	// CUtlVector of integers or floats.
 	template<typename T>
 	plg::vector<T> GetDataVector(CEntityInstance* entity, int offset, int dataSize) {
+		const Storage storage = StorageFor<T>(dataSize);
 		const auto& vec = DataAt<CUtlVector<uint8>>(entity, offset);
-		if (vec.Count() <= 0) {
+		if (vec.Count() <= 0 || storage == Storage::Invalid) {
 			return {};
 		}
-		return ReadValues<T>(vec.Base(), static_cast<size_t>(vec.Count()), dataSize);
+		return ReadValues<T>(vec.Base(), static_cast<size_t>(vec.Count()), storage);
 	}
 
 	template<typename T>
 	void SetDataVector(CEntityInstance* entity, int offset, const plg::vector<T>& value, int dataSize, bool changeState, int chainOffset) {
-		if (!IsValidElementSize<T>(dataSize)) {
+		const Storage storage = StorageFor<T>(dataSize);
+		if (storage == Storage::Invalid) {
 			return;
 		}
 		NotifyDataChanged(entity, offset, chainOffset, changeState);
 		const int count = static_cast<int>(value.size());
 		void* data = ResizeUtlVector(reinterpret_cast<intptr_t>(entity) + offset, count, dataSize);
 		if (data && count > 0) {
-			WriteValues<T>(data, value.data(), value.size(), dataSize);
+			WriteValues<T>(data, value.data(), value.size(), storage);
 		}
 	}
 
@@ -194,9 +206,6 @@ namespace schema {
 		// Address of `element` for arrays and collections, or of the field itself for single values.
 		// Warns and returns nullptr on a type mismatch or when the element is out of range.
 		void* Element(ElementType elementType, int element, std::string_view expected) const;
-
-		// Element address plus its size in bytes, for fields classified by IsIntType/IsFloatType.
-		std::pair<void*, int> SizedElement(ElementSizedType sized, int element, std::string_view expected) const;
 
 		// Marks the field as changed for networking if `changeState` is set.
 		void NotifyChanged(bool changeState) const;
@@ -235,8 +244,8 @@ namespace schema {
 			}
 		}
 
-		const auto [ptr, size] = field.SizedElement(sized, element, numericName<T>);
-		return ptr ? ReadValue<T>(ptr, size, IsUnsignedElement(field.key.type)) : T{};
+		const void* ptr = field.Element(sized.type, element, numericName<T>);
+		return ptr ? ReadValue<T>(ptr, sized.storage) : T{};
 	}
 
 	template<typename T>
@@ -246,13 +255,14 @@ namespace schema {
 			return;
 		}
 
-		const auto [ptr, size] = field.SizedElement(ClassifyNumeric<T>(field.key.type), element, numericName<T>);
-		if (!ptr || !IsValidElementSize<T>(size)) {
+		const auto sized = ClassifyNumeric<T>(field.key.type);
+		void* ptr = field.Element(sized.type, element, numericName<T>);
+		if (!ptr) {
 			return;
 		}
 
 		field.NotifyChanged(changeState);
-		WriteValue<T>(ptr, size, value);
+		WriteValue<T>(ptr, sized.storage, value);
 	}
 
 	// Values stored as-is (vectors), matched by their size.
@@ -291,7 +301,7 @@ namespace schema {
 			return {};
 		}
 
-		const auto [elementType, elementSize] = ClassifyNumeric<T>(field.key.type);
+		const auto [elementType, storage] = ClassifyNumeric<T>(field.key.type);
 		switch (elementType) {
 			case Array:
 			case Collection: {
@@ -299,7 +309,7 @@ namespace schema {
 				if (view.count <= 0) {
 					return {};
 				}
-				return ReadValues<T>(reinterpret_cast<const void*>(view.data), static_cast<size_t>(view.count), elementSize, IsUnsignedElement(field.key.type));
+				return ReadValues<T>(reinterpret_cast<const void*>(view.data), static_cast<size_t>(view.count), storage);
 			}
 			case Single:
 				plg::print(LS_WARNING, "Schema field '{}::{}' is not an array\n", className, memberName);
@@ -317,30 +327,24 @@ namespace schema {
 			return;
 		}
 
-		const auto [elementType, elementSize] = ClassifyNumeric<T>(field.key.type);
+		const auto [elementType, storage] = ClassifyNumeric<T>(field.key.type);
 		switch (elementType) {
 			case Array: {
-				if (!IsValidElementSize<T>(elementSize)) {
-					return;
-				}
 				const int count = static_cast<const CSchemaType_FixedArray*>(field.key.type)->m_nElementCount;
 				if (value.size() > static_cast<size_t>(count)) {
 					plg::print(LS_WARNING, "Schema array '{}::{}' can hold {} elements, {} were given, extra elements are ignored\n", className, memberName, count, value.size());
 				}
 				field.NotifyChanged(changeState);
 				const size_t n = std::min(value.size(), static_cast<size_t>(count));
-				WriteValues<T>(reinterpret_cast<void*>(field.Base()), value.data(), n, elementSize);
+				WriteValues<T>(reinterpret_cast<void*>(field.Base()), value.data(), n, storage);
 				break;
 			}
 			case Collection: {
-				if (!IsValidElementSize<T>(elementSize)) {
-					return;
-				}
 				field.NotifyChanged(changeState);
 				const int count = static_cast<int>(value.size());
-				void* data = ResizeUtlVector(field.Base(), count, elementSize);
+				void* data = ResizeUtlVector(field.Base(), count, SizeOf(storage));
 				if (data && count > 0) {
-					WriteValues<T>(data, value.data(), value.size(), elementSize);
+					WriteValues<T>(data, value.data(), value.size(), storage);
 				}
 				break;
 			}

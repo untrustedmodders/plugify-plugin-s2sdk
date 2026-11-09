@@ -81,7 +81,7 @@ namespace schema {
 			"m_nMusicID",
 	};
 
-	enum ElementType : int32_t {
+	enum ElementType : uint8_t {
 		Invalid,
 		Single,
 		Array,
@@ -89,9 +89,74 @@ namespace schema {
 		Class
 	};
 
+	// How a numeric element is laid out in memory: its size and whether it is signed, unsigned or floating-point.
+	// Reading an unsigned storage zero-extends the value, a signed one sign-extends it.
+	enum class Storage : uint8_t {
+		Invalid,
+		I8,
+		U8,
+		I16,
+		U16,
+		I32,
+		U32,
+		I64,
+		U64,
+		F32,
+		F64
+	};
+
+	constexpr size_t SizeOf(Storage storage) {
+		switch (storage) {
+			case Storage::I8:
+			case Storage::U8:
+				return 1;
+			case Storage::I16:
+			case Storage::U16:
+				return 2;
+			case Storage::I32:
+			case Storage::U32:
+			case Storage::F32:
+				return 4;
+			case Storage::I64:
+			case Storage::U64:
+			case Storage::F64:
+				return 8;
+			default:
+				return -1;
+		}
+	}
+
+	// Signed integer storage of `size` bytes.
+	constexpr Storage IntStorage(int size) {
+		switch (size) {
+			case 1:
+				return Storage::I8;
+			case 2:
+				return Storage::I16;
+			case 4:
+				return Storage::I32;
+			case 8:
+				return Storage::I64;
+			default:
+				return Storage::Invalid;
+		}
+	}
+
+	// Floating-point storage of `size` bytes.
+	constexpr Storage FloatStorage(int size) {
+		switch (size) {
+			case 4:
+				return Storage::F32;
+			case 8:
+				return Storage::F64;
+			default:
+				return Storage::Invalid;
+		}
+	}
+
 	struct ElementSizedType {
 		ElementType type;
-		int32_t size;
+		Storage storage;
 	};
 
     int32_t FindChainOffset(std::string_view className);
@@ -106,8 +171,6 @@ namespace schema {
 	ElementType GetElementType(CSchemaType* type);
 	ElementSizedType IsIntType(CSchemaType* type);
 	ElementSizedType IsFloatType(CSchemaType* type);
-	// True for uint8/uint16/uint32/uint64 fields, fixed arrays and collections; their values must not be sign-extended.
-	bool IsUnsignedElement(CSchemaType* type);
 	ElementType IsPlainType(CSchemaType* type, size_t size);
 	ElementType IsAtomicType(CSchemaType* type, size_t size);
 

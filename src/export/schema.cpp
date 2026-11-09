@@ -1063,8 +1063,14 @@ extern "C" PLUGIN_API plg::vec4 GetEntSchemaColor2(CEntityInstance* entity, cons
 		return {};
 	}
 
-	const auto [ptr, size] = field.SizedElement(schema::IsIntType(field.key.type), element, "color");
-	if (!ptr || size != static_cast<int>(sizeof(Color))) {
+	const auto sized = schema::IsIntType(field.key.type);
+	if (schema::SizeOf(sized.storage) != sizeof(Color)) {
+		field.WarnType("color");
+		return {};
+	}
+
+	const auto* ptr = field.Element(sized.type, element, "color");
+	if (!ptr) {
 		return {};
 	}
 
@@ -1090,8 +1096,14 @@ extern "C" PLUGIN_API void SetEntSchemaColor2(CEntityInstance* entity, const plg
 		return;
 	}
 
-	const auto [ptr, size] = field.SizedElement(schema::IsIntType(field.key.type), element, "color");
-	if (!ptr || size != static_cast<int>(sizeof(Color))) {
+	const auto sized = schema::IsIntType(field.key.type);
+	if (schema::SizeOf(sized.storage) != sizeof(Color)) {
+		field.WarnType("color");
+		return;
+	}
+
+	auto* ptr = field.Element(sized.type, element, "color");
+	if (!ptr) {
 		return;
 	}
 
@@ -1125,16 +1137,16 @@ extern "C" PLUGIN_API plg::string GetEntSchemaString2(CEntityInstance* entity, c
 	}
 
 	// char[N], CUtlVector<char> and char fields
-	const auto [elementType, elementSize] = schema::IsIntType(field.key.type);
+	const auto [elementType, storage] = schema::IsIntType(field.key.type);
 	switch (elementType) {
 		case schema::ElementType::Array:
-			if (elementSize == sizeof(char)) {
+			if (schema::SizeOf(storage) == sizeof(char)) {
 				const char* src = reinterpret_cast<const char*>(field.Base());
 				return plg::string(src, strnlen(src, field.key.size));
 			}
 			break;
 		case schema::ElementType::Collection:
-			if (elementSize == sizeof(char)) {
+			if (schema::SizeOf(storage) == sizeof(char)) {
 				const auto& vec = *reinterpret_cast<const CUtlVector<char>*>(field.Base());
 				return plg::string(vec.Base(), static_cast<size_t>(vec.Count()));
 			}
@@ -1182,10 +1194,10 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 	}
 
 	// char[N], CUtlVector<char> and char fields
-	const auto [elementType, elementSize] = schema::IsIntType(field.key.type);
+	const auto [elementType, storage] = schema::IsIntType(field.key.type);
 	switch (elementType) {
 		case schema::ElementType::Array:
-			if (elementSize == sizeof(char)) {
+			if (schema::SizeOf(storage) == sizeof(char)) {
 				field.NotifyChanged(changeState);
 				char* dst = reinterpret_cast<char*>(field.Base());
 				const size_t n = std::min(value.size(), field.key.size - 1);
@@ -1195,7 +1207,7 @@ extern "C" PLUGIN_API void SetEntSchemaString2(CEntityInstance* entity, const pl
 			}
 			break;
 		case schema::ElementType::Collection:
-			if (elementSize == sizeof(char)) {
+			if (schema::SizeOf(storage) == sizeof(char)) {
 				field.NotifyChanged(changeState);
 				reinterpret_cast<CUtlVector<char>*>(field.Base())->CopyArray(value.data(), static_cast<CUtlVector<char>::IndexType_t>(value.size()));
 				return;
