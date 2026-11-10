@@ -308,7 +308,7 @@ extern "C" PLUGIN_API void ClearTransmitInfoAlwaysAll(CCheckTransmitInfo* info) 
 }
 
 // ============================================================================
-// CCheckTransmitInfo - TargetSlots Vector Methods
+// CCheckTransmitInfo - TargetSpawnGroups Vector Methods
 // ============================================================================
 
 /**

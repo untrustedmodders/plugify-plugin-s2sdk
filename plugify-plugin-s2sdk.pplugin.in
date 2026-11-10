@@ -34373,57 +34373,57 @@
           "bindSelf": true
         },
         {
-          "name": "SetHLTV",
+          "name": "SetAlways",
           "method": "SetTransmitInfoAlways",
           "bindSelf": true
         },
         {
-          "name": "ClearHLTV",
+          "name": "ClearAlways",
           "method": "ClearTransmitInfoAlways",
           "bindSelf": true
         },
         {
-          "name": "IsHLTVSet",
+          "name": "IsAlwaysSet",
           "method": "IsTransmitInfoAlwaysSet",
           "bindSelf": true
         },
         {
-          "name": "SetHLTVAll",
+          "name": "SetAlwaysAll",
           "method": "SetTransmitInfoAlwaysAll",
           "bindSelf": true
         },
         {
-          "name": "ClearHLTVAll",
+          "name": "ClearAlwaysAll",
           "method": "ClearTransmitInfoAlwaysAll",
           "bindSelf": true
         },
         {
-          "name": "GetTargetSlotsCount",
+          "name": "GetTargetSpawnGroupsCount",
           "method": "GetTransmitInfoTargetSpawnGroupsCount",
           "bindSelf": true
         },
         {
-          "name": "GetTargetSlot",
+          "name": "GetTargetSpawnGroup",
           "method": "GetTransmitInfoTargetSpawnGroup",
           "bindSelf": true
         },
         {
-          "name": "AddTargetSlot",
+          "name": "AddTargetSpawnGroup",
           "method": "AddTransmitInfoTargetSpawnGroup",
           "bindSelf": true
         },
         {
-          "name": "RemoveTargetSlot",
+          "name": "RemoveTargetSpawnGroup",
           "method": "RemoveTransmitInfoTargetSpawnGroup",
           "bindSelf": true
         },
         {
-          "name": "GetTargetSlotsAll",
+          "name": "GetTargetSpawnGroupsAll",
           "method": "GetTransmitInfoTargetSpawnGroupsAll",
           "bindSelf": true
         },
         {
-          "name": "RemoveTargetSlotsAll",
+          "name": "RemoveTargetSpawnGroupsAll",
           "method": "RemoveTransmitInfoTargetSpawnGroupsAll",
           "bindSelf": true
         },
