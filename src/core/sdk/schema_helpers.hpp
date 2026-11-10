@@ -184,7 +184,7 @@ namespace schema {
 		int stride{};
 	};
 
-	ArrayView GetArrayView(intptr_t base, CSchemaType* type, FieldKind elementType);
+	ArrayView GetArrayView(intptr_t base, const CSchemaType* type, FieldKind elementType);
 
 	// A resolved schema member of a concrete entity.
 	struct EntityField {
@@ -230,7 +230,7 @@ namespace schema {
 
 	// Integer (int64_t) or floating-point (double) schema values.
 	template<typename T>
-	NumericField ClassifyNumeric(CSchemaType* type) {
+	NumericField ClassifyNumeric(const CSchemaType* type) {
 		if constexpr (std::is_floating_point_v<T>) {
 			return MatchFloat(type);
 		} else {
