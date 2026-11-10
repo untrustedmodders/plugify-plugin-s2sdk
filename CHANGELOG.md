@@ -1,5 +1,32 @@
 # Changelog
 
+## [3.4.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.3.1...v3.4.0) (2026-11-10)
+
+
+### Features
+
+* add array schema methods ([ec2ad8b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ec2ad8b98c8cd85162d94a36b29b7ad767163f63))
+* add SendVoiceData to send Opus voice to clients ([18910ae](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/18910aed7f744bb551430541f7f7a468f8d49c61))
+* add voice speaking listeners and HookClientVoiceData ([79082da](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/79082da18fef33ed1cda16e73520b6e11ecf68d6))
+* store configs as &lt;plugin&gt;.*.jsonc in per-plugin folders ([baffb39](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/baffb399f8a09d0eb85173e24dc6a232911600cc))
+
+
+### Bug Fixes
+
+* add uint64 values in PbAddUInt64 with AddUInt64 ([b7f0e22](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/b7f0e220911369557d3e2782c2ff660905b16efa))
+* build issue ([2cce5d9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/2cce5d94ad81dd92c806eacd555a3d2558ea2c0c))
+* build issue (2) ([76eac99](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/76eac99cd6bfe8a888d0642e8d3b87267a677201))
+* check net channel in GetClientTime and GetClientLatency ([4391146](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/4391146bb6950b57ec8e3f87081b0166ac12cf27))
+* pass entity handles to EntityIO script functions as ehandle ([6a96f95](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6a96f95620cd6db26844a1cdc54ef74cef48b2d0))
+* re-register removed commands and skip callback on failed add ([12112dd](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/12112dd0baf2db0fd8f7d505f68b5f65a95ff211))
+* read manifest version from version.txt on every configure ([e85d6ef](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e85d6ef86d31dab390cc2e86d1020fabd2c86ca0))
+* remove model and body exports whose script functions the game no longer has ([6a3b5c3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6a3b5c367b246e1e122ca3d95c4f7f4f2dcc0aaa))
+* rename CCheckTransmitInfo wrapper methods to match exports ([1d6abb3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1d6abb352c12fe7b0e691795072c9ec5e50721ee))
+* reuse gameconfig only for the same set of paths ([eac0932](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/eac0932281bba4bb3281178be2225fcf769d5ecc))
+* run ServerCommandEx commands right away and return their own output ([cd87ec7](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/cd87ec771718bd2a8d2fc2135ced4bfca1a8f7e4))
+* track existing convars in CreateConVar so change hooks work ([258bb08](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/258bb0893c28a2ce71394e3a4494d19dc4d88648))
+* zero-extend unsigned schema values and check array element types ([ed22e6f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ed22e6f710136ac3c843988e658ef1921ae9ccab))
+
 ## [3.3.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.3.0...v3.3.1) (2026-11-07)
 
 
