@@ -90,12 +90,6 @@ public:
 			return {};
 		}
 
-		auto conVarRef = g_pCVar->FindConVar(name.data());
-		if (conVarRef.IsValidRef()) {
-			plg::print(LS_WARNING, "ConVar '{}' is already exists\n", name);
-			return conVarRef;
-		}
-
 		auto it = m_cnvLookup.find(name);
 		if (it != m_cnvLookup.end()) {
 			plg::print(LS_WARNING, "ConVar '{}' is already exists\n", name);
@@ -109,6 +103,7 @@ public:
 		auto conVar = std::make_unique<ConVarRef>(name.data());
 
 		if (conVar->IsValidRef()) {
+			plg::print(LS_WARNING, "ConVar '{}' is already exists\n", name);
 			conVarInfo->conVar = std::move(conVar);
 		} else {
 			conVarInfo->conVar = std::unique_ptr<ConVarRef>(new CConVar<T>(name.data(), GetFlags(flags), description.data(), defaultVal, hasMin, min, hasMax, max));
