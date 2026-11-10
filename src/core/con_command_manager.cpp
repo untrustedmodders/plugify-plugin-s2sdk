@@ -64,7 +64,7 @@ bool ConCommandManager::RemoveCommandListener(std::string_view name, ConCommandL
 	if (it != m_cmdLookup.end()) {
 		auto commandInfo = it->second;
 		auto status = commandInfo->callbacks[mode].Unregister(callback);
-		if (commandInfo->callbacks[HookMode::Pre].Empty() && commandInfo->callbacks[HookMode::Post].Empty()) {
+		if (commandInfo->defaultCommand && commandInfo->callbacks[HookMode::Pre].Empty() && commandInfo->callbacks[HookMode::Post].Empty()) {
 			m_cmdLookup.erase(it);
 		}
 		return status;
@@ -82,12 +82,16 @@ bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view 
 	}
 
 	auto it = m_cmdLookup.find(name);
-	if (it != m_cmdLookup.end() || g_pCVar->FindConVar(name.data()).IsValidRef() || g_pCVar->FindConCommand(name.data()).IsValidRef()) {
+	auto existingRef = g_pCVar->FindConCommand(name.data());
+
+	bool reusable = existingRef.IsValidRef() && !existingRef.GetRawData()->HasCallback() && (it == m_cmdLookup.end() || it->second->defaultCommand);
+
+	if (!reusable && (it != m_cmdLookup.end() || g_pCVar->FindConVar(name.data()).IsValidRef() || existingRef.IsValidRef())) {
 		plg::print(LS_WARNING, "Command '{}' is already exists\n", name);
 		return false;
 	}
 
-	auto commandInfo = std::make_shared<ConCommandInfo>();
+	auto commandInfo = it != m_cmdLookup.end() ? it->second : std::make_shared<ConCommandInfo>();
 
 	ConCommandCreation_t setup;
 	setup.m_pszName = name.data();
@@ -99,8 +103,11 @@ bool ConCommandManager::AddValveCommand(std::string_view name, std::string_view 
 	commandInfo->commandRef = g_pCVar->RegisterConCommand(setup, ConVar_GetDefaultFlags());
 	commandInfo->command = commandInfo->commandRef.GetRawData();
 	commandInfo->permission = permission;
+	commandInfo->defaultCommand = false;
 
-	m_cmdLookup.emplace(name, commandInfo);
+	if (it == m_cmdLookup.end()) {
+		m_cmdLookup.emplace(name, commandInfo);
+	}
 	return true;
 }
 
@@ -119,6 +126,10 @@ bool ConCommandManager::RemoveValveCommand(std::string_view name) {
 
 	if (m_cmdLookup.erase(name) != 0) {
 		return true;
+	}
+
+	if (!commandRef.GetRawData()->HasCallback()) {
+		return false;
 	}
 
 	g_pCVar->UnregisterConCommandCallbacks(commandRef);

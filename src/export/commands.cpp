@@ -20,7 +20,7 @@ PLUGIFY_LINKAGE()
  */
 extern "C" PLUGIN_API bool AddAdminCommand(const plg::string& name, const plg::string& permission, const plg::string& description, ConVarFlag flags, ConCommandListenerCallback callback, HookMode mode) {
 	auto result = g_ConCommandManager.AddValveCommand(name, description, flags, permission);
-	g_ConCommandManager.AddCommandListener(name, callback, mode);
+	if (result) g_ConCommandManager.AddCommandListener(name, callback, mode);
 	return result;
 }
 
@@ -36,7 +36,7 @@ extern "C" PLUGIN_API bool AddAdminCommand(const plg::string& name, const plg::s
  */
 extern "C" PLUGIN_API bool AddConsoleCommand(const plg::string& name, const plg::string& description, ConVarFlag flags, ConCommandListenerCallback callback, HookMode mode) {
 	auto result = g_ConCommandManager.AddValveCommand(name, description, flags);
-	g_ConCommandManager.AddCommandListener(name, callback, mode);
+	if (result) g_ConCommandManager.AddCommandListener(name, callback, mode);
 	return result;
 }
 
