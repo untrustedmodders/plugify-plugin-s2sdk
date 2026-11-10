@@ -261,19 +261,19 @@ configure_file(
 
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/assets/gamedata.jsonc
-        ${CMAKE_CURRENT_BINARY_DIR}/gamedata.jsonc
+        ${CMAKE_CURRENT_BINARY_DIR}/s2sdk.gamedata.jsonc
         COPYONLY
 )
 
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/assets/settings.jsonc
-        ${CMAKE_CURRENT_BINARY_DIR}/settings.jsonc
+        ${CMAKE_CURRENT_BINARY_DIR}/s2sdk.settings.jsonc
         COPYONLY
 )
 
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/assets/translations.jsonc
-        ${CMAKE_CURRENT_BINARY_DIR}/translations.jsonc
+        ${CMAKE_CURRENT_BINARY_DIR}/s2sdk.translations.jsonc
         COPYONLY
 )
 

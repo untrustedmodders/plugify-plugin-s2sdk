@@ -120,9 +120,9 @@ jobs:
           mkdir -p build/output/bin
           find build -maxdepth 1 -type f \( -name "*${{ env.PROJECT_NAME }}.so" -o -name "*${{ env.PROJECT_NAME }}.dll" \) -exec cp {} build/output/bin/ \;
           cp build/${{ env.PROJECT_NAME }}.pplugin build/output/
-          cp build/gamedata.jsonc build/output/
-          cp build/settings.jsonc build/output/
-          cp build/translations.jsonc build/output/
+          cp build/s2sdk.gamedata.jsonc build/output/
+          cp build/s2sdk.settings.jsonc build/output/
+          cp build/s2sdk.translations.jsonc build/output/
           # Cleanup dev files
           find build/output -type f \( -name "*.exp" -o -name "*.ilk" -o -name "*.lib" -o -name "*.pdb" \) -delete
 

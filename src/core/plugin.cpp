@@ -1099,10 +1099,11 @@ plg::PluginResult Source2SDK::OnPluginStart() {
 	plg::print(LS_DETAILED, "[OnPluginStart] - Source2SDK!\n");
 
 	{
+		auto name = GetName();
 		auto result = globals::Initialize({
-		   { "base", GetLocation() },
-		   { "configs", plg::GetConfigsDir() },
-		   { "data", plg::GetDataDir() },
+		   { "base", GetLocation() + "/" + name + "." },
+		   { "configs", plg::GetConfigsDir() + "/" + name + "/" + name + "." },
+		   { "data", plg::GetDataDir() + "/" + name + "/" + name + "." },
 	   });
 		if (!result) {
 			return plg::PluginResult{ result.error() };

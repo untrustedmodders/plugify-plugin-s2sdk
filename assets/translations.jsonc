@@ -3,7 +3,7 @@
   // translations plugin merges every loaded file into one flat key namespace.
   //
   // Language codes are the ISO codes that s2sdk maps `cl_language` onto; a client whose
-  // language has no entry falls back to "ServerLanguage" from settings.jsonc, then to the
+  // language has no entry falls back to "ServerLanguage" from s2sdk.settings.jsonc, then to the
   // English literal each call site passes to value_or().
   //
   // "{0}", "{1}" are positional placeholders and must be kept as-is, though they may be

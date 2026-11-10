@@ -42,9 +42,9 @@ namespace globals {
 
 		{
 			g_pCoreConfig = new CoreConfig(plg::vector{
-				   paths["base"] + "/settings.jsonc",
-				   paths["configs"] + "/settings.jsonc",
-				   paths["data"] + "/settings.jsonc"
+				   paths["base"] + "settings.jsonc",
+				   paths["configs"] + "settings.jsonc",
+				   paths["data"] + "settings.jsonc"
 		   });
 			auto result = g_pCoreConfig->Initialize();
 			if (!result) {
@@ -53,9 +53,9 @@ namespace globals {
 		}
 		{
 			auto result = lang::Initialize(plg::vector{
-				   paths["base"] + "/translations.jsonc",
-				   paths["configs"] + "/translations.jsonc",
-				   paths["data"] + "/translations.jsonc"
+				   paths["base"] + "translations.jsonc",
+				   paths["configs"] + "translations.jsonc",
+				   paths["data"] + "translations.jsonc"
 			});
 			if (!result) {
 				return MakeError("Failed to load translation configuration: {}", result.error());
@@ -63,9 +63,9 @@ namespace globals {
 		}
 		{
 			auto result = g_GameConfigManager.LoadConfig({ plg::vector{
-				   paths["base"] + "/gamedata.jsonc",
-				   paths["configs"] + "/gamedata.jsonc",
-				   paths["data"] + "/gamedata.jsonc"
+				   paths["base"] + "gamedata.jsonc",
+				   paths["configs"] + "gamedata.jsonc",
+				   paths["data"] + "gamedata.jsonc"
 			   }
 		   });
 			if (!result) {
