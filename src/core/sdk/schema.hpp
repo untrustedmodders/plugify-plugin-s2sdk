@@ -179,8 +179,8 @@ namespace schema {
 	FieldKind GetFieldKind(const CSchemaType* type);
 	NumericField MatchInteger(const CSchemaType* type);
 	NumericField MatchFloat(const CSchemaType* type);
-	FieldKind MatchPlain(const CSchemaType* type, size_t size);
-	FieldKind MatchAtomic(const CSchemaType* type, size_t size);
+	FieldKind MatchPlain(const CSchemaType* type, int size);
+	FieldKind MatchAtomic(const CSchemaType* type, int size);
 
 } // namespace schema
 
