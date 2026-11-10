@@ -1422,20 +1422,7 @@ Result<ConfigId> GameConfigManager::LoadConfig(LoadOptions options) {
 
 	// Check for existing config with same paths
 	for (auto& [id, entry] : m_configs) {
-		const auto& existingPaths = entry.config->GetOptions().configPaths;
-
-		bool matchFound = false;
-		for (const auto& optPath : options.configPaths) {
-			for (const auto& existPath : existingPaths) {
-				if (existPath.ends_with(optPath)) {
-					matchFound = true;
-					break;
-				}
-			}
-			if (matchFound) break;
-		}
-
-		if (matchFound) {
+		if (std::ranges::is_permutation(entry.config->GetOptions().configPaths, options.configPaths)) {
 			// Reuse existing config
 			entry.refCount++;
 			return id;
