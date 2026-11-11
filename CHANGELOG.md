@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.0...v3.4.1) (2026-11-11)
+
+
+### Bug Fixes
+
+* update vote counts after each vote cast ([3ffb296](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3ffb296c881f797422307ebe0563979188cd0910))
+
 ## [3.4.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.3.1...v3.4.0) (2026-11-10)
 
 
