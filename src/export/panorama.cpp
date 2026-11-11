@@ -3,6 +3,7 @@
 
 /**
  * @brief Start a new Yes/No vote
+ * Player votes are counted only when sv_allow_votes is 1.
  *
  * @param duration		Maximum time to leave vote active for
  * @param caller		Player slot of the vote caller. Use VOTE_CALLER_SERVER for 'Server'.
@@ -21,6 +22,7 @@ extern "C" PLUGIN_API bool PanoramaSendYesNoVote(double duration, int caller, co
 
 /**
  * @brief Start a new Yes/No vote with all players included
+ * Player votes are counted only when sv_allow_votes is 1.
  *
  * @param duration		Maximum time to leave vote active for
  * @param caller		Player slot of the vote caller. Use VOTE_CALLER_SERVER for 'Server'.

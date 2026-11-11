@@ -46,6 +46,7 @@ void PanoramaVoteHandler::VoteCast(IGameEvent *event) {
 		m_voteHandler(VoteAction::Vote, controller->GetPlayerSlot(), event->GetInt("vote_option"));
 	}
 
+	UpdateVoteCounts();
 	CheckForEarlyVoteClose();
 }
 
