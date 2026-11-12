@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.4.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.2...v3.4.3) (2026-11-12)
+
+
+### Bug Fixes
+
+* FireOutputInternal delay argument order and hammer id storage, fixes [#161](https://github.com/untrustedmodders/plugify-plugin-s2sdk/issues/161) ([3da92c4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3da92c4f71f90c79f7711e3717886cf305dfae4d))
+* update sdk ([e0215b9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e0215b904ba44634284fcd1e9c55f617d59618b7))
+
 ## [3.4.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.1...v3.4.2) (2026-11-12)
 
 
