@@ -280,9 +280,6 @@ polyhook::ResultType Hook_ClientActive(polyhook::HookHandle hook, polyhook::Para
 
 	plg::print(LS_DETAILED, "[OnClientActive] = {}, {}, {}\n", slot, name, steamID64);
 
-#if defined (CS2)
-	g_MultiAddonManager.OnClientActive(slot, bLoadGame, name, steamID64);
-#endif
 	g_PlayerManager.OnClientActive(slot, bLoadGame);
 	return polyhook::ResultType::Ignored;
 }
@@ -310,7 +307,7 @@ polyhook::ResultType Hook_PerformDisconnection(polyhook::HookHandle hook, polyho
 
 #if defined (CS2)
 	if (!client->IsFakeClient()) {
-		g_MultiAddonManager.OnClientDisconnect(slot, name, steamID64, networkID);
+		g_MultiAddonManager.OnClientDisconnect(slot, name, steamID64, networkID, reason);
 	}
 #endif
 	Player* player = g_PlayerManager.FindSession(client);

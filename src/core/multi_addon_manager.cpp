@@ -39,6 +39,8 @@ struct ClientAddonInfo {
 	plg::vector<PublishedFileId_t> addonsToLoad;
 	plg::vector<PublishedFileId_t> downloadedAddons;
 	PublishedFileId_t currentPendingAddon{};
+	// The addon sent with S2C_CONNECTION, counted as downloaded once the client goes on with the signon
+	PublishedFileId_t connectionAddon{};
 	ClientConnectedState_t connectedState{CLIENTCONN_NONE};
 	double connectionStartTime{};
 };
@@ -825,6 +827,7 @@ bool MultiAddonManager::OnReplyConnection(CNetworkGameServerBase* server, CServe
 	// Handle the first addon here. The rest should be handled in the SendNetMessage hook.
 	if (!std::ranges::contains(clientInfo.downloadedAddons, clientAddons.front())) {
 		clientInfo.currentPendingAddon = clientAddons.front();
+		clientInfo.connectionAddon = clientAddons.front();
 	}
 
 	// In some cases, clients can do a signature check on addons which fails and instantly disconnects them
@@ -866,9 +869,12 @@ void MultiAddonManager::OnSendNetMessage(CServerSideClientBase* client, CNetMess
 
 	auto msg = data->As<CNETMsg_SignonState_t>();
 
+
 	plg::vector<PublishedFileId_t> addons = g_MultiAddonManager.GetClientAddons(steamID64);
 
 	if (msg->signon_state() == SIGNONSTATE_CHANGELEVEL) {
+		clientInfo.connectionAddon = 0;
+
 		// When switching to another map, the signon message might contain more than 1 addon.
 		// This puts the client in limbo because client doesn't know how to handle multiple addons at the same time.
 		plg::vector<PublishedFileId_t> addonsList = plg::parse<PublishedFileId_t>(msg->addons(), ",");
@@ -887,6 +893,16 @@ void MultiAddonManager::OnSendNetMessage(CServerSideClientBase* client, CNetMess
 		clientInfo.currentPendingAddon = addonsList.front();
 
 		return;
+	}
+
+	// The client reaches the signon only after mounting the S2C_CONNECTION addon (downloading it first if missing),
+	// so it does not need it again via CHANGELEVEL. Sending it anyway made every join reconnect once more.
+	if (clientInfo.connectionAddon != 0) {
+		if (!std::ranges::contains(clientInfo.downloadedAddons, clientInfo.connectionAddon))
+			clientInfo.downloadedAddons.push_back(clientInfo.connectionAddon);
+		if (clientInfo.currentPendingAddon == clientInfo.connectionAddon)
+			clientInfo.currentPendingAddon = 0;
+		clientInfo.connectionAddon = 0;
 	}
 
 	for (const auto& downloadedAddon : clientInfo.downloadedAddons) {
@@ -967,6 +983,7 @@ void MultiAddonManager::OnPostEvent(INetworkMessageInternal* message, CNetMessag
 void MultiAddonManager::OnClientConnect(uint64 steamID64) {
 	ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 	clientInfo.connectedState = CLIENTCONN_JOINED;
+	clientInfo.connectionAddon = 0;
 
 	// Clear cache if necessary, unless the client is still downloading addons.
 	double timeAway = Plat_FloatTime() - clientInfo.lastActiveTime;
@@ -987,7 +1004,8 @@ void MultiAddonManager::OnClientConnect(uint64 steamID64) {
 			plg::print(LS_MESSAGE, "{}: Client {} has reconnected after the timeout or did not receive the addon message, will not add addon {} to the downloaded list\n", __func__, steamID64, clientInfo.currentPendingAddon);
 		} else {
 			plg::print(LS_MESSAGE, "{}: Client {} has connected within the interval with the pending addon {}, will send next addon in SendNetMessage hook\n", __func__, steamID64, clientInfo.currentPendingAddon);
-			clientInfo.downloadedAddons.push_back(clientInfo.currentPendingAddon);
+			if (!std::ranges::contains(clientInfo.downloadedAddons, clientInfo.currentPendingAddon))
+				clientInfo.downloadedAddons.push_back(clientInfo.currentPendingAddon);
 		}
 		// Reset the current pending addon anyway, SendNetMessage tells us which addon to download next.
 		clientInfo.currentPendingAddon = 0;
@@ -996,16 +1014,17 @@ void MultiAddonManager::OnClientConnect(uint64 steamID64) {
 	clientInfo.lastActiveTime = Plat_FloatTime();
 }
 
-void MultiAddonManager::OnClientDisconnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID) {
+void MultiAddonManager::OnClientDisconnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID, ENetworkDisconnectionReason reason) {
+	ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 	// Mark the disconnection time for caching purposes.
-	g_ClientAddons[steamID64].lastActiveTime = Plat_FloatTime();
-	g_ClientAddons[steamID64].connectedState = CLIENTCONN_NONE;
-}
+	clientInfo.lastActiveTime = Plat_FloatTime();
+	clientInfo.connectedState = CLIENTCONN_NONE;
 
-void MultiAddonManager::OnClientActive(CPlayerSlot slot, bool loadGame, const char* name, uint64 steamID64) {
-	// When the client reaches this stage, they should already have all the necessary addons downloaded, so we can safely remove the downloaded addons list here.
-	if (!s2_cache_clients_with_addons.Get()) {
-		g_ClientAddons[steamID64].downloadedAddons.clear();
+	// Loop reconnects (addon downloads, map changes) keep the addons mounted on the client, so forget them only when it leaves.
+	// Clearing them on every activation made each map change send the extra addons again, one reconnect per addon.
+	if (!s2_cache_clients_with_addons.Get() && reason != NETWORK_DISCONNECT_LOOPSHUTDOWN && reason != NETWORK_DISCONNECT_LOOPDEACTIVATE) {
+		clientInfo.downloadedAddons.clear();
 	}
 }
+
 #endif

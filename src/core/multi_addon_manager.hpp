@@ -56,8 +56,7 @@ public:
 	void OnSteamAPIActivated(bool reloadMap = true);
 	void OnStartupServer();
 	void OnClientConnect(uint64 steamID64);
-	void OnClientDisconnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID);
-	void OnClientActive(CPlayerSlot slot, bool loadGame, const char* name, uint64 steamID64);
+	void OnClientDisconnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID, ENetworkDisconnectionReason reason);
 	void OnGameFrame();
 	void OnPostEvent(INetworkMessageInternal* message, CNetMessage* data, uint64_t* clients);
 
