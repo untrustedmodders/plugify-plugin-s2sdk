@@ -139,7 +139,7 @@ public:
 	}
 
 	int16_t GetMessageID() const { return m_msgSerializable->GetNetMessageInfo()->m_MessageId; }
-	std::string_view GetMessageName() const { return m_msgSerializable->GetUnscopedName(); }
+	std::string_view GetMessageName() const { return m_msgSerializable->GetNetMessageInfo()->m_szName; }
 	const CNetMessage* GetNetMessage() const { return m_netMessage; }
 	const pb::Message* GetProtobufMessage() const { return m_msg; }
 	INetworkMessageInternal* GetSerializableMessage() const { return m_msgSerializable; }
