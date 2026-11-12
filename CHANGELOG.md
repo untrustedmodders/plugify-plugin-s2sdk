@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.1...v3.4.2) (2026-11-12)
+
+
+### Bug Fixes
+
+* update sdk ([d157aa4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d157aa4433193291f995c8e0306f04948d0abe92))
+
 ## [3.4.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.0...v3.4.1) (2026-11-11)
 
 
