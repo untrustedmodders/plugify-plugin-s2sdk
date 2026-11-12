@@ -222,11 +222,6 @@
         "library": "server",
         "win64": "41 B9 ? ? ? ? 48 89 5D ? 49 8B D5 F3 0F 11 45",
         "linuxsteamrt64": "E8 ? ? ? ? F3 0F 6F 03 48 83 EC ? 45 31 C9 89 C2 45 31 C0 4C 89 FE 0F 11 04 24 8B 43 ? 4C 89 E7"
-      },
-      "SetSchemaHammerUniqueId": {
-        "library": "server",
-        "win64": "75 ? 48 8B 03 48 8B CB FF 90 ? ? ? ? 84 C0 74 ? 48 8D 05",
-        "linuxsteamrt64": "75 ? 48 8B 03 48 89 DF FF 90 ? ? ? ? 84 C0 74 ? 48 8D 05"
       }
     },
     "Offsets": {
@@ -362,19 +357,6 @@
             "read_offs32": 231
           }
         ]
-      },
-      "GetHammerUniqueId": {
-        "vtable": "CPointEntity",
-        "win64": [
-          {
-            "index": 111
-          }
-        ],
-        "linuxsteamrt64": [
-          {
-            "index": 110
-          }
-        ]
       }
     },
     "Patches": {
@@ -382,18 +364,8 @@
         "signature": "VScriptInitialization",
         "win64": "BE 02",
         "linuxsteamrt64": "83 FE 02"
-      },
-      "GetHammerIdPatch": {
-        "address": "GetHammerUniqueId",
-        "win64": "B0 01",
-        "linuxsteamrt64": "B0 01"
       }
-      /*,"SetHammerIdPatch": {
-        "address": "SetHammerUniqueId",
-        "win64": "EB",
-        "linuxsteamrt64": "EB"
-      },
-      "FixWaterFloorJumpPatch": {
+      /*,"FixWaterFloorJumpPatch": {
         "signature": "CheckJumpButtonWater",
         "win64": "11 43",
         "linuxsteamrt64": "11 43"
@@ -431,9 +403,9 @@
         "library": "vscript",
         "table": "CLuaVM"
       },
-      "CPointEntity": {
+      "CGameEntitySystem": {
         "library": "server",
-        "table": "CPointEntity"
+        "table": "CGameEntitySystem"
       }
     }
   },

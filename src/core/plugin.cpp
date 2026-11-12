@@ -493,14 +493,14 @@ polyhook::ResultType Hook_PreWorldUpdate(polyhook::HookHandle hook, polyhook::Pa
 }
 
 polyhook::ResultType Hook_FireOutputInternal(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	// CEntityIOOutput* const self, CEntityInstance* activator, CEntityInstance* caller, const CPulseArgumentPack* args, const CPulseInputParamMap* paramMap, const CVariant* value, float delay
+	// CEntityIOOutput* const self, CEntityInstance* activator, CEntityInstance* caller, const CPulseArgumentPack* args, float delay, const CPulseInputParamMap* paramMap, const CVariant* value
 	auto self = polyhook::GetArgument<CEntityIOOutput* const>(params, 0);
 	auto activator = polyhook::GetArgument<CEntityInstance*>(params, 1);
 	auto caller = polyhook::GetArgument<CEntityInstance*>(params, 2);
 	//auto args = polyhook::GetArgument<const CPulseArgumentPack*>(params, 3);
-	//auto paramMap = polyhook::GetArgument<const CPulseInputParamMap*>(params, 4);
-	//auto value = polyhook::GetArgument<const CVariant* const>(params, 5);
-	auto delay = polyhook::GetArgument<float>(params, 6);
+	auto delay = polyhook::GetArgument<float>(params, 4);
+	//auto paramMap = polyhook::GetArgument<const CPulseInputParamMap*>(params, 5);
+	//auto value = polyhook::GetArgument<const CVariant* const>(params, 6);
 
 	ResultType result = type == polyhook::CallbackType::Post ?
 		g_EntityOutputManager.FireOutputInternal_Post(self, activator, caller, delay) :
@@ -796,6 +796,27 @@ polyhook::ResultType Hook_OnEntitySpawned(polyhook::HookHandle hook, polyhook::P
 	return polyhook::ResultType::Ignored;
 }
 
+// CBaseEntity::Spawn stores the hammerUniqueId keyvalue only in tools mode or for classes that enable it (props, doors, movers, point_template), store it for every entity
+polyhook::ResultType Hook_EntitySystemSpawn(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	static const EntityKeyId_t hammerUniqueIdKey = EntityKeyId_t::Make("hammerUniqueId");
+
+	auto num = polyhook::GetArgument<int>(params, 1);
+	auto infos = polyhook::GetArgument<const EntitySpawnInfo_t*>(params, 2);
+	for (int i = 0; i < num; ++i) {
+		const EntitySpawnInfo_t& info = infos[i];
+		if (!info.m_pEntity || !info.m_pEntity->m_pInstance || !info.m_pKeyValues)
+			continue;
+
+		const char* hammerId = info.m_pKeyValues->GetString(hammerUniqueIdKey);
+		if (*hammerId == '\0')
+			continue;
+
+		auto entity = static_cast<CBaseEntity*>(info.m_pEntity->m_pInstance);
+		entity->m_sUniqueHammerID->Set(hammerId);
+	}
+	return polyhook::ResultType::Ignored;
+}
+
 polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
@@ -1008,8 +1029,12 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IEngineServiceMgr::SwitchToLoop), &IEngineServiceMgr::SwitchToLoop, g_pEngineServiceMgr, Hook_SwitchToLoop, {Pre}));
 	using ReplyConnectionFn = void (*)(CNetworkGameServerBase *server, CServerSideClient* client);
 	CHECK(g_HookManager.AddHookDetourFunc<ReplyConnectionFn>("CNetworkGameServer::ReplyConnection", Hook_ReplyConnection, {Pre, Post}));
-	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CPulseArgumentPack*, const CPulseInputParamMap*, const CVariant*, float);
+	using FireOutputInternalFn = void(*)(CEntityIOOutput*, CEntityInstance*, CEntityInstance*, const CPulseArgumentPack*, float, const CPulseInputParamMap*, const CVariant*);
 	CHECK(g_HookManager.AddHookDetourFunc<FireOutputInternalFn>("CEntityIOOutput::FireOutputInternal", Hook_FireOutputInternal, {Pre, Post}));
+
+	static Memory CGameEntitySystem;
+	UNWRAP(CGameEntitySystem, g_pGameConfig->GetVTable("CGameEntitySystem"));
+	CHECK(g_HookManager.AddHookVFuncFunc(STR(CEntitySystem::Spawn), &CEntitySystem::Spawn, CGameEntitySystem, Hook_EntitySystemSpawn, {Pre}));
 
 	static Memory CServerSideClient;
 	UNWRAP(CServerSideClient, g_pGameConfig->GetVTable("CServerSideClient"));
