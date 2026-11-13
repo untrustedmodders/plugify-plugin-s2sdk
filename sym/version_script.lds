@@ -965,6 +965,7 @@
         GetClientLoadoutItemDefinition;
         SetClientLoadoutItem;
         SetClientLoadoutDefinition;
+        FindClientLoadoutSlot;
         RestoreClientLoadout;
         GetClientInventoryItems;
         CreateClientItem;

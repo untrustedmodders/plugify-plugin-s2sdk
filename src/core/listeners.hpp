@@ -22,7 +22,7 @@ using Manager = ListenerManager<Name, Func>;
 	X(ClientSettingsChanged, void, int playerSlot) \
 	X(ClientAuthenticated, void, int playerSlot, uint64 steamID) \
 	X(ClientInventoryLoaded, void, int playerSlot) \
-	X(ClientLoadoutChanged, void, int playerSlot, CSTeam team, loadout_slot_t loadoutSlot) \
+	X(ClientLoadoutChanged, ResultType, int playerSlot, CSTeam team, loadout_slot_t loadoutSlot) \
 	X(ClientGiveNamedItem, uint64, int playerSlot, const plg::string& itemName) \
 	X(ClientGiveNamedItemPost, void, int playerSlot, int entityHandle) \
 	X(RoundTerminated, void, float delay, CRoundEndReason reason) \

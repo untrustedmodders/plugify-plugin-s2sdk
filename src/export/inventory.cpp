@@ -90,6 +90,7 @@ extern "C" PLUGIN_API uint16_t GetClientLoadoutItemDefinition(int playerSlot, CS
  * @brief Equips an item of the client's inventory in a loadout slot.
  *
  * The game reads the loadout when it gives items, so already given weapons keep their look.
+ * The inventory update event is sent afterwards, as after an equip from the game coordinator.
  * The game rewrites the loadout when the inventory is loaded again or the player changes it.
  *
  * @param playerSlot The index of the player's slot.
@@ -116,6 +117,7 @@ extern "C" PLUGIN_API bool SetClientLoadoutItem(int playerSlot, CSTeam team, loa
 		return false;
 
 	inv->SetItemInLoadout(static_cast<int>(team), loadoutSlot, itemId, definition);
+	inv->SendInventoryUpdateEvent();
 	return true;
 }
 
@@ -144,7 +146,35 @@ extern "C" PLUGIN_API bool SetClientLoadoutDefinition(int playerSlot, CSTeam tea
 		return false;
 
 	inv->SetItemInLoadout(static_cast<int>(team), loadoutSlot, 0, itemDefinition);
+	inv->SendInventoryUpdateEvent();
 	return true;
+}
+
+/**
+ * @brief Finds the loadout slot that gives an item definition to a team, e.g. which rifle slot holds the AK-47.
+ *
+ * Checks the slots the definition can take: its own slot, or every slot of its group for pistols, mid-tier weapons and rifles.
+ * Equip into the returned slot to keep one item per weapon: with two items of one weapon the game picks one at random on every give.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @param team The loadout team.
+ * @param itemDefinition The item definition index.
+ * @return The slot whose equipped or stock item has the definition, or LoadoutSlot::Invalid.
+ */
+extern "C" PLUGIN_API loadout_slot_t FindClientLoadoutSlot(int playerSlot, CSTeam team, uint16_t itemDefinition) {
+	auto definition = inventory::GetItemDefinition(itemDefinition);
+	if (!definition)
+		return LOADOUT_SLOT_INVALID;
+
+	for (int slot = 0; slot < LOADOUT_SLOT_COUNT; ++slot) {
+		if (!FitsLoadoutSlot(definition, slot))
+			continue;
+
+		auto item = inventory::GetLoadoutItem(playerSlot, static_cast<int>(team), slot);
+		if (item && static_cast<uint16_t>(item->m_iItemDefinitionIndex.Get()) == itemDefinition)
+			return static_cast<loadout_slot_t>(slot);
+	}
+	return LOADOUT_SLOT_INVALID;
 }
 
 /**
@@ -158,7 +188,11 @@ extern "C" PLUGIN_API bool RestoreClientLoadout(int playerSlot) {
 	if (!inv)
 		return false;
 
-	return inventory::RestoreGameLoadout(inv);
+	if (!inventory::RestoreGameLoadout(inv))
+		return false;
+
+	inv->SendInventoryUpdateEvent();
+	return true;
 }
 
 /**

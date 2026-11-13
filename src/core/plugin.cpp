@@ -840,6 +840,7 @@ polyhook::ResultType Hook_SOCacheUnsubscribed(polyhook::HookHandle hook, polyhoo
 }
 
 // equip slot object from GC rewrites loadout inside SOCreated / SOUpdated / SODestroyed, compare before and after
+// a listener returning Handled keeps the old item in the slot
 polyhook::ResultType Hook_SOChanged(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	static CCSPlayerInventory* s_inventory = nullptr;
 	static LoadoutSlot_t s_loadout[LOADOUT_COUNT][LOADOUT_SLOT_COUNT];
@@ -856,6 +857,7 @@ polyhook::ResultType Hook_SOChanged(polyhook::HookHandle hook, polyhook::Paramet
 	s_inventory = nullptr;
 
 	auto player = inventory::GetOwner(inv);
+	bool blocked = false;
 	for (int team = 0; team < LOADOUT_COUNT; ++team) {
 		for (int slot = 0; slot < LOADOUT_SLOT_COUNT; ++slot) {
 			const LoadoutSlot_t& before = s_loadout[team][slot];
@@ -864,10 +866,28 @@ polyhook::ResultType Hook_SOChanged(polyhook::HookHandle hook, polyhook::Paramet
 				continue;
 
 			inventory::SaveGameLoadoutSlot(inv, team, slot);
-			if (player) {
-				g_ClientLoadoutChangedListenerManager(player->GetPlayerSlot(), static_cast<CSTeam>(team), static_cast<loadout_slot_t>(slot));
+			if (!player)
+				continue;
+
+			ResultType result = ResultType::Continue;
+			if (auto listeners = g_ClientLoadoutChangedListenerManager.Get()) {
+				for (const auto& listener : listeners->handlers) {
+					result = std::max(result, listener(player->GetPlayerSlot(), static_cast<CSTeam>(team), static_cast<loadout_slot_t>(slot)));
+					if (result == ResultType::Stop)
+						break;
+				}
+			}
+
+			// the player's pick stays the game loadout for RestoreClientLoadout, the slot keeps the old item
+			if (result >= ResultType::Handled) {
+				inv->m_LoadoutItems[team][slot] = before;
+				blocked = true;
 			}
 		}
+	}
+
+	if (blocked) {
+		inv->SendInventoryUpdateEvent();
 	}
 	return polyhook::ResultType::Ignored;
 }

@@ -32888,7 +32888,7 @@
     {
       "name": "SetClientLoadoutItem",
       "group": "Inventory",
-      "description": "Equips an item of the client's inventory in a loadout slot. The game reads the loadout when it gives items, so already given weapons keep their look; it rewrites the loadout when the inventory is loaded again or the player changes it.",
+      "description": "Equips an item of the client's inventory in a loadout slot. The game reads the loadout when it gives items, so already given weapons keep their look; it rewrites the loadout when the inventory is loaded again or the player changes it. The inventory update event is sent afterwards, as after an equip from the game coordinator.",
       "funcName": "SetClientLoadoutItem",
       "paramTypes": [
         {
@@ -32959,6 +32959,38 @@
       "retType": {
         "type": "bool",
         "description": "True if the definition was equipped."
+      }
+    },
+    {
+      "name": "FindClientLoadoutSlot",
+      "group": "Inventory",
+      "description": "Finds the loadout slot that gives an item definition to a team, e.g. which rifle slot holds the AK-47. Checks the slots the definition can take: its own slot, or every slot of its group for pistols, mid-tier weapons and rifles. Equip into the returned slot to keep one item per weapon: with two items of one weapon the game picks one at random on every give.",
+      "funcName": "FindClientLoadoutSlot",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout team.",
+          "enum": "CSTeam"
+        },
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The slot whose equipped or stock item has the definition, or LoadoutSlot.Invalid.",
+        "enum": "LoadoutSlot"
       }
     },
     {
@@ -37259,7 +37291,7 @@
     {
       "name": "OnClientLoadoutChangedCallback",
       "funcName": "OnClientLoadoutChangedCallback",
-      "description": "Called when the game changes a client's loadout slot after an update from the game coordinator, e.g. the player equipped another item. The new item is already in the slot, so SetClientLoadoutItem here replaces it.",
+      "description": "Called when the game changes a client's loadout slot after an update from the game coordinator, e.g. the player equipped another item. The new item is already in the slot and is saved as the game loadout for RestoreClientLoadout. Return Handled or Stop to keep the previous item in the slot; Stop also skips the remaining callbacks.",
       "paramTypes": [
         {
           "name": "playerSlot",
@@ -37280,8 +37312,9 @@
         }
       ],
       "retType": {
-        "type": "void",
-        "description": ""
+        "type": "int32",
+        "description": "Handled or Stop keeps the previous item in the slot.",
+        "enum": "ResultType"
       }
     },
     {
