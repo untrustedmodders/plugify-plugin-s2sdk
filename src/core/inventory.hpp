@@ -35,7 +35,7 @@ namespace inventory {
 	void ValidateCreatedItems(CCSPlayerInventory* inventory);
 
 	// values as text, attribute type parses and prints them
-	bool SetItemAttribute(CCSPlayerInventory* inventory, CEconItem* item, std::string_view name, const char* value);
+	bool SetItemAttribute(CCSPlayerInventory* inventory, CEconItem* item, std::string_view name, std::string_view value);
 	std::optional<std::string> GetItemAttribute(const CEconItemView* item, std::string_view name);
 
 	// items_game sections "paint_kits", "sticker_kits", "keychain_definitions"

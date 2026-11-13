@@ -351,19 +351,19 @@ std::optional<std::string> inventory::GetItemAttribute(const CEconItemView* item
 }
 
 // attribute type inits and parses the value, same as CS:GO CEconItem::SetDynamicAttributeValue
-bool inventory::SetItemAttribute(CCSPlayerInventory* inventory, CEconItem* item, std::string_view name, const char* value) {
+bool inventory::SetItemAttribute(CCSPlayerInventory* inventory, CEconItem* item, std::string_view name, std::string_view value) {
 	auto definition = FindAttribute(name);
 	if (!definition)
 		return false;
 
 	auto type = const_cast<ISchemaAttributeType*>(definition->GetAttributeType());
 	if (auto attribute = FindItemAttribute(item, definition)) {
-		if (!type->BConvertStringToEconAttributeValue(definition, value, &attribute->m_value))
+		if (!type->BConvertStringToEconAttributeValue(definition, value.data(), &attribute->m_value))
 			return false;
 	} else {
 		attribute_data_union_t data{};
 		type->InitializeNewEconAttributeValue(&data);
-		if (!type->BConvertStringToEconAttributeValue(definition, value, &data)) {
+		if (!type->BConvertStringToEconAttributeValue(definition, value.data(), &data)) {
 			type->UnloadEconAttributeValue(&data);
 			return false;
 		}

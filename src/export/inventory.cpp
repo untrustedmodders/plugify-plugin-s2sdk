@@ -21,7 +21,7 @@ namespace {
 	}
 
 	// stops at the first one that fails
-	bool SetCreatedItemAttributes(int playerSlot, uint64_t itemId, std::initializer_list<std::pair<std::string, std::string>> attributes) {
+	bool SetCreatedItemAttributes(int playerSlot, uint64_t itemId, std::initializer_list<std::pair<std::string_view, std::string_view>> attributes) {
 		auto inv = inventory::Get(playerSlot);
 		if (!inv)
 			return false;
@@ -31,7 +31,7 @@ namespace {
 			return false;
 
 		for (const auto& [name, value] : attributes) {
-			if (!inventory::SetItemAttribute(inv, item, name, value.c_str()))
+			if (!inventory::SetItemAttribute(inv, item, name, value))
 				return false;
 		}
 		return true;
@@ -273,7 +273,7 @@ extern "C" PLUGIN_API bool RemoveClientItem(int playerSlot, uint64_t itemId) {
  * @return True if the attribute was set.
  */
 extern "C" PLUGIN_API bool SetClientItemAttribute(int playerSlot, uint64_t itemId, const plg::string& attribute, const plg::string& value) {
-	return SetCreatedItemAttributes(playerSlot, itemId, {{std::string(attribute), std::string(value)}});
+	return SetCreatedItemAttributes(playerSlot, itemId, {{attribute, value}});
 }
 
 /**
@@ -363,7 +363,7 @@ extern "C" PLUGIN_API bool SetClientItemStatTrak(int playerSlot, uint64_t itemId
  * @return True if the name was set.
  */
 extern "C" PLUGIN_API bool SetClientItemName(int playerSlot, uint64_t itemId, const plg::string& name) {
-	return SetCreatedItemAttributes(playerSlot, itemId, {{"custom name attr", std::string(name)}});
+	return SetCreatedItemAttributes(playerSlot, itemId, {{"custom name attr", name}});
 }
 
 /**
