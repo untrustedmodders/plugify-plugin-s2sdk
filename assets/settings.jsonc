@@ -19,7 +19,7 @@
     ".*OnSimulateUserCommands.*",
     ".*OnBufferNotStarved\\(\\),.*"
   ],
-  // Blck modifications of protected schema fields
+  // Block modifications of protected schema fields and items made by CreateClientItem (Valve's server rules)
   "FollowCS2ServerGuidelines": true,
   // The server language
   "ServerLanguage": "en",

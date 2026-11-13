@@ -53,6 +53,15 @@ public:
 	 * @return The previous protection flags if the operation succeeds, otherwise an appropriate error code.
 	 */
 	static ProtFlag MemProtect(CAddress  dest, size_t size, ProtFlag newProtection, bool& status);
+
+	/**
+	 * @brief Reads memory with one system call, fails instead of faulting on a bad address.
+	 * @param src The source memory address.
+	 * @param dest The destination memory address.
+	 * @param size The number of bytes to read.
+	 * @return True if all bytes were read.
+	 */
+	static bool TryRead(CAddress src, void* dest, size_t size) noexcept;
 };
 
 static constexpr size_t MemoryRound(size_t numToRound, size_t multiple)

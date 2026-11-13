@@ -151,7 +151,8 @@ extern "C" PLUGIN_API bool IsPrecached(const plg::string& resource) {
  * @return A pointer to the Econ Item System.
  */
 extern "C" PLUGIN_API void* GetEconItemSystem() {
-	return g_pSource2Server->GetEconItemSystem();
+	// ISource2Server::GetEconItemSystem gives null in CS2
+	return g_ppItemSystem ? *g_ppItemSystem : nullptr;
 }
 
 /**

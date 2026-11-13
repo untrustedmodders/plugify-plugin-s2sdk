@@ -1,6 +1,8 @@
 #include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/entity/ccsweaponbase.h>
 #include <core/sdk/helpers.hpp>
+#include <core/inventory.hpp>
+#include <cstrike15/cstrike15_item_schema.h>
 
 PLUGIFY_WARN_PUSH()
 
@@ -73,20 +75,35 @@ extern "C" PLUGIN_API gear_slot_t GetWeaponGearSlot(int entityHandle) {
  */
 extern "C" PLUGIN_API CSWeaponDefIndex GetWeaponItemDefinition(int entityHandle) {
 	auto* weapon = helpers::GetEntity<CBasePlayerWeapon>(entityHandle);
-	if (!weapon) return {};
+	if (!weapon || !helpers::IsDerivedFrom(weapon, "CEconEntity")) return {};
 	return weapon->m_AttributeManager->m_Item->m_iItemDefinitionIndex;
+}
+
+/**
+ * @brief Retrieves the inventory item ID of a weapon, e.g. to find which item made a kill.
+ *
+ * Deprecated, use GetItemViewId(GetEntityItemView(entityHandle)).
+ *
+ * @param entityHandle The handle of the weapon entity.
+ * @return The item ID, or 0 for a default weapon or an invalid handle.
+ */
+extern "C" PLUGIN_API uint64_t GetWeaponItemId(int entityHandle) {
+	auto* weapon = helpers::GetEntity<CBasePlayerWeapon>(entityHandle);
+	if (!weapon || !helpers::IsDerivedFrom(weapon, "CEconEntity")) return 0;
+	return weapon->m_AttributeManager->m_Item->m_iItemID.Get();
 }
 
 /**
  * @brief Retrieves the item definition index associated with a given item name.
  *
+ * Deprecated, use GetItemDefinitionByName.
+ *
  * @param name The name of the item.
  * @return The item definition index if found; otherwise, 0 or an invalid value.
  */
 extern "C" PLUGIN_API CSWeaponDefIndex GetWeaponItemDefinitionByName(const plg::string& name) {
-	auto itemSchema = reinterpret_cast<CEconItemSchema*>(g_pSource2Server->GetEconItemSystem());
-	if (!itemSchema) return {};
-	return static_cast<CSWeaponDefIndex>(addresses::GetItemDefinitionByName(itemSchema, name.c_str()));
+	auto definition = inventory::GetItemDefinitionByName(name.c_str());
+	return definition ? static_cast<CSWeaponDefIndex>(definition->GetDefinitionIndex()) : CSWeaponDefIndex::Invalid;
 }
 
 PLUGIFY_WARN_POP()

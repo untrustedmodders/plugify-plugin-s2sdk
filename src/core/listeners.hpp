@@ -2,6 +2,7 @@
 
 #include "core/listener_manager.hpp"
 #include <core/sdk/entity/cgamerules.h>
+#include <cstrike15/cstrike15_item_constants.h>
 
 class UserMessage;
 
@@ -20,6 +21,10 @@ using Manager = ListenerManager<Name, Func>;
 	X(ClientFullyConnect, void, int playerSlot) \
 	X(ClientSettingsChanged, void, int playerSlot) \
 	X(ClientAuthenticated, void, int playerSlot, uint64 steamID) \
+	X(ClientInventoryLoaded, void, int playerSlot) \
+	X(ClientLoadoutChanged, void, int playerSlot, CSTeam team, loadout_slot_t loadoutSlot) \
+	X(ClientGiveNamedItem, uint64, int playerSlot, const plg::string& itemName) \
+	X(ClientGiveNamedItemPost, void, int playerSlot, int entityHandle) \
 	X(RoundTerminated, void, float delay, CRoundEndReason reason) \
 	X(EntityCreated, void, int entityHandle) \
 	X(EntitySpawned, void, int entityHandle) \

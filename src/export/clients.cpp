@@ -1900,6 +1900,20 @@ extern "C" PLUGIN_API int GiveNamedItem(int playerSlot, const plg::string& itemN
 }
 
 /**
+ * @brief Makes the server send the client a full update instead of a delta, e.g. after changing gloves.
+ *
+ * @param playerSlot The index of the player's slot.
+ */
+extern "C" PLUGIN_API void ForceClientFullUpdate(int playerSlot) {
+	auto player = g_PlayerManager.ToPlayer(CPlayerSlot(playerSlot));
+	if (!player) return;
+
+	if (auto client = player->GetClient()) {
+		client->ForceFullUpdate();
+	}
+}
+
+/**
  * @brief Retrieves the state of a specific button for a client.
  *
  * @param playerSlot The index of the player's slot.

@@ -7,6 +7,9 @@
 #include <cstring>
 #include <fstream>
 
+#include <sys/uio.h>
+#include <unistd.h>
+
 struct region_t {
 	uintptr_t start;
 	uintptr_t end;
@@ -98,4 +101,11 @@ ProtFlag CMemAccessor::MemProtect(CAddress dest, size_t size, ProtFlag prot, boo
 	status = mprotect(reinterpret_cast<void*>(alignedDest), alignedSize, TranslateProtection(prot)) == 0;
 	return regionInfo.prot;
 }
+bool CMemAccessor::TryRead(CAddress src, void* dest, size_t size) noexcept
+{
+	iovec local{dest, size};
+	iovec remote{src, size};
+	return process_vm_readv(getpid(), &local, 1, &remote, 1, 0) == static_cast<ssize_t>(size);
+}
+
 #endif

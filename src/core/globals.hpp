@@ -20,6 +20,8 @@ class CGlobalVars;
 class CGameEntitySystem;
 class CNetworkSerializerCodeGenDatabase;
 class IGameEventListener2;
+class IEconItemSystem;
+class CCSInventoryManager;
 class IScriptVM;
 class CEntitySystem;
 
@@ -46,6 +48,8 @@ using CBaseGameRulesProxy = CCitadelGameRulesProxy;
 inline IGameEventSystem* g_pGameEventSystem = nullptr;
 inline IGameEventManager2* g_pGameEventManager = nullptr;
 inline CUtlVector<void*>* g_pScripts = nullptr;
+inline IEconItemSystem** g_ppItemSystem = nullptr;
+inline CCSInventoryManager* g_pInventoryManager = nullptr;
 inline CNetworkGameServerBase* g_pNetworkGameServer = nullptr;
 inline CGlobalVars* gpGlobals = nullptr;
 inline CGameEntitySystem* g_pGameEntitySystem = nullptr;
@@ -86,7 +90,8 @@ class CServerSideClientBase;
 class CNetMessage;
 class CCSWeaponBaseVData;
 class CCLCMsg_RespondCvarValue_t;
-class CEconItemSchema;
+class CCSPlayer_ItemServices;
+class CEconItemView;
 
 namespace addresses {
 	inline IGameEventListener2* (*GetLegacyGameEventListener)(CPlayerSlot slot);
@@ -113,7 +118,7 @@ namespace addresses {
 
 	inline CCSWeaponBaseVData* (*GetCSWeaponDataFromKey)(int, const char*);
 
-	inline int16_t (*GetItemDefinitionByName)(CEconItemSchema*, const char*);
+	inline CBaseEntity* (*CCSPlayer_ItemServices_GiveNamedItem)(CCSPlayer_ItemServices* services, const char* name, int subType, const CEconItemView* item, bool force, const Vector* origin);
 
 	inline v8::MaybeLocal<v8::Module> (*CSScript_ResolveModule)(v8::Local<v8::Context> context, v8::Local<v8::String> specifier, v8::Local<v8::FixedArray> import_assertions, v8::Local<v8::Module> referrer);
 

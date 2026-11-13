@@ -6,6 +6,9 @@
 
 #include "module.hpp"
 #include "scan.hpp"
+#include "memaccessor.hpp"
+
+#include <Zydis/Zydis.h>
 
 #ifdef PLATFORM_WINDOWS
 #    include <format>
@@ -183,6 +186,79 @@ std::vector<CAddress> CModule::FindPtrs(CAddress ptr) const
     }
 
     return results;
+}
+
+std::vector<CAddress> CModule::FindInstancePtrs(CAddress vtable) const
+{
+    std::vector<CAddress> results{};
+
+    for (const auto& segment : m_segments)
+    {
+        if (!(segment.flags & SegFlags::W))
+            continue;
+
+        const auto* values = segment.address.As<const uintptr_t*>();
+        const size_t count = segment.size / sizeof(uintptr_t);
+        for (size_t i = 0; i < count; ++i)
+        {
+            const uintptr_t value = values[i];
+            if (!value || (value & (sizeof(uintptr_t) - 1)))
+                continue;
+
+            // most values aren't pointers, read must not fault, ~0.1 s for libserver
+            uintptr_t first;
+            if (CMemAccessor::TryRead(value, &first, sizeof(first)) && first == vtable.GetPtr())
+                results.emplace_back(segment.address + i * sizeof(uintptr_t));
+        }
+    }
+
+    return results;
+}
+
+std::vector<CAddress> CModule::FindStaticInstances(CAddress vtable) const
+{
+    std::vector<CAddress> results{};
+
+    for (const auto& segment : m_segments)
+    {
+        if (!(segment.flags & SegFlags::W))
+            continue;
+
+        for (const auto& tmp : scan::FindPtrs(segment.address, segment.size, vtable))
+        {
+            results.emplace_back(tmp + segment.address);
+        }
+    }
+
+    return results;
+}
+
+CAddress CModule::FollowFirstBranch(CAddress function, size_t maxLength)
+{
+    ZydisDecoder decoder{};
+    if (ZYAN_FAILED(ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64)))
+        return {};
+
+    ZydisDecodedInstruction instr{};
+    ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT]{};
+    for (CAddress ip = function; ip < function + maxLength; ip += instr.length)
+    {
+        if (ZYAN_FAILED(ZydisDecoderDecodeFull(&decoder, ip, ZYDIS_MAX_INSTRUCTION_LENGTH, &instr, operands)))
+            return {};
+
+        if ((instr.mnemonic == ZYDIS_MNEMONIC_CALL || instr.mnemonic == ZYDIS_MNEMONIC_JMP) && (instr.attributes & ZYDIS_ATTRIB_IS_RELATIVE))
+        {
+            ZyanU64 target = 0;
+            if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(&instr, &operands[0], ip, &target)))
+                return target;
+            return {};
+        }
+
+        if (instr.mnemonic == ZYDIS_MNEMONIC_RET)
+            return {};
+    }
+
+    return {};
 }
 
 CAddress CModule::FindInterface(std::string_view name) const

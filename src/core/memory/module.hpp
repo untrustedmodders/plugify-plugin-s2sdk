@@ -166,6 +166,12 @@ public:
 
     [[nodiscard]] CAddress              FindPtr(CAddress ptr) const;
     [[nodiscard]] std::vector<CAddress> FindPtrs(CAddress ptr) const;
+    // pointers in writable data to an object with this vtable, e.g. global holding a heap singleton
+    [[nodiscard]] std::vector<CAddress> FindInstancePtrs(CAddress vtable) const;
+    // objects with this vtable placed in writable data, e.g. static game system
+    [[nodiscard]] std::vector<CAddress> FindStaticInstances(CAddress vtable) const;
+    // target of the first relative call/jmp, e.g. where a thin wrapper forwards
+    [[nodiscard]] static CAddress FollowFirstBranch(CAddress function, size_t maxLength = 0x40);
 
 	[[nodiscard]] CAddress              FindInterface(std::string_view name) const;
 

@@ -46,4 +46,10 @@ ProtFlag CMemAccessor::MemProtect(CAddress dest, size_t size, ProtFlag prot, boo
 	status = VirtualProtect(dest, size, TranslateProtection(prot), &orig) != 0;
 	return TranslateProtection(static_cast<int>(prot));
 }
+bool CMemAccessor::TryRead(CAddress src, void* dest, size_t size) noexcept
+{
+	SIZE_T read = 0;
+	return ReadProcessMemory(GetCurrentProcess(), src, dest, size, &read) && read == size;
+}
+
 #endif

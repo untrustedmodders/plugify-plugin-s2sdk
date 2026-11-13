@@ -12823,6 +12823,23 @@
       }
     },
     {
+      "name": "ForceClientFullUpdate",
+      "group": "Clients",
+      "description": "Makes the server send the client a full update instead of a delta, e.g. after changing gloves.",
+      "funcName": "ForceClientFullUpdate",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "GetClientButtons",
       "group": "Clients",
       "description": "Retrieves the state of a specific button for a client.",
@@ -27436,6 +27453,246 @@
       }
     },
     {
+      "name": "OnClientInventoryLoaded_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnClientInventoryLoaded_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientInventoryLoadedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientInventoryLoaded_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientInventoryLoaded_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientInventoryLoadedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientInventoryLoaded_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientInventoryLoaded_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnClientInventoryLoaded_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientInventoryLoadedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientLoadoutChanged_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnClientLoadoutChanged_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientLoadoutChangedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientLoadoutChanged_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientLoadoutChanged_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientLoadoutChangedCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientLoadoutChanged_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientLoadoutChanged_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnClientLoadoutChanged_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientLoadoutChangedCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientGiveNamedItem_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnClientGiveNamedItem_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientGiveNamedItemCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientGiveNamedItem_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientGiveNamedItem_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientGiveNamedItemCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientGiveNamedItem_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientGiveNamedItem_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnClientGiveNamedItem_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientGiveNamedItemCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientGiveNamedItemPost_Register",
+      "group": "Listeners",
+      "description": "Register callback to event.",
+      "funcName": "OnClientGiveNamedItemPost_Register",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientGiveNamedItemPostCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientGiveNamedItemPost_Register2",
+      "group": "Listeners",
+      "description": "Register callback to event with a priority.",
+      "funcName": "OnClientGiveNamedItemPost_Register2",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientGiveNamedItemPostCallback"
+        },
+        {
+          "name": "priority",
+          "type": "int32",
+          "ref": false,
+          "description": "Higher values run first; equal priorities run in registration order. OnClientGiveNamedItemPost_Register uses 0."
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "OnClientGiveNamedItemPost_Unregister",
+      "group": "Listeners",
+      "description": "Unregister callback to event.",
+      "funcName": "OnClientGiveNamedItemPost_Unregister",
+      "paramTypes": [
+        {
+          "name": "callback",
+          "type": "function",
+          "ref": false,
+          "description": "Function callback.",
+          "prototype": "OnClientGiveNamedItemPostCallback"
+        }
+      ],
+      "retType": {
+        "type": "void"
+      }
+    },
+    {
       "name": "OnRoundTerminated_Register",
       "group": "Listeners",
       "description": "Register callback to event.",
@@ -32508,9 +32765,29 @@
       }
     },
     {
+      "name": "GetWeaponItemId",
+      "group": "Weapons",
+      "description": "Retrieves the inventory item ID of a weapon, e.g. to find which item made a kill.",
+      "deprecated": "Use GetItemViewId(GetEntityItemView(entityHandle)) instead. Will be removed soon",
+      "funcName": "GetWeaponItemId",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the weapon entity."
+        }
+      ],
+      "retType": {
+        "type": "uint64",
+        "description": "The item ID, or 0 for a default weapon or an invalid handle."
+      }
+    },
+    {
       "name": "GetWeaponItemDefinitionByName",
       "group": "Weapons",
       "description": "Retrieves the item definition index associated with a given item name.",
+      "deprecated": "Use GetItemDefinitionByName instead. Will be removed soon",
       "funcName": "GetWeaponItemDefinitionByName",
       "paramTypes": [
         {
@@ -32524,6 +32801,1267 @@
         "type": "uint16",
         "description": "The weapon definition index as a `uint16_t`, or 0 if the entity handle is invalid.",
         "enum": "WeaponDefIndex"
+      }
+    },
+    {
+      "name": "GetClientInventory",
+      "group": "Inventory",
+      "description": "Returns the client's game inventory (CCSPlayerInventory). Available once OnClientInventoryLoaded fires; bots have no inventory.",
+      "funcName": "GetClientInventory",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the inventory, or nullptr if it is not loaded."
+      }
+    },
+    {
+      "name": "GetClientLoadoutItemId",
+      "group": "Inventory",
+      "description": "Returns the item ID equipped in a loadout slot. An empty slot gives the default item of the slot, whose ID is 0.",
+      "funcName": "GetClientLoadoutItemId",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout team; music kits and flair use CSTeam.None.",
+          "enum": "CSTeam"
+        },
+        {
+          "name": "loadoutSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout position.",
+          "enum": "LoadoutSlot"
+        }
+      ],
+      "retType": {
+        "type": "uint64",
+        "description": "The item ID, or 0."
+      }
+    },
+    {
+      "name": "GetClientLoadoutItemDefinition",
+      "group": "Inventory",
+      "description": "Returns the item definition index equipped in a loadout slot. An empty slot gives the default item of the slot.",
+      "funcName": "GetClientLoadoutItemDefinition",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout team; music kits and flair use CSTeam.None.",
+          "enum": "CSTeam"
+        },
+        {
+          "name": "loadoutSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout position.",
+          "enum": "LoadoutSlot"
+        }
+      ],
+      "retType": {
+        "type": "uint16",
+        "description": "The item definition index, or 0."
+      }
+    },
+    {
+      "name": "SetClientLoadoutItem",
+      "group": "Inventory",
+      "description": "Equips an item of the client's inventory in a loadout slot. The game reads the loadout when it gives items, so already given weapons keep their look; it rewrites the loadout when the inventory is loaded again or the player changes it.",
+      "funcName": "SetClientLoadoutItem",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout team; music kits and flair use CSTeam.None.",
+          "enum": "CSTeam"
+        },
+        {
+          "name": "loadoutSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout position.",
+          "enum": "LoadoutSlot"
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID, it must be in the client's inventory and belong to the slot or its group."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the item was equipped."
+      }
+    },
+    {
+      "name": "SetClientLoadoutDefinition",
+      "group": "Inventory",
+      "description": "Equips a stock item definition in a loadout slot without an owned item, e.g. picks USP-S over P2000. The definition must belong to the slot or its group. Works like SetClientLoadoutItem otherwise.",
+      "funcName": "SetClientLoadoutDefinition",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout team; music kits and flair use CSTeam.None.",
+          "enum": "CSTeam"
+        },
+        {
+          "name": "loadoutSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout position.",
+          "enum": "LoadoutSlot"
+        },
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the definition was equipped."
+      }
+    },
+    {
+      "name": "RestoreClientLoadout",
+      "group": "Inventory",
+      "description": "Undoes the loadout changes made through s2sdk and puts back what the game equipped.",
+      "funcName": "RestoreClientLoadout",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the loadout was restored."
+      }
+    },
+    {
+      "name": "GetClientInventoryItems",
+      "group": "Inventory",
+      "description": "Returns the IDs of the items in the client's inventory.",
+      "funcName": "GetClientInventoryItems",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "uint64[]",
+        "description": "The item IDs, empty if the inventory is not loaded."
+      }
+    },
+    {
+      "name": "CreateClientItem",
+      "group": "Inventory",
+      "description": "Creates an item that the client does not own and puts it into the client's inventory. The item lives until the client leaves, the map changes or the game coordinator sends the inventory again, so create items again in OnClientInventoryLoaded. Equip it with SetClientLoadoutItem. Refused while the \"FollowCS2ServerGuidelines\" option is enabled: Valve's server rules forbid giving players items they do not own. Attributes can be set only on created items.",
+      "funcName": "CreateClientItem",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        },
+        {
+          "name": "quality",
+          "type": "int32",
+          "ref": false,
+          "description": "The item quality.",
+          "enum": "ItemQuality"
+        }
+      ],
+      "retType": {
+        "type": "uint64",
+        "description": "The new item ID, or 0 on failure."
+      }
+    },
+    {
+      "name": "RemoveClientItem",
+      "group": "Inventory",
+      "description": "Removes an item made by CreateClientItem from the client's inventory. Loadout slots that held the item get back what the game equipped there.",
+      "funcName": "RemoveClientItem",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the item was removed."
+      }
+    },
+    {
+      "name": "SetClientItemAttribute",
+      "group": "Inventory",
+      "description": "Sets an attribute of an item made by CreateClientItem, e.g. \"set item texture prefab\" (paint kit), \"set item texture seed\", \"set item texture wear\", \"kill eater\" or \"custom name attr\". The value is text that the attribute's type parses, as in the item schema: \"38\", \"0.01\" or a name.",
+      "funcName": "SetClientItemAttribute",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        },
+        {
+          "name": "attribute",
+          "type": "string",
+          "ref": false,
+          "description": "The attribute definition name."
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "ref": false,
+          "description": "The value."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the attribute was set."
+      }
+    },
+    {
+      "name": "SetClientItemPaint",
+      "group": "Inventory",
+      "description": "Sets the skin of an item made by CreateClientItem.",
+      "funcName": "SetClientItemPaint",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        },
+        {
+          "name": "paintKit",
+          "type": "int32",
+          "ref": false,
+          "description": "The paint kit index, e.g. 259 for Howl."
+        },
+        {
+          "name": "seed",
+          "type": "int32",
+          "ref": false,
+          "description": "The pattern seed, 0 to 1000."
+        },
+        {
+          "name": "wear",
+          "type": "float",
+          "ref": false,
+          "description": "The wear, 0.0 (factory new) to 1.0."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the skin was set."
+      }
+    },
+    {
+      "name": "SetClientItemSticker",
+      "group": "Inventory",
+      "description": "Puts a sticker on an item made by CreateClientItem. The client draws stickers of a created item after a full update, see ForceClientFullUpdate.",
+      "funcName": "SetClientItemSticker",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        },
+        {
+          "name": "stickerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The sticker slot, from 0 to GetItemDefinitionStickerSlots - 1."
+        },
+        {
+          "name": "stickerId",
+          "type": "int32",
+          "ref": false,
+          "description": "The sticker kit index, e.g. 60 for iBUYPOWER (Holo) | Katowice 2014."
+        },
+        {
+          "name": "wear",
+          "type": "float",
+          "ref": false,
+          "description": "The sticker wear, 0.0 (new) to 1.0 (scraped off)."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the sticker was set."
+      }
+    },
+    {
+      "name": "SetClientItemKeychain",
+      "group": "Inventory",
+      "description": "Puts a keychain (charm) on an item made by CreateClientItem.",
+      "funcName": "SetClientItemKeychain",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        },
+        {
+          "name": "keychainSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The keychain slot, from 0 to GetItemDefinitionKeychainSlots - 1."
+        },
+        {
+          "name": "keychainId",
+          "type": "int32",
+          "ref": false,
+          "description": "The keychain definition index."
+        },
+        {
+          "name": "seed",
+          "type": "int32",
+          "ref": false,
+          "description": "The keychain pattern seed."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the keychain was set."
+      }
+    },
+    {
+      "name": "SetClientItemStatTrak",
+      "group": "Inventory",
+      "description": "Makes an item made by CreateClientItem a StatTrak item with the given kill count. The game does not count kills for created items, the plugin counts them and calls this again. Create the item with quality 9 to show the StatTrak name.",
+      "funcName": "SetClientItemStatTrak",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        },
+        {
+          "name": "kills",
+          "type": "int32",
+          "ref": false,
+          "description": "The kill count."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the counter was set."
+      }
+    },
+    {
+      "name": "SetClientItemName",
+      "group": "Inventory",
+      "description": "Sets the name tag of an item made by CreateClientItem.",
+      "funcName": "SetClientItemName",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The name."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the name was set."
+      }
+    },
+    {
+      "name": "GetClientItemAttribute",
+      "group": "Inventory",
+      "description": "Returns an attribute of an item in the client's inventory as text, e.g. \"kill eater\" after a plugin counted kills.",
+      "funcName": "GetClientItemAttribute",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        },
+        {
+          "name": "attribute",
+          "type": "string",
+          "ref": false,
+          "description": "The attribute definition name."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The value, or an empty string if the item has no such attribute."
+      }
+    },
+    {
+      "name": "GetItemDefinitionName",
+      "group": "Items",
+      "description": "Returns the name of an item definition, e.g. \"weapon_ak47\" or \"weapon_knife_karambit\".",
+      "funcName": "GetItemDefinitionName",
+      "paramTypes": [
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The definition name, or an empty string."
+      }
+    },
+    {
+      "name": "GetItemDefinitionByName",
+      "group": "Items",
+      "description": "Finds an item definition by its name, e.g. \"weapon_ak47\", \"studded_brokenfang_gloves\" or \"customplayer_tm_leet_varianta\".",
+      "funcName": "GetItemDefinitionByName",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The definition name."
+        }
+      ],
+      "retType": {
+        "type": "uint16",
+        "description": "The item definition index, or 0."
+      }
+    },
+    {
+      "name": "GetItemDefinitionClassName",
+      "group": "Items",
+      "description": "Returns the item class of an item definition, e.g. \"weapon_knife\" for every knife.",
+      "funcName": "GetItemDefinitionClassName",
+      "paramTypes": [
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The item class, or an empty string."
+      }
+    },
+    {
+      "name": "GetItemDefinitionLoadoutSlot",
+      "group": "Items",
+      "description": "Returns the loadout slot that an item definition takes for a team.",
+      "funcName": "GetItemDefinitionLoadoutSlot",
+      "paramTypes": [
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The team.",
+          "enum": "CSTeam"
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The loadout position, or Invalid.",
+        "enum": "LoadoutSlot"
+      }
+    },
+    {
+      "name": "GetItemDefinitionTeam",
+      "group": "Items",
+      "description": "Returns the only team that can use an item definition.",
+      "funcName": "GetItemDefinitionTeam",
+      "paramTypes": [
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The team, or CSTeam.None when both teams or neither can use it.",
+        "enum": "CSTeam"
+      }
+    },
+    {
+      "name": "GetItemDefinitionStickerSlots",
+      "group": "Items",
+      "description": "Returns how many stickers (or patches on an agent) an item definition takes.",
+      "funcName": "GetItemDefinitionStickerSlots",
+      "paramTypes": [
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The number of sticker slots."
+      }
+    },
+    {
+      "name": "GetItemDefinitionKeychainSlots",
+      "group": "Items",
+      "description": "Returns how many keychains an item definition takes.",
+      "funcName": "GetItemDefinitionKeychainSlots",
+      "paramTypes": [
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The number of keychain slots."
+      }
+    },
+    {
+      "name": "GetItemDefinitionImage",
+      "group": "Items",
+      "description": "Returns the inventory image of an item definition.",
+      "funcName": "GetItemDefinitionImage",
+      "paramTypes": [
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The image path, or an empty string."
+      }
+    },
+    {
+      "name": "GetItemDefinitionModel",
+      "group": "Items",
+      "description": "Returns the model of an item definition.",
+      "funcName": "GetItemDefinitionModel",
+      "paramTypes": [
+        {
+          "name": "itemDefinition",
+          "type": "uint16",
+          "ref": false,
+          "description": "The item definition index."
+        },
+        {
+          "name": "world",
+          "type": "bool",
+          "ref": false,
+          "description": "True for the world model, false for the one the player holds."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The model path, or an empty string."
+      }
+    },
+    {
+      "name": "GetAttributeDefinitionIndex",
+      "group": "Items",
+      "description": "Returns the index of an attribute definition, e.g. 6 for \"set item texture prefab\".",
+      "funcName": "GetAttributeDefinitionIndex",
+      "paramTypes": [
+        {
+          "name": "attribute",
+          "type": "string",
+          "ref": false,
+          "description": "The attribute definition name."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The attribute definition index, or -1."
+      }
+    },
+    {
+      "name": "GetAttributeDefinitionName",
+      "group": "Items",
+      "description": "Returns the name of an attribute definition.",
+      "funcName": "GetAttributeDefinitionName",
+      "paramTypes": [
+        {
+          "name": "attributeIndex",
+          "type": "int32",
+          "ref": false,
+          "description": "The attribute definition index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The attribute definition name, or an empty string."
+      }
+    },
+    {
+      "name": "GetPaintKitName",
+      "group": "Items",
+      "description": "Returns the schema name of a paint kit, e.g. \"cu_medieval_dragon_awp\".",
+      "funcName": "GetPaintKitName",
+      "paramTypes": [
+        {
+          "name": "paintKit",
+          "type": "int32",
+          "ref": false,
+          "description": "The paint kit index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The name, or an empty string."
+      }
+    },
+    {
+      "name": "GetPaintKitLocName",
+      "group": "Items",
+      "description": "Returns the localization token of a paint kit's name, e.g. \"#PaintKit_cu_medieval_dragon_awp_Tag\" (Dragon Lore). The server has no translations; the client shows the text for a token sent to it.",
+      "funcName": "GetPaintKitLocName",
+      "paramTypes": [
+        {
+          "name": "paintKit",
+          "type": "int32",
+          "ref": false,
+          "description": "The paint kit index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The token, or an empty string."
+      }
+    },
+    {
+      "name": "FindPaintKit",
+      "group": "Items",
+      "description": "Finds a paint kit by its schema name.",
+      "funcName": "FindPaintKit",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The schema name, e.g. \"cu_medieval_dragon_awp\"."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The paint kit index, or -1."
+      }
+    },
+    {
+      "name": "GetStickerKitName",
+      "group": "Items",
+      "description": "Returns the schema name of a sticker kit, e.g. \"kat2014_ibuypower_holo\".",
+      "funcName": "GetStickerKitName",
+      "paramTypes": [
+        {
+          "name": "stickerKit",
+          "type": "int32",
+          "ref": false,
+          "description": "The sticker kit index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The name, or an empty string."
+      }
+    },
+    {
+      "name": "GetStickerKitLocName",
+      "group": "Items",
+      "description": "Returns the localization token of a sticker kit's name, e.g. \"#StickerKit_kat2014_ibuypower_holo\". The server has no translations; the client shows the text for a token sent to it.",
+      "funcName": "GetStickerKitLocName",
+      "paramTypes": [
+        {
+          "name": "stickerKit",
+          "type": "int32",
+          "ref": false,
+          "description": "The sticker kit index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The token, or an empty string."
+      }
+    },
+    {
+      "name": "FindStickerKit",
+      "group": "Items",
+      "description": "Finds a sticker kit by its schema name.",
+      "funcName": "FindStickerKit",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The schema name, e.g. \"kat2014_ibuypower_holo\"."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The sticker kit index, or -1."
+      }
+    },
+    {
+      "name": "GetKeychainName",
+      "group": "Items",
+      "description": "Returns the schema name of a keychain, e.g. \"kc_missinglink_ava\".",
+      "funcName": "GetKeychainName",
+      "paramTypes": [
+        {
+          "name": "keychain",
+          "type": "int32",
+          "ref": false,
+          "description": "The keychain index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The name, or an empty string."
+      }
+    },
+    {
+      "name": "GetKeychainLocName",
+      "group": "Items",
+      "description": "Returns the localization token of a keychain's name, e.g. \"#keychain_kc_missinglink_ava\". The server has no translations; the client shows the text for a token sent to it.",
+      "funcName": "GetKeychainLocName",
+      "paramTypes": [
+        {
+          "name": "keychain",
+          "type": "int32",
+          "ref": false,
+          "description": "The keychain index."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The token, or an empty string."
+      }
+    },
+    {
+      "name": "FindKeychain",
+      "group": "Items",
+      "description": "Finds a keychain by its schema name.",
+      "funcName": "FindKeychain",
+      "paramTypes": [
+        {
+          "name": "name",
+          "type": "string",
+          "ref": false,
+          "description": "The schema name, e.g. \"kc_missinglink_ava\"."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The keychain index, or -1."
+      }
+    },
+    {
+      "name": "GetClientItemView",
+      "group": "Items",
+      "description": "Returns the item view (CEconItemView) of an item in the client's inventory. Valid while the item stays in the inventory.",
+      "funcName": "GetClientItemView",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the item view, or nullptr."
+      }
+    },
+    {
+      "name": "GetClientLoadoutItemView",
+      "group": "Items",
+      "description": "Returns the item view (CEconItemView) equipped in a loadout slot. An empty slot gives the default item of the slot. Valid while the inventory is loaded.",
+      "funcName": "GetClientLoadoutItemView",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout team; music kits and flair use CSTeam.None.",
+          "enum": "CSTeam"
+        },
+        {
+          "name": "loadoutSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The loadout position.",
+          "enum": "LoadoutSlot"
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the item view, or nullptr."
+      }
+    },
+    {
+      "name": "GetEntityItemView",
+      "group": "Items",
+      "description": "Returns the item view (CEconItemView) of a weapon or another econ entity. Valid while the entity exists.",
+      "funcName": "GetEntityItemView",
+      "paramTypes": [
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "ref": false,
+          "description": "The handle of the entity."
+        }
+      ],
+      "retType": {
+        "type": "ptr64",
+        "description": "A pointer to the item view, or nullptr."
+      }
+    },
+    {
+      "name": "GetItemViewDefinition",
+      "group": "Items",
+      "description": "Returns the item definition index of an item view.",
+      "funcName": "GetItemViewDefinition",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "uint16",
+        "description": "The item definition index."
+      }
+    },
+    {
+      "name": "GetItemViewId",
+      "group": "Items",
+      "description": "Returns the item ID of an item view, 0 for a default item.",
+      "funcName": "GetItemViewId",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "uint64",
+        "description": "The item ID."
+      }
+    },
+    {
+      "name": "GetItemViewAccountId",
+      "group": "Items",
+      "description": "Returns the Steam account ID of the owner of an item view.",
+      "funcName": "GetItemViewAccountId",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "uint32",
+        "description": "The account ID."
+      }
+    },
+    {
+      "name": "GetItemViewQuality",
+      "group": "Items",
+      "description": "Returns the quality of an item view.",
+      "funcName": "GetItemViewQuality",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The quality.",
+        "enum": "ItemQuality"
+      }
+    },
+    {
+      "name": "GetItemViewRarity",
+      "group": "Items",
+      "description": "Returns the rarity of an item view.",
+      "funcName": "GetItemViewRarity",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The rarity.",
+        "enum": "ItemRarity"
+      }
+    },
+    {
+      "name": "GetItemViewOrigin",
+      "group": "Items",
+      "description": "Returns how the item of an item view was obtained (eEconItemOrigin).",
+      "funcName": "GetItemViewOrigin",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The origin.",
+        "enum": "ItemOrigin"
+      }
+    },
+    {
+      "name": "IsItemViewTradable",
+      "group": "Items",
+      "description": "Returns whether the item of an item view can be traded.",
+      "funcName": "IsItemViewTradable",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if it is tradable."
+      }
+    },
+    {
+      "name": "IsItemViewMarketable",
+      "group": "Items",
+      "description": "Returns whether the item of an item view can be sold on the market.",
+      "funcName": "IsItemViewMarketable",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if it is marketable."
+      }
+    },
+    {
+      "name": "GetItemViewPaintKit",
+      "group": "Items",
+      "description": "Returns the paint kit of an item view.",
+      "funcName": "GetItemViewPaintKit",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The paint kit index, 0 without a paint."
+      }
+    },
+    {
+      "name": "GetItemViewPaintKitSeed",
+      "group": "Items",
+      "description": "Returns the paint seed of an item view.",
+      "funcName": "GetItemViewPaintKitSeed",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The seed."
+      }
+    },
+    {
+      "name": "GetItemViewPaintKitWear",
+      "group": "Items",
+      "description": "Returns the paint wear of an item view.",
+      "funcName": "GetItemViewPaintKitWear",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        }
+      ],
+      "retType": {
+        "type": "float",
+        "description": "The wear, 0 without a paint."
+      }
+    },
+    {
+      "name": "GetItemViewStickerAttribute",
+      "group": "Items",
+      "description": "Returns an attribute of a sticker on an item view.",
+      "funcName": "GetItemViewStickerAttribute",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        },
+        {
+          "name": "stickerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The sticker slot."
+        },
+        {
+          "name": "attribute",
+          "type": "int32",
+          "ref": false,
+          "description": "The sticker attribute.",
+          "enum": "StickerAttribute"
+        }
+      ],
+      "retType": {
+        "type": "double",
+        "description": "The value, 0 if the slot is empty."
+      }
+    },
+    {
+      "name": "GetItemViewKeychainAttribute",
+      "group": "Items",
+      "description": "Returns an attribute of a keychain on an item view.",
+      "funcName": "GetItemViewKeychainAttribute",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        },
+        {
+          "name": "keychainSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The keychain slot."
+        },
+        {
+          "name": "attribute",
+          "type": "int32",
+          "ref": false,
+          "description": "The keychain attribute.",
+          "enum": "StickerAttribute"
+        }
+      ],
+      "retType": {
+        "type": "double",
+        "description": "The value, 0 if the slot is empty."
+      }
+    },
+    {
+      "name": "GetItemViewAttribute",
+      "group": "Items",
+      "description": "Returns any attribute of an item view as text, e.g. \"kill eater\" (StatTrak), \"custom name attr\" or \"sticker slot 0 id\".",
+      "funcName": "GetItemViewAttribute",
+      "paramTypes": [
+        {
+          "name": "itemView",
+          "type": "ptr64",
+          "ref": false,
+          "description": "A pointer to the item view."
+        },
+        {
+          "name": "attribute",
+          "type": "string",
+          "ref": false,
+          "description": "The attribute definition name."
+        }
+      ],
+      "retType": {
+        "type": "string",
+        "description": "The value, or an empty string if the item has no such attribute."
+      }
+    },
+    {
+      "name": "GiveClientItem",
+      "group": "Items",
+      "description": "Gives the client a weapon made from an item of their inventory, with its paint, stickers and name.",
+      "funcName": "GiveClientItem",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        },
+        {
+          "name": "itemId",
+          "type": "uint64",
+          "ref": false,
+          "description": "The item ID."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The weapon's entity handle, or INVALID_EHANDLE_INDEX."
       }
     }
   ],
@@ -34913,6 +36451,174 @@
           "bindSelf": true
         }
       ]
+    },
+    {
+      "name": "ItemDefinition",
+      "group": "Items",
+      "description": "Wrapper for an item definition index from the item schema.",
+      "handleType": "uint16",
+      "invalidValue": "0",
+      "bindings": [
+        {
+          "name": "FindByName",
+          "method": "GetItemDefinitionByName",
+          "bindSelf": false,
+          "retAlias": {
+            "name": "ItemDefinition",
+            "owner": false
+          }
+        },
+        {
+          "name": "GetName",
+          "method": "GetItemDefinitionName",
+          "bindSelf": true
+        },
+        {
+          "name": "GetClassName",
+          "method": "GetItemDefinitionClassName",
+          "bindSelf": true
+        },
+        {
+          "name": "GetLoadoutSlot",
+          "method": "GetItemDefinitionLoadoutSlot",
+          "bindSelf": true
+        },
+        {
+          "name": "GetTeam",
+          "method": "GetItemDefinitionTeam",
+          "bindSelf": true
+        },
+        {
+          "name": "GetStickerSlots",
+          "method": "GetItemDefinitionStickerSlots",
+          "bindSelf": true
+        },
+        {
+          "name": "GetKeychainSlots",
+          "method": "GetItemDefinitionKeychainSlots",
+          "bindSelf": true
+        },
+        {
+          "name": "GetImage",
+          "method": "GetItemDefinitionImage",
+          "bindSelf": true
+        },
+        {
+          "name": "GetModel",
+          "method": "GetItemDefinitionModel",
+          "bindSelf": true
+        }
+      ]
+    },
+    {
+      "name": "ItemView",
+      "group": "Items",
+      "description": "Wrapper for a CEconItemView pointer. It does not own the view: a view of an inventory item is gone when the item is removed or the inventory is unloaded, a view of an entity is gone with the entity.",
+      "handleType": "ptr64",
+      "invalidValue": "0",
+      "bindings": [
+        {
+          "name": "FromClient",
+          "method": "GetClientItemView",
+          "bindSelf": false,
+          "retAlias": {
+            "name": "ItemView",
+            "owner": false
+          }
+        },
+        {
+          "name": "FromLoadout",
+          "method": "GetClientLoadoutItemView",
+          "bindSelf": false,
+          "retAlias": {
+            "name": "ItemView",
+            "owner": false
+          }
+        },
+        {
+          "name": "FromEntity",
+          "method": "GetEntityItemView",
+          "bindSelf": false,
+          "retAlias": {
+            "name": "ItemView",
+            "owner": false
+          }
+        },
+        {
+          "name": "GetDefinition",
+          "method": "GetItemViewDefinition",
+          "bindSelf": true,
+          "retAlias": {
+            "name": "ItemDefinition",
+            "owner": false
+          }
+        },
+        {
+          "name": "GetId",
+          "method": "GetItemViewId",
+          "bindSelf": true
+        },
+        {
+          "name": "GetAccountId",
+          "method": "GetItemViewAccountId",
+          "bindSelf": true
+        },
+        {
+          "name": "GetQuality",
+          "method": "GetItemViewQuality",
+          "bindSelf": true
+        },
+        {
+          "name": "GetRarity",
+          "method": "GetItemViewRarity",
+          "bindSelf": true
+        },
+        {
+          "name": "GetOrigin",
+          "method": "GetItemViewOrigin",
+          "bindSelf": true
+        },
+        {
+          "name": "IsTradable",
+          "method": "IsItemViewTradable",
+          "bindSelf": true
+        },
+        {
+          "name": "IsMarketable",
+          "method": "IsItemViewMarketable",
+          "bindSelf": true
+        },
+        {
+          "name": "GetPaintKit",
+          "method": "GetItemViewPaintKit",
+          "bindSelf": true
+        },
+        {
+          "name": "GetPaintKitSeed",
+          "method": "GetItemViewPaintKitSeed",
+          "bindSelf": true
+        },
+        {
+          "name": "GetPaintKitWear",
+          "method": "GetItemViewPaintKitWear",
+          "bindSelf": true
+        },
+        {
+          "name": "GetStickerAttribute",
+          "method": "GetItemViewStickerAttribute",
+          "bindSelf": true
+        },
+        {
+          "name": "GetKeychainAttribute",
+          "method": "GetItemViewKeychainAttribute",
+          "bindSelf": true
+        },
+        {
+          "name": "GetAttribute",
+          "method": "GetItemViewAttribute",
+          "bindSelf": true
+        }
+      ]
     }
   ],
   "prototypes": [
@@ -35485,6 +37191,92 @@
           "name": "steamID",
           "type": "uint64",
           "description": "Steam account ID or 0 if not available."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": ""
+      }
+    },
+    {
+      "name": "OnClientInventoryLoadedCallback",
+      "funcName": "OnClientInventoryLoadedCallback",
+      "description": "Called when a client's inventory arrives from the game coordinator, and again after a full update from it. The game has just written the loadout, so this is the place to change it.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The player slot"
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": ""
+      }
+    },
+    {
+      "name": "OnClientGiveNamedItemCallback",
+      "funcName": "OnClientGiveNamedItemCallback",
+      "description": "Called before the game gives a client a weapon or another item by name, without a specific item. Return an item ID of the client's inventory to give that item instead, with its paint and name, or 0. The first listener by priority that returns an item ID decides.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The player slot"
+        },
+        {
+          "name": "itemName",
+          "type": "string",
+          "description": "The item name, e.g. \"weapon_ak47\"."
+        }
+      ],
+      "retType": {
+        "type": "uint64",
+        "description": "An item ID, or 0 to keep the default."
+      }
+    },
+    {
+      "name": "OnClientGiveNamedItemPostCallback",
+      "funcName": "OnClientGiveNamedItemPostCallback",
+      "description": "Called after the game gave a client a weapon or another item by name.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The player slot"
+        },
+        {
+          "name": "entityHandle",
+          "type": "int32",
+          "description": "The handle of the given entity."
+        }
+      ],
+      "retType": {
+        "type": "void",
+        "description": ""
+      }
+    },
+    {
+      "name": "OnClientLoadoutChangedCallback",
+      "funcName": "OnClientLoadoutChangedCallback",
+      "description": "Called when the game changes a client's loadout slot after an update from the game coordinator, e.g. the player equipped another item. The new item is already in the slot, so SetClientLoadoutItem here replaces it.",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "description": "The player slot"
+        },
+        {
+          "name": "team",
+          "type": "int32",
+          "description": "The loadout team; music kits and flair use CSTeam.None.",
+          "enum": "CSTeam"
+        },
+        {
+          "name": "loadoutSlot",
+          "type": "int32",
+          "description": "The loadout position.",
+          "enum": "LoadoutSlot"
         }
       ],
       "retType": {
@@ -38323,6 +40115,589 @@
         {
           "value": 526,
           "name": "KnifeKukri"
+        }
+      ]
+    },
+    {
+      "name": "LoadoutSlot",
+      "description": "Loadout positions of the CS2 inventory (loadout_slot_t).",
+      "values": [
+        {
+          "value": -2,
+          "name": "Promoted"
+        },
+        {
+          "value": -1,
+          "name": "Invalid",
+          "description": "No loadout slot, e.g. from GetItemDefinitionLoadoutSlot for a team that cannot use the item."
+        },
+        {
+          "value": 0,
+          "name": "Melee",
+          "description": "Shown in the game as \"Melee\"."
+        },
+        {
+          "value": 1,
+          "name": "C4",
+          "description": "Shown in the game as \"C4\"."
+        },
+        {
+          "value": 2,
+          "name": "Secondary0",
+          "description": "Shown in the game as \"Starting Pistol\"."
+        },
+        {
+          "value": 3,
+          "name": "Secondary1",
+          "description": "Shown in the game as \"Pistols\"."
+        },
+        {
+          "value": 4,
+          "name": "Secondary2",
+          "description": "Shown in the game as \"Pistols\"."
+        },
+        {
+          "value": 5,
+          "name": "Secondary3",
+          "description": "Shown in the game as \"Pistols\"."
+        },
+        {
+          "value": 6,
+          "name": "Secondary4",
+          "description": "Shown in the game as \"Pistols\"."
+        },
+        {
+          "value": 7,
+          "name": "Secondary5",
+          "description": "Shown in the game as \"Pistols\"."
+        },
+        {
+          "value": 8,
+          "name": "SMG0",
+          "description": "Shown in the game as \"Mid-Tier\"."
+        },
+        {
+          "value": 9,
+          "name": "SMG1",
+          "description": "Shown in the game as \"Mid-Tier\"."
+        },
+        {
+          "value": 10,
+          "name": "SMG2",
+          "description": "Shown in the game as \"Mid-Tier\"."
+        },
+        {
+          "value": 11,
+          "name": "SMG3",
+          "description": "Shown in the game as \"Mid-Tier\"."
+        },
+        {
+          "value": 12,
+          "name": "SMG4",
+          "description": "Shown in the game as \"Mid-Tier\"."
+        },
+        {
+          "value": 13,
+          "name": "SMG5",
+          "description": "Shown in the game as \"Mid-Tier\"."
+        },
+        {
+          "value": 14,
+          "name": "Rifle0",
+          "description": "Shown in the game as \"Rifles\"."
+        },
+        {
+          "value": 15,
+          "name": "Rifle1",
+          "description": "Shown in the game as \"Rifles\"."
+        },
+        {
+          "value": 16,
+          "name": "Rifle2",
+          "description": "Shown in the game as \"Rifles\"."
+        },
+        {
+          "value": 17,
+          "name": "Rifle3",
+          "description": "Shown in the game as \"Rifles\"."
+        },
+        {
+          "value": 18,
+          "name": "Rifle4",
+          "description": "Shown in the game as \"Rifles\"."
+        },
+        {
+          "value": 19,
+          "name": "Rifle5",
+          "description": "Shown in the game as \"Rifles\"."
+        },
+        {
+          "value": 20,
+          "name": "Heavy0",
+          "description": "Shown in the game as \"Heavy\"."
+        },
+        {
+          "value": 21,
+          "name": "Heavy1",
+          "description": "Shown in the game as \"Heavy\"."
+        },
+        {
+          "value": 22,
+          "name": "Heavy2",
+          "description": "Shown in the game as \"Heavy\"."
+        },
+        {
+          "value": 23,
+          "name": "Heavy3",
+          "description": "Shown in the game as \"Heavy\"."
+        },
+        {
+          "value": 24,
+          "name": "Heavy4",
+          "description": "Shown in the game as \"Heavy\"."
+        },
+        {
+          "value": 25,
+          "name": "Heavy5",
+          "description": "Shown in the game as \"Heavy\"."
+        },
+        {
+          "value": 26,
+          "name": "Grenade0",
+          "description": "Shown in the game as \"Grenades\"."
+        },
+        {
+          "value": 27,
+          "name": "Grenade1",
+          "description": "Shown in the game as \"Grenades\"."
+        },
+        {
+          "value": 28,
+          "name": "Grenade2",
+          "description": "Shown in the game as \"Grenades\"."
+        },
+        {
+          "value": 29,
+          "name": "Grenade3",
+          "description": "Shown in the game as \"Grenades\"."
+        },
+        {
+          "value": 30,
+          "name": "Grenade4",
+          "description": "Shown in the game as \"Grenades\"."
+        },
+        {
+          "value": 31,
+          "name": "Grenade5",
+          "description": "Shown in the game as \"Grenades\"."
+        },
+        {
+          "value": 32,
+          "name": "Equipment0",
+          "description": "Shown in the game as \"Equipment\"."
+        },
+        {
+          "value": 33,
+          "name": "Equipment1",
+          "description": "Shown in the game as \"Equipment\"."
+        },
+        {
+          "value": 34,
+          "name": "Equipment2",
+          "description": "Shown in the game as \"Equipment\"."
+        },
+        {
+          "value": 35,
+          "name": "Equipment3",
+          "description": "Shown in the game as \"Equipment\"."
+        },
+        {
+          "value": 36,
+          "name": "Equipment4",
+          "description": "Shown in the game as \"Equipment\"."
+        },
+        {
+          "value": 37,
+          "name": "Equipment5",
+          "description": "Shown in the game as \"Equipment\"."
+        },
+        {
+          "value": 38,
+          "name": "ClothingCustomPlayer",
+          "description": "Shown in the game as \"Agents\"."
+        },
+        {
+          "value": 39,
+          "name": "ClothingCustomHead"
+        },
+        {
+          "value": 40,
+          "name": "ClothingFacemask"
+        },
+        {
+          "value": 41,
+          "name": "ClothingHands",
+          "description": "Shown in the game as \"Gloves\"."
+        },
+        {
+          "value": 42,
+          "name": "ClothingEyewear"
+        },
+        {
+          "value": 43,
+          "name": "ClothingHat"
+        },
+        {
+          "value": 44,
+          "name": "ClothingLowerBody"
+        },
+        {
+          "value": 45,
+          "name": "ClothingTorso"
+        },
+        {
+          "value": 46,
+          "name": "ClothingAppearance"
+        },
+        {
+          "value": 47,
+          "name": "Misc0",
+          "description": "Shown in the game as \"Misc\"."
+        },
+        {
+          "value": 48,
+          "name": "Misc1",
+          "description": "Shown in the game as \"Misc\"."
+        },
+        {
+          "value": 49,
+          "name": "Misc2",
+          "description": "Shown in the game as \"Misc\"."
+        },
+        {
+          "value": 50,
+          "name": "Misc3",
+          "description": "Shown in the game as \"Misc\"."
+        },
+        {
+          "value": 51,
+          "name": "Misc4",
+          "description": "Shown in the game as \"Misc\"."
+        },
+        {
+          "value": 52,
+          "name": "Misc5",
+          "description": "Shown in the game as \"Misc\"."
+        },
+        {
+          "value": 53,
+          "name": "Misc6",
+          "description": "Shown in the game as \"Misc\"."
+        },
+        {
+          "value": 54,
+          "name": "MusicKit",
+          "description": "Shown in the game as \"Music Kit\"."
+        },
+        {
+          "value": 55,
+          "name": "Flair0",
+          "description": "Shown in the game as \"Display\"."
+        },
+        {
+          "value": 56,
+          "name": "Spray0",
+          "description": "Shown in the game as \"Graffiti\"."
+        },
+        {
+          "value": 57,
+          "name": "Pet"
+        }
+      ]
+    },
+    {
+      "name": "ItemQuality",
+      "description": "Item qualities from the items_game \"qualities\" section (EEconItemQuality).",
+      "values": [
+        {
+          "value": -1,
+          "name": "Undefined"
+        },
+        {
+          "value": 0,
+          "name": "Normal",
+          "description": "Shown in the game as \"Normal\"."
+        },
+        {
+          "value": 1,
+          "name": "Genuine",
+          "description": "Shown in the game as \"Genuine\"."
+        },
+        {
+          "value": 2,
+          "name": "Vintage",
+          "description": "Shown in the game as \"Vintage\"."
+        },
+        {
+          "value": 3,
+          "name": "Unusual",
+          "description": "Shown in the game as \"★\"."
+        },
+        {
+          "value": 4,
+          "name": "Unique",
+          "description": "Shown in the game as \"Unique\"."
+        },
+        {
+          "value": 5,
+          "name": "Community",
+          "description": "Shown in the game as \"Community\"."
+        },
+        {
+          "value": 6,
+          "name": "Developer",
+          "description": "Shown in the game as \"Valve\"."
+        },
+        {
+          "value": 7,
+          "name": "SelfMade",
+          "description": "Shown in the game as \"Prototype\"."
+        },
+        {
+          "value": 8,
+          "name": "Customized",
+          "description": "Shown in the game as \"Customized\"."
+        },
+        {
+          "value": 9,
+          "name": "Strange",
+          "description": "Shown in the game as \"StatTrak™\"."
+        },
+        {
+          "value": 10,
+          "name": "Completed",
+          "description": "Shown in the game as \"Completed\"."
+        },
+        {
+          "value": 11,
+          "name": "Haunted"
+        },
+        {
+          "value": 12,
+          "name": "Tournament",
+          "description": "Shown in the game as \"Souvenir\"."
+        },
+        {
+          "value": 13,
+          "name": "Highlight",
+          "description": "Shown in the game as \"Highlight\"."
+        },
+        {
+          "value": 14,
+          "name": "Volatile",
+          "description": "Shown in the game as \"Volatile\"."
+        }
+      ]
+    },
+    {
+      "name": "ItemRarity",
+      "description": "Item rarities from the items_game \"rarities\" section.",
+      "values": [
+        {
+          "value": 0,
+          "name": "Default",
+          "description": "\"Stock\" for weapons, \"Default\" for other items."
+        },
+        {
+          "value": 1,
+          "name": "Common",
+          "description": "\"Consumer Grade\" for weapons, \"Base Grade\" for other items."
+        },
+        {
+          "value": 2,
+          "name": "Uncommon",
+          "description": "\"Industrial Grade\" for weapons, \"Medium Grade\" for other items."
+        },
+        {
+          "value": 3,
+          "name": "Rare",
+          "description": "\"Mil-Spec Grade\" for weapons, \"Distinguished\" for agents, \"High Grade\" for other items."
+        },
+        {
+          "value": 4,
+          "name": "Mythical",
+          "description": "\"Restricted\" for weapons, \"Exceptional\" for agents, \"Remarkable\" for other items."
+        },
+        {
+          "value": 5,
+          "name": "Legendary",
+          "description": "\"Classified\" for weapons, \"Superior\" for agents, \"Exotic\" for other items."
+        },
+        {
+          "value": 6,
+          "name": "Ancient",
+          "description": "\"Covert\" for weapons, \"Master\" for agents, \"Extraordinary\" for other items."
+        },
+        {
+          "value": 7,
+          "name": "Immortal",
+          "description": "Shown in the game as \"Contraband\"."
+        },
+        {
+          "value": 99,
+          "name": "Unusual"
+        }
+      ]
+    },
+    {
+      "name": "ItemOrigin",
+      "description": "How an item got into the inventory (eEconItemOrigin).",
+      "values": [
+        {
+          "value": -1,
+          "name": "Invalid",
+          "description": "Never stored; marks an in-memory object only."
+        },
+        {
+          "value": 0,
+          "name": "Drop"
+        },
+        {
+          "value": 1,
+          "name": "Achievement"
+        },
+        {
+          "value": 2,
+          "name": "Purchased"
+        },
+        {
+          "value": 3,
+          "name": "Traded"
+        },
+        {
+          "value": 4,
+          "name": "Crafted"
+        },
+        {
+          "value": 5,
+          "name": "StorePromotion"
+        },
+        {
+          "value": 6,
+          "name": "Gifted"
+        },
+        {
+          "value": 7,
+          "name": "SupportGranted"
+        },
+        {
+          "value": 8,
+          "name": "FoundInCrate"
+        },
+        {
+          "value": 9,
+          "name": "Earned"
+        },
+        {
+          "value": 10,
+          "name": "ThirdPartyPromotion"
+        },
+        {
+          "value": 11,
+          "name": "GiftWrapped"
+        },
+        {
+          "value": 12,
+          "name": "HalloweenDrop"
+        },
+        {
+          "value": 13,
+          "name": "PackageItem"
+        },
+        {
+          "value": 14,
+          "name": "Foreign"
+        },
+        {
+          "value": 15,
+          "name": "CDKey"
+        },
+        {
+          "value": 16,
+          "name": "CollectionReward"
+        },
+        {
+          "value": 17,
+          "name": "PreviewItem"
+        },
+        {
+          "value": 18,
+          "name": "SteamWorkshopContribution"
+        },
+        {
+          "value": 19,
+          "name": "PeriodicScoreReward"
+        },
+        {
+          "value": 20,
+          "name": "Recycling"
+        },
+        {
+          "value": 21,
+          "name": "TournamentDrop"
+        },
+        {
+          "value": 22,
+          "name": "StockItem"
+        },
+        {
+          "value": 23,
+          "name": "QuestReward"
+        },
+        {
+          "value": 24,
+          "name": "LevelUpReward"
+        }
+      ]
+    },
+    {
+      "name": "StickerAttribute",
+      "description": "Attributes of a sticker or keychain slot (EStickerAttributeType).",
+      "values": [
+        {
+          "value": 0,
+          "name": "Id",
+          "description": "The \"sticker slot N id\" attribute: the sticker kit index, or the keychain index for a keychain slot."
+        },
+        {
+          "value": 1,
+          "name": "Wear",
+          "description": "The \"sticker slot N wear\" attribute."
+        },
+        {
+          "value": 2,
+          "name": "Scale",
+          "description": "The \"sticker slot N scale\" attribute."
+        },
+        {
+          "value": 3,
+          "name": "Rotation",
+          "description": "The \"sticker slot N rotation\" attribute."
+        },
+        {
+          "value": 4,
+          "name": "OffsetX",
+          "description": "The \"sticker slot N offset x\" attribute."
+        },
+        {
+          "value": 5,
+          "name": "OffsetY",
+          "description": "The \"sticker slot N offset y\" attribute."
+        },
+        {
+          "value": 6,
+          "name": "Schema",
+          "description": "The \"sticker slot N schema\" attribute."
         }
       ]
     }

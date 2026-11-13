@@ -147,6 +147,7 @@ public:
 	DECLARE_SCHEMA_CLASS_INLINE(CEconItemView);
 
 	SCHEMA_FIELD(CSWeaponDefIndex, m_iItemDefinitionIndex)
+	SCHEMA_FIELD(uint64, m_iItemID)
 	SCHEMA_FIELD(bool, m_bInitialized)
 };
 

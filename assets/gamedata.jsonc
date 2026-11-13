@@ -406,6 +406,22 @@
       "CGameEntitySystem": {
         "library": "server",
         "table": "CGameEntitySystem"
+      },
+      "CCStrike15ItemSystem": {
+        "library": "server",
+        "table": "CCStrike15ItemSystem"
+      },
+      "CCSInventoryManager": {
+        "library": "server",
+        "table": "CCSInventoryManager"
+      },
+      "CCSPlayerInventory": {
+        "library": "server",
+        "table": "CCSPlayerInventory"
+      },
+      "CCSPlayer_ItemServices": {
+        "library": "server",
+        "table": "CCSPlayer_ItemServices"
       }
     }
   },

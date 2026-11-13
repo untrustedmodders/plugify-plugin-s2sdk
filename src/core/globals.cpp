@@ -98,6 +98,40 @@ namespace globals {
 		UNWRAP(addresses::CCSPlayerController_SwitchTeam, g_pGameConfig->GetSignature("CCSPlayerController::SwitchTeam"));
 		UNWRAP(addresses::CGameRules_TerminateRound, g_pGameConfig->GetSignature("CGameRules::TerminateRound"));
 		UNWRAP(addresses::GetCSWeaponDataFromKey, g_pGameConfig->GetSignature("GetCSWeaponDataFromKey"));
+		// virtual GiveNamedItem(name) just zeroes other args and jumps to the full one
+		{
+			Memory itemServicesVTable;
+			UNWRAP(itemServicesVTable, g_pGameConfig->GetVTable("CCSPlayer_ItemServices"));
+			auto index = g_pGameConfig->GetOffset("CCSPlayer_ItemServices::GiveNamedItem");
+			if (!index) {
+				return MakeError(std::move(index.error()));
+			}
+			auto giveNamedItem = CModule::FollowFirstBranch(itemServicesVTable.As<void**>()[*index]);
+			if (!giveNamedItem) {
+				return MakeError("Could not follow CCSPlayer_ItemServices::GiveNamedItem to the full function");
+			}
+			addresses::CCSPlayer_ItemServices_GiveNamedItem = giveNamedItem.As<decltype(addresses::CCSPlayer_ItemServices_GiveNamedItem)>();
+		}
+		// ItemSystem() keeps it in a local static, take the only global pointing to it
+		{
+			Memory itemSystemVTable;
+			UNWRAP(itemSystemVTable, g_pGameConfig->GetVTable("CCStrike15ItemSystem"));
+			auto ptrs = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindInstancePtrs(itemSystemVTable);
+			if (ptrs.size() != 1) {
+				return MakeError("Expected one pointer to CCStrike15ItemSystem, found {}", ptrs.size());
+			}
+			g_ppItemSystem = ptrs.front().As<IEconItemSystem**>();
+		}
+		// static game system object in server module
+		{
+			Memory inventoryManagerVTable;
+			UNWRAP(inventoryManagerVTable, g_pGameConfig->GetVTable("CCSInventoryManager"));
+			auto instances = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindStaticInstances(inventoryManagerVTable);
+			if (instances.size() != 1) {
+				return MakeError("Expected one CCSInventoryManager, found {}", instances.size());
+			}
+			g_pInventoryManager = instances.front().As<CCSInventoryManager*>();
+		}
 #endif
 
 		ConVarManager::Init();
