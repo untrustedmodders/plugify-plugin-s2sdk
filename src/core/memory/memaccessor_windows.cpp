@@ -12,7 +12,7 @@ bool CMemAccessor::MemCopy(CAddress dest, CAddress src, size_t size)
 	return true;
 }
 
-bool CMemAccessor::SafeMemCopy(CAddress dest, CAddress src, size_t size, size_t& written) noexcept
+bool CMemAccessor::SafeMemWrite(CAddress dest, CAddress src, size_t size, size_t& written) noexcept
 {
 	written = 0;
 	return WriteProcessMemory(GetCurrentProcess(), dest, src, (SIZE_T)size, (PSIZE_T)&written);
@@ -46,10 +46,4 @@ ProtFlag CMemAccessor::MemProtect(CAddress dest, size_t size, ProtFlag prot, boo
 	status = VirtualProtect(dest, size, TranslateProtection(prot), &orig) != 0;
 	return TranslateProtection(static_cast<int>(prot));
 }
-bool CMemAccessor::TryRead(CAddress src, void* dest, size_t size) noexcept
-{
-	SIZE_T read = 0;
-	return ReadProcessMemory(GetCurrentProcess(), src, dest, size, &read) && read == size;
-}
-
 #endif

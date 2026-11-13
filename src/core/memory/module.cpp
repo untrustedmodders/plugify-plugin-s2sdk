@@ -188,7 +188,7 @@ std::vector<CAddress> CModule::FindPtrs(CAddress ptr) const
     return results;
 }
 
-std::vector<CAddress> CModule::FindInstancePtrs(CAddress vtable) const
+std::vector<CAddress> CModule::FindInstancePointers(CAddress vtable) const
 {
     std::vector<CAddress> results{};
 
@@ -207,7 +207,8 @@ std::vector<CAddress> CModule::FindInstancePtrs(CAddress vtable) const
 
             // most values aren't pointers, read must not fault, ~0.1 s for libserver
             uintptr_t first;
-            if (CMemAccessor::TryRead(value, &first, sizeof(first)) && first == vtable.GetPtr())
+            size_t read;
+            if (CMemAccessor::SafeMemRead(value, &first, sizeof(first), read) && read == sizeof(first) && first == vtable.GetPtr())
                 results.emplace_back(segment.address + i * sizeof(uintptr_t));
         }
     }

@@ -60,36 +60,24 @@ bool CMemAccessor::MemCopy(CAddress dest, CAddress src, size_t size)
 	return true;
 }
 
-bool CMemAccessor::SafeMemCopy(CAddress dest, CAddress src, size_t size, size_t& written) noexcept
+bool CMemAccessor::SafeMemWrite(CAddress dest, CAddress src, size_t size, size_t& written) noexcept
 {
-	region_t region_infos = get_region_from_addr(src);
-
-	// Make sure that the region we query is writable
-	if (!(region_infos.prot & ProtFlag::W))
-		return false;
-
-	size = std::min<uintptr_t>(region_infos.end - src, size);
-
-	std::memcpy(dest, src, size);
-	written = size;
-
-	return true;
+	// fails on an unmapped or read-only page instead of faulting, stops at the first such page
+	iovec local{src, size};
+	iovec remote{dest, size};
+	ssize_t result = process_vm_writev(getpid(), &local, 1, &remote, 1, 0);
+	written = result > 0 ? static_cast<size_t>(result) : 0;
+	return written > 0;
 }
 
 bool CMemAccessor::SafeMemRead(CAddress src, CAddress dest, size_t size, size_t& read) noexcept
 {
-	region_t region_infos = get_region_from_addr(src);
-
-	// Make sure that the region we query is readable
-	if (!(region_infos.prot & ProtFlag::R))
-		return false;
-
-	size = std::min<uintptr_t>(region_infos.end - src, size);
-
-	std::memcpy(dest, src, size);
-	read = size;
-
-	return true;
+	// fails on an unmapped page instead of faulting, stops at the first such page
+	iovec local{dest, size};
+	iovec remote{src, size};
+	ssize_t result = process_vm_readv(getpid(), &local, 1, &remote, 1, 0);
+	read = result > 0 ? static_cast<size_t>(result) : 0;
+	return read > 0;
 }
 
 ProtFlag CMemAccessor::MemProtect(CAddress dest, size_t size, ProtFlag prot, bool& status)
@@ -100,12 +88,6 @@ ProtFlag CMemAccessor::MemProtect(CAddress dest, size_t size, ProtFlag prot, boo
 	uintptr_t alignedSize = MemoryRoundUp(size, pageSize);
 	status = mprotect(reinterpret_cast<void*>(alignedDest), alignedSize, TranslateProtection(prot)) == 0;
 	return regionInfo.prot;
-}
-bool CMemAccessor::TryRead(CAddress src, void* dest, size_t size) noexcept
-{
-	iovec local{dest, size};
-	iovec remote{src, size};
-	return process_vm_readv(getpid(), &local, 1, &remote, 1, 0) == static_cast<ssize_t>(size);
 }
 
 #endif

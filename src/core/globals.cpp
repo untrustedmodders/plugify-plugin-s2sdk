@@ -116,7 +116,7 @@ namespace globals {
 		{
 			Memory itemSystemVTable;
 			UNWRAP(itemSystemVTable, g_pGameConfig->GetVTable("CCStrike15ItemSystem"));
-			auto ptrs = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindInstancePtrs(itemSystemVTable);
+			auto ptrs = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindInstancePointers(itemSystemVTable);
 			if (ptrs.size() != 1) {
 				return MakeError("Expected one pointer to CCStrike15ItemSystem, found {}", ptrs.size());
 			}
