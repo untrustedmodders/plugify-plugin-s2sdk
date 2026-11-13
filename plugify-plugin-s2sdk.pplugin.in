@@ -40687,17 +40687,17 @@
         {
           "value": 4,
           "name": "OffsetX",
-          "description": "The \"sticker slot N offset x\" attribute."
+          "description": "The \"sticker slot N offset x\" attribute: shifts the sticker from its position (0.05 is a visible step, 0.3 moved it off an AK-47)."
         },
         {
           "value": 5,
           "name": "OffsetY",
-          "description": "The \"sticker slot N offset y\" attribute."
+          "description": "The \"sticker slot N offset y\" attribute: shifts the sticker from its position, like OffsetX."
         },
         {
           "value": 6,
           "name": "Schema",
-          "description": "The \"sticker slot N schema\" attribute."
+          "description": "The \"sticker slot N schema\" attribute: the sticker slot whose position the sticker takes; the offsets shift it from there."
         }
       ]
     }
