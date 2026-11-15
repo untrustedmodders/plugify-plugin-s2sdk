@@ -2,6 +2,8 @@
 
 #include <vscript/ivscript.h>
 
+#include "virtual.hpp"
+
 struct VScriptBinding {
 	void* funcaddr;
 	size_t vtable_index;
@@ -40,23 +42,8 @@ public:
 	Ret operator()(Args... args) {
 		static VScriptBinding binding = vscript::FindBinding(ThisClass::m_className, FunctionName);
 		void* instance = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(this) - MemberOffset());
-#if defined(_MSC_VER)
-		// MSVC: funcaddr is the member function pointer itself (8 bytes, single inheritance).
-		// Calling through it (not a plain __thiscall pointer) keeps the x64 member-function ABI:
-		// this in RCX, hidden return pointer in RDX.
-		class Crutch {};
-		using MemberFunc = Ret(Crutch::*)(Args...);
-		const auto func = std::bit_cast<MemberFunc>(binding.funcaddr);
-		return (static_cast<Crutch*>(instance)->*func)(std::forward<Args>(args)...);
-#elif defined(__GNUC__) || defined(__clang__)
-		// GCC/Clang (System V): 'this' is just the first argument, so a plain function pointer works.
-		// Virtual functions have no address in the binding - take it from the vtable.
-		using Func = Ret(*)(void*, Args...);
-		const auto func = reinterpret_cast<Func>(binding.funcaddr ? binding.funcaddr : (*static_cast<void***>(instance))[binding.vtable_index]);
-		return func(instance, std::forward<Args>(args)...);
-#else
-#	error "Unsupported compiler"
-#endif
+		void* addr = binding.funcaddr ? binding.funcaddr : (*static_cast<void***>(instance))[binding.vtable_index];
+		return CallMember<Ret>(addr, instance, std::forward<Args>(args)...);
 	}
 };
 
@@ -70,15 +57,8 @@ public:
 	Ret operator()(Args... args) {
 		static VScriptBinding binding = vscript::FindBinding(ThisClass::m_className, FunctionName);
 		using Func = Ret(*)(Args...);
-#if defined(_MSC_VER)
-		auto fn = reinterpret_cast<Func>(binding.funcaddr);
-		return fn(std::forward<Args>(args)...);
-#elif defined(__GNUC__) || defined(__clang__)
-		auto fn = reinterpret_cast<Func>(binding.funcaddr);
-		return fn(std::forward<Args>(args)...);
-#else
-#   error "Unsupported compiler"
-#endif
+		Func func = reinterpret_cast<Func>(binding.funcaddr);
+		return func(std::forward<Args>(args)...);
 	}
 };
 

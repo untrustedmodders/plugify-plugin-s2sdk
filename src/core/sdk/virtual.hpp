@@ -2,42 +2,32 @@
 
 #define CALL_VIRTUAL(retType, idx, ...) CallVirtual<retType>(static_cast<size_t>(idx), __VA_ARGS__)
 
-template<typename T = void*>
-T GetVMethod(size_t index, void* klass) {
-	if (!klass) {
-		return T{};
-	}
-
-	void** table = *static_cast<void***>(klass);
-	if (!table) {
-		return T{};
-	}
-
-	return reinterpret_cast<T>(table[index]);
-}
-
-template<typename T, typename... Args>
-T CallVirtual(size_t index, void* klass, Args... args) {
-	void* addr = GetVMethod(index, klass);
-	if (!addr) {
-		if constexpr (std::is_void_v<T>) {
-			return;
-		} else {
-			return T{};
-		}
-	}
-
-#if defined(_MSC_VER)
+// Calls a member function at a raw address on 'klass' using the compiler's own
+// member-function calling convention (via a member function pointer).
+//   MSVC x64: 'this' in RCX, hidden return pointer in RDX. A plain (__thiscall*) pointer is a free
+//             function on x64 and swaps them for struct returns, so it must not be used.
+//   Itanium (GCC/Clang): {ptr, adj} with an even ptr = direct call to that address, adj = 0.
+template<typename Ret, typename... Args>
+Ret CallMember(void* addr, void* klass, Args... args) {
 	class Crutch {};
-	using MemberFunc = T (Crutch::*)(Args...);
+	using MemberFunc = Ret (Crutch::*)(Args...);
+#if defined(_MSC_VER)
 	const auto func = std::bit_cast<MemberFunc>(addr);
-	return (static_cast<Crutch*>(klass)->*func)(std::forward<Args>(args)...);
 #elif defined(__GNUC__) || defined(__clang__)
-	// GCC/Clang (System V): 'this' is just the first argument.
-	using Func = T (*)(void*, Args...);
-	const auto func = reinterpret_cast<Func>(addr);
-	return func(klass, std::forward<Args>(args)...);
+	struct ItaniumMFP {
+		uintptr_t ptr;
+		intptr_t adj;
+	};
+	const auto func = std::bit_cast<MemberFunc>(ItaniumMFP{reinterpret_cast<uintptr_t>(addr), 0});
 #else
 #	error "Unsupported compiler"
 #endif
+	return (static_cast<Crutch*>(klass)->*func)(std::forward<Args>(args)...);
+}
+
+template<typename Ret, typename... Args>
+Ret CallVirtual(auto index, void* klass, Args... args) {
+	// No null checks on purpose: a null object / vtable must crash here, not be silently skipped.
+	void* addr = (*static_cast<void***>(klass))[index];
+	return CallMember<Ret>(addr, klass, std::forward<Args>(args)...);
 }
