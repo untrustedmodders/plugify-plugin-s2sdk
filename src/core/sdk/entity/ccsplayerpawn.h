@@ -68,7 +68,7 @@ public:
 
 	void Respawn() {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn"));
-		CALL_VIRTUAL(void, offset, this);
+		CallVirtual<void>(offset, this);
 	}
 
 	void SetSpeed(float speed) {

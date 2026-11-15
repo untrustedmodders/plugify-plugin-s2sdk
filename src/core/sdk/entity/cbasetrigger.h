@@ -39,7 +39,7 @@ public:
 
 	/*bool PassesTriggerFilters(CBaseEntity* other) {
 		static int offset = g_pGameConfig->GetOffset("PassesTriggerFilters");
-		return CALL_VIRTUAL(bool, offset, this, other);
+		return CallVirtual<bool>(offset, this, other);
 	}*/
 
 	//bool IsStartZone() { return !V_stricmp(this->GetClassname(), "trigger_multiple") && this->m_pEntity->NameMatches("timer_startzone"); }

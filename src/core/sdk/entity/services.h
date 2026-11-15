@@ -139,22 +139,22 @@ public:
 
 	bool CanUse(CBasePlayerWeapon* weapon) {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::CanUse"));
-		return CALL_VIRTUAL(bool, offset, this, weapon);
+		return CallVirtual<bool>(offset, this, weapon);
 	}
 
 	void DropWeapon(CBasePlayerWeapon* weapon, const Vector* target = nullptr, const Vector* velocity = nullptr) {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::DropWeapon"));
-		CALL_VIRTUAL(void, offset, this, weapon, target, velocity);
+		CallVirtual<void>(offset, this, weapon, target, velocity);
 	}
 
 	int SelectItem(CBasePlayerWeapon* weapon) {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::SelectItem"));
-		return CALL_VIRTUAL(int, offset, this, weapon);
+		return CallVirtual<int>(offset, this, weapon);
 	}
 
 	bool SwitchWeapon(CBasePlayerWeapon* weapon, int a3 = 0) {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_WeaponServices::SwitchWeapon"));
-		return CALL_VIRTUAL(int, offset, this, weapon, a3);
+		return CallVirtual<int>(offset, this, weapon, a3);
 	}
 };
 
@@ -198,12 +198,12 @@ public:
 
 	CBaseEntity* GiveNamedItem(const char* name) {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_ItemServices::GiveNamedItem"));
-		return CALL_VIRTUAL(CBaseEntity*, offset, this, name);
+		return CallVirtual<CBaseEntity*>(offset, this, name);
 	}
 
 	int RemoveWeapons(bool removeSuit = false) {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayer_ItemServices::RemoveAllItems"));
-		return CALL_VIRTUAL(int, offset, this, removeSuit);
+		return CallVirtual<int>(offset, this, removeSuit);
 	}
 };
 

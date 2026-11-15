@@ -283,12 +283,12 @@ public:
 
 	void CollisionRulesChanged() {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBaseEntity::CollisionRulesChanged"));
-		CALL_VIRTUAL(void, offset, this);
+		CallVirtual<void>(offset, this);
 	}
 
 	void Teleport(const Vector& newPosition, const QAngle& newAngles, const Vector& newVelocity) {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBaseEntity::Teleport"));
-		CALL_VIRTUAL(bool, offset, this, newPosition.IsValid() ? &newPosition : nullptr, newAngles.IsValid() ? &newAngles : nullptr, newVelocity.IsValid() ? &newVelocity : nullptr);
+		CallVirtual<bool>(offset, this, newPosition.IsValid() ? &newPosition : nullptr, newAngles.IsValid() ? &newAngles : nullptr, newVelocity.IsValid() ? &newVelocity : nullptr);
 	}
 
 	CHandle<CBaseEntity> GetHandle() { return m_pEntity->m_EHandle; }
@@ -367,7 +367,7 @@ public:
 
 	bool IsWeapon() {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBaseEntity::IsWeapon"));
-		return CALL_VIRTUAL(bool, offset, this);
+		return CallVirtual<bool>(offset, this);
 	}
 
 	void Remove() {

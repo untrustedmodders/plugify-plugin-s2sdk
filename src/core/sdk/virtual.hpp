@@ -1,7 +1,5 @@
 #pragma once
 
-#define CALL_VIRTUAL(retType, idx, ...) CallVirtual<retType>(static_cast<size_t>(idx), __VA_ARGS__)
-
 // Calls a member function at a raw address on 'klass' using the compiler's own
 // member-function calling convention (via a member function pointer).
 //   MSVC x64: 'this' in RCX, hidden return pointer in RDX. A plain (__thiscall*) pointer is a free

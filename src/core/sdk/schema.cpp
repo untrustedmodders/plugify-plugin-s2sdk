@@ -28,7 +28,7 @@
 
 void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32_t networkStateChangedOffset) {
 	NetworkStateChanged_t data(offset);
-	CALL_VIRTUAL(void, networkStateChangedOffset, reinterpret_cast<void*>(networkVar), &data);
+	CallVirtual<void>(networkStateChangedOffset, reinterpret_cast<void*>(networkVar), &data);
 }
 
 void EntityNetworkStateChanged(uintptr_t entity, uint32_t offset) {

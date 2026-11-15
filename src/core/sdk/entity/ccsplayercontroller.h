@@ -66,7 +66,7 @@ public:
 
 	void ChangeTeam(CSTeam team) {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSPlayerController::ChangeTeam"));
-		CALL_VIRTUAL(void, offset, this, team);
+		CallVirtual<void>(offset, this, team);
 	}
 
 	void SwitchTeam(CSTeam team) {
@@ -88,6 +88,6 @@ public:
 
 		SetPawn(pawn);
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn"));
-		CALL_VIRTUAL(void, offset, this);
+		CallVirtual<void>(offset, this);
 	}
 };
