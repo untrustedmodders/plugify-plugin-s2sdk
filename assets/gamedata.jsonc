@@ -71,26 +71,6 @@
         "win64": "48 8B 15 ? ? ? ? 48 85 D2 74 ? 85 C9",
         "linuxsteamrt64": "48 8B 05 ? ? ? ? 48 85 C0 74 16 83 FF 3F"
       },
-      // String: "-pressdemo",
-      //          "MathLib_Init",
-      //          "gameeventmanager->Init()",
-      //          "CEngineServiceRegistry::RegisterEngineServices()",
-      //          "CLoopModeRegistry::RegisterLoopModes()",
-      //          "g_pGameSaveRestoreBlockSet",
-      //          "InitGameSystems - Start",
-      //          "InitGameSystems - Finish",
-      //          "[STARTUP] {%.3f} server module init %s\n",
-      //          "ok"
-      "CSource2Server::Init": {
-        "library": "server",
-        "win64": "41 57 48 83 EC ? 48 83 3D ? ? ? ? ? 48 89 6C 24 ? 48 8B E9 74 ? 33 C9 E8 ? ? ? ? FF 15",
-        "linuxsteamrt64": "48 8D 05 ? ? ? ? 55 48 89 E5 41 56 41 55 49 89 FD 41 54 53 48 83 38 00",
-        "refs": [
-          {
-            "string": "CEngineServiceRegistry::RegisterEngineServices()"
-          }
-        ]
-      },
       // "InPass" is passed to this
       "CEntityInstance::AcceptInput": {
         "library": "server",
@@ -281,11 +261,6 @@
         "win64": 27,
         "linuxsteamrt64": 28
       },
-      // "InitialActivate" and "OnActivate"
-      "CCSScript_EntityScript": {
-        "win64": 1216,
-        "linuxsteamrt64": 1952
-      },
       // 5 functions after one with "targethealthfrac"
       "CollisionRulesChanged": {
         "linuxsteamrt64": 187
@@ -297,67 +272,6 @@
       }
     },
     "Addresses": {
-      // Signature-based address for game event manager after "gameeventmanager->Init()"
-      "&s_GameEventManager": {
-        "signature": "CSource2Server::Init",
-        "win64": [
-          {
-            "read_offs32": 113
-          },
-          {
-            "read": 0
-          }
-        ],
-        "linuxsteamrt64": [
-          {
-            "read_offs32": 107
-          },
-          {
-            "read": 0
-          }
-        ]
-      },
-      // String: look for UtlVector in if before "Unexpected module request."
-      // (int)s_pScripts > 0 && (v15 = ptrScript, (v16 = *(_BYTE **)(ptrScript + 8LL * ((int)s_pScripts - 1))) != 0LL) )
-      "&s_pScripts": {
-        "signature": "CSScript::ResolveModule",
-        "win64": [
-          {
-            "read_offs32": 290
-          }
-        ],
-        "linuxsteamrt64": [
-          {
-            "read_offs32": 370
-          }
-        ]
-      },
-      "v8::Isolate::Enter": {
-        "signature": "CSScript::ResolveModule",
-        "win64": [
-          {
-            "read_offs32": 57
-          }
-        ],
-        "linuxsteamrt64": [
-          {
-            "read_offs32": 38
-          }
-        ]
-      },
-      "v8::Isolate::Exit": {
-        "signature": "CSScript::ResolveModule",
-        "win64": [
-          {
-            "read_offs32": 1042
-          }
-        ],
-        "linuxsteamrt64": [
-          {
-            "read_offs32": 231
-          }
-        ]
-      }
     },
     "Patches": {
       "VScriptPatch": {
@@ -403,6 +317,14 @@
         "library": "vscript",
         "table": "CLuaVM"
       },
+      "CGameEventManager": {
+        "library": "server",
+        "table": "CGameEventManager"
+      },
+      "CCSScript_EntityScript": {
+        "library": "server",
+        "table": "CCSScript_EntityScript"
+      },
       "CGameEntitySystem": {
         "library": "server",
         "table": "CGameEntitySystem"
@@ -438,21 +360,6 @@
       "LegacyGameEventListener": {
         "library": "server",
         "win64": "48 8B 05 ? ? ? ? 48 85 C0 74 16 83 FF 3F",
-        "linuxsteamrt64": "TODO"
-      },
-      // String: "-pressdemo",
-      //          "MathLib_Init",
-      //          "gameeventmanager->Init()",
-      //          "CEngineServiceRegistry::RegisterEngineServices()",
-      //          "CLoopModeRegistry::RegisterLoopModes()",
-      //          "g_pGameSaveRestoreBlockSet",
-      //          "InitGameSystems - Start",
-      //          "InitGameSystems - Finish",
-      //          "[STARTUP] {%.3f} server module init %s\n",
-      //          "ok"
-      "CSource2Server::Init": {
-        "library": "server",
-        "win64": "48 83 EC 28 48 83 3D ? ? ? ? 00 74 ? 33 C9 E8 ? ? ? ? FF 15",
         "linuxsteamrt64": "TODO"
       },
       // "InPass" is passed to this
@@ -516,26 +423,6 @@
       }
     },
     "Addresses": {
-      // Signature-based address for game event manager after "gameeventmanager->Init()"
-      "&s_GameEventManager": {
-        "signature": "CSource2Server::Init",
-        "win64": [
-          {
-            "read_offs32": 98
-          },
-          {
-            "read": 0
-          }
-        ],
-        "linuxsteamrt64": [
-          {
-            "read_offs32": 106
-          },
-          {
-            "read": 0
-          }
-        ]
-      }
     },
     "Patches": {
     },
@@ -543,6 +430,10 @@
       "CLuaVM": {
         "library": "vscript",
         "table": "CLuaVM"
+      },
+      "CGameEventManager": {
+        "library": "server",
+        "table": "CGameEventManager"
       }
     }
   }

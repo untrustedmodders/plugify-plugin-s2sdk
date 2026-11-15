@@ -172,6 +172,15 @@ public:
     [[nodiscard]] std::vector<CAddress> FindPtrs(CAddress ptr) const;
 
 	[[nodiscard]] CAddress              FindInterface(std::string_view name) const;
+	[[nodiscard]] std::vector<CAddress> FindStaticInstances(CAddress vtable) const;
+	[[nodiscard]] std::vector<CAddress> FindImportThunks(CAddress function) const;
+
+	struct DataRead
+	{
+		CAddress target{};
+		uint16_t bits{};
+	};
+	[[nodiscard]] std::vector<DataRead> FindRipDataReads(CAddress function) const;
 
 	[[nodiscard]] std::vector<CAddress> GetVFunctionsFromVTable(std::string_view vtableName) const;
 	void LoopVFunctions(std::string_view vtable_name, const std::function<bool(CAddress)>& callback) const;

@@ -1,3 +1,4 @@
+#include <algorithm>
 
 #include <core/sdk/entity/cbaseentity.h>
 #include <core/sdk/utils.hpp>
@@ -78,10 +79,16 @@ namespace globals {
 			}
 		}
 
-		UNWRAP(g_pGameEventManager, g_pGameConfig->GetAddress("&s_GameEventManager"));
-#if defined (CS2)
-		UNWRAP(g_pScripts, g_pGameConfig->GetAddress("&s_pScripts"));
-#endif
+		// static object in server module
+		{
+			Memory gameEventManagerVTable;
+			UNWRAP(gameEventManagerVTable, g_pGameConfig->GetVTable("CGameEventManager"));
+			auto instances = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindStaticInstances(gameEventManagerVTable);
+			if (instances.size() != 1) {
+				return MakeError("Expected one CGameEventManager, found {}", instances.size());
+			}
+			g_pGameEventManager = instances.front().As<IGameEventManager2*>();
+		}
 
 		// load more if needed
 		UNWRAP(addresses::GetLegacyGameEventListener, g_pGameConfig->GetSignature("LegacyGameEventListener"));
@@ -94,6 +101,27 @@ namespace globals {
 
 #if defined (CS2)
 		UNWRAP(addresses::CSScript_ResolveModule, g_pGameConfig->GetSignature("CSScript::ResolveModule"));
+		// ResolveModule reads s_pScripts as a CUtlVector: m_Size, then the elements 8 bytes on
+		{
+			auto reads = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindRipDataReads(reinterpret_cast<void*>(addresses::CSScript_ResolveModule));
+			// a second such pair would make the pick a guess
+			std::vector<uintptr_t> sizes;
+			for (const auto& read : reads) {
+				const uintptr_t target = read.target.GetPtr();
+				if (read.bits != 32 || std::ranges::find(sizes, target) != sizes.end()) {
+					continue;
+				}
+				if (std::ranges::any_of(reads, [&](const CModule::DataRead& other) {
+					return other.bits == 64 && other.target.GetPtr() == target + 8;
+				})) {
+					sizes.push_back(target);
+				}
+			}
+			if (sizes.size() != 1) {
+				return MakeError("Expected one s_pScripts in CSScript::ResolveModule, found {}", sizes.size());
+			}
+			g_pScripts = reinterpret_cast<CUtlVector<void*>*>(sizes.front());
+		}
 		UNWRAP(addresses::CCSPlayer_WeaponServices_RemoveItem, g_pGameConfig->GetSignature("CCSPlayer_WeaponServices::RemoveItem"));
 		UNWRAP(addresses::CCSPlayerController_SwitchTeam, g_pGameConfig->GetSignature("CCSPlayerController::SwitchTeam"));
 		UNWRAP(addresses::CGameRules_TerminateRound, g_pGameConfig->GetSignature("CGameRules::TerminateRound"));

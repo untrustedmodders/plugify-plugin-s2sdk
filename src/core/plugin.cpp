@@ -1,3 +1,7 @@
+#include <array>
+#include <bit>
+#include <cstring>
+
 #include <core/sdk/cvars.hpp>
 #include <core/sdk/entity/cgamerules.h>
 #include <core/sdk/entity/cteam.h>
@@ -23,6 +27,7 @@
 #include "event_manager.hpp"
 #include "hook_manager.hpp"
 #include "listeners.hpp"
+#include "memory/memaccessor.hpp"
 #include "menu/menu_manager.hpp"
 #include "multi_addon_manager.hpp"
 #include "output_manager.hpp"
@@ -757,6 +762,31 @@ polyhook::ResultType Hook_Serialize(polyhook::HookHandle hook, polyhook::Paramet
 	return polyhook::ResultType::Ignored;
 }
 
+#if defined (CS2)
+// CCSScript_EntityScript member of point_script, found by its vtable
+void* GetEntityScript(CBaseEntity* pointScript) {
+	static const size_t offset = [pointScript]() -> size_t {
+		auto vtable = g_pGameConfig->GetVTable("CCSScript_EntityScript");
+		if (!vtable) {
+			plg::print(LS_WARNING, "{}\n", vtable.error());
+			return 0;
+		}
+		std::array<uintptr_t, 0x1000 / sizeof(uintptr_t)> data{};
+		size_t read = 0;
+		CMemAccessor::SafeMemRead(pointScript, data.data(), sizeof(data), read);
+		// slot 0 is the entity's own vtable
+		for (size_t i = 1; i < read / sizeof(uintptr_t); ++i) {
+			if (data[i] == vtable->GetPtr()) {
+				return i * sizeof(uintptr_t);
+			}
+		}
+		plg::print(LS_WARNING, "Could not find CCSScript_EntityScript in point_script\n");
+		return 0;
+	}();
+	return offset ? reinterpret_cast<uint8_t*>(pointScript) + offset : nullptr;
+}
+#endif
+
 polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
@@ -775,8 +805,9 @@ polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::P
 			{"targetname", "plugify_script"},
 			/*{"cs_script", CS_SCRIPT_PATH}*/
 		});
-		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
-		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);
+		if (auto script = GetEntityScript(g_pPointScript)) {
+			g_pScripts->AddToTail(script);
+		}
 #endif
 	}
 
@@ -826,8 +857,9 @@ polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::P
 	} else if (entity == g_pPointScript) {
 #if defined (CS2)
 		// CSScript::ResolveModule uses the last script without checking it, so a deleted one must not stay there
-		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
-		g_pScripts->FindAndRemove(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);
+		if (auto script = GetEntityScript(g_pPointScript)) {
+			g_pScripts->FindAndRemove(script);
+		}
 #endif
 		g_pPointScript = nullptr;
 	}
@@ -1061,20 +1093,32 @@ Result<void> SetupHooks() {
 #if 1
 	using v8IsolateFn = void(*)(v8::Isolate*);
 
+	// hook the server's import thunks, not v8 itself: the v8 language module calls the same library
+	auto findIsolateThunk = [](std::string_view symbol) -> Result<Memory> {
+		auto function = ModuleLookup::FindSymbolFromModule(S2SDK_LIBRARY_PREFIX "v8" S2SDK_LIBRARY_SUFFIX, symbol);
+		if (!function) {
+			return MakeError("Could not find {} in v8", symbol);
+		}
+		auto thunks = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindImportThunks(function);
+		if (thunks.size() != 1) {
+			return MakeError("Expected one server import thunk for {}, found {}", symbol, thunks.size());
+		}
+		return thunks.front();
+	};
+
 	uint8_t* v8IsolateEnterPtr;
 	uint8_t* v8IsolateExitPtr;
 
-	UNWRAP(v8IsolateEnterPtr, g_pGameConfig->GetAddress("v8::Isolate::Enter"));
-	UNWRAP(v8IsolateExitPtr, g_pGameConfig->GetAddress("v8::Isolate::Exit"));
-
 #if PLATFORM_WINDOWS
-	const uint8_t fix = 0;
+	UNWRAP(v8IsolateEnterPtr, findIsolateThunk("?Enter@Isolate@v8@@QEAAXXZ"));
+	UNWRAP(v8IsolateExitPtr, findIsolateThunk("?Exit@Isolate@v8@@QEAAXXZ"));
 #else
-	const uint8_t fix = 6; // skip plt staff
+	UNWRAP(v8IsolateEnterPtr, findIsolateThunk("_ZN2v87Isolate5EnterEv"));
+	UNWRAP(v8IsolateExitPtr, findIsolateThunk("_ZN2v87Isolate4ExitEv"));
 #endif
 
-	CHECK(g_HookManager.AddHookDetourFunc<v8IsolateFn>("v8::Isolate::Enter", reinterpret_cast<uintptr_t>(v8IsolateEnterPtr + fix), Hook_IsolateEnter, {Pre}));
-	CHECK(g_HookManager.AddHookDetourFunc<v8IsolateFn>("v8::Isolate::Exit", reinterpret_cast<uintptr_t>(v8IsolateExitPtr + fix), Hook_IsolateExit, {Post}));
+	CHECK(g_HookManager.AddHookDetourFunc<v8IsolateFn>("v8::Isolate::Enter", reinterpret_cast<uintptr_t>(v8IsolateEnterPtr), Hook_IsolateEnter, {Pre}));
+	CHECK(g_HookManager.AddHookDetourFunc<v8IsolateFn>("v8::Isolate::Exit", reinterpret_cast<uintptr_t>(v8IsolateExitPtr), Hook_IsolateExit, {Post}));
 
 	using SetModuleResolverFn = void(*)(v8::Module::ResolveModuleCallback);
 	if (auto resolve = ModuleLookup::FindSymbolAs<SetModuleResolverFn>(S2SDK_LIBRARY_PREFIX "plugify-module-v8" S2SDK_LIBRARY_SUFFIX, "SetModuleResolver")) {

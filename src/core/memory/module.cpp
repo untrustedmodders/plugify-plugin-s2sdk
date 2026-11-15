@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstring>
 #include <iterator>
 #include <memory>
 #include <span>
@@ -6,6 +7,7 @@
 
 #include "module.hpp"
 #include "scan.hpp"
+#include <Zydis/Zydis.h>
 
 #ifdef PLATFORM_WINDOWS
 #    include <format>
@@ -179,6 +181,98 @@ std::vector<CAddress> CModule::FindPtrs(CAddress ptr) const
         for (const auto& tmp : ptrs)
         {
             results.emplace_back(tmp + segment.address);
+        }
+    }
+
+    return results;
+}
+
+std::vector<CAddress> CModule::FindStaticInstances(CAddress vtable) const
+{
+    std::vector<CAddress> results{};
+
+    for (const auto& segment : m_segments)
+    {
+        if (!(segment.flags & SegFlags::W))
+            continue;
+
+        for (const auto& tmp : scan::FindPtrs(segment.address, segment.size, vtable))
+        {
+            results.emplace_back(tmp + segment.address);
+        }
+    }
+
+    return results;
+}
+
+std::vector<CModule::DataRead> CModule::FindRipDataReads(CAddress function) const
+{
+    std::vector<DataRead> results{};
+
+    // stay inside the indexed function bounds
+    auto it = std::ranges::upper_bound(m_function_entries, function, {}, &FunctionEntry::start);
+    if (it == m_function_entries.begin())
+        return results;
+
+    const auto end = std::prev(it)->end;
+    if (!(function < end))
+        return results;
+
+    ZydisDecoder decoder{};
+    if (ZYAN_FAILED(ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64)))
+        return results;
+
+    ZydisDecodedInstruction instr{};
+    ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT]{};
+    for (CAddress ip = function; ip < end; ip += instr.length)
+    {
+        if (ZYAN_FAILED(ZydisDecoderDecodeFull(&decoder, ip, ZYDIS_MAX_INSTRUCTION_LENGTH, &instr, operands)))
+            break;
+
+        for (ZyanU8 i = 0; i < instr.operand_count_visible; ++i)
+        {
+            const auto& op = operands[i];
+            // lea is an address computation, not a read
+            if (op.type != ZYDIS_OPERAND_TYPE_MEMORY || op.mem.type != ZYDIS_MEMOP_TYPE_MEM || op.mem.base != ZYDIS_REGISTER_RIP)
+                continue;
+            if (!(op.actions & ZYDIS_OPERAND_ACTION_MASK_READ))
+                continue;
+
+            ZyanU64 target = 0;
+            if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(&instr, &op, ip, &target)))
+                results.push_back({target, op.size});
+        }
+    }
+
+    return results;
+}
+
+std::vector<CAddress> CModule::FindImportThunks(CAddress function) const
+{
+    std::vector<CAddress> results{};
+
+    // got/iat slots hold the resolved import
+    const auto slots = FindPtrs(function);
+    if (slots.empty())
+        return results;
+
+    for (const auto& segment : m_segments)
+    {
+        if (!(segment.flags & SegFlags::X))
+            continue;
+
+        const auto& data = segment.data;
+        for (size_t i = 0; i + 6 <= data.size(); ++i)
+        {
+            // jmp [rip+disp32]
+            if (data[i] != 0xFF || data[i + 1] != 0x25)
+                continue;
+
+            int32_t disp;
+            std::memcpy(&disp, &data[i + 2], sizeof(disp));
+            const uintptr_t slot = segment.address.GetPtr() + i + 6 + static_cast<intptr_t>(disp);
+            if (std::ranges::any_of(slots, [slot](const CAddress& s) { return s.GetPtr() == slot; }))
+                results.emplace_back(segment.address + i);
         }
     }
 
