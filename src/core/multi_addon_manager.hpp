@@ -22,7 +22,7 @@ public:
 		return instance;
 	}
 
-	std::string BuildAddonPath(PublishedFileId_t addon);
+	std::string BuildAddonPath(PublishedFileId_t addon, std::string_view suffix = {});
 	bool MountAddon(PublishedFileId_t addon, bool addToTail = false);
 	bool UnmountAddon(PublishedFileId_t addon, bool remove = true);
 	bool AddAddon(PublishedFileId_t addon, bool refresh = false);
@@ -56,6 +56,7 @@ public:
 	void OnSteamAPIActivated(bool reloadMap = true);
 	void OnStartupServer();
 	void OnClientConnect(uint64 steamID64);
+	void OnClientActive(CPlayerSlot slot, uint64 steamID64);
 	void OnClientDisconnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID, ENetworkDisconnectionReason reason);
 	void OnGameFrame();
 	void OnPostEvent(INetworkMessageInternal* message, CNetMessage* data, uint64_t* clients);

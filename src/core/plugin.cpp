@@ -281,6 +281,7 @@ polyhook::ResultType Hook_ClientActive(polyhook::HookHandle hook, polyhook::Para
 	plg::print(LS_DETAILED, "[OnClientActive] = {}, {}, {}\n", slot, name, steamID64);
 
 	g_PlayerManager.OnClientActive(slot, bLoadGame);
+	g_MultiAddonManager.OnClientActive(slot, steamID64);
 	return polyhook::ResultType::Ignored;
 }
 

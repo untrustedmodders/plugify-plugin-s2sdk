@@ -24,6 +24,7 @@ CConVar<bool> s2_addon_mount_download("s2_addon_mount_download", FCVAR_NONE, "Wh
 CConVar<bool> s2_block_disconnect_messages("s2_block_disconnect_messages", FCVAR_NONE, "Whether to block \"loop shutdown\" disconnect messages", false);
 CConVar<bool> s2_cache_clients_with_addons("s2_cache_clients_with_addons", FCVAR_NONE, "Whether to cache clients addon download list, this will prevent reconnects on mapchange/rejoin", false);
 CConVar<double> s2_cache_clients_duration("s2_cache_clients_duration", FCVAR_NONE, "How long to cache clients' downloaded addons list in seconds, pass 0 for forever.", 0.0);
+CConVar<bool> s2_addon_refresh_reconnect("s2_addon_refresh_reconnect", FCVAR_NONE, "Whether to reconnect a client once per join after it has all addons, so addon files that replace game files (e.g. Panorama images) apply already on the first join", false);
 CConVar<double> s2_extra_addons_timeout("s2_extra_addons_timeout", FCVAR_NONE, "How long until clients are timed out in between connects for extra addons in seconds, requires s2_extra_addons to be used", 10.0);
 CConVar<float> s2_addon_connection_timeout("s2_addon_connection_timeout", FCVAR_NONE, "How long until clients are timed out while downloading the first required addon (usually the current map), 0 disables", 300.f);
 
@@ -43,6 +44,7 @@ struct ClientAddonInfo {
 	PublishedFileId_t connectionAddon{};
 	ClientConnectedState_t connectedState{CLIENTCONN_NONE};
 	double connectionStartTime{};
+	bool refreshed{};
 };
 
 plg::parallel_node_hash_map_m<uint64, ClientAddonInfo> g_ClientAddons;
@@ -75,14 +77,14 @@ CConVar<CUtlString> s2_sent_addons("s2_sent_addons", FCVAR_NONE, "The workshop I
 
 MultiAddonManager MultiAddonManager::instance;
 
-std::string MultiAddonManager::BuildAddonPath(PublishedFileId_t addon) {
+std::string MultiAddonManager::BuildAddonPath(PublishedFileId_t addon, std::string_view suffix) {
     // The workshop on a dedicated server is stored relative to the working directory for whatever reason
 	static const CBufferStringN<MAX_PATH> workingDir = [] {
 		CBufferStringN<MAX_PATH> path;
 		g_pFullFileSystem->GetSearchPath("EXECUTABLE_PATH", GET_SEARCH_PATH_ALL, path, 1);
 		return path;
 	}();
-    return std::format("{}steamapps/workshop/content/730/{}/{}_dir.vpk", static_cast<std::string_view>(workingDir), addon, addon);
+	return std::format("{}steamapps/workshop/content/730/{}/{}{}.vpk", static_cast<std::string_view>(workingDir), addon, addon, suffix);
 }
 
 bool MultiAddonManager::MountAddon(PublishedFileId_t addon, bool addToTail) {
@@ -114,20 +116,9 @@ bool MultiAddonManager::MountAddon(PublishedFileId_t addon, bool addToTail) {
 
 	auto path = BuildAddonPath(addon);
 
-	constexpr std::string_view current = "_dir.vpk";
-	constexpr std::string_view legacy = ".vpk";
-
-	if (!g_pFullFileSystem->FileExists(path.c_str())) {
-		// This might be a legacy addon (before multi-chunk was introduced), try again without the _dir
-		path.replace(path.size() - current.size(), current.size(), legacy);
-
-		if (!g_pFullFileSystem->FileExists(path.c_str())) {
-			plg::print(LS_WARNING, "{}: Addon {} not found at {}\n", __func__, addon, path);
-			return false;
-		}
-	} else {
-		// We still need it without _dir anyway because the filesystem will append suffixes if needed
-		path.replace(path.size() - current.size(), current.size(), legacy);
+	if (!g_pFullFileSystem->FileExists(BuildAddonPath(addon, "_dir").c_str()) && !g_pFullFileSystem->FileExists(path.c_str())) {
+		plg::print(LS_WARNING, "{}: Addon {} not found at {}\n", __func__, addon, path);
+		return false;
 	}
 
 	if (std::ranges::contains(m_mountedAddons, addon)) {
@@ -403,8 +394,9 @@ bool MultiAddonManager::RemovePrivateAddon(PublishedFileId_t addon, bool refresh
 }
 
 void MultiAddonManager::OnPluginStart() {
-	std::array<uint64, 10> conVarHandles = {
+	std::array<uint64, 11> conVarHandles = {
 		s2_addon_mount_download,
+		s2_addon_refresh_reconnect,
 		s2_block_disconnect_messages,
 		s2_cache_clients_with_addons,
 		s2_cache_clients_duration,
@@ -1014,6 +1006,31 @@ void MultiAddonManager::OnClientConnect(uint64 steamID64) {
 	clientInfo.lastActiveTime = Plat_FloatTime();
 }
 
+void MultiAddonManager::OnClientActive(CPlayerSlot slot, uint64 steamID64) {
+	if (!s2_addon_refresh_reconnect.Get() || !steamID64 || !g_pEngineServer->IsDedicatedServer())
+		return;
+
+	ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
+	if (clientInfo.refreshed)
+		return;
+
+	auto addons = GetClientAddons(steamID64);
+	if (addons.empty() || !std::ranges::all_of(addons, [&](auto addon) { return std::ranges::contains(clientInfo.downloadedAddons, addon); }))
+		return;
+
+	auto client = utils::GetClientBySlot(slot);
+	if (!client || !client->GetNetChannel())
+		return;
+
+	std::unique_ptr<CNETMsg_SignonState_t> msg(GetAddonSignonStateMessage(addons.front()));
+	if (!msg)
+		return;
+
+	clientInfo.refreshed = true;
+	plg::print(LS_MESSAGE, "{}: Reconnecting {} once to apply addon files\n", __func__, steamID64);
+	client->GetNetChannel()->SendNetMessage(msg.get(), BUF_RELIABLE);
+}
+
 void MultiAddonManager::OnClientDisconnect(CPlayerSlot slot, const char* name, uint64 steamID64, const char* networkID, ENetworkDisconnectionReason reason) {
 	ClientAddonInfo& clientInfo = g_ClientAddons[steamID64];
 	// Mark the disconnection time for caching purposes.
@@ -1022,8 +1039,11 @@ void MultiAddonManager::OnClientDisconnect(CPlayerSlot slot, const char* name, u
 
 	// Loop reconnects (addon downloads, map changes) keep the addons mounted on the client, so forget them only when it leaves.
 	// Clearing them on every activation made each map change send the extra addons again, one reconnect per addon.
-	if (!s2_cache_clients_with_addons.Get() && reason != NETWORK_DISCONNECT_LOOPSHUTDOWN && reason != NETWORK_DISCONNECT_LOOPDEACTIVATE) {
-		clientInfo.downloadedAddons.clear();
+	if (reason != NETWORK_DISCONNECT_LOOPSHUTDOWN && reason != NETWORK_DISCONNECT_LOOPDEACTIVATE) {
+		clientInfo.refreshed = false;
+		if (!s2_cache_clients_with_addons.Get()) {
+			clientInfo.downloadedAddons.clear();
+		}
 	}
 }
 
