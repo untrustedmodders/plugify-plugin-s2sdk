@@ -213,6 +213,8 @@ void CModule::DumpExports(void* module_base)
     }
 }
 
+CModule::~CModule() = default;
+
 CAddress CModule::GetFunctionByName(std::string_view proc_name) const
 {
     if (auto it = _exports.find(proc_name); it != _exports.end())

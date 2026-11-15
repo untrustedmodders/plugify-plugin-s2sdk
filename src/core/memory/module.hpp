@@ -97,7 +97,11 @@ class CModule final
     void DumpVtables();
     std::vector<std::unique_ptr<VTable>> m_vtables{};
 
-#ifndef PLATFORM_WINDOWS
+#ifdef PLATFORM_WINDOWS
+	// __std_type_info_data* of type_infos whose name cache was filled by our name() calls;
+	// reset in ~CModule() so no dangling pointer is left after our DLL unloads
+	plg::flat_hash_set<void*> m_owned_type_names{};
+#else
 	struct RunTimeTypeInfo
 	{
 		CAddress class_typeinfo;
@@ -128,7 +132,7 @@ class CModule final
 
 public:
     CModule() = default;
-	//~CModule();
+	~CModule();
 
     CModule(const CModule&)     = delete;
     CModule(CModule&&) noexcept = delete;
