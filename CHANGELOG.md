@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.4.4](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.3...v3.4.4) (2026-11-16)
+
+
+### Bug Fixes
+
+* crash on reload related to freed decorated names ([9d17a61](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9d17a615d65e4e3e3b7e92dcda477a319be0109e))
+* drop the extra addon reconnect on join and map change ([1465d72](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1465d720e4bd947169292b4d3afe38fc3857b1f9))
+* member calls on MSVC ([8c7322a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8c7322a9cd793f7321372577e4dac655995230bc))
+* refactor member and virtual call ([04623f9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/04623f9fa356a1717fa7838d60692123c1b81c6c))
+* remove call macro ([0cbd133](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0cbd133aa250cf1001455d3129779bb95016c473))
+* unmount addons by their mounted path and reconnect once to apply overriding addon files ([f50c098](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f50c09800bc331816d74fd95e2e4b5bfea289586))
+
 ## [3.4.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.2...v3.4.3) (2026-11-12)
 
 
