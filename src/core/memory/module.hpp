@@ -184,6 +184,7 @@ public:
     [[nodiscard]] CAddress              GetFunctionByName(std::string_view proc_name) const;
     [[nodiscard]] CAddress              GetTypeInfoFromName(std::string_view name) const;
 
+	[[nodiscard]] std::vector<RunTimeVTableInfo>  GetVirtualTablesByName(std::string_view name) const;
 	[[nodiscard]] std::vector<RunTimeVTableInfo>  FindVtablePartial(std::string_view vtable_name) const;
     [[nodiscard]] bool                            IsPointerDerivedFrom(void* ptr, std::string_view vtable_name) const;
     [[nodiscard]] std::vector<CAddress>           IntersectFunctionReferences(std::vector<std::span<const ReferenceEntry>>& reference_sets) const;
