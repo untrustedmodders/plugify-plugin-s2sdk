@@ -2,10 +2,10 @@
 
 #if defined (CS2)
 
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <charconv>
-#include <cstring>
 #include <format>
 #include <string>
 #include <unordered_map>
@@ -106,7 +106,7 @@ namespace {
 		return nullptr;
 	}
 
-	// attributes sit right after the block header, so realloc it through tier0, game frees it there
+	// attributes follow the block header, the game frees the block through tier0
 	CEconItem::attribute_t* AddItemAttribute(CEconItem* item) {
 		CustomData* block = item->m_pCustomDataOptimizedObject;
 		uint32 count = block ? block->m_numAttributes : 0;
@@ -114,12 +114,12 @@ namespace {
 			return nullptr;
 
 		size_t size = sizeof(CustomData) + (count + 1) * sizeof(CEconItem::attribute_t);
-		auto newBlock = static_cast<CustomData*>(MemAlloc_Alloc(size));
-		std::memset(static_cast<void*>(newBlock), 0, size);
+		CustomData* newBlock;
 		if (block) {
-			std::memcpy(static_cast<void*>(newBlock), block, sizeof(CustomData) + count * sizeof(CEconItem::attribute_t));
-			MemAlloc_Free(block);
+			newBlock = static_cast<CustomData*>(MemAlloc_ReallocFunc(block, size));
+			*newBlock->GetAttribute(count) = {};
 		} else {
+			newBlock = static_cast<CustomData*>(MemAlloc_CallocFunc(1, size));
 			newBlock->m_equipInstanceSlot1 = INVALID_EQUIPPED_SLOT_BITPACKED;
 		}
 		newBlock->m_numAttributes = count + 1;
@@ -212,7 +212,10 @@ const CCStrike15ItemDefinition* inventory::GetItemDefinitionByName(const char* n
 }
 
 void inventory::SaveGameLoadout(CCSPlayerInventory* inventory) {
-	std::memcpy(&s_gameLoadouts[inventory], inventory->m_LoadoutItems, sizeof(Loadout));
+	auto& loadout = s_gameLoadouts[inventory];
+	for (int team = 0; team < LOADOUT_COUNT; ++team) {
+		std::ranges::copy(inventory->m_LoadoutItems[team], loadout[team].begin());
+	}
 }
 
 void inventory::SaveGameLoadoutSlot(CCSPlayerInventory* inventory, int team, int loadoutSlot) {
@@ -227,7 +230,9 @@ bool inventory::RestoreGameLoadout(CCSPlayerInventory* inventory) {
 	if (it == s_gameLoadouts.end())
 		return false;
 
-	std::memcpy(inventory->m_LoadoutItems, &it->second, sizeof(Loadout));
+	for (int team = 0; team < LOADOUT_COUNT; ++team) {
+		std::ranges::copy(it->second[team], inventory->m_LoadoutItems[team]);
+	}
 	return true;
 }
 
@@ -265,8 +270,7 @@ uint64 inventory::CreateItem(CCSPlayerInventory* inventory, uint16 itemDefinitio
 	if (!inventory->m_pSOCache && !CreateOwnCache(inventory))
 		return 0;
 
-	auto item = static_cast<CEconItem*>(MemAlloc_Alloc(sizeof(CEconItem)));
-	std::memset(static_cast<void*>(item), 0, sizeof(CEconItem));
+	auto item = static_cast<CEconItem*>(MemAlloc_CallocFunc(1, sizeof(CEconItem)));
 	reinterpret_cast<void**>(item)[0] = vtable;
 	reinterpret_cast<void**>(item)[1] = interfaceVTable;
 	item->m_iItemSet = 255;
