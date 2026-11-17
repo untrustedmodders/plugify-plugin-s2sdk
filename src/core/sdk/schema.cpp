@@ -18,6 +18,7 @@
  */
 
 #include "schema.hpp"
+#include "helpers.hpp"
 #include "schema_helpers.hpp"
 #include "utils.hpp"
 
@@ -56,6 +57,11 @@ void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset) {
 namespace {
 	using SchemaValueMap = plg::flat_hash_map<plg::string, SchemaKey, plg::string_hash, std::equal_to<>>;
 	using SchemaTableMap = plg::flat_hash_map<plg::string, SchemaValueMap, plg::string_hash, std::equal_to<>>;
+
+	SchemaTableMap schemaTableMap;
+	// classes without a chain that are not entities, e.g. CEconItemAttribute
+	plg::flat_hash_set<plg::string, plg::string_hash, std::equal_to<>> nonEntityClasses;
+	std::shared_mutex schemaMutex;
 
 	void CollectSchemaFields(
 		CSchemaClassInfo& cls,
@@ -111,11 +117,17 @@ namespace {
 
 		SchemaValueMap map;
 		CollectSchemaFields(*cls, map, className);
+
+		if (!map.contains(schema::chainKey) && !helpers::IsDerivedFrom(cls.Get(), "CEntityInstance")) {
+			nonEntityClasses.emplace(className);
+		}
 		return map;
 	}
 
-	SchemaTableMap schemaTableMap;
-	std::shared_mutex schemaMutex;
+	bool IsNonEntityClass(std::string_view className) {
+		std::shared_lock lock(schemaMutex);
+		return nonEntityClasses.contains(className);
+	}
 }// namespace
 
 namespace schema {
@@ -372,7 +384,12 @@ namespace schema {
 			return;
 		}
 		if (key.networked) {
-			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), key.offset, FindChainOffset(className));
+			const int32_t chain = FindChainOffset(className);
+			if (chain == -1 && IsNonEntityClass(className)) {
+				plg::print(LS_WARNING, "Schema field '{}::{}' has no chain to send it over network\n", className, memberName);
+				return;
+			}
+			SafeNetworkStateChanged(reinterpret_cast<intptr_t>(entity), key.offset, chain);
 		} else {
 			plg::print(LS_WARNING, "Schema field '{}::{}' cannot be sent over network\n", className, memberName);
 		}

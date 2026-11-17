@@ -20,12 +20,16 @@ namespace helpers {
 		return entity;
 	}
 
-	inline bool IsDerivedFrom(CEntityInstance* entity, std::string_view className) {
-		for (CSchemaClassInfo* cls = entity->Schema_DynamicBinding().Get(); cls; cls = cls->GetParent()) {
+	inline bool IsDerivedFrom(CSchemaClassInfo* cls, std::string_view className) {
+		for (; cls; cls = cls->GetParent()) {
 			if (cls->m_pszName == className)
 				return true;
 		}
 		return false;
+	}
+
+	inline bool IsDerivedFrom(CEntityInstance* entity, std::string_view className) {
+		return IsDerivedFrom(entity->Schema_DynamicBinding().Get(), className);
 	}
 
 	// Resolves an entity handle and calls `fn` with the entity, or returns `fallback` if the handle is invalid.
