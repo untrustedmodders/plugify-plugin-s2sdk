@@ -32,6 +32,8 @@
 #include <execution>
 #include <random>
 #include <regex>
+#include <bit>
+#include <type_traits>
 
 namespace fs = std::filesystem;
 

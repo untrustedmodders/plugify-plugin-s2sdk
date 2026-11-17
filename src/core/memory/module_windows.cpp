@@ -24,6 +24,18 @@
 #    endif
 #    include <vcruntime.h>
 
+CModule::~CModule()
+{
+    // Reset every type_info name cache that our own name() calls filled (see DumpVtables).
+    // Static destructors run before the CRT frees its type_info name list on DLL unload,
+    // so the strings are still valid here and nothing is left pointing at freed memory.
+    for (auto* data : m_owned_type_names)
+    {
+        auto* field = &static_cast<__std_type_info_data*>(data)->_UndecoratedName;
+        InterlockedExchangePointer(reinterpret_cast<PVOID volatile*>(const_cast<char**>(field)), nullptr);
+    }
+}
+
 void CModule::GetModuleInfo(std::string_view module_name)
 {
     HMODULE handle = GetModuleHandleA(module_name.data());
@@ -337,7 +349,18 @@ void CModule::DumpVtables()
                 auto vtable_start = ptr + sizeof(void*);
                 auto ti = (m_base_address + col->pTypeDescriptor).As<std::type_info*>();
 
+                // type_info::name() caches the undecorated string inside the type_info
+                // (_UndecoratedName) and registers the allocation with *our* module's CRT,
+                // which frees it when our DLL unloads. If the cache is empty now, the string
+                // our name() call creates is ours: remember it so ~CModule() can reset the
+                // field before the CRT frees it, leaving no dangling pointer in this module.
+                auto raw_data = reinterpret_cast<__std_type_info_data*>(reinterpret_cast<uintptr_t>(ti) + sizeof(void*));
+                //raw_data->_UndecoratedName = nullptr; // fixes a crash if memory already allocated because it's not allocated by us
+                const bool name_was_empty = raw_data->_UndecoratedName == nullptr;
+
                 auto node = std::make_unique<VTable>(ti, vtable_start, ti->name(), col->offset, col);
+
+                if (name_was_empty) m_owned_type_names.insert(raw_data);
 
                 if (col->offset == 0) vtable_map[ti] = node.get();
 
