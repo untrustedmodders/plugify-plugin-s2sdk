@@ -290,9 +290,15 @@ polyhook::ResultType Hook_ClientActive(polyhook::HookHandle hook, polyhook::Para
 }
 
 void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
+#if defined (CS2)
+	auto inv = inventory::Get(slot);
+#endif
 	g_PlayerManager.OnClientDisconnect(slot, reason);
 	g_PanoramaVoteHandler.RemovePlayerFromVote(slot);
 	g_MenuManager.OnClientDisconnect(slot);
+#if defined (CS2)
+	inventory::DropOwnCache(inv);
+#endif
 }
 
 polyhook::ResultType Hook_PerformDisconnection(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
@@ -823,6 +829,8 @@ polyhook::ResultType Hook_EntitySystemSpawn(polyhook::HookHandle hook, polyhook:
 // called when items come from GC, and again after full update
 polyhook::ResultType Hook_SOCacheSubscribed(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto inv = polyhook::GetArgument<CCSPlayerInventory*>(params, 0);
+	// GC cache came after we made our own
+	inventory::DropOwnCache(inv);
 	inventory::SaveGameLoadout(inv);
 	inventory::ValidateCreatedItems(inv);
 

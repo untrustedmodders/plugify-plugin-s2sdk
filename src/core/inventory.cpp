@@ -9,6 +9,7 @@
 #include <format>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 #include <cstrike15_gcmessages.pb.h> // CAttribute_String
 #include <econ/econ_item.h>
@@ -26,6 +27,7 @@ namespace {
 
 	std::unordered_map<CCSPlayerInventory*, Loadout> s_gameLoadouts;
 	std::unordered_map<CCSPlayerInventory*, std::unordered_map<uint64, CEconItem*>> s_createdItems;
+	std::unordered_map<CCSPlayerInventory*, GCSDK::CGCClientSharedObjectCache*> s_ownCaches;
 
 	// way below GC item ids and k_ulDefaultEquippedDefinitionID
 	uint64 s_nextItemId = 0x1000000000000000ull;
@@ -34,19 +36,19 @@ namespace {
 		return g_ppItemSystem && *g_ppItemSystem ? (*g_ppItemSystem)->GetItemSchemaInterface() : nullptr;
 	}
 
+	std::pair<void*, void*> FindVTables(std::string_view name) {
+		std::pair<void*, void*> result{};
+		auto* server = g_GameConfigManager.GetModuleProvider().GetModule("server");
+		for (const auto& info : server->GetVirtualTablesByName(name)) {
+			(info.offset == 0 ? result.first : result.second) = info.address;
+		}
+		return result;
+	}
+
 	// game allocates CEconItem bare: two vtables, rest zeroed, m_iItemSet = 255
 	// freed by its virtual destructor through tier0
 	std::pair<void*, void*> GetItemVTables() {
-		static std::pair<void*, void*> vtables = [] {
-			std::pair<void*, void*> result{};
-			auto* server = g_GameConfigManager.GetModuleProvider().GetModule("server");
-			for (const auto& info : server->FindVtablePartial("CEconItem")) {
-				if (info.demangled_name == "CEconItem") {
-					(info.offset == 0 ? result.first : result.second) = info.address;
-				}
-			}
-			return result;
-		}();
+		static std::pair<void*, void*> vtables = FindVTables("CEconItem");
 		return vtables;
 	}
 
@@ -162,6 +164,22 @@ namespace {
 			delete item;
 		}
 	}
+
+	bool CreateOwnCache(CCSPlayerInventory* inventory) {
+		static void* vtable = FindVTables("GCSDK::CGCClientSharedObjectCache").first;
+		if (!vtable)
+			return false;
+
+		// as the game ctor: zeroed, vtable, owner
+		static_assert(sizeof(GCSDK::CGCClientSharedObjectCache) == 64);
+		auto cache = static_cast<GCSDK::CGCClientSharedObjectCache*>(MemAlloc_CallocFunc(1, sizeof(GCSDK::CGCClientSharedObjectCache)));
+		*reinterpret_cast<void**>(cache) = vtable;
+		cache->m_owner = inventory->m_OwnerID;
+
+		inventory->SOCacheSubscribed(inventory->m_OwnerID, cache, GCSDK::eSOCacheEvent_Subscribed);
+		s_ownCaches[inventory] = cache;
+		return true;
+	}
 } // namespace
 
 CCSPlayerInventory* inventory::Get(int playerSlot) {
@@ -213,6 +231,21 @@ bool inventory::RestoreGameLoadout(CCSPlayerInventory* inventory) {
 	return true;
 }
 
+void inventory::DropOwnCache(CCSPlayerInventory* inventory) {
+	auto it = s_ownCaches.find(inventory);
+	if (it == s_ownCaches.end())
+		return;
+
+	auto cache = it->second;
+	s_ownCaches.erase(it);
+
+	// created items are in our cache even when GC cache has replaced it
+	auto current = std::exchange(inventory->m_pSOCache, cache);
+	Forget(inventory);
+	inventory->m_pSOCache = current == cache ? nullptr : current;
+	delete cache;
+}
+
 void inventory::Forget(CCSPlayerInventory* inventory) {
 	// SO cache outlives the inventory on map change, take our items out of it
 	if (auto it = s_createdItems.find(inventory); it != s_createdItems.end()) {
@@ -226,7 +259,10 @@ void inventory::Forget(CCSPlayerInventory* inventory) {
 
 uint64 inventory::CreateItem(CCSPlayerInventory* inventory, uint16 itemDefinition, int quality) {
 	auto [vtable, interfaceVTable] = GetItemVTables();
-	if (!GetItemDefinition(itemDefinition) || !inventory->m_pSOCache || !vtable || !interfaceVTable)
+	if (!GetItemDefinition(itemDefinition) || !vtable || !interfaceVTable)
+		return 0;
+
+	if (!inventory->m_pSOCache && !CreateOwnCache(inventory))
 		return 0;
 
 	auto item = static_cast<CEconItem*>(MemAlloc_Alloc(sizeof(CEconItem)));

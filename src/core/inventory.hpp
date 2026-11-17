@@ -27,6 +27,9 @@ namespace inventory {
 	bool RestoreGameLoadout(CCSPlayerInventory* inventory);
 	void Forget(CCSPlayerInventory* inventory);
 
+	// CreateItem makes our own SO cache when GC sent none, GC never frees it
+	void DropOwnCache(CCSPlayerInventory* inventory);
+
 	// created items live in SO cache, it outlives the inventory on map change, Forget removes them
 	uint64 CreateItem(CCSPlayerInventory* inventory, uint16 itemDefinition, int quality);
 	bool RemoveItem(CCSPlayerInventory* inventory, uint64 itemId);
