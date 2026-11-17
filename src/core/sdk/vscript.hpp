@@ -43,7 +43,7 @@ public:
 		static VScriptBinding binding = vscript::FindBinding(ThisClass::m_className, FunctionName);
 		void* instance = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(this) - MemberOffset());
 		void* addr = binding.funcaddr ? binding.funcaddr : (*static_cast<void***>(instance))[binding.vtable_index];
-		return CallMember<Ret>(addr, instance, std::forward<Args>(args)...);
+		return CallMember<Ret, Args...>(addr, instance, std::forward<Args>(args)...);
 	}
 };
 
