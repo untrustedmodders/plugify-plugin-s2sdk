@@ -9,6 +9,8 @@
 #include <string_view>
 
 class Player;
+class CCSPlayerPawn;
+class CCSPlayerController;
 class CEconItem;
 class CEconItemView;
 class CEconItemAttributeDefinition;
@@ -44,6 +46,9 @@ namespace inventory {
 	// items_game sections "paint_kits", "sticker_kits", "keychain_definitions"
 	const char* GetSchemaValue(std::string_view section, int id, const char* key);
 	int FindSchemaEntry(std::string_view section, std::string_view name);
+
+	// CCSPlayer_ItemServices::GiveDefaultWearables without the game function
+	bool GiveDefaultWearables(CCSPlayerPawn* pawn, CCSPlayerController* controller, CCSPlayerInventory* inventory);
 
 	CEconItemView* FindItemView(CCSPlayerInventory* inventory, uint64 itemId);
 	CEconItemView* GetItemView(int playerSlot, uint64 itemId);

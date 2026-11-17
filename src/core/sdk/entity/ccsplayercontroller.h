@@ -35,6 +35,7 @@ public:
 	SCHEMA_FIELD(char[32], m_szClanName)
 	SCHEMA_FIELD(bool, m_bEverFullyConnected)
 	SCHEMA_FIELD(bool, m_bPawnIsAlive)
+	SCHEMA_FIELD(bool, m_bControllingBot)
 	SCHEMA_FIELD(int32_t, m_nDisconnectionTick)
 	SCHEMA_FIELD(CHandle<CCSPlayerPawn>, m_hPlayerPawn)
 	SCHEMA_FIELD(CHandle<CCSPlayerPawnBase>, m_hObserverPawn)

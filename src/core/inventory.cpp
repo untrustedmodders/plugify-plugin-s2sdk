@@ -7,6 +7,7 @@
 #include <bit>
 #include <charconv>
 #include <format>
+#include <new>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -15,9 +16,16 @@
 #include <econ/econ_item.h>
 #include <tier0/keyvalues.h>
 #include <tier0/memalloc.h>
+#include <tier2/fieldpath.h>
+#include <entity2/entityclass.h>
+#include <entity2/entityidentity.h>
+#include <entity2/entitynetwork.h>
+#include <networksystem/iflattenedserializers.h>
+#include <networksystem/networkvar.h>
 
 #include "game_config.hpp"
 #include "player_manager.hpp"
+#include "sdk/entity/ccsplayercontroller.h"
 
 namespace {
 	using Loadout = std::array<std::array<LoadoutSlot_t, LOADOUT_SLOT_COUNT>, LOADOUT_COUNT>;
@@ -147,7 +155,6 @@ namespace {
 		}
 
 	private:
-		// false stops the iteration
 		bool Take(const CEconItemAttributeDefinition* definition, auto&& format) {
 			if (definition->GetDefinitionIndex() != m_index)
 				return true;
@@ -179,6 +186,104 @@ namespace {
 		inventory->SOCacheSubscribed(inventory->m_OwnerID, cache, GCSDK::eSOCacheEvent_Subscribed);
 		s_ownCaches[inventory] = cache;
 		return true;
+	}
+
+	// storage of CAttributeList::m_Attributes, the sdk keeps it protected
+	using AttributeStorage = CUtlVector<CEconItemAttribute, int, CNetworkUtlVector_MemoryType<CEconItemAttribute>>;
+	using Attributes = decltype(CAttributeList::m_Attributes);
+
+	constexpr const char* kPaintAttributes[] = {"set item texture prefab", "set item texture seed", "set item texture wear"};
+
+	// custom gloves are drawn with the model's default ones hidden, redrawn on a change
+	// server pawns only use thirdperson_default and thirdperson_hide_default_gloves
+	void HideDefaultGloves(CCSPlayerPawn* pawn, bool hide) {
+		pawn->SetBodygroupByName("first_or_third_person", hide ? 1 : 0);
+	}
+
+	// unlike the game shows default gloves back, otherwise the next gloves are not drawn
+	void ClearGloves(CCSPlayerPawn* pawn) {
+		HideDefaultGloves(pawn, false);
+		auto gloves = pawn->m_EconGloves.Get();
+		if (!gloves->m_bInitialized)
+			return;
+
+		gloves->m_bInitialized = false;
+		gloves->m_iItemID = 0;
+		gloves->m_iItemDefinitionIndex = static_cast<CSWeaponDefIndex>(0);
+		++pawn->m_nEconGlovesChanged;
+	}
+
+	void SetAgentPatches(CCSPlayerPawn* pawn, CCSPlayerInventory* inventory, int team) {
+		std::remove_reference_t<decltype(pawn->m_vecPlayerPatchEconIndices.Get())> patches{};
+		const IEconItemInterface* agent = inventory ? inventory->GetItemInLoadout(team, LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER) : nullptr;
+		auto definition = agent ? agent->GetItemDefinition() : nullptr;
+		// the game reads all of them once the agent has any sticker slot
+		if (definition && definition->GetDefaultLoadoutSlot() == LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER && definition->GetNumberOfStickerSlots() > 0) {
+			for (int i = 0; i < static_cast<int>(std::size(patches)); ++i) {
+				patches[i] = agent->GetStickerAttributeBySlotIndexInt(i, k_EStickerAttribute_ID, 0);
+			}
+		}
+		pawn->m_vecPlayerPatchEconIndices = patches;
+	}
+
+	// the game resolves the path on the first element, a pawn that never had attributes has none
+	bool ResolvePath(CCSPlayerPawn* pawn, Attributes& attributes) {
+		if (attributes.IsPathResolved())
+			return true;
+
+		bool exact = false;
+		CFieldPath path = g_pFlattenedSerializers->OffsetToFieldPath(pawn->m_pEntity->m_pClass->m_flattenedSerializer, pawn, &attributes, &exact);
+		if (path.Count() <= 0)
+			return false;
+
+		attributes.m_PathToVector = path;
+		attributes.m_nNetworkingFlags = exact;
+		attributes.m_nResolveFlags |= NETWORK_RESOLVE_PATH_RESOLVED;
+		return true;
+	}
+
+	void SetGlovesAttributes(CCSPlayerPawn* pawn, const IEconItemInterface* item) {
+		static void* vtable = FindVTables("CEconItemAttribute").first;
+		static const auto paint = [] {
+			std::array<attrib_definition_index_t, std::size(kPaintAttributes)> result{};
+			for (size_t i = 0; i < result.size(); ++i) {
+				auto attribute = inventory::FindAttribute(kPaintAttributes[i]);
+				result[i] = attribute ? attribute->GetDefinitionIndex() : 0;
+			}
+			return result;
+		}();
+
+		auto& attributes = pawn->m_EconGloves->m_NetworkedDynamicAttributes->m_Attributes;
+		if (!vtable || !ResolvePath(pawn, attributes))
+			return;
+
+		const float values[] = {static_cast<float>(item->GetCustomPaintKitIndex()), static_cast<float>(item->GetCustomPaintKitSeed()), item->GetCustomPaintKitWear()};
+		int count = values[0] != 0.0f ? static_cast<int>(std::size(values)) : 0;
+
+		auto& storage = reinterpret_cast<AttributeStorage&>(attributes);
+		storage.Purge();
+
+		// abstract with the game's vtable, so only its members are constructed
+		auto elements = count ? static_cast<CEconItemAttribute*>(MemAlloc_Alloc(count * sizeof(CEconItemAttribute))) : nullptr;
+		for (int i = 0; i < count; ++i) {
+			auto& element = elements[i];
+			*reinterpret_cast<void**>(&element) = vtable;
+			new (&element.__m_pChainEntity) CNetworkVarChainer{};
+			element.m_iAttributeDefinitionIndex = paint[i];
+			element.m_flValue = element.m_flInitialValue = values[i];
+			element.m_nRefundableCurrency = 0;
+			element.m_bSetBonus = false;
+
+			CFieldPath path = attributes.m_PathToVector;
+			path.m_Path[path.m_nCount++] = static_cast<int16>(i);
+			element.__m_pChainEntity.SetObject(pawn);
+			element.__m_pChainEntity.m_PathIndex = pawn->AddChangeAccessorPath(path);
+			element.__m_pChainEntity.m_bNetworkingEnabled = true;
+		}
+		storage.AssumeMemory(elements, count, count);
+
+		CAttributeList::NetworkVar_m_Attributes::NetworkStateChanged(&attributes);
+		pawn->NetworkStateChangedBranch(attributes.m_PathToVector);
 	}
 } // namespace
 
@@ -386,7 +491,7 @@ std::optional<std::string> inventory::GetItemAttribute(const CEconItemView* item
 
 	// item view asks its inventory item, or its own attribute lists if there is none
 	AttributeReader reader(definition->GetDefinitionIndex());
-	reinterpret_cast<const IEconItemInterface*>(item)->IterateAttributes(&reader);
+	item->IterateAttributes(&reader);
 	return std::move(reader.value);
 }
 
@@ -437,6 +542,41 @@ int inventory::FindSchemaEntry(std::string_view section, std::string_view name) 
 
 	auto it = entries->names.find(name);
 	return it != entries->names.end() ? it->second : -1;
+}
+
+bool inventory::GiveDefaultWearables(CCSPlayerPawn* pawn, CCSPlayerController* controller, CCSPlayerInventory* inventory) {
+	auto team = static_cast<CSTeam>(pawn->m_iTeamNum.Get());
+	if ((team != CSTeam::T && team != CSTeam::CT) || pawn->IsBot() || (controller && controller->m_bControllingBot)) {
+		ClearGloves(pawn);
+		return true;
+	}
+
+	SetAgentPatches(pawn, inventory, static_cast<int>(team));
+
+	CEconItemView* source = inventory ? inventory->GetItemInLoadout(static_cast<int>(team), LOADOUT_SLOT_CLOTHING_HANDS) : nullptr;
+	auto definition = source ? source->GetItemDefinition() : nullptr;
+	if (!definition || definition->IsBaseItem()) {
+		ClearGloves(pawn);
+		return true;
+	}
+
+	auto gloves = pawn->m_EconGloves.Get();
+	if (gloves->m_bInitialized != source->m_bInitialized.Get() || gloves->m_iItemID != source->m_iItemID.Get() || gloves->m_iItemDefinitionIndex != source->m_iItemDefinitionIndex.Get()) {
+		++pawn->m_nEconGlovesChanged;
+	}
+
+	gloves->m_iItemDefinitionIndex = source->m_iItemDefinitionIndex.Get();
+	gloves->m_iEntityQuality = source->m_iEntityQuality.Get();
+	gloves->m_iEntityLevel = source->m_iEntityLevel.Get();
+	gloves->m_iItemID = source->m_iItemID.Get();
+	gloves->m_iItemIDHigh = source->m_iItemIDHigh.Get();
+	gloves->m_iItemIDLow = source->m_iItemIDLow.Get();
+	gloves->m_iAccountID = source->m_iAccountID.Get();
+	gloves->m_iInventoryPosition = source->m_iInventoryPosition.Get();
+	gloves->m_bInitialized = source->m_bInitialized.Get();
+	SetGlovesAttributes(pawn, source);
+	HideDefaultGloves(pawn, true);
+	return true;
 }
 
 #endif

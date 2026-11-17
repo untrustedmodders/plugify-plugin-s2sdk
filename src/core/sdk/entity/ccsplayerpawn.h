@@ -20,6 +20,7 @@
 #pragma once
 
 #include "cbaseplayerpawn.h"
+#include "ceconitemview.h"
 
 enum CSPlayerState {
 	STATE_ACTIVE = 0x0,
@@ -65,6 +66,9 @@ public:
 	SCHEMA_FIELD(int, m_ArmorValue)
 	SCHEMA_FIELD(float, m_flVelocityModifier)
 	SCHEMA_FIELD(CCSPlayer_ActionTrackingServices*, m_pActionTrackingServices)
+	SCHEMA_FIELD_POINTER(CEconItemView, m_EconGloves)
+	SCHEMA_FIELD(uint8, m_nEconGlovesChanged)
+	SCHEMA_FIELD(uint32[5], m_vecPlayerPatchEconIndices)
 
 	void Respawn() {
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn"));

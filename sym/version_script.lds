@@ -968,6 +968,7 @@
         SetClientLoadoutDefinition;
         FindClientLoadoutSlot;
         RestoreClientLoadout;
+        GiveClientDefaultWearables;
         GetClientInventoryItems;
         CreateClientItem;
         RemoveClientItem;

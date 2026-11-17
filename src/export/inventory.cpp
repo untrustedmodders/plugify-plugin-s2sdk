@@ -1,5 +1,6 @@
 #include <core/core_config.hpp>
 #include <core/inventory.hpp>
+#include <core/sdk/helpers.hpp>
 #include <core/sdk/entity/ccsweaponbase.h>
 #include <cstrike15/cstrike15_item_schema.h>
 
@@ -193,6 +194,26 @@ extern "C" PLUGIN_API bool RestoreClientLoadout(int playerSlot) {
 
 	inv->SendInventoryUpdateEvent();
 	return true;
+}
+
+/**
+ * @brief Puts the client's loadout wearables on the pawn at once, as the game does at spawn.
+ *
+ * Repeats CCSPlayer_ItemServices::GiveDefaultWearables: the agent patches come from the agent slot and
+ * the gloves from the gloves slot, a stock or missing gloves item takes the gloves off. Bots and players
+ * outside T and CT get the gloves taken off.
+ *
+ * @param playerSlot The index of the player's slot.
+ * @return True if the wearables were applied, false if the player has no pawn.
+ */
+extern "C" PLUGIN_API bool GiveClientDefaultWearables(int playerSlot) {
+	// the player pawn, the current one is the observer pawn while dead
+	auto controller = helpers::GetController(playerSlot);
+	auto pawn = controller ? controller->GetPlayerPawn() : nullptr;
+	if (!pawn)
+		return false;
+
+	return inventory::GiveDefaultWearables(pawn, controller, inventory::Get(playerSlot));
 }
 
 /**

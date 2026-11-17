@@ -33036,6 +33036,24 @@
       }
     },
     {
+      "name": "GiveClientDefaultWearables",
+      "group": "Inventory",
+      "description": "Puts the client's loadout wearables on the pawn at once, as the game does at spawn: agent patches from the agent slot and gloves from the gloves slot.",
+      "funcName": "GiveClientDefaultWearables",
+      "paramTypes": [
+        {
+          "name": "playerSlot",
+          "type": "int32",
+          "ref": false,
+          "description": "The index of the player's slot."
+        }
+      ],
+      "retType": {
+        "type": "bool",
+        "description": "True if the wearables were applied, false if the player has no pawn."
+      }
+    },
+    {
       "name": "GetClientInventoryItems",
       "group": "Inventory",
       "description": "Returns the IDs of the items in the client's inventory.",

@@ -37,6 +37,7 @@ namespace globals {
 		UNWRAP(g_pNetworkServerService, utils::QueryInterface("engine2", NETWORKSERVERSERVICE_INTERFACE_VERSION));
 		UNWRAP(g_pNetworkMessages, utils::QueryInterface("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
 		UNWRAP(g_pNetworkSystem, utils::QueryInterface("networksystem", NETWORKSYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pFlattenedSerializers, utils::QueryInterface("networksystem", FLATTENEDSERIALIZERS_INTERFACE_VERSION));
 		UNWRAP(g_pScriptManager, utils::QueryInterface("vscript", VSCRIPT_INTERFACE_VERSION));
 		UNWRAP(g_pNetworkStringTableServer, utils::QueryInterface("engine2", INTERFACENAME_NETWORKSTRINGTABLESERVER));
 
