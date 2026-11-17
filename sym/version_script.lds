@@ -599,6 +599,7 @@
         GetSchemaOffset;
         GetSchemaChainOffset;
         IsSchemaFieldNetworked;
+        GetSchemaFieldSize;
         GetSchemaClassSize;
         GetEntData2;
         SetEntData2;

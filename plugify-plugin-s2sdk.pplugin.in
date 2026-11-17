@@ -22665,6 +22665,30 @@
       }
     },
     {
+      "name": "GetSchemaFieldSize",
+      "group": "Schema",
+      "description": "Get the size of a schema field.",
+      "funcName": "GetSchemaFieldSize",
+      "paramTypes": [
+        {
+          "name": "className",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the class."
+        },
+        {
+          "name": "memberName",
+          "type": "string",
+          "ref": false,
+          "description": "The name of the member whose size is to be retrieved."
+        }
+      ],
+      "retType": {
+        "type": "int32",
+        "description": "The size of the member in bytes, or 0 if the member is not found."
+      }
+    },
+    {
       "name": "GetSchemaClassSize",
       "group": "Schema",
       "description": "Get the size of a schema class.",
