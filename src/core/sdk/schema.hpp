@@ -190,6 +190,12 @@ void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32_t netw
 
 void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset);
 
+// non-entity classes that declare their NetworkStateChanged, e.g. CEconItemView after IEconItemInterface
+template<typename T>
+concept HasOwnNetworkStateChanged = !std::is_base_of_v<CEntityInstance, T> && requires(T& object) {
+	object.NetworkStateChanged(NetworkStateChanged_t());
+};
+
 template<
     typename T,
     typename ThisClass,
@@ -336,6 +342,8 @@ public:
 			::ChainNetworkStateChanged(thisPtr + chain, offset);
 		} else if constexpr (ThisClass::m_networkStateChangedOffset) {
 			::NetworkVarStateChanged(thisPtr, offset, ThisClass::m_networkStateChangedOffset);
+		} else if constexpr (HasOwnNetworkStateChanged<ThisClass>) {
+			reinterpret_cast<ThisClass*>(thisPtr)->NetworkStateChanged(NetworkStateChanged_t(static_cast<uint32>(offset)));
 		} else {
 			::EntityNetworkStateChanged(thisPtr, offset);
 		}
@@ -400,6 +408,8 @@ public:
             ::ChainNetworkStateChanged(thisPtr + chain, offset);
         } else if constexpr (ThisClass::m_networkStateChangedOffset) {
             ::NetworkVarStateChanged(thisPtr, offset, ThisClass::m_networkStateChangedOffset);
+        } else if constexpr (HasOwnNetworkStateChanged<ThisClass>) {
+            reinterpret_cast<ThisClass*>(thisPtr)->NetworkStateChanged(NetworkStateChanged_t(static_cast<uint32>(offset)));
         } else {
             ::EntityNetworkStateChanged(thisPtr, offset);
         }
