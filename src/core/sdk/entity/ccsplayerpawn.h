@@ -70,11 +70,6 @@ public:
 	SCHEMA_FIELD(uint8, m_nEconGlovesChanged)
 	SCHEMA_FIELD(uint32[5], m_vecPlayerPatchEconIndices)
 
-	void Respawn() {
-		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn"));
-		CallVirtual<void>(offset, this);
-	}
-
 	void SetSpeed(float speed) {
 		m_flVelocityModifier = speed;
 	}

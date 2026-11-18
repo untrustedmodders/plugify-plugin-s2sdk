@@ -81,13 +81,14 @@ public:
 		}
 	}
 
-	// Respawns the player if the player is not alive, does nothing otherwise.
+	// alive or dead, the game calls RoundRespawn of the pawn
 	void Respawn() {
 		CCSPlayerPawn* pawn = GetPlayerPawn();
-		if (!pawn || pawn->IsAlive())
+		if (!pawn)
 			return;
 
-		SetPawn(pawn);
+		if (!pawn->IsAlive())
+			SetPawn(pawn);
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CBasePlayerController::RoundRespawn"));
 		CallVirtual<void>(offset, this);
 	}

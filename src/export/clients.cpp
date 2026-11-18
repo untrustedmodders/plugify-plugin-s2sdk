@@ -1725,13 +1725,9 @@ extern "C" PLUGIN_API void ChangeClientTeam(int playerSlot, CSTeam team) {
  * @param playerSlot The index of the player's slot to respawn.
  */
 extern "C" PLUGIN_API void RespawnClient(int playerSlot) {
-	auto [controller, pawn] = helpers::GetController2(playerSlot);
-	if (!pawn) return;
-	if (pawn->IsAlive()) {
-		pawn->Respawn();
-	} else {
-		controller->Respawn();
-	}
+	auto controller = helpers::GetController(playerSlot);
+	if (!controller) return;
+	controller->Respawn();
 }
 
 /**
