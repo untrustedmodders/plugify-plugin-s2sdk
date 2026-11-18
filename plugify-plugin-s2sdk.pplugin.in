@@ -16326,25 +16326,25 @@
     {
       "name": "GetSoundDuration",
       "group": "Engine",
-      "description": "Returns the duration of a specified sound.",
+      "description": "Returns the duration of a specified sound. On a dedicated server the game returns 0 for known sound events.",
       "funcName": "GetSoundDuration",
       "paramTypes": [
         {
           "name": "name",
           "type": "string",
           "ref": false,
-          "description": "The name of the sound to check."
+          "description": "The name of the sound event to check."
         },
         {
           "name": "actorModel",
           "type": "string",
           "ref": false,
-          "description": "The name of the sound to check."
+          "description": "Not used by the game, pass an empty string."
         }
       ],
       "retType": {
         "type": "float",
-        "description": "The duration of the sound in seconds."
+        "description": "The duration of the sound in seconds, or -1 if the sound event is unknown."
       }
     },
     {
@@ -16817,7 +16817,7 @@
     {
       "name": "FindEntityByClassnameWithin",
       "group": "Entities",
-      "description": "Finds an entity by classname within a radius with iteration.",
+      "description": "Finds an entity by classname within a radius with iteration. Server-only entities, such as info_target, are not found.",
       "funcName": "FindEntityByClassnameWithin",
       "paramTypes": [
         {
@@ -16967,7 +16967,7 @@
     {
       "name": "FindEntityInSphere",
       "group": "Entities",
-      "description": "Finds an entity within a sphere with iteration.",
+      "description": "Finds an entity within a sphere with iteration. Server-only entities, such as info_target, are not found.",
       "funcName": "FindEntityInSphere",
       "paramTypes": [
         {

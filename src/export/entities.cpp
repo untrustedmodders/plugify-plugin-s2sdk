@@ -253,6 +253,7 @@ extern "C" PLUGIN_API int FindEntityByClassnameNearest(const plg::string& classn
 
 /**
  * @brief Finds an entity by classname within a radius with iteration.
+ * Server-only entities, such as info_target, are not found.
  *
  * @param startFrom The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh.
  * @param classname The class name to search for.
@@ -322,6 +323,7 @@ extern "C" PLUGIN_API int FindEntityByTarget(int startFrom, const plg::string& n
 
 /**
  * @brief Finds an entity within a sphere with iteration.
+ * Server-only entities, such as info_target, are not found.
  *
  * @param startFrom The handle of the entity to start from, or INVALID_EHANDLE_INDEX to start fresh.
  * @param origin The center of the search sphere.

@@ -186,9 +186,11 @@ extern "C" PLUGIN_API void QueueTaskForNextWorldUpdate(TaskCallback callback, co
 
 /**
  * @brief Returns the duration of a specified sound.
+ * On a dedicated server the game returns 0 for known sound events.
  *
- * @param sound The name of the sound to check.
- * @return The duration of the sound in seconds.
+ * @param soundName The name of the sound event to check.
+ * @param actorModel Not used by the game, pass an empty string.
+ * @return The duration of the sound in seconds, or -1 if the sound event is unknown.
  */
 extern "C" PLUGIN_API float GetSoundDuration(const plg::string& soundName, const plg::string& actorModel) {
 	CBaseEntity* entity = static_cast<CBaseEntity*>(g_pGameEntitySystem->GetEntityInstance(CEntityIndex(0)));
