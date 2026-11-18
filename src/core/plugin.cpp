@@ -786,7 +786,7 @@ polyhook::ResultType Hook_OnEntityCreated(polyhook::HookHandle hook, polyhook::P
 			/*{"cs_script", CS_SCRIPT_PATH}*/
 		});
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
-		g_pScripts->AddToTail(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);
+		g_pScripts->AddToTail(reinterpret_cast<CCSScript_EntityScript*>(reinterpret_cast<uint8_t*>(g_pPointScript) + offset));
 #endif
 	}
 
@@ -952,7 +952,7 @@ polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::P
 #if defined (CS2)
 		// CSScript::ResolveModule uses the last script without checking it, so a deleted one must not stay there
 		static auto offset = GetOrLog(g_pGameConfig->GetOffset("CCSScript_EntityScript"));
-		g_pScripts->FindAndRemove(reinterpret_cast<uint8_t*>(g_pPointScript) + offset);
+		g_pScripts->FindAndRemove(reinterpret_cast<CCSScript_EntityScript*>(reinterpret_cast<uint8_t*>(g_pPointScript) + offset));
 #endif
 		g_pPointScript = nullptr;
 	}

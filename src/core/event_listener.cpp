@@ -1,6 +1,6 @@
 #include "event_listener.hpp"
 
-std::vector<CGameEventListener*> g_vecEventListeners;
+std::vector<GameEventListener*> g_vecEventListeners;
 bool g_registered = false;
 
 void RegisterEventListeners() {

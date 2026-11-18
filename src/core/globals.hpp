@@ -23,6 +23,7 @@ class IGameEventListener2;
 class IEconItemSystem;
 class CCSInventoryManager;
 class IScriptVM;
+class CCSBaseScript;
 class CEntitySystem;
 
 class CEntityInstance;
@@ -47,7 +48,7 @@ using CBaseGameRulesProxy = CCitadelGameRulesProxy;
 
 inline IGameEventSystem* g_pGameEventSystem = nullptr;
 inline IGameEventManager2* g_pGameEventManager = nullptr;
-inline CUtlVector<void*>* g_pScripts = nullptr;
+inline CUtlVector<CCSBaseScript*>* g_pScripts = nullptr;
 inline IEconItemSystem** g_ppItemSystem = nullptr;
 inline CCSInventoryManager* g_pInventoryManager = nullptr;
 inline CNetworkGameServerBase* g_pNetworkGameServer = nullptr;
