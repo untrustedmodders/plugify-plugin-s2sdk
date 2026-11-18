@@ -33684,7 +33684,7 @@
     {
       "name": "FindStickerKit",
       "group": "Items",
-      "description": "Finds a sticker kit by its schema name.",
+      "description": "Finds a sticker kit by its schema name. The name is compared without case, as the game does.",
       "funcName": "FindStickerKit",
       "paramTypes": [
         {

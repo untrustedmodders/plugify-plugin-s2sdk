@@ -190,7 +190,6 @@ void NetworkVarStateChanged(uintptr_t networkVar, uint32_t offset, uint32_t netw
 
 void SafeNetworkStateChanged(intptr_t entity, int offset, int chainOffset);
 
-// non-entity classes that declare their NetworkStateChanged, e.g. CEconItemView after IEconItemInterface
 template<typename T>
 concept HasOwnNetworkStateChanged = !std::is_base_of_v<CEntityInstance, T> && requires(T& object) {
 	object.NetworkStateChanged(NetworkStateChanged_t());

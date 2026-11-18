@@ -62,7 +62,6 @@ bool CMemAccessor::MemCopy(CAddress dest, CAddress src, size_t size)
 
 bool CMemAccessor::SafeMemWrite(CAddress dest, CAddress src, size_t size, size_t& written) noexcept
 {
-	// fails on an unmapped or read-only page instead of faulting, stops at the first such page
 	iovec local{src, size};
 	iovec remote{dest, size};
 	ssize_t result = process_vm_writev(getpid(), &local, 1, &remote, 1, 0);
@@ -72,7 +71,6 @@ bool CMemAccessor::SafeMemWrite(CAddress dest, CAddress src, size_t size, size_t
 
 bool CMemAccessor::SafeMemRead(CAddress src, CAddress dest, size_t size, size_t& read) noexcept
 {
-	// fails on an unmapped page instead of faulting, stops at the first such page
 	iovec local{dest, size};
 	iovec remote{src, size};
 	ssize_t result = process_vm_readv(getpid(), &local, 1, &remote, 1, 0);

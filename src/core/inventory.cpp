@@ -5,16 +5,14 @@
 #include <algorithm>
 #include <array>
 #include <bit>
-#include <charconv>
 #include <format>
 #include <new>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
-#include <cstrike15_gcmessages.pb.h> // CAttribute_String
+#include <cstrike15_gcmessages.pb.h>
 #include <econ/econ_item.h>
-#include <tier0/keyvalues.h>
 #include <tier0/memalloc.h>
 #include <tier2/fieldpath.h>
 #include <entity2/entityclass.h>
@@ -30,6 +28,7 @@
 namespace {
 	using Loadout = std::array<std::array<LoadoutSlot_t, LOADOUT_SLOT_COUNT>, LOADOUT_COUNT>;
 	static_assert(sizeof(Loadout) == sizeof(CCSPlayerInventory::m_LoadoutItems));
+	constexpr size_t kLoadoutSlots = LOADOUT_COUNT * LOADOUT_SLOT_COUNT;
 
 	using CustomData = CEconItem::CustomDataOptimizedObject_t;
 
@@ -37,11 +36,20 @@ namespace {
 	std::unordered_map<CCSPlayerInventory*, std::unordered_map<uint64, CEconItem*>> s_createdItems;
 	std::unordered_map<CCSPlayerInventory*, GCSDK::CGCClientSharedObjectCache*> s_ownCaches;
 
-	// way below GC item ids and k_ulDefaultEquippedDefinitionID
 	uint64 s_nextItemId = 0x1000000000000000ull;
 
 	IEconItemSchema* GetSchema() {
 		return g_ppItemSystem && *g_ppItemSystem ? (*g_ppItemSystem)->GetItemSchemaInterface() : nullptr;
+	}
+
+	CEconItemSchema* GetItemSchema() {
+		return static_cast<CEconItemSchema*>(GetSchema());
+	}
+
+	template<typename Map>
+	auto FindInMap(const Map& map, int id) -> std::remove_reference_t<decltype(map.Element(0))> {
+		auto index = map.Find(id);
+		return index != map.InvalidIndex() ? map.Element(index) : nullptr;
 	}
 
 	std::pair<void*, void*> FindVTables(std::string_view name) {
@@ -53,54 +61,9 @@ namespace {
 		return result;
 	}
 
-	// game allocates CEconItem bare: two vtables, rest zeroed, m_iItemSet = 255
-	// freed by its virtual destructor through tier0
 	std::pair<void*, void*> GetItemVTables() {
 		static std::pair<void*, void*> vtables = FindVTables("CEconItem");
 		return vtables;
-	}
-
-	struct SchemaSection {
-		std::unordered_map<int, KeyValues*> entries;
-		std::unordered_map<std::string, int, plg::string_hash, std::equal_to<>> names;
-	};
-
-	// paint kits, sticker kits and keychains have no schema interface, read them from raw items_game
-	// one section there is split into many blocks with the same name
-	const SchemaSection* GetSchemaSection(std::string_view section) {
-		auto schema = GetSchema();
-		KeyValues* root = schema ? schema->GetRawDefinition() : nullptr;
-		if (!root)
-			return nullptr;
-
-		static KeyValues* s_root = nullptr;
-		static std::unordered_map<std::string, SchemaSection, plg::string_hash, std::equal_to<>> s_sections;
-		if (s_root != root) {
-			s_root = root;
-			s_sections.clear();
-		}
-
-		if (auto it = s_sections.find(section); it != s_sections.end())
-			return &it->second;
-
-		auto& result = s_sections[std::string(section)];
-		for (KeyValues* block = root->GetFirstTrueSubKey(); block; block = block->GetNextTrueSubKey()) {
-			if (section != block->GetName())
-				continue;
-
-			for (KeyValues* entry = block->GetFirstTrueSubKey(); entry; entry = entry->GetNextTrueSubKey()) {
-				std::string_view key = entry->GetName();
-				int id;
-				if (std::from_chars(key.data(), key.data() + key.size(), id).ec != std::errc{})
-					continue;
-
-				result.entries.emplace(id, entry);
-				if (const char* name = entry->GetString("name", nullptr)) {
-					result.names.emplace(name, id);
-				}
-			}
-		}
-		return &result;
 	}
 
 	CEconItem::attribute_t* FindItemAttribute(CEconItem* item, const CEconItemAttributeDefinition* definition) {
@@ -114,7 +77,6 @@ namespace {
 		return nullptr;
 	}
 
-	// attributes follow the block header, the game frees the block through tier0
 	CEconItem::attribute_t* AddItemAttribute(CEconItem* item) {
 		CustomData* block = item->m_pCustomDataOptimizedObject;
 		uint32 count = block ? block->m_numAttributes : 0;
@@ -177,7 +139,6 @@ namespace {
 		if (!vtable)
 			return false;
 
-		// as the game ctor: zeroed, vtable, owner
 		static_assert(sizeof(GCSDK::CGCClientSharedObjectCache) == 64);
 		auto cache = static_cast<GCSDK::CGCClientSharedObjectCache*>(MemAlloc_CallocFunc(1, sizeof(GCSDK::CGCClientSharedObjectCache)));
 		*reinterpret_cast<void**>(cache) = vtable;
@@ -188,19 +149,15 @@ namespace {
 		return true;
 	}
 
-	// storage of CAttributeList::m_Attributes, the sdk keeps it protected
 	using AttributeStorage = CUtlVector<CEconItemAttribute, int, CNetworkUtlVector_MemoryType<CEconItemAttribute>>;
 	using Attributes = decltype(CAttributeList::m_Attributes);
 
 	constexpr const char* kPaintAttributes[] = {"set item texture prefab", "set item texture seed", "set item texture wear"};
 
-	// custom gloves are drawn with the model's default ones hidden, redrawn on a change
-	// server pawns only use thirdperson_default and thirdperson_hide_default_gloves
 	void HideDefaultGloves(CCSPlayerPawn* pawn, bool hide) {
 		pawn->SetBodygroupByName("first_or_third_person", hide ? 1 : 0);
 	}
 
-	// unlike the game shows default gloves back, otherwise the next gloves are not drawn
 	void ClearGloves(CCSPlayerPawn* pawn) {
 		HideDefaultGloves(pawn, false);
 		auto gloves = pawn->m_EconGloves.Get();
@@ -217,7 +174,6 @@ namespace {
 		std::remove_reference_t<decltype(pawn->m_vecPlayerPatchEconIndices.Get())> patches{};
 		const IEconItemInterface* agent = inventory ? inventory->GetItemInLoadout(team, LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER) : nullptr;
 		auto definition = agent ? agent->GetItemDefinition() : nullptr;
-		// the game reads all of them once the agent has any sticker slot
 		if (definition && definition->GetDefaultLoadoutSlot() == LOADOUT_SLOT_CLOTHING_CUSTOMPLAYER && definition->GetNumberOfStickerSlots() > 0) {
 			for (int i = 0; i < static_cast<int>(std::size(patches)); ++i) {
 				patches[i] = agent->GetStickerAttributeBySlotIndexInt(i, k_EStickerAttribute_ID, 0);
@@ -226,7 +182,6 @@ namespace {
 		pawn->m_vecPlayerPatchEconIndices = patches;
 	}
 
-	// the game resolves the path on the first element, a pawn that never had attributes has none
 	bool ResolvePath(CCSPlayerPawn* pawn, Attributes& attributes) {
 		if (attributes.IsPathResolved())
 			return true;
@@ -263,7 +218,6 @@ namespace {
 		auto& storage = reinterpret_cast<AttributeStorage&>(attributes);
 		storage.Purge();
 
-		// abstract with the game's vtable, so only its members are constructed
 		auto elements = count ? static_cast<CEconItemAttribute*>(MemAlloc_Alloc(count * sizeof(CEconItemAttribute))) : nullptr;
 		for (int i = 0; i < count; ++i) {
 			auto& element = elements[i];
@@ -317,10 +271,7 @@ const CCStrike15ItemDefinition* inventory::GetItemDefinitionByName(const char* n
 }
 
 void inventory::SaveGameLoadout(CCSPlayerInventory* inventory) {
-	auto& loadout = s_gameLoadouts[inventory];
-	for (int team = 0; team < LOADOUT_COUNT; ++team) {
-		std::ranges::copy(inventory->m_LoadoutItems[team], loadout[team].begin());
-	}
+	std::copy_n(&inventory->m_LoadoutItems[0][0], kLoadoutSlots, s_gameLoadouts[inventory].front().data());
 }
 
 void inventory::SaveGameLoadoutSlot(CCSPlayerInventory* inventory, int team, int loadoutSlot) {
@@ -335,9 +286,7 @@ bool inventory::RestoreGameLoadout(CCSPlayerInventory* inventory) {
 	if (it == s_gameLoadouts.end())
 		return false;
 
-	for (int team = 0; team < LOADOUT_COUNT; ++team) {
-		std::ranges::copy(it->second[team], inventory->m_LoadoutItems[team]);
-	}
+	std::copy_n(it->second.front().data(), kLoadoutSlots, &inventory->m_LoadoutItems[0][0]);
 	return true;
 }
 
@@ -349,7 +298,6 @@ void inventory::DropOwnCache(CCSPlayerInventory* inventory) {
 	auto cache = it->second;
 	s_ownCaches.erase(it);
 
-	// created items are in our cache even when GC cache has replaced it
 	auto current = std::exchange(inventory->m_pSOCache, cache);
 	Forget(inventory);
 	inventory->m_pSOCache = current == cache ? nullptr : current;
@@ -357,7 +305,6 @@ void inventory::DropOwnCache(CCSPlayerInventory* inventory) {
 }
 
 void inventory::Forget(CCSPlayerInventory* inventory) {
-	// SO cache outlives the inventory on map change, take our items out of it
 	if (auto it = s_createdItems.find(inventory); it != s_createdItems.end()) {
 		for (auto [itemId, item] : it->second) {
 			DestroyItem(inventory, item);
@@ -388,7 +335,6 @@ uint64 inventory::CreateItem(CCSPlayerInventory* inventory, uint16 itemDefinitio
 	item->m_nQuality = static_cast<uint16>(quality);
 	item->m_unLevel = 1;
 
-	// AddObject doesn't notify listeners, GC calls SOCreated itself
 	inventory->m_pSOCache->AddObject(item);
 	inventory->SOCreated(inventory->m_OwnerID, item, GCSDK::eSOCacheEvent_Incremental);
 
@@ -403,7 +349,6 @@ bool inventory::RemoveItem(CCSPlayerInventory* inventory, uint64 itemId) {
 
 	s_createdItems[inventory].erase(itemId);
 
-	// slot with a removed item gives the base item, put back what the game equipped
 	if (auto game = s_gameLoadouts.find(inventory); game != s_gameLoadouts.end()) {
 		for (int team = 0; team < LOADOUT_COUNT; ++team) {
 			for (int slot = 0; slot < LOADOUT_SLOT_COUNT; ++slot) {
@@ -437,26 +382,25 @@ void inventory::ValidateCreatedItems(CCSPlayerInventory* inventory) {
 	});
 }
 
-// schema has no lookup by name, index names once per schema
 const CEconItemAttributeDefinition* inventory::FindAttribute(std::string_view name) {
-	auto schema = GetSchema();
+	auto schema = GetItemSchema();
 	if (!schema)
 		return nullptr;
 
-	static IEconItemSchema* s_schema = nullptr;
-	static std::unordered_map<std::string, int, plg::string_hash, std::equal_to<>> s_indices;
+	static CEconItemSchema* s_schema = nullptr;
+	static std::unordered_map<std::string, const CEconItemAttributeDefinition*, plg::string_hash, std::equal_to<>> s_definitions;
 	if (s_schema != schema) {
 		s_schema = schema;
-		s_indices.clear();
-		for (int i = 0; i <= 0xFFFF; ++i) {
-			if (auto definition = schema->GetAttributeDefinitionInterface(i)) {
-				s_indices.emplace(definition->GetDefinitionName(), i);
+		s_definitions.clear();
+		for (const CEconItemAttributeDefinition* definition : schema->m_mapAttributesContainer) {
+			if (definition) {
+				s_definitions.emplace(definition->GetDefinitionName(), definition);
 			}
 		}
 	}
 
-	auto it = s_indices.find(name);
-	return it != s_indices.end() ? static_cast<const CEconItemAttributeDefinition*>(schema->GetAttributeDefinitionInterface(it->second)) : nullptr;
+	auto it = s_definitions.find(name);
+	return it != s_definitions.end() ? it->second : nullptr;
 }
 
 const CEconItemAttributeDefinition* inventory::GetAttribute(int index) {
@@ -489,13 +433,11 @@ std::optional<std::string> inventory::GetItemAttribute(const CEconItemView* item
 	if (!definition)
 		return std::nullopt;
 
-	// item view asks its inventory item, or its own attribute lists if there is none
 	AttributeReader reader(definition->GetDefinitionIndex());
 	item->IterateAttributes(&reader);
 	return std::move(reader.value);
 }
 
-// attribute type inits and parses the value, same as CS:GO CEconItem::SetDynamicAttributeValue
 bool inventory::SetItemAttribute(CCSPlayerInventory* inventory, CEconItem* item, std::string_view name, std::string_view value) {
 	auto definition = FindAttribute(name);
 	if (!definition)
@@ -526,22 +468,47 @@ bool inventory::SetItemAttribute(CCSPlayerInventory* inventory, CEconItem* item,
 	return true;
 }
 
-const char* inventory::GetSchemaValue(std::string_view section, int id, const char* key) {
-	auto entries = GetSchemaSection(section);
-	if (!entries)
-		return nullptr;
-
-	auto it = entries->entries.find(id);
-	return it != entries->entries.end() ? it->second->GetString(key, nullptr) : nullptr;
+const CPaintKit* inventory::GetPaintKit(int id) {
+	auto schema = GetItemSchema();
+	return schema ? schema->GetPaintKitDefinitionByMapIndex(id) : nullptr;
 }
 
-int inventory::FindSchemaEntry(std::string_view section, std::string_view name) {
-	auto entries = GetSchemaSection(section);
-	if (!entries)
-		return -1;
+const CPaintKit* inventory::FindPaintKit(const char* name) {
+	auto schema = GetItemSchema();
+	return schema ? schema->GetPaintKitDefinitionByName(name) : nullptr;
+}
 
-	auto it = entries->names.find(name);
-	return it != entries->names.end() ? it->second : -1;
+const CStickerKit* inventory::GetStickerKit(int id) {
+	auto schema = GetItemSchema();
+	return schema ? FindInMap(schema->m_mapStickerKits, id) : nullptr;
+}
+
+const CStickerKit* inventory::FindStickerKit(const char* name) {
+	auto schema = GetItemSchema();
+	if (!schema)
+		return nullptr;
+
+	auto& kits = schema->m_dictStickerKits;
+	auto index = kits.Find(name);
+	return index != kits.InvalidIndex() ? kits[index] : nullptr;
+}
+
+const CKeyChain* inventory::GetKeychain(int id) {
+	auto schema = GetItemSchema();
+	return schema ? FindInMap(schema->m_mapKeychains, id) : nullptr;
+}
+
+const CKeyChain* inventory::FindKeychain(const char* name) {
+	auto schema = GetItemSchema();
+	if (!schema)
+		return nullptr;
+
+	FOR_EACH_MAP_FAST(schema->m_mapKeychains, i) {
+		CKeyChain* keychain = schema->m_mapKeychains.Element(i);
+		if (V_strcmp(keychain->m_strName.Get(), name) == 0)
+			return keychain;
+	}
+	return nullptr;
 }
 
 bool inventory::GiveDefaultWearables(CCSPlayerPawn* pawn, CCSPlayerController* controller, CCSPlayerInventory* inventory) {

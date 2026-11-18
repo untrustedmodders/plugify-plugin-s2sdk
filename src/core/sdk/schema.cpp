@@ -59,7 +59,6 @@ namespace {
 	using SchemaTableMap = plg::flat_hash_map<plg::string, SchemaValueMap, plg::string_hash, std::equal_to<>>;
 
 	SchemaTableMap schemaTableMap;
-	// classes without a chain that are not entities, e.g. CEconItemAttribute
 	plg::flat_hash_set<plg::string, plg::string_hash, std::equal_to<>> nonEntityClasses;
 	std::shared_mutex schemaMutex;
 

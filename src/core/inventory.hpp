@@ -17,43 +17,38 @@ class CEconItemAttributeDefinition;
 class CCStrike15ItemDefinition;
 
 namespace inventory {
-	// only humans, nullptr until GC sends it
 	CCSPlayerInventory* Get(int playerSlot);
 	Player* GetOwner(CCSPlayerInventory* inventory);
 	const CCStrike15ItemDefinition* GetItemDefinition(uint16 itemDefinition);
 	const CCStrike15ItemDefinition* GetItemDefinitionByName(const char* name);
 
-	// loadout written by the game, kept to undo our changes
 	void SaveGameLoadout(CCSPlayerInventory* inventory);
 	void SaveGameLoadoutSlot(CCSPlayerInventory* inventory, int team, int loadoutSlot);
 	bool RestoreGameLoadout(CCSPlayerInventory* inventory);
 	void Forget(CCSPlayerInventory* inventory);
 
-	// CreateItem makes our own SO cache when GC sent none, GC never frees it
 	void DropOwnCache(CCSPlayerInventory* inventory);
 
-	// created items live in SO cache, it outlives the inventory on map change, Forget removes them
 	uint64 CreateItem(CCSPlayerInventory* inventory, uint16 itemDefinition, int quality);
 	bool RemoveItem(CCSPlayerInventory* inventory, uint64 itemId);
 	CEconItem* FindCreatedItem(CCSPlayerInventory* inventory, uint64 itemId);
-	// drop items the game removed from the cache, e.g. after full update from GC
 	void ValidateCreatedItems(CCSPlayerInventory* inventory);
 
-	// values as text, attribute type parses and prints them
 	bool SetItemAttribute(CCSPlayerInventory* inventory, CEconItem* item, std::string_view name, std::string_view value);
 	std::optional<std::string> GetItemAttribute(const CEconItemView* item, std::string_view name);
 
-	// items_game sections "paint_kits", "sticker_kits", "keychain_definitions"
-	const char* GetSchemaValue(std::string_view section, int id, const char* key);
-	int FindSchemaEntry(std::string_view section, std::string_view name);
+	const CPaintKit* GetPaintKit(int id);
+	const CPaintKit* FindPaintKit(const char* name);
+	const CStickerKit* GetStickerKit(int id);
+	const CStickerKit* FindStickerKit(const char* name);
+	const CKeyChain* GetKeychain(int id);
+	const CKeyChain* FindKeychain(const char* name);
 
-	// CCSPlayer_ItemServices::GiveDefaultWearables without the game function
 	bool GiveDefaultWearables(CCSPlayerPawn* pawn, CCSPlayerController* controller, CCSPlayerInventory* inventory);
 
 	CEconItemView* FindItemView(CCSPlayerInventory* inventory, uint64 itemId);
 	CEconItemView* GetItemView(int playerSlot, uint64 itemId);
 	bool IsLoadoutSlot(int team, int loadoutSlot);
-	// what the game gives for the slot: equipped item or slot default
 	CEconItemView* GetLoadoutItem(int playerSlot, int team, int loadoutSlot);
 	const CEconItemAttributeDefinition* FindAttribute(std::string_view name);
 	const CEconItemAttributeDefinition* GetAttribute(int index);

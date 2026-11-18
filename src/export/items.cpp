@@ -159,7 +159,8 @@ extern "C" PLUGIN_API plg::string GetAttributeDefinitionName(int attributeIndex)
  * @return The name, or an empty string.
  */
 extern "C" PLUGIN_API plg::string GetPaintKitName(int paintKit) {
-	return ToString(inventory::GetSchemaValue("paint_kits", paintKit, "name"));
+	auto kit = inventory::GetPaintKit(paintKit);
+	return kit ? ToString(kit->sName.Get()) : plg::string();
 }
 
 /**
@@ -171,7 +172,8 @@ extern "C" PLUGIN_API plg::string GetPaintKitName(int paintKit) {
  * @return The token, or an empty string.
  */
 extern "C" PLUGIN_API plg::string GetPaintKitLocName(int paintKit) {
-	return ToString(inventory::GetSchemaValue("paint_kits", paintKit, "description_tag"));
+	auto kit = inventory::GetPaintKit(paintKit);
+	return kit ? ToString(kit->sDescriptionTag.Get()) : plg::string();
 }
 
 /**
@@ -181,7 +183,8 @@ extern "C" PLUGIN_API plg::string GetPaintKitLocName(int paintKit) {
  * @return The paint kit index, or -1.
  */
 extern "C" PLUGIN_API int FindPaintKit(const plg::string& name) {
-	return inventory::FindSchemaEntry("paint_kits", name);
+	auto kit = inventory::FindPaintKit(name.c_str());
+	return kit ? kit->nID : -1;
 }
 
 /**
@@ -191,7 +194,8 @@ extern "C" PLUGIN_API int FindPaintKit(const plg::string& name) {
  * @return The name, or an empty string.
  */
 extern "C" PLUGIN_API plg::string GetStickerKitName(int stickerKit) {
-	return ToString(inventory::GetSchemaValue("sticker_kits", stickerKit, "name"));
+	auto kit = inventory::GetStickerKit(stickerKit);
+	return kit ? ToString(kit->sName.Get()) : plg::string();
 }
 
 /**
@@ -203,17 +207,20 @@ extern "C" PLUGIN_API plg::string GetStickerKitName(int stickerKit) {
  * @return The token, or an empty string.
  */
 extern "C" PLUGIN_API plg::string GetStickerKitLocName(int stickerKit) {
-	return ToString(inventory::GetSchemaValue("sticker_kits", stickerKit, "item_name"));
+	auto kit = inventory::GetStickerKit(stickerKit);
+	return kit ? ToString(kit->sItemName.Get()) : plg::string();
 }
 
 /**
  * @brief Finds a sticker kit by its schema name.
+ * The name is compared without case, as the game does.
  *
  * @param name The schema name, e.g. "kat2014_ibuypower_holo".
  * @return The sticker kit index, or -1.
  */
 extern "C" PLUGIN_API int FindStickerKit(const plg::string& name) {
-	return inventory::FindSchemaEntry("sticker_kits", name);
+	auto kit = inventory::FindStickerKit(name.c_str());
+	return kit ? kit->nID : -1;
 }
 
 /**
@@ -223,7 +230,8 @@ extern "C" PLUGIN_API int FindStickerKit(const plg::string& name) {
  * @return The name, or an empty string.
  */
 extern "C" PLUGIN_API plg::string GetKeychainName(int keychain) {
-	return ToString(inventory::GetSchemaValue("keychain_definitions", keychain, "name"));
+	auto kit = inventory::GetKeychain(keychain);
+	return kit ? ToString(kit->m_strName.Get()) : plg::string();
 }
 
 /**
@@ -235,7 +243,8 @@ extern "C" PLUGIN_API plg::string GetKeychainName(int keychain) {
  * @return The token, or an empty string.
  */
 extern "C" PLUGIN_API plg::string GetKeychainLocName(int keychain) {
-	return ToString(inventory::GetSchemaValue("keychain_definitions", keychain, "loc_name"));
+	auto kit = inventory::GetKeychain(keychain);
+	return kit ? ToString(kit->m_strLocName.Get()) : plg::string();
 }
 
 /**
@@ -245,7 +254,8 @@ extern "C" PLUGIN_API plg::string GetKeychainLocName(int keychain) {
  * @return The keychain index, or -1.
  */
 extern "C" PLUGIN_API int FindKeychain(const plg::string& name) {
-	return inventory::FindSchemaEntry("keychain_definitions", name);
+	auto kit = inventory::FindKeychain(name.c_str());
+	return kit ? kit->m_nID : -1;
 }
 
 /**

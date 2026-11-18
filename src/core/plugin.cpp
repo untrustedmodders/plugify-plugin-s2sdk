@@ -1,5 +1,4 @@
 #include <bit>
-#include <cstring>
 
 #include <core/sdk/cvars.hpp>
 #include <core/sdk/entity/cgamerules.h>
@@ -826,10 +825,8 @@ polyhook::ResultType Hook_EntitySystemSpawn(polyhook::HookHandle hook, polyhook:
 }
 
 #if defined (CS2)
-// called when items come from GC, and again after full update
 polyhook::ResultType Hook_SOCacheSubscribed(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto inv = polyhook::GetArgument<CCSPlayerInventory*>(params, 0);
-	// GC cache came after we made our own
 	inventory::DropOwnCache(inv);
 	inventory::SaveGameLoadout(inv);
 	inventory::ValidateCreatedItems(inv);
@@ -841,35 +838,41 @@ polyhook::ResultType Hook_SOCacheSubscribed(polyhook::HookHandle hook, polyhook:
 	return polyhook::ResultType::Ignored;
 }
 
-// comes after leave when player is already gone, clean up in OnClientDisconnect
 polyhook::ResultType Hook_SOCacheUnsubscribed(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto inv = polyhook::GetArgument<CCSPlayerInventory*>(params, 0);
 	inventory::Forget(inv);
 	return polyhook::ResultType::Ignored;
 }
 
-// equip slot object from GC rewrites loadout inside SOCreated / SOUpdated / SODestroyed, compare before and after
-// a listener returning Handled keeps the old item in the slot
 polyhook::ResultType Hook_SOChanged(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	static CCSPlayerInventory* s_inventory = nullptr;
-	static LoadoutSlot_t s_loadout[LOADOUT_COUNT][LOADOUT_SLOT_COUNT];
+	struct Snapshot {
+		explicit Snapshot(CCSPlayerInventory* inv) : inventory(inv) {
+			std::copy_n(&inv->m_LoadoutItems[0][0], LOADOUT_COUNT * LOADOUT_SLOT_COUNT, &loadout[0][0]);
+		}
+
+		CCSPlayerInventory* inventory;
+		LoadoutSlot_t loadout[LOADOUT_COUNT][LOADOUT_SLOT_COUNT];
+	};
+	static std::vector<Snapshot> s_snapshots;
 
 	auto inv = polyhook::GetArgument<CCSPlayerInventory*>(params, 0);
 	if (type == polyhook::CallbackType::Pre) {
-		s_inventory = inv;
-		std::memcpy(s_loadout, inv->m_LoadoutItems, sizeof(s_loadout));
+		s_snapshots.emplace_back(inv);
 		return polyhook::ResultType::Ignored;
 	}
 
-	if (s_inventory != inv)
+	if (s_snapshots.empty())
 		return polyhook::ResultType::Ignored;
-	s_inventory = nullptr;
+	const Snapshot snapshot = s_snapshots.back();
+	s_snapshots.pop_back();
+	if (snapshot.inventory != inv)
+		return polyhook::ResultType::Ignored;
 
 	auto player = inventory::GetOwner(inv);
 	bool blocked = false;
 	for (int team = 0; team < LOADOUT_COUNT; ++team) {
 		for (int slot = 0; slot < LOADOUT_SLOT_COUNT; ++slot) {
-			const LoadoutSlot_t& before = s_loadout[team][slot];
+			const LoadoutSlot_t& before = snapshot.loadout[team][slot];
 			const LoadoutSlot_t& after = inv->m_LoadoutItems[team][slot];
 			if (before.m_ItemID == after.m_ItemID && before.m_ItemDefIndex == after.m_ItemDefIndex)
 				continue;
@@ -887,7 +890,6 @@ polyhook::ResultType Hook_SOChanged(polyhook::HookHandle hook, polyhook::Paramet
 				}
 			}
 
-			// the player's pick stays the game loadout for RestoreClientLoadout, the slot keeps the old item
 			if (result >= ResultType::Handled) {
 				inv->m_LoadoutItems[team][slot] = before;
 				blocked = true;
@@ -901,7 +903,6 @@ polyhook::ResultType Hook_SOChanged(polyhook::HookHandle hook, polyhook::Paramet
 	return polyhook::ResultType::Ignored;
 }
 
-// every GiveNamedItem ends here, listener can hand an inventory item so the weapon gets its look
 polyhook::ResultType Hook_GiveNamedItem(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto player = g_PlayerManager.ToPlayer(polyhook::GetArgument<CPlayerPawnComponent*>(params, 0));
 	if (!player)
@@ -919,7 +920,6 @@ polyhook::ResultType Hook_GiveNamedItem(polyhook::HookHandle hook, polyhook::Par
 	if (!name || polyhook::GetArgument<const CEconItemView*>(params, 3))
 		return polyhook::ResultType::Ignored;
 
-	// first listener by priority returning an item id wins
 	uint64 itemId = 0;
 	if (auto listeners = g_ClientGiveNamedItemListenerManager.Get()) {
 		plg::string itemName(name);
@@ -1183,7 +1183,6 @@ Result<void> SetupHooks() {
 #if defined (CS2)
 	static Memory CCSPlayerInventory;
 	UNWRAP(CCSPlayerInventory, g_pGameConfig->GetVTable("CCSPlayerInventory"));
-	// SOID_t is 16 bytes: Win64 passes by pointer, SysV in two registers
 #if PLATFORM_WINDOWS
 	using SOCacheSubscribedFn = void(GCSDK::ISharedObjectListener::*)(const GCSDK::SOID_t*, GCSDK::CGCClientSharedObjectCache*, GCSDK::ESOCacheEvent);
 	using SOChangedFn = void(GCSDK::ISharedObjectListener::*)(const GCSDK::SOID_t*, const GCSDK::CSharedObject*, GCSDK::ESOCacheEvent);

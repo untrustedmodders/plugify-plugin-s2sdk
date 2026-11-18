@@ -28,8 +28,6 @@ enum class CSWeaponDefIndex : uint16_t;
 
 class CAttributeManager;
 
-// CEconItemAttribute and CAttributeList stay commented out in the sdk, projects keep their own copies
-
 class CEconItemAttribute {
 public:
 	virtual SchemaMetaInfoHandle_t<CSchemaClassInfo> Schema_DynamicBinding() = 0;
@@ -47,7 +45,6 @@ public:
 };
 static_assert(sizeof(CEconItemAttribute) == 0x48);
 
-// embedded in CEconItemView, whose NetworkVar_ wrappers override the notifications
 class CAttributeList {
 	DECLARE_CLASS_NOBASE(CAttributeList);
 

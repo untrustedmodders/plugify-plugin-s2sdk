@@ -205,7 +205,6 @@ std::vector<CAddress> CModule::FindInstancePointers(CAddress vtable) const
             if (!value || (value & (sizeof(uintptr_t) - 1)))
                 continue;
 
-            // most values aren't pointers, read must not fault, ~0.1 s for libserver
             uintptr_t first;
             size_t read;
             if (CMemAccessor::SafeMemRead(value, &first, sizeof(first), read) && read == sizeof(first) && first == vtable.GetPtr())
@@ -332,7 +331,6 @@ void CModule::LoopVFunctions(std::string_view vtable_name, const std::function<b
 static constexpr std::string_view class_prefix  = "class ";
 static constexpr std::string_view struct_prefix = "struct ";
 
-// msvc names start with "class " or "struct "
 static bool IsClassName(std::string_view demangled_name, std::string_view name)
 {
     if (demangled_name == name)

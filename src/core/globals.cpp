@@ -99,7 +99,6 @@ namespace globals {
 		UNWRAP(addresses::CCSPlayerController_SwitchTeam, g_pGameConfig->GetSignature("CCSPlayerController::SwitchTeam"));
 		UNWRAP(addresses::CGameRules_TerminateRound, g_pGameConfig->GetSignature("CGameRules::TerminateRound"));
 		UNWRAP(addresses::GetCSWeaponDataFromKey, g_pGameConfig->GetSignature("GetCSWeaponDataFromKey"));
-		// virtual GiveNamedItem(name) just zeroes other args and jumps to the full one
 		{
 			Memory itemServicesVTable;
 			UNWRAP(itemServicesVTable, g_pGameConfig->GetVTable("CCSPlayer_ItemServices"));
@@ -113,7 +112,6 @@ namespace globals {
 			}
 			addresses::CCSPlayer_ItemServices_GiveNamedItem = giveNamedItem.As<decltype(addresses::CCSPlayer_ItemServices_GiveNamedItem)>();
 		}
-		// ItemSystem() keeps it in a local static, take the only global pointing to it
 		{
 			Memory itemSystemVTable;
 			UNWRAP(itemSystemVTable, g_pGameConfig->GetVTable("CCStrike15ItemSystem"));
@@ -123,7 +121,6 @@ namespace globals {
 			}
 			g_ppItemSystem = ptrs.front().As<IEconItemSystem**>();
 		}
-		// static game system object in server module
 		{
 			Memory inventoryManagerVTable;
 			UNWRAP(inventoryManagerVTable, g_pGameConfig->GetVTable("CCSInventoryManager"));

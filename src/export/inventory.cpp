@@ -3,6 +3,7 @@
 #include <core/sdk/helpers.hpp>
 #include <core/sdk/entity/ccsweaponbase.h>
 #include <cstrike15/cstrike15_item_schema.h>
+#include <tier0/keyvalues.h>
 
 PLUGIFY_WARN_PUSH()
 
@@ -11,9 +12,14 @@ PLUGIFY_LINKAGE()
 #if defined (CS2)
 
 namespace {
-	// GetItemInLoadout takes an item only into its slot group (or its own slot), otherwise gives the base item
+	constexpr uint16_t kMaxStockDefinition = 256;
+
 	bool FitsLoadoutSlot(const CCStrike15ItemDefinition* definition, int loadoutSlot) {
 		int itemSlot = definition->GetDefaultLoadoutSlot();
+		if (loadoutSlot == LOADOUT_SLOT_SPRAY0 && itemSlot == LOADOUT_SLOT_FLAIR0) {
+			KeyValues* raw = definition->GetRawDefinition();
+			return raw && std::string_view(raw->GetString("item_sub_position2", "")) == "spray0";
+		}
 		for (auto [first, last] : {std::pair{LOADOUT_SLOT_SECONDARY1, LOADOUT_SLOT_SECONDARY4}, {LOADOUT_SLOT_SMG0, LOADOUT_SLOT_SMG4}, {LOADOUT_SLOT_RIFLE0, LOADOUT_SLOT_RIFLE4}}) {
 			if (itemSlot >= first && itemSlot <= last)
 				return loadoutSlot >= first && loadoutSlot <= last;
@@ -21,7 +27,6 @@ namespace {
 		return itemSlot == loadoutSlot;
 	}
 
-	// stops at the first one that fails
 	bool SetCreatedItemAttributes(int playerSlot, uint64_t itemId, std::initializer_list<std::pair<std::string_view, std::string_view>> attributes) {
 		auto inv = inventory::Get(playerSlot);
 		if (!inv)
@@ -141,9 +146,8 @@ extern "C" PLUGIN_API bool SetClientLoadoutDefinition(int playerSlot, CSTeam tea
 	if (!inv)
 		return false;
 
-	// without an item game takes only stock definitions
 	auto definition = inventory::GetItemDefinition(itemDefinition);
-	if (!definition || itemDefinition > 256 || !definition->IsBaseItem() || !FitsLoadoutSlot(definition, loadoutSlot))
+	if (!definition || itemDefinition > kMaxStockDefinition || !definition->IsBaseItem() || !FitsLoadoutSlot(definition, loadoutSlot))
 		return false;
 
 	inv->SetItemInLoadout(static_cast<int>(team), loadoutSlot, 0, itemDefinition);
@@ -207,7 +211,6 @@ extern "C" PLUGIN_API bool RestoreClientLoadout(int playerSlot) {
  * @return True if the wearables were applied, false if the player has no pawn.
  */
 extern "C" PLUGIN_API bool GiveClientDefaultWearables(int playerSlot) {
-	// the player pawn, the current one is the observer pawn while dead
 	auto controller = helpers::GetController(playerSlot);
 	auto pawn = controller ? controller->GetPlayerPawn() : nullptr;
 	if (!pawn)
@@ -258,7 +261,7 @@ extern "C" PLUGIN_API uint64_t CreateClientItem(int playerSlot, uint16_t itemDef
 	}
 
 	auto inv = inventory::Get(playerSlot);
-	if (!inv || quality < 0 || quality > 15)
+	if (!inv || quality < AE_NORMAL || quality >= AE_MAX_TYPES)
 		return 0;
 
 	return inventory::CreateItem(inv, itemDefinition, quality);
