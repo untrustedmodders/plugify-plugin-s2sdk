@@ -5,8 +5,10 @@
 #include "virtual.hpp"
 
 struct VScriptBinding {
-	void* funcaddr;
-	size_t vtable_index;
+	void* funcaddr = nullptr;
+	size_t vtable_index = static_cast<size_t>(-1);
+
+	bool IsValid() const { return funcaddr || vtable_index != static_cast<size_t>(-1); }
 };
 
 struct VScriptFunction {
@@ -29,7 +31,23 @@ namespace vscript {
 	VScriptBinding FindBinding(std::string_view className, std::string_view functionName);
 	VScriptBinding FindBinding(const char* className, const char* functionName);
 	void* FindInstance(std::string_view className);
+
+	inline bool ResolveBinding(VScriptBinding& binding, const char* className, const char* functionName) {
+		if (!binding.IsValid())
+			binding = FindBinding(className, functionName);
+		return binding.IsValid();
+	}
 }// namespace schema
+
+template<typename Ret>
+Ret VScriptMissingResult() {
+	if constexpr (std::is_reference_v<Ret>) {
+		static std::remove_cvref_t<Ret> value{};
+		return value;
+	} else {
+		return Ret();
+	}
+}
 
 template<
 	typename ThisClass,
@@ -40,7 +58,9 @@ template<
 class VScriptMemberFunction {
 public:
 	Ret operator()(Args... args) {
-		static VScriptBinding binding = vscript::FindBinding(ThisClass::m_className, FunctionName);
+		static VScriptBinding binding;
+		if (!vscript::ResolveBinding(binding, ThisClass::m_className, FunctionName))
+			return VScriptMissingResult<Ret>();
 		void* instance = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(this) - MemberOffset());
 		void* addr = binding.funcaddr ? binding.funcaddr : (*static_cast<void***>(instance))[binding.vtable_index];
 		return CallMember<Ret, Args...>(addr, instance, std::forward<Args>(args)...);
@@ -55,7 +75,9 @@ template<
 class VScriptGlobalFunction {
 public:
 	Ret operator()(Args... args) {
-		static VScriptBinding binding = vscript::FindBinding(ThisClass::m_className, FunctionName);
+		static VScriptBinding binding;
+		if (!vscript::ResolveBinding(binding, ThisClass::m_className, FunctionName))
+			return VScriptMissingResult<Ret>();
 		using Func = Ret(*)(Args...);
 		Func func = reinterpret_cast<Func>(binding.funcaddr);
 		return func(std::forward<Args>(args)...);
