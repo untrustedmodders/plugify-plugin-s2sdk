@@ -28,6 +28,7 @@ namespace inventory {
 	void Forget(CCSPlayerInventory* inventory);
 
 	void DropOwnCache(CCSPlayerInventory* inventory);
+	void Shutdown();
 
 	uint64 CreateItem(CCSPlayerInventory* inventory, uint16 itemDefinition, int quality);
 	bool RemoveItem(CCSPlayerInventory* inventory, uint64 itemId);

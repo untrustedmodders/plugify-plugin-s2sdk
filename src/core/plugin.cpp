@@ -522,12 +522,12 @@ polyhook::ResultType Hook_FireOutputInternal(polyhook::HookHandle hook, polyhook
 
 #if defined (CS2)
 polyhook::ResultType Hook_TerminateRound(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	//auto gameRules = polyhook::GetArgument<CCSGameRules*>(params, 0);
+	auto gameRules = polyhook::GetArgument<CBaseGameRules*>(params, 0);
 	auto delay = polyhook::GetArgument<float>(params, 1);
 	auto reason = static_cast<CRoundEndReason>(polyhook::GetArgument<uint32_t>(params, 2));
 
-	if (g_pCoreConfig->FixFlashAlertMessage) {
-		g_pGameRules->m_bGameRestart = false;
+	if (g_pCoreConfig->FixFlashAlertMessage && gameRules) {
+		gameRules->m_bGameRestart = false;
 	}
 
 	g_RoundTerminatedListenerManager(delay, reason);
@@ -1322,6 +1322,9 @@ plg::PluginResult Source2SDK::OnPluginStart() {
 }
 
 plg::PluginResult Source2SDK::OnPluginEnd() {
+#if defined (CS2)
+	inventory::Shutdown();
+#endif
 	g_HookManager.UnhookAll();
 	g_PlayerManager.OnSteamAPIDeactivated();
 #if defined (CS2)

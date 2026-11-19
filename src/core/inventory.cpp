@@ -314,6 +314,24 @@ void inventory::Forget(CCSPlayerInventory* inventory) {
 	s_gameLoadouts.erase(inventory);
 }
 
+void inventory::Shutdown() {
+	if (g_pInventoryManager) {
+		for (const auto& entry : g_pInventoryManager->m_pInventories) {
+			auto inventory = static_cast<CCSPlayerInventory*>(entry.pInventory);
+			RestoreGameLoadout(inventory);
+			if (s_ownCaches.contains(inventory)) {
+				DropOwnCache(inventory);
+			} else {
+				Forget(inventory);
+			}
+		}
+	}
+
+	s_ownCaches.clear();
+	s_createdItems.clear();
+	s_gameLoadouts.clear();
+}
+
 uint64 inventory::CreateItem(CCSPlayerInventory* inventory, uint16 itemDefinition, int quality) {
 	auto [vtable, interfaceVTable] = GetItemVTables();
 	if (!GetItemDefinition(itemDefinition) || !vtable || !interfaceVTable)
