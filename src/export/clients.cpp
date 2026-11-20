@@ -1685,11 +1685,14 @@ extern "C" PLUGIN_API void* GetClientPawn(int playerSlot) {
 }
 
 /**
- * @brief Processes the target string to determine if one user can target another.
+ * @brief Finds the players matching a target string.
  *
- * @param caller The index of the player's slot making the target request.
- * @param target The target string specifying the player or players to be targeted.
- * @return A vector where the result of the targeting operation will be stored.
+ * Accepts @me, @all, @t, @ct, @spec, @random, @randomt, @randomct, #slot, &accountid, $steamid64
+ * or an exact player name. Immunity and other permissions are not checked.
+ *
+ * @param caller The index of the player's slot making the request, used for @me.
+ * @param target The target string.
+ * @return The slots of the matching players, empty if none match.
  */
 extern "C" PLUGIN_API plg::vector<int> ProcessTargetString(int caller, const plg::string& target) {
 	return g_PlayerManager.TargetPlayerString(caller, target);

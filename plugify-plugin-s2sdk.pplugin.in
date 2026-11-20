@@ -12432,25 +12432,25 @@
     {
       "name": "ProcessTargetString",
       "group": "Clients",
-      "description": "Processes the target string to determine if one user can target another.",
+      "description": "Finds the players matching a target string. Accepts @me, @all, @t, @ct, @spec, @random, @randomt, @randomct, #slot, &accountid, $steamid64 or an exact player name. Immunity and other permissions are not checked.",
       "funcName": "ProcessTargetString",
       "paramTypes": [
         {
           "name": "caller",
           "type": "int32",
           "ref": false,
-          "description": "The index of the player's slot making the target request."
+          "description": "The index of the player's slot making the request, used for @me."
         },
         {
           "name": "target",
           "type": "string",
           "ref": false,
-          "description": "The target string specifying the player or players to be targeted."
+          "description": "The target string."
         }
       ],
       "retType": {
         "type": "int32[]",
-        "description": "A vector where the result of the targeting operation will be stored."
+        "description": "The slots of the matching players, empty if none match."
       }
     },
     {
