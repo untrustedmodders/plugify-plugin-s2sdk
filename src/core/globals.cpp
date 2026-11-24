@@ -3,7 +3,6 @@
 #include <core/sdk/utils.hpp>
 #include <core/sdk/virtual.hpp>
 #include <engine/igameeventsystem.h>
-#include <IEngineSound.h>
 #include <igameevents.h>
 #include <igamesystemfactory.h>
 
@@ -37,6 +36,7 @@ namespace globals {
 		UNWRAP(g_pNetworkServerService, utils::QueryInterface("engine2", NETWORKSERVERSERVICE_INTERFACE_VERSION));
 		UNWRAP(g_pNetworkMessages, utils::QueryInterface("networksystem", NETWORKMESSAGES_INTERFACE_VERSION));
 		UNWRAP(g_pNetworkSystem, utils::QueryInterface("networksystem", NETWORKSYSTEM_INTERFACE_VERSION));
+		UNWRAP(g_pFlattenedSerializers, utils::QueryInterface("networksystem", FLATTENEDSERIALIZERS_INTERFACE_VERSION));
 		UNWRAP(g_pScriptManager, utils::QueryInterface("vscript", VSCRIPT_INTERFACE_VERSION));
 		UNWRAP(g_pNetworkStringTableServer, utils::QueryInterface("engine2", INTERFACENAME_NETWORKSTRINGTABLESERVER));
 
@@ -98,6 +98,37 @@ namespace globals {
 		UNWRAP(addresses::CCSPlayerController_SwitchTeam, g_pGameConfig->GetSignature("CCSPlayerController::SwitchTeam"));
 		UNWRAP(addresses::CGameRules_TerminateRound, g_pGameConfig->GetSignature("CGameRules::TerminateRound"));
 		UNWRAP(addresses::GetCSWeaponDataFromKey, g_pGameConfig->GetSignature("GetCSWeaponDataFromKey"));
+		{
+			Memory itemServicesVTable;
+			UNWRAP(itemServicesVTable, g_pGameConfig->GetVTable("CCSPlayer_ItemServices"));
+			auto index = g_pGameConfig->GetOffset("CCSPlayer_ItemServices::GiveNamedItem");
+			if (!index) {
+				return MakeError(std::move(index.error()));
+			}
+			auto giveNamedItem = CModule::FollowFirstBranch(itemServicesVTable.As<void**>()[*index]);
+			if (!giveNamedItem) {
+				return MakeError("Could not follow CCSPlayer_ItemServices::GiveNamedItem to the full function");
+			}
+			addresses::CCSPlayer_ItemServices_GiveNamedItem = giveNamedItem.As<decltype(addresses::CCSPlayer_ItemServices_GiveNamedItem)>();
+		}
+		{
+			Memory itemSystemVTable;
+			UNWRAP(itemSystemVTable, g_pGameConfig->GetVTable("CCStrike15ItemSystem"));
+			auto ptrs = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindInstancePointers(itemSystemVTable);
+			if (ptrs.size() != 1) {
+				return MakeError("Expected one pointer to CCStrike15ItemSystem, found {}", ptrs.size());
+			}
+			g_ppItemSystem = ptrs.front().As<IEconItemSystem**>();
+		}
+		{
+			Memory inventoryManagerVTable;
+			UNWRAP(inventoryManagerVTable, g_pGameConfig->GetVTable("CCSInventoryManager"));
+			auto instances = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindStaticInstances(inventoryManagerVTable);
+			if (instances.size() != 1) {
+				return MakeError("Expected one CCSInventoryManager, found {}", instances.size());
+			}
+			g_pInventoryManager = instances.front().As<CCSInventoryManager*>();
+		}
 #endif
 
 		ConVarManager::Init();
@@ -118,65 +149,65 @@ namespace globals {
 namespace entities {
 	CEntityInstance* CreateEntityByName(const char* className) {
 		auto handle = CEntities{}.CreateByClassname(className);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindEntityByName(CEntityInstance* startEntity, const char* name) {
 		ParamScope params(startEntity);
 		auto handle = CEntities{}.FindByName(params[0], name);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindByNameNearest(const char* name, const Vector& origin, float maxRadius) {
 		auto handle = CEntities{}.FindByNameNearest(name, origin, maxRadius);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindByNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
 		ParamScope params(startEntity);
 		auto handle = CEntities{}.FindByNameWithin(params[0], name, origin, maxRadius);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindEntityByClassName(CEntityInstance* startEntity, const char* name) {
 		ParamScope params(startEntity);
 		auto handle = CEntities{}.FindByClassname(params[0], name);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindEntityByClassNameNearest(const char* name, const Vector& origin, float maxRadius) {
 		auto handle = CEntities{}.FindByClassnameNearest(name, origin, maxRadius);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindEntityByClassNameWithin(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
 		ParamScope params(startEntity);
 		auto handle = CEntities{}.FindByClassnameWithin(params[0], name, origin, maxRadius);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name) {
 		ParamScope params(startEntity);
 		auto handle = CEntities{}.FindByModel(params[0], name);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindByModel(CEntityInstance* startEntity, const char* name, const Vector& origin, float maxRadius) {
 		ParamScope params(startEntity);
 		auto handle = CEntities{}.FindByModelWithin(params[0], name, origin, maxRadius);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindByTarget(CEntityInstance* startEntity, const char* name) {
 		ParamScope params(startEntity);
 		auto handle = CEntities{}.FindByTarget(params[0], name);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 
 	CEntityInstance* FindInSphere(CEntityInstance* startEntity, const Vector& origin, float maxRadius) {
 		ParamScope params(startEntity);
 		auto handle = CEntities{}.FindInSphere(params[0], origin, maxRadius);
-		return reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle));
+		return helpers::GetScriptEntity(handle);
 	}
 }// namespace entities
 

@@ -20,6 +20,18 @@ namespace helpers {
 		return entity;
 	}
 
+	inline bool IsDerivedFrom(CSchemaClassInfo* cls, std::string_view className) {
+		for (; cls; cls = cls->GetParent()) {
+			if (cls->m_pszName == className)
+				return true;
+		}
+		return false;
+	}
+
+	inline bool IsDerivedFrom(CEntityInstance* entity, std::string_view className) {
+		return IsDerivedFrom(entity->Schema_DynamicBinding().Get(), className);
+	}
+
 	// Resolves an entity handle and calls `fn` with the entity, or returns `fallback` if the handle is invalid.
 	template<typename R, typename F>
 	R WithEntity(
@@ -311,7 +323,7 @@ public:
 
 private:
 	void AddEntity(CEntityInstance* entity) {
-		if (!entity) {
+		if (!entity || !g_pScriptVM) {
 			m_instances.emplace_back(nullptr);
 			return;
 		}
@@ -328,7 +340,14 @@ private:
 };
 
 namespace helpers {
+	inline CEntityInstance* GetScriptEntity(HSCRIPT handle) {
+		return g_pScriptVM && handle ? static_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(handle)) : nullptr;
+	}
+
 	inline int TakeDamage(CBaseEntity* entity, CBaseEntity* inflictor, CBaseEntity* attacker, const Vector& force, const Vector& hitPos, float damage, int damageTypes) {
+		if (!g_pScriptVM)
+			return 0;
+
 		ParamScope params(inflictor, attacker);
 		HSCRIPT info = CTakeDamage{}.CreateDamageInfo(params[0], params[1], force, hitPos, damage, damageTypes);
 		void* infoPtr = g_pScriptVM->GetInstanceValue(info);

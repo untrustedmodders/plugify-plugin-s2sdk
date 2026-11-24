@@ -12,7 +12,7 @@ bool CMemAccessor::MemCopy(CAddress dest, CAddress src, size_t size)
 	return true;
 }
 
-bool CMemAccessor::SafeMemCopy(CAddress dest, CAddress src, size_t size, size_t& written) noexcept
+bool CMemAccessor::SafeMemWrite(CAddress dest, CAddress src, size_t size, size_t& written) noexcept
 {
 	written = 0;
 	return WriteProcessMemory(GetCurrentProcess(), dest, src, (SIZE_T)size, (PSIZE_T)&written);

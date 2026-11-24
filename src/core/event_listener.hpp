@@ -4,18 +4,18 @@
 
 using GameEventListenerCallback = void (*)(IGameEvent* event);
 
-class CGameEventListener;
+class GameEventListener;
 
-extern std::vector<CGameEventListener*> g_vecEventListeners;
+extern std::vector<GameEventListener*> g_vecEventListeners;
 
-class CGameEventListener : public IGameEventListener2 {
+class GameEventListener : public IGameEventListener2 {
 public:
-	CGameEventListener(GameEventListenerCallback callback, std::string_view eventName) :
+	GameEventListener(GameEventListenerCallback callback, std::string_view eventName) :
 		m_callback(callback), m_eventName(eventName) {
 		g_vecEventListeners.emplace_back(this);
 	}
-	~CGameEventListener() override = default;
-	NONCOPYABLE(CGameEventListener)
+	~GameEventListener() override = default;
+	NONCOPYABLE(GameEventListener)
 
 	// FireEvent is called by EventManager if event just occured
 	// KeyValue memory will be freed by manager if not needed anymore
@@ -35,5 +35,5 @@ void UnregisterEventListeners();
 
 #define GAME_EVENT_F(_event)                                          \
 	void _event##_callback(IGameEvent*);                              \
-	CGameEventListener _event##_listener(_event##_callback, #_event); \
+	GameEventListener _event##_listener(_event##_callback, #_event); \
 	void _event##_callback(IGameEvent* event)

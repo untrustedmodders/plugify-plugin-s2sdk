@@ -49,6 +49,8 @@ public:
 		// The game leaves out the keys of a trace that hit nothing or started outside a solid
 		outHit = false;
 		outStartSolid = false;
+		if (!g_pScriptVM)
+			return false;
 
 		ParamScope params(ent);
 
@@ -122,6 +124,8 @@ public:
 		// The game leaves out the keys of a trace that hit nothing or started outside a solid
 		outHit = false;
 		outStartSolid = false;
+		if (!g_pScriptVM)
+			return false;
 
 		ParamScope params(ignore);
 
@@ -190,6 +194,8 @@ public:
 		// The game leaves out the keys of a trace that hit nothing or started outside a solid
 		outHit = false;
 		outStartSolid = false;
+		if (!g_pScriptVM)
+			return false;
 
 		ParamScope params(ignore);
 		// Create input table

@@ -164,7 +164,7 @@ namespace vscript {
 			}
 		}
 		plg::print(
-			LS_ERROR,
+			scriptClassMap.empty() ? LS_WARNING : LS_ERROR,
 			"vscript::FindBinding(): '{}' was not found in '{}'!\n",
 			functionName,
 			className

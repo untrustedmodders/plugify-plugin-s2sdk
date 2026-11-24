@@ -22,6 +22,7 @@
 #include "cbaseentity.h"
 #include "cbasemodelentity.h"
 #include "ccollisionproperty.h"
+#include "ceconitemview.h"
 
 enum class gear_slot_t : uint32_t {
 	GEAR_SLOT_INVALID = 0xffffffff,
@@ -140,21 +141,6 @@ enum class CSWeaponDefIndex : uint16_t {
 	KnifeWidowmaker = 523,
 	KnifeSkeleton = 525,
 	KnifeKukri = 526
-};
-
-class CEconItemView {
-public:
-	DECLARE_SCHEMA_CLASS_INLINE(CEconItemView);
-
-	SCHEMA_FIELD(CSWeaponDefIndex, m_iItemDefinitionIndex)
-	SCHEMA_FIELD(bool, m_bInitialized)
-};
-
-class CAttributeContainer {
-public:
-	DECLARE_SCHEMA_CLASS_INLINE(CAttributeContainer);
-
-	SCHEMA_FIELD(CEconItemView, m_Item)
 };
 
 class CBaseAnimGraph : public CBaseModelEntity {

@@ -21,7 +21,6 @@
 
 #include "cbaseplayercontroller.h"
 #include "ccitadelplayerpawn.h"
-#include <sharedInterface.h>
 
 class CCitadelPlayerController : public CBasePlayerController {
 public:

@@ -4758,10 +4758,10 @@ declare module ":s2sdk" {
   export function GetClientPawn(playerSlot: number): bigint;
 
   /**
-   * Processes the target string to determine if one user can target another.
-   * @param caller - The index of the player's slot making the target request.
-   * @param target - The target string specifying the player or players to be targeted.
-   * @returns A vector where the result of the targeting operation will be stored.
+   * Finds the players matching a target string. Accepts @me, @all, @t, @ct, @spec, @random, @randomt, @randomct, #slot, &accountid, $steamid64 or an exact player name. Immunity and other permissions are not checked.
+   * @param caller - The index of the player's slot making the request, used for @me.
+   * @param target - The target string.
+   * @returns The slots of the matching players, empty if none match.
    */
   export function ProcessTargetString(caller: number, target: string): number[];
 

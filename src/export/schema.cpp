@@ -52,6 +52,20 @@ extern "C" PLUGIN_API bool IsSchemaFieldNetworked(const plg::string& className, 
 }
 
 /**
+ * @brief Get the size of a schema field.
+ *
+ * This function retrieves the size of the specified member of the given class in bytes.
+ * For a fixed array it is the size of the whole array.
+ *
+ * @param className The name of the class.
+ * @param memberName The name of the member whose size is to be retrieved.
+ * @return The size of the member in bytes, or 0 if the member is not found.
+ */
+extern "C" PLUGIN_API int32_t GetSchemaFieldSize(const plg::string& className, const plg::string& memberName) {
+	return static_cast<int32_t>(schema::FindOffset(className, memberName).size);
+}
+
+/**
  * @brief Get the size of a schema class.
  *
  * This function retrieves the size of the specified class in bytes.

@@ -1,3 +1,5 @@
+#include <bit>
+
 #include <core/sdk/cvars.hpp>
 #include <core/sdk/entity/cgamerules.h>
 #include <core/sdk/entity/cteam.h>
@@ -22,6 +24,7 @@
 #include "event_listener.hpp"
 #include "event_manager.hpp"
 #include "hook_manager.hpp"
+#include "inventory.hpp"
 #include "listeners.hpp"
 #include "menu/menu_manager.hpp"
 #include "multi_addon_manager.hpp"
@@ -286,9 +289,15 @@ polyhook::ResultType Hook_ClientActive(polyhook::HookHandle hook, polyhook::Para
 }
 
 void OnClientDisconnect(CPlayerSlot slot, ENetworkDisconnectionReason reason) {
+#if defined (CS2)
+	auto inv = inventory::Get(slot);
+#endif
 	g_PlayerManager.OnClientDisconnect(slot, reason);
 	g_PanoramaVoteHandler.RemovePlayerFromVote(slot);
 	g_MenuManager.OnClientDisconnect(slot);
+#if defined (CS2)
+	inventory::DropOwnCache(inv);
+#endif
 }
 
 polyhook::ResultType Hook_PerformDisconnection(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
@@ -513,12 +522,12 @@ polyhook::ResultType Hook_FireOutputInternal(polyhook::HookHandle hook, polyhook
 
 #if defined (CS2)
 polyhook::ResultType Hook_TerminateRound(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	//auto gameRules = polyhook::GetArgument<CCSGameRules*>(params, 0);
+	auto gameRules = polyhook::GetArgument<CBaseGameRules*>(params, 0);
 	auto delay = polyhook::GetArgument<float>(params, 1);
 	auto reason = static_cast<CRoundEndReason>(polyhook::GetArgument<uint32_t>(params, 2));
 
-	if (g_pCoreConfig->FixFlashAlertMessage) {
-		g_pGameRules->m_bGameRestart = false;
+	if (g_pCoreConfig->FixFlashAlertMessage && gameRules) {
+		gameRules->m_bGameRestart = false;
 	}
 
 	g_RoundTerminatedListenerManager(delay, reason);
@@ -815,6 +824,122 @@ polyhook::ResultType Hook_EntitySystemSpawn(polyhook::HookHandle hook, polyhook:
 	return polyhook::ResultType::Ignored;
 }
 
+#if defined (CS2)
+polyhook::ResultType Hook_SOCacheSubscribed(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	auto inv = polyhook::GetArgument<CCSPlayerInventory*>(params, 0);
+	inventory::DropOwnCache(inv);
+	inventory::SaveGameLoadout(inv);
+	inventory::ValidateCreatedItems(inv);
+
+	auto player = inventory::GetOwner(inv);
+	if (player) {
+		g_ClientInventoryLoadedListenerManager(player->GetPlayerSlot());
+	}
+	return polyhook::ResultType::Ignored;
+}
+
+polyhook::ResultType Hook_SOCacheUnsubscribed(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	auto inv = polyhook::GetArgument<CCSPlayerInventory*>(params, 0);
+	inventory::Forget(inv);
+	return polyhook::ResultType::Ignored;
+}
+
+polyhook::ResultType Hook_SOChanged(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	struct Snapshot {
+		explicit Snapshot(CCSPlayerInventory* inv) : inventory(inv) {
+			std::copy_n(&inv->m_LoadoutItems[0][0], LOADOUT_COUNT * LOADOUT_SLOT_COUNT, &loadout[0][0]);
+		}
+
+		CCSPlayerInventory* inventory;
+		LoadoutSlot_t loadout[LOADOUT_COUNT][LOADOUT_SLOT_COUNT];
+	};
+	static std::vector<Snapshot> s_snapshots;
+
+	auto inv = polyhook::GetArgument<CCSPlayerInventory*>(params, 0);
+	if (type == polyhook::CallbackType::Pre) {
+		s_snapshots.emplace_back(inv);
+		return polyhook::ResultType::Ignored;
+	}
+
+	if (s_snapshots.empty())
+		return polyhook::ResultType::Ignored;
+	const Snapshot snapshot = s_snapshots.back();
+	s_snapshots.pop_back();
+	if (snapshot.inventory != inv)
+		return polyhook::ResultType::Ignored;
+
+	auto player = inventory::GetOwner(inv);
+	bool blocked = false;
+	for (int team = 0; team < LOADOUT_COUNT; ++team) {
+		for (int slot = 0; slot < LOADOUT_SLOT_COUNT; ++slot) {
+			const LoadoutSlot_t& before = snapshot.loadout[team][slot];
+			const LoadoutSlot_t& after = inv->m_LoadoutItems[team][slot];
+			if (before.m_ItemID == after.m_ItemID && before.m_ItemDefIndex == after.m_ItemDefIndex)
+				continue;
+
+			inventory::SaveGameLoadoutSlot(inv, team, slot);
+			if (!player)
+				continue;
+
+			ResultType result = ResultType::Continue;
+			if (auto listeners = g_ClientLoadoutChangedListenerManager.Get()) {
+				for (const auto& listener : listeners->handlers) {
+					result = std::max(result, listener(player->GetPlayerSlot(), static_cast<CSTeam>(team), static_cast<loadout_slot_t>(slot)));
+					if (result == ResultType::Stop)
+						break;
+				}
+			}
+
+			if (result >= ResultType::Handled) {
+				inv->m_LoadoutItems[team][slot] = before;
+				blocked = true;
+			}
+		}
+	}
+
+	if (blocked) {
+		inv->SendInventoryUpdateEvent();
+	}
+	return polyhook::ResultType::Ignored;
+}
+
+polyhook::ResultType Hook_GiveNamedItem(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
+	auto player = g_PlayerManager.ToPlayer(polyhook::GetArgument<CPlayerPawnComponent*>(params, 0));
+	if (!player)
+		return polyhook::ResultType::Ignored;
+
+	int playerSlot = player->GetPlayerSlot();
+	if (type == polyhook::CallbackType::Post) {
+		if (auto entity = static_cast<CBaseEntity*>(polyhook::GetReturnPointer(ret))) {
+			g_ClientGiveNamedItemPostListenerManager(playerSlot, entity->GetRefEHandle().ToInt());
+		}
+		return polyhook::ResultType::Ignored;
+	}
+
+	auto name = polyhook::GetArgument<const char*>(params, 1);
+	if (!name || polyhook::GetArgument<const CEconItemView*>(params, 3))
+		return polyhook::ResultType::Ignored;
+
+	uint64 itemId = 0;
+	if (auto listeners = g_ClientGiveNamedItemListenerManager.Get()) {
+		plg::string itemName(name);
+		for (const auto& listener : listeners->handlers) {
+			uint64 id = listener(playerSlot, itemName);
+			if (!itemId) {
+				itemId = id;
+			}
+		}
+	}
+
+	auto item = itemId ? inventory::GetItemView(playerSlot, itemId) : nullptr;
+	if (!item)
+		return polyhook::ResultType::Ignored;
+
+	polyhook::SetArgument<CEconItemView*>(params, 3, item);
+	return polyhook::ResultType::Handled;
+}
+#endif
+
 polyhook::ResultType Hook_OnEntityDeleted(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
 	auto entity = polyhook::GetArgument<CBaseEntity*>(params, 1);
 	std::string_view name(entity->GetClassname());
@@ -1055,6 +1180,26 @@ Result<void> SetupHooks() {
 	using TerminateRoundFn = void(*)(CGameRules*, float, uint32_t, uint64_t, uint32_t);
 	CHECK(g_HookManager.AddHookDetourFunc<TerminateRoundFn>("CGameRules::TerminateRound", Hook_TerminateRound, {Pre}));
 
+#if defined (CS2)
+	static Memory CCSPlayerInventory;
+	UNWRAP(CCSPlayerInventory, g_pGameConfig->GetVTable("CCSPlayerInventory"));
+#if PLATFORM_WINDOWS
+	using SOCacheSubscribedFn = void(GCSDK::ISharedObjectListener::*)(const GCSDK::SOID_t*, GCSDK::CGCClientSharedObjectCache*, GCSDK::ESOCacheEvent);
+	using SOChangedFn = void(GCSDK::ISharedObjectListener::*)(const GCSDK::SOID_t*, const GCSDK::CSharedObject*, GCSDK::ESOCacheEvent);
+#else
+	using SOCacheSubscribedFn = void(GCSDK::ISharedObjectListener::*)(uint64, uint64, GCSDK::CGCClientSharedObjectCache*, GCSDK::ESOCacheEvent);
+	using SOChangedFn = void(GCSDK::ISharedObjectListener::*)(uint64, uint64, const GCSDK::CSharedObject*, GCSDK::ESOCacheEvent);
+#endif
+	CHECK(g_HookManager.AddHookVFuncFunc<SOCacheSubscribedFn>(STR(GCSDK::ISharedObjectListener::SOCacheSubscribed), std::bit_cast<SOCacheSubscribedFn>(&GCSDK::ISharedObjectListener::SOCacheSubscribed), CCSPlayerInventory, Hook_SOCacheSubscribed, {Post}));
+	CHECK(g_HookManager.AddHookVFuncFunc<SOCacheSubscribedFn>(STR(GCSDK::ISharedObjectListener::SOCacheUnsubscribed), std::bit_cast<SOCacheSubscribedFn>(&GCSDK::ISharedObjectListener::SOCacheUnsubscribed), CCSPlayerInventory, Hook_SOCacheUnsubscribed, {Pre}));
+	CHECK(g_HookManager.AddHookVFuncFunc<SOChangedFn>(STR(GCSDK::ISharedObjectListener::SOCreated), std::bit_cast<SOChangedFn>(&GCSDK::ISharedObjectListener::SOCreated), CCSPlayerInventory, Hook_SOChanged, {Pre, Post}));
+	CHECK(g_HookManager.AddHookVFuncFunc<SOChangedFn>(STR(GCSDK::ISharedObjectListener::SOUpdated), std::bit_cast<SOChangedFn>(&GCSDK::ISharedObjectListener::SOUpdated), CCSPlayerInventory, Hook_SOChanged, {Pre, Post}));
+	CHECK(g_HookManager.AddHookVFuncFunc<SOChangedFn>(STR(GCSDK::ISharedObjectListener::SODestroyed), std::bit_cast<SOChangedFn>(&GCSDK::ISharedObjectListener::SODestroyed), CCSPlayerInventory, Hook_SOChanged, {Pre, Post}));
+
+	using GiveNamedItemFn = CBaseEntity* (*)(CCSPlayer_ItemServices*, const char*, int, const CEconItemView*, bool, const Vector*);
+	CHECK(g_HookManager.AddHookDetourFunc<GiveNamedItemFn>("CCSPlayer_ItemServices::GiveNamedItem", reinterpret_cast<uintptr_t>(addresses::CCSPlayer_ItemServices_GiveNamedItem), Hook_GiveNamedItem, {Pre, Post}));
+#endif
+
 	using ScriptGetAddonFn = uint64(*)();
 	CHECK(g_HookManager.AddHookDetourFunc<ScriptGetAddonFn>("ScriptGetAddon", Hook_ScriptGetAddon, {Pre}));
 
@@ -1177,6 +1322,9 @@ plg::PluginResult Source2SDK::OnPluginStart() {
 }
 
 plg::PluginResult Source2SDK::OnPluginEnd() {
+#if defined (CS2)
+	inventory::Shutdown();
+#endif
 	g_HookManager.UnhookAll();
 	g_PlayerManager.OnSteamAPIDeactivated();
 #if defined (CS2)

@@ -802,7 +802,7 @@ extern "C" PLUGIN_API int GetEntityOwner(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
 	auto owner = entity->GetOwner();
-	auto instance = reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(owner));
+	auto instance = helpers::GetScriptEntity(owner);
 	return instance != nullptr ? instance->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
 
@@ -838,7 +838,7 @@ extern "C" PLUGIN_API int GetEntityParent(int entityHandle) {
 	auto* entity = helpers::GetEntity(entityHandle);
 	if (!entity) return {};
 	auto parent = entity->GetMoveParent();
-	auto instance = reinterpret_cast<CEntityInstance*>(g_pScriptVM->GetInstanceValue(parent));
+	auto instance = helpers::GetScriptEntity(parent);
 	return instance != nullptr ? instance->GetRefEHandle().ToInt() : INVALID_EHANDLE_INDEX;
 }
 

@@ -6,6 +6,9 @@
 
 #include "module.hpp"
 #include "scan.hpp"
+#include "memaccessor.hpp"
+
+#include <Zydis/Zydis.h>
 
 #ifdef PLATFORM_WINDOWS
 #    include <format>
@@ -185,6 +188,79 @@ std::vector<CAddress> CModule::FindPtrs(CAddress ptr) const
     return results;
 }
 
+std::vector<CAddress> CModule::FindInstancePointers(CAddress vtable) const
+{
+    std::vector<CAddress> results{};
+
+    for (const auto& segment : m_segments)
+    {
+        if (!(segment.flags & SegFlags::W))
+            continue;
+
+        const auto* values = segment.address.As<const uintptr_t*>();
+        const size_t count = segment.size / sizeof(uintptr_t);
+        for (size_t i = 0; i < count; ++i)
+        {
+            const uintptr_t value = values[i];
+            if (!value || (value & (sizeof(uintptr_t) - 1)))
+                continue;
+
+            uintptr_t first;
+            size_t read;
+            if (CMemAccessor::SafeMemRead(value, &first, sizeof(first), read) && read == sizeof(first) && first == vtable.GetPtr())
+                results.emplace_back(segment.address + i * sizeof(uintptr_t));
+        }
+    }
+
+    return results;
+}
+
+std::vector<CAddress> CModule::FindStaticInstances(CAddress vtable) const
+{
+    std::vector<CAddress> results{};
+
+    for (const auto& segment : m_segments)
+    {
+        if (!(segment.flags & SegFlags::W))
+            continue;
+
+        for (const auto& tmp : scan::FindPtrs(segment.address, segment.size, vtable))
+        {
+            results.emplace_back(tmp + segment.address);
+        }
+    }
+
+    return results;
+}
+
+CAddress CModule::FollowFirstBranch(CAddress function, size_t maxLength)
+{
+    ZydisDecoder decoder{};
+    if (ZYAN_FAILED(ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64)))
+        return {};
+
+    ZydisDecodedInstruction instr{};
+    ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT]{};
+    for (CAddress ip = function; ip < function + maxLength; ip += instr.length)
+    {
+        if (ZYAN_FAILED(ZydisDecoderDecodeFull(&decoder, ip, ZYDIS_MAX_INSTRUCTION_LENGTH, &instr, operands)))
+            return {};
+
+        if ((instr.mnemonic == ZYDIS_MNEMONIC_CALL || instr.mnemonic == ZYDIS_MNEMONIC_JMP) && (instr.attributes & ZYDIS_ATTRIB_IS_RELATIVE))
+        {
+            ZyanU64 target = 0;
+            if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(&instr, &operands[0], ip, &target)))
+                return target;
+            return {};
+        }
+
+        if (instr.mnemonic == ZYDIS_MNEMONIC_RET)
+            return {};
+    }
+
+    return {};
+}
+
 CAddress CModule::FindInterface(std::string_view name) const
 {
 	if (!m_createInterface)
@@ -255,6 +331,22 @@ void CModule::LoopVFunctions(std::string_view vtable_name, const std::function<b
 static constexpr std::string_view class_prefix  = "class ";
 static constexpr std::string_view struct_prefix = "struct ";
 
+static bool IsClassName(std::string_view demangled_name, std::string_view name)
+{
+    if (demangled_name == name)
+        return true;
+
+#ifdef PLATFORM_WINDOWS
+    for (auto prefix : {class_prefix, struct_prefix})
+    {
+        if (demangled_name.starts_with(prefix) && demangled_name.substr(prefix.size()) == name)
+            return true;
+    }
+#endif
+
+    return false;
+}
+
 CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name) const
 {
 	{
@@ -313,6 +405,19 @@ CAddress CModule::GetVirtualTableByName(std::string_view name, bool is_raw_name)
     return address;
 }
 
+std::vector<RunTimeVTableInfo> CModule::GetVirtualTablesByName(std::string_view name) const
+{
+    std::vector<RunTimeVTableInfo> result{};
+
+    for (const auto& vtable : m_vtables)
+    {
+        if (IsClassName(vtable->demangled_name, name))
+            result.emplace_back(vtable->demangled_name, vtable->vtable_address, vtable->offset);
+    }
+
+    return result;
+}
+
 std::vector<RunTimeVTableInfo> CModule::FindVtablePartial(std::string_view vtable_name) const
 {
     std::vector<RunTimeVTableInfo> result{};
@@ -361,24 +466,8 @@ CAddress CModule::GetTypeInfoFromName(std::string_view name) const
 {
     for (const auto& vtable : m_vtables)
     {
-        std::string_view demangled_name = vtable->demangled_name;
-
-        if (demangled_name == name)
+        if (IsClassName(vtable->demangled_name, name))
             return vtable->type_info;
-
-#ifdef PLATFORM_WINDOWS
-        if (demangled_name.starts_with(class_prefix))
-        {
-            if (demangled_name.substr(class_prefix.size()) == name)
-                return vtable->type_info;
-        }
-
-        if (demangled_name.starts_with(struct_prefix))
-        {
-            if (demangled_name.substr(struct_prefix.size()) == name)
-                return vtable->type_info;
-        }
-#endif
     }
 
     return {};

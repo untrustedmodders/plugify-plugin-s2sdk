@@ -30,7 +30,7 @@ public:
 	 * @param written A reference to the variable that will hold the number of bytes successfully written.
 	 * @return True if the memory copy succeeds, false otherwise.
 	 */
-	static bool SafeMemCopy(CAddress  dest, CAddress  src, size_t size, size_t& written) noexcept;
+	static bool SafeMemWrite(CAddress  dest, CAddress  src, size_t size, size_t& written) noexcept;
 
 	/**
 	 * @brief Defines a memory read routine that will not throw exceptions, and can handle potential

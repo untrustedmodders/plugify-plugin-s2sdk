@@ -172,6 +172,10 @@ public:
     [[nodiscard]] std::vector<CAddress> FindPtrs(CAddress ptr) const;
 
 	[[nodiscard]] CAddress              FindInterface(std::string_view name) const;
+	[[nodiscard]] std::vector<CAddress> FindInstancePointers(CAddress vtable) const;
+	[[nodiscard]] std::vector<CAddress> FindStaticInstances(CAddress vtable) const;
+
+	[[nodiscard]] static CAddress FollowFirstBranch(CAddress function, size_t maxLength = 0x40);
 
 	[[nodiscard]] std::vector<CAddress> GetVFunctionsFromVTable(std::string_view vtableName) const;
 	void LoopVFunctions(std::string_view vtable_name, const std::function<bool(CAddress)>& callback) const;
@@ -180,6 +184,7 @@ public:
     [[nodiscard]] CAddress              GetFunctionByName(std::string_view proc_name) const;
     [[nodiscard]] CAddress              GetTypeInfoFromName(std::string_view name) const;
 
+	[[nodiscard]] std::vector<RunTimeVTableInfo>  GetVirtualTablesByName(std::string_view name) const;
 	[[nodiscard]] std::vector<RunTimeVTableInfo>  FindVtablePartial(std::string_view vtable_name) const;
     [[nodiscard]] bool                            IsPointerDerivedFrom(void* ptr, std::string_view vtable_name) const;
     [[nodiscard]] std::vector<CAddress>           IntersectFunctionReferences(std::vector<std::span<const ReferenceEntry>>& reference_sets) const;
