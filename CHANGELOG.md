@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.5.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.5.0...v3.5.1) (2026-11-24)
+
+
+### Bug Fixes
+
+* allocate glove attributes zeroed instead of constructing CNetworkVarChainer ([ed64b9f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ed64b9fc1cd7d5cc38bd8e01b82eeece6622ade2))
+
 ## [3.5.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.3...v3.5.0) (2026-11-24)
 
 
