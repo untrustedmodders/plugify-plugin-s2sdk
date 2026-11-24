@@ -218,11 +218,10 @@ namespace {
 		auto& storage = reinterpret_cast<AttributeStorage&>(attributes);
 		storage.Purge();
 
-		auto elements = count ? static_cast<CEconItemAttribute*>(MemAlloc_Alloc(count * sizeof(CEconItemAttribute))) : nullptr;
+		auto elements = count ? static_cast<CEconItemAttribute*>(MemAlloc_CallocFunc(count, sizeof(CEconItemAttribute))) : nullptr;
 		for (int i = 0; i < count; ++i) {
 			auto& element = elements[i];
 			*reinterpret_cast<void**>(&element) = vtable;
-			new (&element.__m_pChainEntity) CNetworkVarChainer{};
 			element.m_iAttributeDefinitionIndex = paint[i];
 			element.m_flValue = element.m_flInitialValue = values[i];
 			element.m_nRefundableCurrency = 0;
