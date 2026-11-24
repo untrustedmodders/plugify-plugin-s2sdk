@@ -604,14 +604,24 @@ polyhook::ResultType Hook_SwitchToLoop(polyhook::HookHandle hook, polyhook::Para
 }
 
 polyhook::ResultType Hook_CreateFakeClient(polyhook::HookHandle hook, polyhook::ParametersHandle params, int count, polyhook::ReturnHandle ret, polyhook::CallbackType type) {
-	// const char* netname -> CPlayerSlot
+#if PLATFORM_WINDOWS
+	// MSVC x64 passes this, caller-owned return storage, then netname.
+	auto name = polyhook::GetArgument<const char*>(params, 2);
+#else
 	auto name = polyhook::GetArgument<const char*>(params, 1);
+#endif
 
 	plg::print(LS_DETAILED, "[CreateFakeClient] = {}\n", name);
 
 	ENetworkDisconnectionReason reason = g_PlayerManager.OnClientConnect(name, g_pNetworkSystem->GetLocalAdr().ToString(true), 0);
 	if (reason != NETWORK_DISCONNECT_INVALID) {
+#if PLATFORM_WINDOWS
+		auto slot = polyhook::GetArgument<CPlayerSlot*>(params, 1);
+		*slot = INVALID_PLAYER_SLOT;
+		polyhook::SetReturn<CPlayerSlot*>(ret, slot);
+#else
 		polyhook::SetReturn<int>(ret, INVALID_PLAYER_SLOT_INDEX);
+#endif
 		return polyhook::ResultType::Supercede;
 	}
 
@@ -1101,7 +1111,13 @@ Result<void> SetupHooks() {
 	CHECK(g_HookManager.AddHookVTableFunc<PostEventAbstract>(STR(IGameEventSystem::PostEventAbstract), &IGameEventSystem::PostEventAbstract, g_pGameEventSystem, Hook_PostEvent, {Pre, Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(INetworkMessages::SerializeAbstract), &INetworkMessages::SerializeAbstract, g_pNetworkMessages, Hook_Serialize, {Pre}));
 
+#if PLATFORM_WINDOWS
+	// The cast describes the hook's physical signature; it is never called as a member pointer.
+	using CreateFakeClientAbi = CPlayerSlot*(IVEngineServer2::*)(CPlayerSlot*, const char*);
+	CHECK(g_HookManager.AddHookVTableFunc(STR(IVEngineServer2::CreateFakeClient), reinterpret_cast<CreateFakeClientAbi>(&IVEngineServer2::CreateFakeClient), g_pEngineServer, Hook_CreateFakeClient, {Pre}));
+#else
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IVEngineServer2::CreateFakeClient), &IVEngineServer2::CreateFakeClient, g_pEngineServer, Hook_CreateFakeClient, {Pre}));
+#endif
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::OnClientConnected), &IServerGameClients::OnClientConnected, g_pSource2GameClients, Hook_OnClientConnected, {Post}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::CanHLTVClientConnect), &IServerGameClients::CanHLTVClientConnect, g_pSource2GameClients, Hook_CanHLTVClientConnect, {Pre}));
 	CHECK(g_HookManager.AddHookVTableFunc(STR(IServerGameClients::ClientCommand), &IServerGameClients::ClientCommand, g_pSource2GameClients, Hook_ClientCommand, {Pre}));
