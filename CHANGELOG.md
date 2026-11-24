@@ -1,5 +1,38 @@
 # Changelog
 
+## [3.5.0](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.3...v3.5.0) (2026-11-24)
+
+
+### Features
+
+* add CModule::GetVirtualTablesByName ([dbc565b](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/dbc565bdadc1dfcc1f80a91272337427d77b08ce))
+* add GetSchemaFieldSize export ([a7d150f](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a7d150fdc50e7e68edf8e3ff2e28082e5497f97c))
+* add GiveClientDefaultWearables export ([a82d613](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/a82d613967caa1a57e9fd5e89d0b1d238ab4861f))
+* add inventory api ([6d93d81](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6d93d81ffbbc5eb8db3b93f35f0a523d2ac1d00a))
+* add loadout slot lookup, inventory update event and loadout change blocking ([ea801cc](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/ea801cc11460781979199aad1854b473beac5e51))
+* create own SO cache when GC sends no inventory ([bf5c1b8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/bf5c1b805503de74142186eaba0a418685ef7adb))
+
+
+### Bug Fixes
+
+* check gpGlobals before validating player slots ([98d8459](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/98d8459b6b5686bd1bef60167c6ed0e305de37fa))
+* crash on reload related to freed decorated names ([9d17a61](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9d17a615d65e4e3e3b7e92dcda477a319be0109e))
+* do not notify non-entity schema classes without a chain ([55eeec8](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/55eeec88af50aee1d1fbd85c61c049db528f342f))
+* drop the extra addon reconnect on join and map change ([1465d72](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/1465d720e4bd947169292b4d3afe38fc3857b1f9))
+* **gamedata:** disambiguate windows remove item signature ([fa72bff](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fa72bff4a36f247297d31f27567be0393cce7b95))
+* guard vscript calls while the script vm is not set ([f26cba9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f26cba9260dc377e7f8d1a2e3571f9deec58a204))
+* inventory loadout hook re-entrancy, schema map lookups and review cleanups ([d13a537](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/d13a537d9d6d68987a303f3fcbb114f3b6c1e1d5))
+* member calls on MSVC ([8c7322a](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/8c7322a9cd793f7321372577e4dac655995230bc))
+* notify CEconItemView fields through its NetworkVar wrapper ([9d8fc39](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/9d8fc39bdfe5b77635fbba9cb3839c15cb25a85a))
+* pass template arguments to CallMember in vscript bindings ([3dab993](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/3dab9934c356bdb112892786e475515c10d3fd60))
+* refactor member and virtual call ([04623f9](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/04623f9fa356a1717fa7838d60692123c1b81c6c))
+* remove call macro ([0cbd133](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/0cbd133aa250cf1001455d3129779bb95016c473))
+* restore inventories on unload and take game rules from terminate round args ([239eccb](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/239eccb83fe15e901a0825d79d7bc977573f3546))
+* retry missing vscript bindings instead of caching them ([872bc0e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/872bc0e760c975edc21c6d1d39d12e72596e98e3))
+* unmount addons by their mounted path and reconnect once to apply overriding addon files ([f50c098](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/f50c09800bc331816d74fd95e2e4b5bfea289586))
+* update sdk ([214e10e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/214e10e5504e2fc1ade40486d309933dc5489ec6))
+* update sourcesdk for the ISource2Server vtable change ([fb14616](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/fb14616ee8696f5ed05d73722da3597eb08f94f4))
+
 ## [3.4.3](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.4.2...v3.4.3) (2026-11-12)
 
 
