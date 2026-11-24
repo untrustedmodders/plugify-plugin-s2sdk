@@ -22,7 +22,6 @@
 #include "cbaseplayercontroller.h"
 #include "ccsplayerpawn.h"
 #include "ccsteam.h"
-#include <sharedInterface.h>
 
 class CCSPlayerController : public CBasePlayerController {
 public:

@@ -3,7 +3,6 @@
 #include <core/sdk/utils.hpp>
 #include <core/sdk/virtual.hpp>
 #include <engine/igameeventsystem.h>
-#include <IEngineSound.h>
 #include <igameevents.h>
 #include <igamesystemfactory.h>
 

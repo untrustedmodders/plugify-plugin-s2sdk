@@ -956,7 +956,7 @@ void MultiAddonManager::OnGameFrame() {
 
 void MultiAddonManager::OnPostEvent(INetworkMessageInternal* message, CNetMessage* data, uint64_t* clients) {
 	if (s2_block_disconnect_messages.Get() && message->GetNetMessageInfo()->m_MessageId == GE_Source1LegacyGameEvent) {
-		auto msg = data->As<CMsgSource1LegacyGameEvent_t>();
+		auto msg = data->As<Source1LegacyGameEvent_t>();
 
 		static int disconnectId = g_pGameEventManager->LookupEventId("player_disconnect");
 
