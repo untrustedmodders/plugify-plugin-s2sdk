@@ -6,7 +6,6 @@
 
 #include "module.hpp"
 #include "scan.hpp"
-#include "memaccessor.hpp"
 
 #include <Zydis/Zydis.h>
 
@@ -188,33 +187,6 @@ std::vector<CAddress> CModule::FindPtrs(CAddress ptr) const
     return results;
 }
 
-std::vector<CAddress> CModule::FindInstancePointers(CAddress vtable) const
-{
-    std::vector<CAddress> results{};
-
-    for (const auto& segment : m_segments)
-    {
-        if (!(segment.flags & SegFlags::W))
-            continue;
-
-        const auto* values = segment.address.As<const uintptr_t*>();
-        const size_t count = segment.size / sizeof(uintptr_t);
-        for (size_t i = 0; i < count; ++i)
-        {
-            const uintptr_t value = values[i];
-            if (!value || (value & (sizeof(uintptr_t) - 1)))
-                continue;
-
-            uintptr_t first;
-            size_t read;
-            if (CMemAccessor::SafeMemRead(value, &first, sizeof(first), read) && read == sizeof(first) && first == vtable.GetPtr())
-                results.emplace_back(segment.address + i * sizeof(uintptr_t));
-        }
-    }
-
-    return results;
-}
-
 std::vector<CAddress> CModule::FindStaticInstances(CAddress vtable) const
 {
     std::vector<CAddress> results{};
@@ -256,6 +228,56 @@ CAddress CModule::FollowFirstBranch(CAddress function, size_t maxLength)
 
         if (instr.mnemonic == ZYDIS_MNEMONIC_RET)
             return {};
+    }
+
+    return {};
+}
+
+// first mov [rip+global], reg64 after ip, within the same function
+static CAddress FindGlobalStore(const ZydisDecoder& decoder, CAddress ip, size_t maxLength)
+{
+    ZydisDecodedInstruction instr{};
+    ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT]{};
+    for (const CAddress end = ip + maxLength; ip < end; ip += instr.length)
+    {
+        if (ZYAN_FAILED(ZydisDecoderDecodeFull(&decoder, ip, ZYDIS_MAX_INSTRUCTION_LENGTH, &instr, operands)))
+            return {};
+
+        if (instr.mnemonic == ZYDIS_MNEMONIC_RET || instr.mnemonic == ZYDIS_MNEMONIC_INT3)
+            return {};
+
+        if (instr.mnemonic == ZYDIS_MNEMONIC_MOV && instr.operand_width == 64 &&
+            operands[0].type == ZYDIS_OPERAND_TYPE_MEMORY && operands[0].mem.base == ZYDIS_REGISTER_RIP &&
+            operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER)
+            return ip + instr.length + instr.raw.disp.value;
+    }
+
+    return {};
+}
+
+CAddress CModule::FindLazySingleton(CAddress vtable) const
+{
+    ZydisDecoder decoder{};
+    if (ZYAN_FAILED(ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64)))
+        return {};
+
+    // every inlined getter constructs the object (lea reg, [rip+vtable]) and then
+    // publishes it (mov [rip+global], reg), so the construction sites vote for the global
+    plg::flat_hash_map<uintptr_t, size_t> votes{};
+    size_t total = 0;
+    for (const auto& ref : GetReferenceRange(vtable))
+    {
+        if (auto global = FindGlobalStore(decoder, ref.source_ip, 0x100))
+        {
+            ++votes[global];
+            ++total;
+        }
+    }
+
+    for (const auto& [global, count] : votes)
+    {
+        if (count * 2 > total)
+            return global;
     }
 
     return {};

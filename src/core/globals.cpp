@@ -112,15 +112,6 @@ namespace globals {
 			addresses::CCSPlayer_ItemServices_GiveNamedItem = giveNamedItem.As<decltype(addresses::CCSPlayer_ItemServices_GiveNamedItem)>();
 		}
 		{
-			Memory itemSystemVTable;
-			UNWRAP(itemSystemVTable, g_pGameConfig->GetVTable("CCStrike15ItemSystem"));
-			auto ptrs = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindInstancePointers(itemSystemVTable);
-			if (ptrs.size() != 1) {
-				return MakeError("Expected one pointer to CCStrike15ItemSystem, found {}", ptrs.size());
-			}
-			g_ppItemSystem = ptrs.front().As<IEconItemSystem**>();
-		}
-		{
 			Memory inventoryManagerVTable;
 			UNWRAP(inventoryManagerVTable, g_pGameConfig->GetVTable("CCSInventoryManager"));
 			auto instances = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindStaticInstances(inventoryManagerVTable);
@@ -128,6 +119,17 @@ namespace globals {
 				return MakeError("Expected one CCSInventoryManager, found {}", instances.size());
 			}
 			g_pInventoryManager = instances.front().As<CCSInventoryManager*>();
+		}
+		{
+			// the system is created lazily, possibly after plugins load (Metamod),
+			// so take the global that every inlined ItemSystem() fills
+			Memory itemSystemVTable;
+			UNWRAP(itemSystemVTable, g_pGameConfig->GetVTable("CCStrike15ItemSystem"));
+			auto itemSystem = g_GameConfigManager.GetModuleProvider().GetModule("server")->FindLazySingleton(itemSystemVTable);
+			if (!itemSystem) {
+				return MakeError("Could not find the CCStrike15ItemSystem global");
+			}
+			g_ppItemSystem = itemSystem.As<IEconItemSystem**>();
 		}
 #endif
 

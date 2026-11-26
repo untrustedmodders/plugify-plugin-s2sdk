@@ -172,8 +172,8 @@ public:
     [[nodiscard]] std::vector<CAddress> FindPtrs(CAddress ptr) const;
 
 	[[nodiscard]] CAddress              FindInterface(std::string_view name) const;
-	[[nodiscard]] std::vector<CAddress> FindInstancePointers(CAddress vtable) const;
 	[[nodiscard]] std::vector<CAddress> FindStaticInstances(CAddress vtable) const;
+	[[nodiscard]] CAddress              FindLazySingleton(CAddress vtable) const;
 
 	[[nodiscard]] static CAddress FollowFirstBranch(CAddress function, size_t maxLength = 0x40);
 
