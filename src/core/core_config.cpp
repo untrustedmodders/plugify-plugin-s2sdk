@@ -1,4 +1,5 @@
 #include "core_config.hpp"
+#include "localization.hpp"
 #include <core/sdk/entity/globaltypes.h>
 #include <core/sdk/utils.hpp>
 #include <configs/configs.hpp>
@@ -92,6 +93,9 @@ Result<bool> CoreConfig::Initialize() {
 	}
 
 	ServerLanguage = config.GetString("ServerLanguage", "en");
+	if (auto code = lang::GetCode(ServerLanguage); !code.empty()) {
+		ServerLanguage = code;
+	}
 	FollowCS2ServerGuidelines = config.GetBool("FollowCS2ServerGuidelines", true);
 	FixFlashAlertMessage = config.GetBool("FixFlashAlertMessage", true);
 	FixServerListPlayer = config.GetBool("FixServerListPlayer", true);

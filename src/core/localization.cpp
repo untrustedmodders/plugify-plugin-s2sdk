@@ -6,6 +6,39 @@
 #include <translations/translations.hpp>
 
 namespace {
+	// `cl_language` reports the Steam language name; translation files are keyed by ISO code.
+	const plg::flat_hash_map<std::string_view, std::string_view, plg::case_insensitive_hash, plg::case_insensitive_equal> s_languageCodes = {
+		{"english", "en"},
+		{"german", "de"},
+		{"french", "fr"},
+		{"italian", "it"},
+		{"koreana", "ko"},
+		{"spanish", "es"},
+		{"schinese", "zh-CN"},
+		{"tchinese", "zh-TW"},
+		{"russian", "ru"},
+		{"thai", "th"},
+		{"japanese", "ja"},
+		{"portuguese", "pt"},
+		{"polish", "pl"},
+		{"danish", "da"},
+		{"dutch", "nl"},
+		{"finnish", "fi"},
+		{"norwegian", "no"},
+		{"swedish", "sv"},
+		{"hungarian", "hu"},
+		{"czech", "cs"},
+		{"romanian", "ro"},
+		{"turkish", "tr"},
+		{"brazilian", "pt-BR"},
+		{"bulgarian", "bg"},
+		{"greek", "el"},
+		{"ukrainian", "uk"},
+		{"latam", "es-419"},
+		{"vietnamese", "vi"},
+		{"indonesian", "id"},
+	};
+
 	std::string_view ServerLanguage() {
 		return g_pCoreConfig != nullptr ? g_pCoreConfig->ServerLanguage : "en";
 	}
@@ -19,6 +52,11 @@ namespace {
 	}
 }// namespace
 
+std::string_view lang::GetCode(std::string_view name) {
+	auto it = s_languageCodes.find(name);
+	return it != s_languageCodes.end() ? it->second : std::string_view{};
+}
+
 Result<void> lang::Initialize(const plg::vector<plg::string>& paths) {
 	if (!__translations_LoadTranslation) {
 		return {};
@@ -26,6 +64,10 @@ Result<void> lang::Initialize(const plg::vector<plg::string>& paths) {
 
 	if (auto error = translations::LoadTranslation(paths); !error.empty()) {
 		return MakeError("Reading error: {}", error);
+	}
+
+	if (__translations_SetDefaultLanguage) {
+		translations::SetDefaultLanguage(plg::string(ServerLanguage()));
 	}
 	return {};
 }
@@ -35,15 +77,7 @@ std::optional<plg::string> lang::Get(CPlayerSlot slot, std::string_view key) {
 		return std::nullopt;
 	}
 
-	plg::string name(key);
-	plg::string client = ClientLanguage(slot);
-	plg::string server = ServerLanguage();
-
-	plg::string text = translations::Translate(client, name);
-	if (text.empty() && client != server) {
-		text = translations::Translate(server, name);
-	}
-	return text;
+	return translations::Translate(plg::string(ClientLanguage(slot)), plg::string(key));
 }
 
 std::optional<plg::string> lang::Get(CPlayerSlot slot, std::string_view key, std::format_args args) {

@@ -33,6 +33,18 @@ namespace translations {
     return __translations_ReloadTransalations();
   }
 
+  using _SetDefaultLanguage = void (*)(const plg::string&);
+}
+extern "C" PLUGIN_API translations::_SetDefaultLanguage __translations_SetDefaultLanguage;
+namespace translations {
+  /**
+   * @brief Sets the language used when a key has no value for the requested language.
+   * @param lang (string): The default language code. An empty string disables the fallback.
+   */
+  inline void SetDefaultLanguage(const plg::string& lang) {
+    return __translations_SetDefaultLanguage(lang);
+  }
+
   using _HasTranslation = bool (*)(const plg::string&);
 }
 extern "C" PLUGIN_API translations::_HasTranslation __translations_HasTranslation;
@@ -68,7 +80,7 @@ namespace translations {
    * @brief Translates a key into the specified language.
    * @param lang (string): The target language code.
    * @param key (string): The translation key.
-   * @return string: The translated string, or an empty string if not found.
+   * @return string: The translated string. Falls back to the default language when the language has no value; the key itself if neither is found.
    */
   inline plg::string Translate(const plg::string& lang, const plg::string& key) {
     return __translations_Translate(lang, key);
@@ -83,7 +95,7 @@ namespace translations {
    * @param lang (string): The target language code.
    * @param key (string): The translation key.
    * @param args (any[]): Format arguments to substitute into the translated string.
-   * @return string: The formatted translated string, or an empty string if not found.
+   * @return string: The formatted translated string. Falls back to the default language when the language has no value; the key itself if neither is found.
    */
   inline plg::string TranslateFormat(const plg::string& lang, const plg::string& key, const plg::vector<plg::any>& args) {
     return __translations_TranslateFormat(lang, key, args);

@@ -21,7 +21,13 @@
   ],
   // Block modifications of protected schema fields and items made by CreateClientItem (Valve's server rules)
   "FollowCS2ServerGuidelines": true,
-  // The server language
+  // The server language: a language code or its Steam name (the name is case-insensitive).
+  // Used when a translation has no value for the client language.
+  // Supported: en (english), de (german), fr (french), it (italian), ko (koreana), es (spanish),
+  // zh-CN (schinese), zh-TW (tchinese), ru (russian), th (thai), ja (japanese), pt (portuguese),
+  // pl (polish), da (danish), nl (dutch), fi (finnish), no (norwegian), sv (swedish),
+  // hu (hungarian), cs (czech), ro (romanian), tr (turkish), pt-BR (brazilian), bg (bulgarian),
+  // el (greek), uk (ukrainian), es-419 (latam), vi (vietnamese), id (indonesian)
   "ServerLanguage": "en",
   // Fixed flashing of the alert message (ONLY CS2)
   "FixFlashAlertMessage": true,
