@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.5.2](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.5.1...v3.5.2) (2026-11-26)
+
+
+### Bug Fixes
+
+* find the item system global instead of its instance ([e8a563e](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/e8a563e48cd26c744c89388d0197fd5f87fc2edf))
+* **hooks:** match the Windows CreateFakeClient ABI ([6d3efc1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6d3efc19d23a5884e4b3fb416c324ab18f965720))
+* set server language as default for translations ([6be0923](https://github.com/untrustedmodders/plugify-plugin-s2sdk/commit/6be0923041b9868491662c1e161d150d28c2af85))
+
 ## [3.5.1](https://github.com/untrustedmodders/plugify-plugin-s2sdk/compare/v3.5.0...v3.5.1) (2026-11-24)
 
 
